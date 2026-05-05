@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { useAuthStore } from "@/store/auth";
 import { api } from "@/lib/api";
@@ -19,6 +19,12 @@ export default function DashboardPage() {
     if (!token) { router.push("/login"); return; }
     api.get<Case[]>("/cases", token).then(setCases).finally(() => setLoading(false));
   }, [token, router]);
+
+  const handleDelete = useCallback(async (id: string) => {
+    if (!token) return;
+    await api.delete(`/cases/${id}`, token);
+    setCases((prev) => prev.filter((c) => c.id !== id));
+  }, [token]);
 
   return (
     <div className="flex h-screen bg-background">
@@ -50,7 +56,12 @@ export default function DashboardPage() {
           ) : (
             <div className="grid gap-3">
               {cases.map((c) => (
-                <CaseCard key={c.id} caseData={c} onClick={() => router.push(`/dashboard/case/${c.id}`)} />
+                <CaseCard
+                  key={c.id}
+                  caseData={c}
+                  onClick={() => router.push(`/dashboard/case/${c.id}`)}
+                  onDelete={() => handleDelete(c.id)}
+                />
               ))}
             </div>
           )}
