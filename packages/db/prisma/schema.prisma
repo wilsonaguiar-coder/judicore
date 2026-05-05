@@ -1,0 +1,91 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum LegalArea {
+  TRIBUTARIO
+  PREVIDENCIARIO
+  ADMINISTRATIVO
+  CRIMINAL
+  AMBIENTAL
+  TRABALHISTA
+  CIVIL
+  OUTRO
+}
+
+enum DocumentType {
+  DESPACHO
+  DECISAO
+  SENTENCA
+}
+
+enum UserRole {
+  MAGISTRADO
+  ASSESSOR
+  SERVIDOR
+  ADMIN
+}
+
+model User {
+  id           String     @id @default(cuid())
+  email        String     @unique
+  name         String
+  passwordHash String     @map("password_hash")
+  role         UserRole   @default(SERVIDOR)
+  defaultArea  LegalArea? @map("default_area")
+  createdAt    DateTime   @default(now()) @map("created_at")
+  updatedAt    DateTime   @updatedAt @map("updated_at")
+
+  cases Case[]
+
+  @@map("users")
+}
+
+model Case {
+  id          String    @id @default(cuid())
+  userId      String    @map("user_id")
+  title       String
+  description String
+  area        LegalArea
+  processNum  String?   @map("process_num")
+  createdAt   DateTime  @default(now()) @map("created_at")
+  updatedAt   DateTime  @updatedAt @map("updated_at")
+
+  user      User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  searches  Search[]
+  documents Document[]
+
+  @@map("cases")
+}
+
+model Search {
+  id          String    @id @default(cuid())
+  caseId      String    @map("case_id")
+  query       String
+  area        LegalArea
+  resultsJson Json      @map("results_json") // jurisprudências retornadas pelo ES
+  createdAt   DateTime  @default(now()) @map("created_at")
+
+  case Case @relation(fields: [caseId], references: [id], onDelete: Cascade)
+
+  @@map("searches")
+}
+
+model Document {
+  id           String       @id @default(cuid())
+  caseId       String       @map("case_id")
+  type         DocumentType
+  content      String       @db.Text
+  sourcesJson  Json         @map("sources_json") // citações usadas
+  modelUsed    String       @map("model_used")
+  createdAt    DateTime     @default(now()) @map("created_at")
+
+  case Case @relation(fields: [caseId], references: [id], onDelete: Cascade)
+
+  @@map("documents")
+}
