@@ -28,7 +28,7 @@ export async function searchRoutes(app: FastifyInstance) {
     // 1. Elasticsearch busca — SEM IA
     const result = await searchJurisprudencia({
       query: body.data.query,
-      area: body.data.area ?? caseData.area as any,
+      area: body.data.area,
       tribunais: body.data.tribunais,
       size: body.data.size,
     });
