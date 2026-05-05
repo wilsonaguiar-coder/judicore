@@ -49,7 +49,6 @@ async function fetchStfPage(
   const url = `${STF_BASE}/api/search/search?${params}`;
 
   const res = await fetch(url, {
-    // @ts-expect-error — undici dispatcher não está nos tipos do RequestInit
     dispatcher: tlsAgent,
     headers: {
       "User-Agent": "Judicore/1.0 (pesquisa jurídica institucional)",

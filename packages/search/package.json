@@ -20,7 +20,8 @@
     "dev": "tsc --watch"
   },
   "dependencies": {
-    "@elastic/elasticsearch": "^8.13.0"
+    "@elastic/elasticsearch": "^8.13.0",
+    "undici": "^6.0.0"
   },
   "devDependencies": {
     "typescript": "^5.4.0",
