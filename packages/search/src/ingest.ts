@@ -2,21 +2,23 @@ import { getElasticsearchClient } from "./client.js";
 import { JURISPRUDENCIA_INDEX } from "./indices.js";
 import type { Jurisprudencia } from "./types.js";
 
-export async function indexJurisprudencia(doc: Omit<Jurisprudencia, "id" | "score">): Promise<string> {
+export async function indexJurisprudencia(doc: Omit<Jurisprudencia, "score">): Promise<string> {
   const client = getElasticsearchClient();
+  const { id, ...body } = doc;
   const response = await client.index({
     index: JURISPRUDENCIA_INDEX,
-    document: doc,
+    ...(id ? { id } : {}),
+    document: body,
   });
   return response._id;
 }
 
 export async function bulkIndexJurisprudencia(
-  docs: Omit<Jurisprudencia, "id" | "score">[]
+  docs: Omit<Jurisprudencia, "score">[]
 ): Promise<void> {
   const client = getElasticsearchClient();
-  const operations = docs.flatMap((doc) => [
-    { index: { _index: JURISPRUDENCIA_INDEX } },
+  const operations = docs.flatMap(({ id, ...doc }) => [
+    { index: { _index: JURISPRUDENCIA_INDEX, ...(id ? { _id: id } : {}) } },
     doc,
   ]);
   const response = await client.bulk({ operations });

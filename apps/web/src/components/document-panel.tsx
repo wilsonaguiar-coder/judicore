@@ -166,7 +166,7 @@ export function DocumentPanel({ caseId, token, jurisprudencias, activeDoc, activ
           )}
           {jurisprudencias.length === 0
             ? "Nenhuma decisão selecionada"
-            : `${jurisprudencias.length} decisão${jurisprudencias.length > 1 ? "ões" : ""} selecionada${jurisprudencias.length > 1 ? "s" : ""}`}
+            : `${jurisprudencias.length} ${jurisprudencias.length > 1 ? "decisões selecionadas" : "decisão selecionada"}`}
         </div>
 
         {error && <p className="text-xs text-destructive">{error}</p>}
