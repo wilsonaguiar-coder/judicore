@@ -4,5 +4,5 @@ export { searchJurisprudencia } from "./search.js";
 export { indexJurisprudencia, bulkIndexJurisprudencia } from "./ingest.js";
 export { runIndexer } from "./indexer.js";
 export type { Jurisprudencia, SearchParams, SearchResult, LegalArea } from "./types.js";
-export { datajudAdapter, stjAdapter, stfAdapter } from "./indexers/index.js";
+export { datajudAdapter, stjAdapter, stfAdapter, lexmlAdapter } from "./indexers/index.js";
 export type { JurisprudenciaAdapter, IndexerOptions, IndexerResult } from "./indexers/types.js";

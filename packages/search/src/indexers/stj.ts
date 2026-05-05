@@ -25,15 +25,41 @@ function delay(ms: number) {
   return new Promise((r) => setTimeout(r, ms));
 }
 
+async function fetchInteiroTeor(numReg: string, dtPublicacao: string): Promise<string> {
+  try {
+    const url = `${SCON_BASE}/GetInteiroTeorDoAcordao?num_registro=${numReg}&dt_publicacao=${dtPublicacao}`;
+    const res = await fetch(url, {
+      dispatcher: tlsAgent as any,
+      headers: { "User-Agent": "Judicore/1.0", Accept: "text/html" },
+    });
+    if (!res.ok) return "";
+    const html = await res.text();
+    // Remove tags HTML, CDATA e normaliza espaços
+    return html
+      .replace(/<style[\s\S]*?<\/style>/gi, "")
+      .replace(/<script[\s\S]*?<\/script>/gi, "")
+      .replace(/<[^>]+>/g, " ")
+      .replace(/&nbsp;/g, " ")
+      .replace(/&amp;/g, "&")
+      .replace(/&lt;/g, "<")
+      .replace(/&gt;/g, ">")
+      .replace(/\s{2,}/g, " ")
+      .trim()
+      .slice(0, 50000); // ES limita text fields grandes
+  } catch {
+    return "";
+  }
+}
+
 async function fetchSconPage(
   query: string,
   start: number
 ): Promise<{ items: Jurisprudencia[]; total: number }> {
   const params = new URLSearchParams({
-    b: "ACOR",          // base: acórdãos
+    b: "ACOR",
     p: "true",
     t: "V",
-    l: "20",            // 20 por página
+    l: "20",
     i: String(start),
     operador: "e",
     pesquisa_tipo: "livre",
@@ -54,8 +80,6 @@ async function fetchSconPage(
   if (!res.ok) throw new Error(`SCON STJ HTTP ${res.status}`);
 
   const text = await res.text();
-
-  // Parse XML simples sem dependência externa
   const items = parseSTJXml(text);
   const totalMatch = text.match(/<registros>(\d+)<\/registros>/);
   const total = totalMatch ? parseInt(totalMatch[1] ?? "0", 10) : 0;
@@ -115,7 +139,7 @@ export const stjAdapter: JurisprudenciaAdapter = {
 
   async *fetch(query: string, options: IndexerOptions) {
     const maxPages = options.maxPages ?? 3;
-    const delayMs = options.delayMs ?? 1500; // STJ sem rate limit documentado — conservador
+    const delayMs = options.delayMs ?? 1500;
 
     let start = 1;
 
@@ -124,7 +148,17 @@ export const stjAdapter: JurisprudenciaAdapter = {
         const { items, total } = await fetchSconPage(query, start);
         if (items.length === 0) break;
 
-        yield items;
+        // Busca inteiro teor para cada decisão — enriquece o campo conteudoIntegral
+        const enriched = await Promise.all(
+          items.map(async (item) => {
+            const numReg = item.id.replace("stj-", "");
+            const dtPublicacao = item.dataJulgamento.replace(/-/g, "/");
+            const conteudoIntegral = await fetchInteiroTeor(numReg, dtPublicacao);
+            return conteudoIntegral ? { ...item, conteudoIntegral } : item;
+          })
+        );
+
+        yield enriched;
 
         start += 20;
         if (start > total) break;
