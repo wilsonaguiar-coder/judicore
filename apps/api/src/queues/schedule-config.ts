@@ -102,7 +102,7 @@ export function buildJobData(
   return {
     area,
     sources,
-    queries: QUERIES_BY_AREA[area],
+    queries: QUERIES_BY_AREA[area] ?? [area.toLowerCase()],
     maxPages,
     triggeredBy,
   };

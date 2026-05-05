@@ -1,6 +1,6 @@
 import "dotenv/config";
 import { getIndexingQueue } from "../queues/queue.js";
-import { SCHEDULE_CONFIG } from "../queues/schedule-config.js";
+import { buildJobData } from "../queues/schedule-config.js";
 import type { IndexingSource } from "../queues/types.js";
 import type { LegalArea } from "@judicore/search";
 
@@ -36,10 +36,10 @@ console.log(`Fontes: ${sources.join(", ")}`);
 console.log(`Páginas por job: ${maxPages}\n`);
 
 for (const area of areas) {
-  const queries = SCHEDULE_CONFIG.find((c) => c.area === area)?.queries ?? [area.toLowerCase()];
+  const jobData = buildJobData(area, sources, maxPages, "manual");
   const job = await queue.add(
     `manual-${area}-${Date.now()}`,
-    { area, sources, queries, maxPages, triggeredBy: "manual" },
+    jobData,
     { priority: 2 }
   );
   console.log(`  ✓ Job adicionado: ${area} (id: ${job.id})`);

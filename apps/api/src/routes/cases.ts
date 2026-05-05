@@ -31,7 +31,13 @@ export async function casesRoutes(app: FastifyInstance) {
     if (!body.success) return reply.status(400).send({ error: body.error.flatten() });
 
     const newCase = await prisma.case.create({
-      data: { ...body.data, userId: sub },
+      data: {
+        title: body.data.title,
+        description: body.data.description,
+        area: body.data.area,
+        processNum: body.data.processNum ?? null,
+        userId: sub,
+      },
     });
     return reply.status(201).send(newCase);
   });
