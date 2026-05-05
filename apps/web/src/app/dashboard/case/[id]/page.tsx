@@ -50,7 +50,7 @@ export default function CasePage() {
             <SearchPanel
               caseId={id}
               token={token!}
-              defaultArea={caseData?.area}
+              {...(caseData?.area ? { defaultArea: caseData.area } : {})}
               onResults={setResults}
             />
           </div>
