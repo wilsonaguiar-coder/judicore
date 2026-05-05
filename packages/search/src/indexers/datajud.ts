@@ -5,10 +5,9 @@ import type { JurisprudenciaAdapter, IndexerOptions } from "./types.js";
 const DATAJUD_API_KEY = "cDZHYzlZa0JadVREZDJCendQbXY6SkJlTzNjLV9TRENyQk1RdnFKZGRQdw==";
 const BASE_URL = "https://api-publica.datajud.cnj.jus.br";
 
-// Alias dos tribunais no DataJud
+// Alias dos tribunais no DataJud (STF não está disponível na API pública)
 const TRIBUNAL_ALIAS: Record<string, string> = {
   STJ:  "api_publica_stj",
-  STF:  "api_publica_stf",
   TRF1: "api_publica_trf1",
   TRF2: "api_publica_trf2",
   TRF3: "api_publica_trf3",

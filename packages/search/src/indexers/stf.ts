@@ -1,8 +1,12 @@
+import { Agent } from "undici";
 import type { Jurisprudencia, LegalArea } from "../types.js";
 import type { JurisprudenciaAdapter, IndexerOptions } from "./types.js";
 
 // Portal de Jurisprudência do STF — sem API formal, usa endpoint interno do portal
 const STF_BASE = "https://jurisprudencia.stf.jus.br";
+
+// O STF usa certificado ICP-Brasil não reconhecido pelo trust store padrão do Node.js
+const tlsAgent = new Agent({ connect: { rejectUnauthorized: false } });
 
 interface StfApiResponse {
   resultado?: {
@@ -45,6 +49,8 @@ async function fetchStfPage(
   const url = `${STF_BASE}/api/search/search?${params}`;
 
   const res = await fetch(url, {
+    // @ts-expect-error — undici dispatcher não está nos tipos do RequestInit
+    dispatcher: tlsAgent,
     headers: {
       "User-Agent": "Judicore/1.0 (pesquisa jurídica institucional)",
       Accept: "application/json",
