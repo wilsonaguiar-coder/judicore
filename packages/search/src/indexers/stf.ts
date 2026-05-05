@@ -49,7 +49,7 @@ async function fetchStfPage(
   const url = `${STF_BASE}/api/search/search?${params}`;
 
   const res = await fetch(url, {
-    dispatcher: tlsAgent,
+    dispatcher: tlsAgent as any, // undici/undici-types version mismatch
     headers: {
       "User-Agent": "Judicore/1.0 (pesquisa jurídica institucional)",
       Accept: "application/json",
