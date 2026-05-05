@@ -11,7 +11,7 @@ export function Sidebar({ user }: { user: User | null }) {
 
   function handleLogout() {
     logout();
-    router.push("/login");
+    router.push("/");
   }
 
   return (
