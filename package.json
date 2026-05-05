@@ -1,0 +1,20 @@
+{
+  "name": "judicore",
+  "version": "0.0.1",
+  "private": true,
+  "packageManager": "pnpm@9.0.0",
+  "scripts": {
+    "dev": "turbo dev",
+    "build": "turbo build",
+    "lint": "turbo lint",
+    "typecheck": "turbo typecheck",
+    "db:generate": "pnpm --filter @judicore/db generate",
+    "db:migrate": "pnpm --filter @judicore/db migrate",
+    "db:studio": "pnpm --filter @judicore/db studio"
+  },
+  "devDependencies": {
+    "turbo": "^2.0.0",
+    "typescript": "^5.4.0",
+    "@types/node": "^20.0.0"
+  }
+}
