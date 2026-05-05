@@ -60,7 +60,9 @@ export function startIndexingWorker(): Worker<IndexingJobData, IndexingJobResult
     },
     {
       connection: getRedisConnection(),
-      concurrency: 1, // uma área por vez para não sobrecarregar as APIs externas
+      concurrency: 1,
+      stalledInterval: 120000, // verifica stall a cada 2 min (padrão 30s — insuficiente com inteiro teor)
+      maxStalledCount: 3,      // permite 3 stalls antes de falhar
     }
   );
 

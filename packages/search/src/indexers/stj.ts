@@ -148,15 +148,15 @@ export const stjAdapter: JurisprudenciaAdapter = {
         const { items, total } = await fetchSconPage(query, start);
         if (items.length === 0) break;
 
-        // Busca inteiro teor para cada decisão — enriquece o campo conteudoIntegral
-        const enriched = await Promise.all(
-          items.map(async (item) => {
-            const numReg = item.id.replace("stj-", "");
-            const dtPublicacao = item.dataJulgamento.replace(/-/g, "/");
-            const conteudoIntegral = await fetchInteiroTeor(numReg, dtPublicacao);
-            return conteudoIntegral ? { ...item, conteudoIntegral } : item;
-          })
-        );
+        // Busca inteiro teor sequencialmente para não saturar a conexão
+        const enriched: Jurisprudencia[] = [];
+        for (const item of items) {
+          const numReg = item.id.replace("stj-", "");
+          const dtPublicacao = item.dataJulgamento.replace(/-/g, "/");
+          const conteudoIntegral = await fetchInteiroTeor(numReg, dtPublicacao);
+          enriched.push(conteudoIntegral ? { ...item, conteudoIntegral } : item);
+          await delay(500);
+        }
 
         yield enriched;
 
