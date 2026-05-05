@@ -15,8 +15,11 @@ export async function runIndexer(
   console.log(`[${adapter.name}] Iniciando indexação para: "${query}"`);
 
   for await (const batch of adapter.fetch(query, options)) {
+    const batchFinal = options.area
+      ? batch.map((doc) => ({ ...doc, area: options.area! }))
+      : batch;
     try {
-      await bulkIndexJurisprudencia(batch);
+      await bulkIndexJurisprudencia(batchFinal);
       indexed += batch.length;
       console.log(`[${adapter.name}] +${batch.length} (total: ${indexed})`);
     } catch (err) {
