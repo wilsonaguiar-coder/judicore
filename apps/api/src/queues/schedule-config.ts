@@ -1,10 +1,6 @@
 import type { IndexingJobData, IndexingSource } from "./types.js";
 import type { LegalArea } from "@judicore/search";
 
-/**
- * Termos de busca por área jurídica.
- * Adicionar mais termos aumenta a cobertura do índice.
- */
 const QUERIES_BY_AREA: Record<LegalArea, string[]> = {
   TRIBUTARIO: [
     "imposto de renda pessoa jurídica",
@@ -13,6 +9,20 @@ const QUERIES_BY_AREA: Record<LegalArea, string[]> = {
     "compensação tributária",
     "decadência prescrição tributária",
     "execução fiscal redirecionamento",
+    "PIS COFINS crédito não cumulatividade",
+    "ISS serviço prestado local",
+    "IPTU progressividade base de cálculo",
+    "ITBI transmissão bem imóvel",
+    "IPI industrialização produto",
+    "IOF operação financeira",
+    "parcelamento débito tributário REFIS",
+    "lançamento tributário auto de infração",
+    "repetição indébito tributário prazo",
+    "imunidade tributária entidade filantrópica",
+    "isenção tributária interpretação literal",
+    "denúncia espontânea multa tributária",
+    "responsabilidade tributária sócio gerente",
+    "medida cautelar fiscal indisponibilidade",
   ],
   PREVIDENCIARIO: [
     "aposentadoria por invalidez",
@@ -21,6 +31,20 @@ const QUERIES_BY_AREA: Record<LegalArea, string[]> = {
     "revisão benefício previdenciário",
     "acidente trabalho nexo causal",
     "pensão por morte dependente",
+    "aposentadoria rural segurado especial",
+    "salário maternidade empregada doméstica",
+    "auxílio acidente sequela incapacidade",
+    "BPC LOAS pessoa com deficiência",
+    "desaposentação recalculo benefício",
+    "período de carência benefício previdenciário",
+    "contribuição individual autônomo MEI",
+    "reabilitação profissional INSS",
+    "índice reajuste benefício previdenciário",
+    "decadência revisão ato concessório INSS",
+    "aposentadoria compulsória servidor público",
+    "benefício assistencial miserabilidade renda",
+    "trabalhador rural meeiro parceiro",
+    "aposentadoria especial exposição agente nocivo",
   ],
   ADMINISTRATIVO: [
     "improbidade administrativa dano erário",
@@ -29,6 +53,20 @@ const QUERIES_BY_AREA: Record<LegalArea, string[]> = {
     "desapropriação indenização justa",
     "responsabilidade civil estado",
     "mandado segurança ato administrativo",
+    "concurso público aprovação cadastro reserva",
+    "processo administrativo disciplinar demissão",
+    "anulação ato administrativo vício",
+    "concessão permissão serviço público",
+    "poder de polícia licença alvará",
+    "pregão eletrônico habilitação proposta",
+    "agente público cargo emprego função",
+    "tombamento bem patrimônio histórico",
+    "regulação agência fiscalização sanção",
+    "lei acesso informação transparência",
+    "ato administrativo discricionário vinculado",
+    "contrato administrativo rescisão unilateral",
+    "servidor público reintegração cargo",
+    "abuso poder autoridade coação",
   ],
   CRIMINAL: [
     "tráfico drogas pena substituição",
@@ -36,18 +74,60 @@ const QUERIES_BY_AREA: Record<LegalArea, string[]> = {
     "habeas corpus prisão preventiva",
     "lavagem dinheiro crime antecedente",
     "corrupção ativa passiva funcionário público",
+    "estelionato fraude prejuízo vítima",
+    "homicídio doloso qualificado júri",
+    "furto reincidência regime semiaberto",
+    "associação criminosa organização crime",
+    "porte arma fogo sem registro",
+    "crime tributário sonegação fiscal",
+    "peculato desvio verba pública",
+    "extorsão mediante sequestro",
+    "receptação produto crime",
+    "execução penal progressão regime",
+    "liberdade condicional requisitos",
+    "prescrição penal pena máxima",
+    "lesão corporal violência doméstica Lei Maria da Penha",
+    "concurso formal material crimes",
+    "crime culposo imprudência negligência",
   ],
   AMBIENTAL: [
     "dano ambiental reparação integral",
     "área proteção permanente supressão",
     "crime ambiental pessoa jurídica",
     "licença ambiental exigência",
+    "estudo impacto ambiental EIA RIMA",
+    "poluição rio contaminação solo",
+    "desmatamento embargo área rural",
+    "reserva legal compensação florestal",
+    "responsabilidade ambiental objetiva",
+    "mineração degradação ambiental recuperação",
+    "unidade conservação uso sustentável",
+    "agrotóxico contaminação saúde ambiental",
+    "queimada incêndio florestal",
+    "pesca predatória recurso pesqueiro",
+    "saneamento básico esgoto tratamento",
   ],
   TRABALHISTA: [
     "vínculo empregatício reconhecimento",
     "horas extras habitualidade",
     "assédio moral dano moral trabalho",
     "rescisão indireta justa causa",
+    "adicional insalubridade periculosidade",
+    "equiparação salarial isonomia",
+    "dispensa discriminatória reintegração",
+    "intervalo intrajornada supressão",
+    "terceirização responsabilidade subsidiária",
+    "trabalho intermitente contrato",
+    "pejotização fraude vínculo emprego",
+    "demissão sem justa causa verbas rescisórias",
+    "estabilidade gestante acidente trabalho",
+    "contribuição sindical desconto",
+    "banco de horas compensação jornada",
+    "dano existencial jornada excessiva",
+    "assédio sexual trabalho",
+    "trabalho análogo escravo dignidade",
+    "FGTS recolhimento multa",
+    "seguro desemprego período aquisitivo",
   ],
   CIVIL: [
     "responsabilidade civil médico erro",
@@ -55,42 +135,50 @@ const QUERIES_BY_AREA: Record<LegalArea, string[]> = {
     "contrato compra venda rescisão",
     "usucapião posse animus domini",
     "alimentos revisional exoneração",
+    "união estável reconhecimento dissolução",
+    "guarda compartilhada melhor interesse",
+    "alienação parental síndrome",
+    "inventário partilha herança",
+    "locação despejo falta pagamento",
+    "plano saúde cobertura negativa",
+    "consumidor código CDC vício produto",
+    "banco cobrança indevida dano moral",
+    "empréstimo consignado irregularidade",
+    "seguro indenização sinistro",
+    "incorporação imobiliária atraso entrega",
+    "doação revogação ingratidão",
+    "testamento validade nulidade",
+    "divórcio partilha bem comum",
+    "adoção destituição poder familiar",
   ],
   OUTRO: [
     "recurso especial admissibilidade",
     "repercussão geral tema",
+    "conflito competência justiça federal estadual",
+    "intervenção federal estado município",
+    "mandado injunção omissão legislativa",
+    "ação civil pública interesse difuso",
+    "tutela antecipada urgência evidência",
+    "cumprimento sentença execução título",
   ],
 };
 
 const ALL_SOURCES: IndexingSource[] = ["datajud", "stj", "stf"];
 
-/**
- * Configuração de agendamento por área.
- * cron: expressão cron (UTC)
- * Estratégia: áreas mais comuns rodam mais frequentemente
- */
 export const SCHEDULE_CONFIG: Array<{
   area: LegalArea;
   cron: string;
   sources: IndexingSource[];
   maxPages: number;
 }> = [
-  // Terça e sexta às 02:00
-  { area: "TRIBUTARIO",     cron: "0 2 * * 2,5", sources: ALL_SOURCES, maxPages: 5 },
-  // Segunda e quinta às 02:30
-  { area: "PREVIDENCIARIO", cron: "30 2 * * 1,4", sources: ALL_SOURCES, maxPages: 5 },
-  // Quarta e sábado às 03:00
-  { area: "ADMINISTRATIVO", cron: "0 3 * * 3,6", sources: ALL_SOURCES, maxPages: 5 },
-  // Sexta às 04:00
-  { area: "CRIMINAL",       cron: "0 4 * * 5",   sources: ALL_SOURCES, maxPages: 4 },
-  // Domingo às 03:00
-  { area: "AMBIENTAL",      cron: "0 3 * * 0",   sources: ALL_SOURCES, maxPages: 3 },
-  // Domingo às 04:00
-  { area: "TRABALHISTA",    cron: "0 4 * * 0",   sources: ALL_SOURCES, maxPages: 3 },
-  // Sábado às 02:00
-  { area: "CIVIL",          cron: "0 2 * * 6",   sources: ALL_SOURCES, maxPages: 5 },
-  // Domingo às 05:00
-  { area: "OUTRO",          cron: "0 5 * * 0",   sources: ["datajud"], maxPages: 2 },
+  { area: "TRIBUTARIO",     cron: "0 2 * * 2,5", sources: ALL_SOURCES, maxPages: 10 },
+  { area: "PREVIDENCIARIO", cron: "30 2 * * 1,4", sources: ALL_SOURCES, maxPages: 10 },
+  { area: "ADMINISTRATIVO", cron: "0 3 * * 3,6", sources: ALL_SOURCES, maxPages: 10 },
+  { area: "CRIMINAL",       cron: "0 4 * * 5",   sources: ALL_SOURCES, maxPages: 10 },
+  { area: "AMBIENTAL",      cron: "0 3 * * 0",   sources: ALL_SOURCES, maxPages: 8  },
+  { area: "TRABALHISTA",    cron: "0 4 * * 0",   sources: ALL_SOURCES, maxPages: 10 },
+  { area: "CIVIL",          cron: "0 2 * * 6",   sources: ALL_SOURCES, maxPages: 10 },
+  { area: "OUTRO",          cron: "0 5 * * 0",   sources: ["datajud"], maxPages: 5  },
 ];
 
 export function buildJobData(
