@@ -1,9 +1,12 @@
+import { Agent } from "undici";
 import type { Jurisprudencia, LegalArea } from "../types.js";
 import type { JurisprudenciaAdapter, IndexerOptions } from "./types.js";
 
-// SCON do STJ — interface web pública, sem API formal
-// Endpoint de busca retorna HTML; usamos o endpoint que expõe JSON interno
+// SCON do STJ — interface web pública, retorna XML com ementa completa
 const SCON_BASE = "https://scon.stj.jus.br/SCON";
+
+// STJ usa certificado ICP-Brasil não reconhecido pelo trust store padrão do Node.js
+const tlsAgent = new Agent({ connect: { rejectUnauthorized: false } });
 
 interface SconResult {
   documento: Array<{
@@ -41,9 +44,10 @@ async function fetchSconPage(
   const url = `${SCON_BASE}/pesquisar.jsp?${params}`;
 
   const res = await fetch(url, {
+    dispatcher: tlsAgent as any,
     headers: {
       "User-Agent": "Judicore/1.0 (pesquisa jurídica institucional)",
-      Accept: "application/xml, text/xml",
+      Accept: "application/xml, text/xml, */*",
     },
   });
 
@@ -59,35 +63,44 @@ async function fetchSconPage(
   return { items, total };
 }
 
-function extractTag(xml: string, tag: string): string {
-  const match = xml.match(new RegExp(`<${tag}[^>]*>([\\s\\S]*?)<\\/${tag}>`, "i"));
-  return match ? match[1]?.replace(/<[^>]+>/g, "").trim() ?? "" : "";
+function extractTag(xml: string, ...tags: string[]): string {
+  for (const tag of tags) {
+    const match = xml.match(new RegExp(`<${tag}[^>]*>([\\s\\S]*?)<\\/${tag}>`, "i"));
+    if (match) return match[1]?.replace(/<!\[CDATA\[|\]\]>|<[^>]+>/g, "").trim() ?? "";
+  }
+  return "";
 }
 
 function parseSTJXml(xml: string): Jurisprudencia[] {
   const docMatches = xml.match(/<documento[\s\S]*?<\/documento>/gi) ?? [];
 
-  return docMatches.map((doc) => {
-    const numero = extractTag(doc, "num-processo");
-    const relator = extractTag(doc, "min-relator");
-    const orgao = extractTag(doc, "orgao-julgador");
-    const dataJulg = extractTag(doc, "data-julgamento");
-    const ementa = extractTag(doc, "ementa");
-    const numReg = extractTag(doc, "num-registro");
+  return docMatches
+    .map((doc) => {
+      const numero  = extractTag(doc, "num-processo", "numero-processo");
+      const relator = extractTag(doc, "min-relator", "relator");
+      const dataJulg = extractTag(doc, "data-julgamento", "data-decisao");
+      const ementa  = extractTag(doc, "ementa");
+      const numReg  = extractTag(doc, "num-registro", "numero-registro");
+      const classe  = extractTag(doc, "classe");
 
-    return {
-      id: `stj-${numReg || numero}`,
-      tribunal: "STJ",
-      numero,
-      ementa: ementa || "Ementa não disponível",
-      relator,
-      dataJulgamento: formatDate(dataJulg),
-      area: "OUTRO" as LegalArea,
-      url: numero
-        ? `https://scon.stj.jus.br/SCON/GetInteiroTeorDoAcordao?num_registro=${numReg}&dt_publicacao=${dataJulg}`
-        : "https://scon.stj.jus.br/SCON/",
-    };
-  });
+      if (!numReg && !numero) return null;
+
+      const numeroDisplay = classe ? `${classe} ${numero}`.trim() : numero;
+
+      return {
+        id: `stj-${numReg || numero}`,
+        tribunal: "STJ",
+        numero: numeroDisplay,
+        ementa: ementa || "Ementa não disponível",
+        relator,
+        dataJulgamento: formatDate(dataJulg),
+        area: "OUTRO" as LegalArea,
+        url: numReg
+          ? `https://scon.stj.jus.br/SCON/GetInteiroTeorDoAcordao?num_registro=${numReg}&dt_publicacao=${dataJulg}`
+          : `https://processo.stj.jus.br/processo/pesquisa/?tipoPesquisa=tipoPesquisaNumeroUnico&termo=${encodeURIComponent(numero)}`,
+      };
+    })
+    .filter((item): item is Jurisprudencia => item !== null);
 }
 
 function formatDate(raw: string): string {
