@@ -10,7 +10,7 @@ const loginSchema = z.object({
 
 const registerSchema = loginSchema.extend({
   name: z.string().min(2),
-  role: z.enum(["MAGISTRADO", "ASSESSOR", "SERVIDOR"]).optional(),
+  role: z.enum(["MAGISTRADO", "ASSESSOR", "SERVIDOR", "ADMIN"]).optional(),
 });
 
 function hashPassword(password: string): string {
