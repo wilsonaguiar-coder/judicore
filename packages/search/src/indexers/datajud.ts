@@ -31,6 +31,29 @@ interface DataJudHit {
   };
 }
 
+function getTribunalUrl(tribunal: string, numeroProcesso?: string): string {
+  if (!numeroProcesso) return "";
+  const enc = encodeURIComponent(numeroProcesso);
+  switch (tribunal) {
+    case "STJ":
+      return `https://processo.stj.jus.br/processo/pesquisa/?tipoPesquisa=tipoPesquisaNumeroUnico&termo=${enc}`;
+    case "STF":
+      return `https://portal.stf.jus.br/processos/listarPartes.asp?termo=${enc}`;
+    case "TRF1":
+      return `https://processual.trf1.jus.br/consultaProcessual/processo.php?proc=${enc}&secao=TRF`;
+    case "TRF2":
+      return `https://consultaprocessual.trf2.jus.br/consultaProcessual/servlet/ConsultaProcessual?numero=${enc}`;
+    case "TRF3":
+      return `https://web.trf3.jus.br/base/PesquisaProcessual/PesquisaProcessual/Resultado?Proc=${enc}`;
+    case "TRF4":
+      return `https://www2.trf4.jus.br/trf4/controlador.php?acao=consulta_processual_pesquisa_doc&doc=${enc}`;
+    case "TRF5":
+      return `https://www.trf5.jus.br/cp/cp.do?proc=${enc}`;
+    default:
+      return `https://www.cnj.jus.br/consultas-processuais/?numero=${enc}`;
+  }
+}
+
 function mapToJurisprudencia(hit: DataJudHit, tribunal: string): Jurisprudencia {
   const src = hit._source;
   const assunto = src.assuntos?.map((a) => a.nome).filter(Boolean).join("; ") ?? "";
@@ -44,7 +67,7 @@ function mapToJurisprudencia(hit: DataJudHit, tribunal: string): Jurisprudencia 
     relator: src.orgaoJulgador?.nome ?? "Não informado",
     dataJulgamento: ultimoMov?.dataHora?.slice(0, 10) ?? src.dataHoraUltimaAtualizacao?.slice(0, 10) ?? "",
     area: "OUTRO" as LegalArea,
-    url: `https://www.cnj.jus.br/consultas-processuais/?numero=${src.numeroProcesso ?? ""}`,
+    url: getTribunalUrl(tribunal, src.numeroProcesso),
   };
 }
 
