@@ -103,12 +103,6 @@ export default function LandingPage() {
         <div className="flex items-center gap-4">
           <Link
             href="/login"
-            className="text-sm text-white/60 hover:text-white transition-colors hidden md:block"
-          >
-            Entrar
-          </Link>
-          <Link
-            href="/login"
             className="flex items-center gap-1.5 px-4 py-2 rounded-lg bg-violet-600 hover:bg-violet-500 text-sm font-medium transition-all hover:shadow-lg hover:shadow-violet-500/25"
           >
             Acessar sistema <ArrowRight size={13} />
