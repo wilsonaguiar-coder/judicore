@@ -1,4 +1,4 @@
-import { getAnthropicClient, MODEL } from "./client.js";
+import { getGroqClient, MODEL } from "./client.js";
 import { buildSystemPrompt, buildDocumentPrompt, buildAnalysisPrompt } from "./prompts.js";
 import type { GenerateDocumentParams, AnalyzeParams, AIResult } from "./types.js";
 
@@ -6,22 +6,21 @@ export async function* generateDocumentStream(
   params: GenerateDocumentParams
 ): AsyncGenerator<string> {
   const { type, caseDescription, jurisprudencias } = params;
-  const client = getAnthropicClient();
+  const client = getGroqClient();
 
-  const stream = await client.messages.stream({
+  const stream = await client.chat.completions.create({
     model: MODEL,
     max_tokens: 4096,
-    system: buildSystemPrompt(),
-    messages: [{ role: "user", content: buildDocumentPrompt(type, caseDescription, jurisprudencias) }],
+    messages: [
+      { role: "system", content: buildSystemPrompt() },
+      { role: "user", content: buildDocumentPrompt(type, caseDescription, jurisprudencias) },
+    ],
+    stream: true,
   });
 
-  for await (const event of stream) {
-    if (
-      event.type === "content_block_delta" &&
-      event.delta.type === "text_delta"
-    ) {
-      yield event.delta.text;
-    }
+  for await (const chunk of stream) {
+    const text = chunk.choices[0]?.delta?.content ?? "";
+    if (text) yield text;
   }
 }
 
@@ -29,82 +28,66 @@ export async function* analyzeCaseStream(
   params: AnalyzeParams
 ): AsyncGenerator<string> {
   const { caseDescription, jurisprudencias } = params;
-  const client = getAnthropicClient();
+  const client = getGroqClient();
 
-  const stream = await client.messages.stream({
+  const stream = await client.chat.completions.create({
     model: MODEL,
     max_tokens: 2048,
-    system: buildSystemPrompt(),
-    messages: [{ role: "user", content: buildAnalysisPrompt(caseDescription, jurisprudencias) }],
+    messages: [
+      { role: "system", content: buildSystemPrompt() },
+      { role: "user", content: buildAnalysisPrompt(caseDescription, jurisprudencias) },
+    ],
+    stream: true,
   });
 
-  for await (const event of stream) {
-    if (
-      event.type === "content_block_delta" &&
-      event.delta.type === "text_delta"
-    ) {
-      yield event.delta.text;
-    }
+  for await (const chunk of stream) {
+    const text = chunk.choices[0]?.delta?.content ?? "";
+    if (text) yield text;
   }
 }
 
-
 export async function generateDocument(params: GenerateDocumentParams): Promise<AIResult> {
   const { type, caseDescription, jurisprudencias } = params;
-  const client = getAnthropicClient();
+  const client = getGroqClient();
 
-  const response = await client.messages.create({
+  const response = await client.chat.completions.create({
     model: MODEL,
     max_tokens: 4096,
-    system: buildSystemPrompt(),
     messages: [
-      {
-        role: "user",
-        content: buildDocumentPrompt(type, caseDescription, jurisprudencias),
-      },
+      { role: "system", content: buildSystemPrompt() },
+      { role: "user", content: buildDocumentPrompt(type, caseDescription, jurisprudencias) },
     ],
+    stream: false,
   });
 
-  const content = response.content
-    .filter((b) => b.type === "text")
-    .map((b) => b.text)
-    .join("");
-
   return {
-    content,
+    content: response.choices[0]?.message?.content ?? "",
     modelUsed: MODEL,
     sourcesUsed: jurisprudencias,
-    inputTokens: response.usage.input_tokens,
-    outputTokens: response.usage.output_tokens,
+    inputTokens: response.usage?.prompt_tokens ?? 0,
+    outputTokens: response.usage?.completion_tokens ?? 0,
   };
 }
 
 export async function analyzeCase(params: AnalyzeParams): Promise<AIResult> {
   const { caseDescription, jurisprudencias } = params;
-  const client = getAnthropicClient();
+  const client = getGroqClient();
 
-  const response = await client.messages.create({
+  const response = await client.chat.completions.create({
     model: MODEL,
     max_tokens: 2048,
-    system: buildSystemPrompt(),
     messages: [
-      {
-        role: "user",
-        content: buildAnalysisPrompt(caseDescription, jurisprudencias),
-      },
+      { role: "system", content: buildSystemPrompt() },
+      { role: "user", content: buildAnalysisPrompt(caseDescription, jurisprudencias) },
     ],
+    stream: false,
   });
 
-  const content = response.content
-    .filter((b) => b.type === "text")
-    .map((b) => b.text)
-    .join("");
-
   return {
-    content,
+    content: response.choices[0]?.message?.content ?? "",
     modelUsed: MODEL,
     sourcesUsed: jurisprudencias,
-    inputTokens: response.usage.input_tokens,
-    outputTokens: response.usage.output_tokens,
+    inputTokens: response.usage?.prompt_tokens ?? 0,
+    outputTokens: response.usage?.completion_tokens ?? 0,
   };
 }

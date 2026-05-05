@@ -1,14 +1,14 @@
-import Anthropic from "@anthropic-ai/sdk";
+import Groq from "groq-sdk";
 
-let _client: Anthropic | null = null;
+let _client: Groq | null = null;
 
-export function getAnthropicClient(): Anthropic {
+export function getGroqClient(): Groq {
   if (!_client) {
-    const apiKey = process.env["ANTHROPIC_API_KEY"];
-    if (!apiKey) throw new Error("ANTHROPIC_API_KEY não definida");
-    _client = new Anthropic({ apiKey });
+    const apiKey = process.env["GROQ_API_KEY"];
+    if (!apiKey) throw new Error("GROQ_API_KEY não definida");
+    _client = new Groq({ apiKey });
   }
   return _client;
 }
 
-export const MODEL = "claude-sonnet-4-6";
+export const MODEL = "llama-3.3-70b-versatile";
