@@ -1,18 +1,7 @@
-/**
- * CLI para indexar jurisprudência no Elasticsearch.
- *
- * Uso:
- *   pnpm --filter @judicore/api tsx src/scripts/index-jurisprudencia.ts \
- *     --query "responsabilidade civil estado" \
- *     --sources datajud,stj,stf \
- *     --area CIVIL \
- *     --tribunais STJ,TRF3 \
- *     --pages 5
- */
-
-import { runIndexer } from "@judicore/search";
-import { datajudAdapter, stjAdapter, stfAdapter } from "@judicore/search/indexers";
-import type { IndexerOptions } from "@judicore/search/indexers";
+import "dotenv/config";
+import { getIndexingQueue } from "../queues/queue.js";
+import { SCHEDULE_CONFIG } from "../queues/schedule-config.js";
+import type { IndexingSource } from "../queues/types.js";
 import type { LegalArea } from "@judicore/search";
 
 const args = process.argv.slice(2);
@@ -20,40 +9,42 @@ function getArg(name: string): string | undefined {
   const idx = args.indexOf(`--${name}`);
   return idx !== -1 ? args[idx + 1] : undefined;
 }
-
-const query = getArg("query") ?? "responsabilidade civil";
-const sources = (getArg("sources") ?? "datajud,stj,stf").split(",");
-const area = (getArg("area") as LegalArea) ?? undefined;
-const tribunais = getArg("tribunais")?.split(",");
-const maxPages = parseInt(getArg("pages") ?? "3", 10);
-
-const options: IndexerOptions = { area, tribunais, maxPages, delayMs: 1000 };
-
-const adapters: Record<string, typeof datajudAdapter> = {
-  datajud: datajudAdapter,
-  stj: stjAdapter,
-  stf: stfAdapter,
-};
-
-console.log(`\nIndexando: "${query}"`);
-console.log(`Fontes: ${sources.join(", ")}`);
-console.log(`Área: ${area ?? "todas"} | Tribunais: ${tribunais?.join(", ") ?? "todos"}\n`);
-
-let totalIndexed = 0;
-let totalFailed = 0;
-
-for (const source of sources) {
-  const adapter = adapters[source];
-  if (!adapter) {
-    console.warn(`Fonte desconhecida: ${source}`);
-    continue;
-  }
-  const result = await runIndexer(adapter, query, options);
-  totalIndexed += result.indexed;
-  totalFailed += result.failed;
+function hasFlag(name: string): boolean {
+  return args.includes(`--${name}`);
 }
 
-console.log(`\n=== Resultado final ===`);
-console.log(`Indexados: ${totalIndexed}`);
-console.log(`Falhos:    ${totalFailed}`);
-process.exit(totalFailed > 0 ? 1 : 0);
+const ALL_AREAS: LegalArea[] = [
+  "TRIBUTARIO", "PREVIDENCIARIO", "ADMINISTRATIVO", "CRIMINAL",
+  "AMBIENTAL", "TRABALHISTA", "CIVIL", "OUTRO",
+];
+
+const rawSources = getArg("sources")?.split(/[, ]+/) ?? ["datajud", "stj", "stf"];
+const sources = rawSources.filter((s): s is IndexingSource =>
+  ["datajud", "stj", "stf"].includes(s)
+);
+const maxPages = parseInt(getArg("pages") ?? "3", 10);
+const allAreas = hasFlag("all") || !getArg("area");
+const areas: LegalArea[] = allAreas
+  ? ALL_AREAS
+  : [(getArg("area") as LegalArea)];
+
+const queue = getIndexingQueue();
+
+console.log(`\nAdicionando jobs à fila BullMQ...`);
+console.log(`Áreas: ${areas.join(", ")}`);
+console.log(`Fontes: ${sources.join(", ")}`);
+console.log(`Páginas por job: ${maxPages}\n`);
+
+for (const area of areas) {
+  const queries = SCHEDULE_CONFIG.find((c) => c.area === area)?.queries ?? [area.toLowerCase()];
+  const job = await queue.add(
+    `manual-${area}-${Date.now()}`,
+    { area, sources, queries, maxPages, triggeredBy: "manual" },
+    { priority: 2 }
+  );
+  console.log(`  ✓ Job adicionado: ${area} (id: ${job.id})`);
+}
+
+console.log(`\nJobs adicionados. Acompanhe no painel admin em /dashboard/admin`);
+await queue.close();
+process.exit(0);
