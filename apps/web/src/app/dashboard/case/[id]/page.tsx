@@ -23,7 +23,7 @@ export default function CasePage() {
   const [activeDocId, setActiveDocId] = useState<string | null>(null);
 
   useEffect(() => {
-    if (!token) { router.push("/login"); return; }
+    if (!token) return;
     api.get<Case>(`/cases/${id}`, token).then(setCaseData);
   }, [id, token, router]);
 

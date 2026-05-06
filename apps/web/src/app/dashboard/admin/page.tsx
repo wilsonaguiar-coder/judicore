@@ -69,10 +69,10 @@ export default function AdminPage() {
   }, [token, router]);
 
   useEffect(() => {
-    if (!token) { router.push("/login"); return; }
+    if (!token) return;
     if (user?.role !== "ADMIN") { router.push("/dashboard"); return; }
     load();
-    const interval = setInterval(load, 10_000); // auto-refresh a cada 10s
+    const interval = setInterval(load, 10_000);
     return () => clearInterval(interval);
   }, [token, user, router, load]);
 

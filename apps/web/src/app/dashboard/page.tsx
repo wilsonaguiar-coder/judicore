@@ -16,7 +16,7 @@ export default function DashboardPage() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (!token) { router.push("/login"); return; }
+    if (!token) return;
     api.get<Case[]>("/cases", token).then(setCases).finally(() => setLoading(false));
   }, [token, router]);
 

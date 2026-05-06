@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { useAuthStore } from "@/store/auth";
 import { api } from "@/lib/api";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, Scale } from "lucide-react";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -31,56 +31,112 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-background">
-      <div className="w-full max-w-sm space-y-8">
-        <div className="text-center">
+    <div className="min-h-screen flex items-center justify-center bg-[#07070f] relative overflow-hidden">
+      {/* Glow de fundo */}
+      <div className="absolute inset-0 pointer-events-none">
+        <div className="absolute top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[700px] rounded-full bg-violet-700/10 blur-[140px]" />
+        <div className="absolute bottom-1/4 left-1/2 -translate-x-1/2 w-[400px] h-[400px] rounded-full bg-indigo-700/8 blur-[100px]" />
+      </div>
+
+      {/* Grid sutil */}
+      <div
+        className="absolute inset-0 opacity-[0.025]"
+        style={{
+          backgroundImage:
+            "linear-gradient(rgba(255,255,255,0.6) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.6) 1px, transparent 1px)",
+          backgroundSize: "40px 40px",
+        }}
+      />
+
+      <div className="relative z-10 w-full max-w-sm px-6">
+        {/* Voltar */}
+        <div className="mb-10">
           <Link
             href="/"
-            className="inline-flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground transition-colors mb-6"
+            className="inline-flex items-center gap-1.5 text-xs text-white/30 hover:text-white/60 transition-colors"
           >
             <ArrowLeft size={13} />
             Página principal
           </Link>
-          <h1 className="text-2xl font-semibold tracking-tight">Judicore</h1>
-          <p className="text-sm text-muted-foreground mt-1">Apoio à Decisão Judicial</p>
         </div>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="space-y-2">
-            <label className="text-sm font-medium" htmlFor="email">E-mail</label>
-            <input
-              id="email"
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className="w-full px-3 py-2 rounded-md border bg-background text-sm focus:outline-none focus:ring-2 focus:ring-ring"
-              placeholder="seu@email.gov.br"
-              required
-            />
+        {/* Logo + título */}
+        <div className="mb-8">
+          <div className="flex items-center gap-2.5 mb-5">
+            <div className="w-9 h-9 rounded-xl bg-violet-600/15 border border-violet-500/25 flex items-center justify-center">
+              <Scale size={16} className="text-violet-400" />
+            </div>
+            <span className="font-semibold text-white tracking-tight">Judicore</span>
           </div>
+          <h1 className="text-2xl font-semibold text-white leading-tight">
+            Bem-vindo de volta
+          </h1>
+          <p className="text-sm text-white/35 mt-1.5">
+            Acesse sua conta para continuar
+          </p>
+        </div>
 
-          <div className="space-y-2">
-            <label className="text-sm font-medium" htmlFor="password">Senha</label>
-            <input
-              id="password"
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              className="w-full px-3 py-2 rounded-md border bg-background text-sm focus:outline-none focus:ring-2 focus:ring-ring"
-              required
-            />
-          </div>
+        {/* Card */}
+        <div className="rounded-2xl border border-white/[0.07] bg-white/[0.03] backdrop-blur-sm p-6 space-y-4">
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <div className="space-y-1.5">
+              <label className="block text-[11px] font-medium text-white/40 uppercase tracking-widest" htmlFor="email">
+                E-mail
+              </label>
+              <input
+                id="email"
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                className="w-full px-3.5 py-2.5 rounded-lg border border-white/[0.08] bg-white/[0.04] text-white text-sm placeholder-white/20 focus:outline-none focus:ring-2 focus:ring-violet-500/40 focus:border-violet-500/40 transition-all"
+                placeholder="seu@email.gov.br"
+                required
+                autoComplete="email"
+              />
+            </div>
 
-          {error && <p className="text-sm text-destructive">{error}</p>}
+            <div className="space-y-1.5">
+              <label className="block text-[11px] font-medium text-white/40 uppercase tracking-widest" htmlFor="password">
+                Senha
+              </label>
+              <input
+                id="password"
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                className="w-full px-3.5 py-2.5 rounded-lg border border-white/[0.08] bg-white/[0.04] text-white text-sm placeholder-white/20 focus:outline-none focus:ring-2 focus:ring-violet-500/40 focus:border-violet-500/40 transition-all"
+                placeholder="••••••••"
+                required
+                autoComplete="current-password"
+              />
+            </div>
 
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full py-2 px-4 rounded-md bg-primary text-primary-foreground text-sm font-medium hover:bg-primary/90 disabled:opacity-50 transition-colors"
-          >
-            {loading ? "Entrando..." : "Entrar"}
-          </button>
-        </form>
+            {error && (
+              <div className="rounded-lg bg-red-500/10 border border-red-500/20 px-3.5 py-2.5">
+                <p className="text-xs text-red-400">{error}</p>
+              </div>
+            )}
+
+            <button
+              type="submit"
+              disabled={loading}
+              className="w-full py-2.5 px-4 rounded-lg bg-violet-600 hover:bg-violet-500 active:bg-violet-700 text-white text-sm font-medium disabled:opacity-50 transition-colors mt-1"
+            >
+              {loading ? (
+                <span className="flex items-center justify-center gap-2">
+                  <span className="w-3.5 h-3.5 rounded-full border-2 border-white/40 border-t-white animate-spin" />
+                  Entrando...
+                </span>
+              ) : (
+                "Entrar"
+              )}
+            </button>
+          </form>
+        </div>
+
+        <p className="text-center text-[11px] text-white/20 mt-6">
+          Judicore · Apoio à Decisão Judicial
+        </p>
       </div>
     </div>
   );
