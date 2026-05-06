@@ -9,8 +9,8 @@ import type { Jurisprudencia, LegalArea } from "@/types";
 interface Props {
   caseId: string;
   token: string;
-  defaultArea?: LegalArea;
-  defaultQuery?: string;
+  defaultArea?: LegalArea | undefined;
+  defaultQuery?: string | undefined;
   onResults: (results: Jurisprudencia[]) => void;
 }
 
