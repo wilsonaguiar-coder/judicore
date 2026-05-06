@@ -60,23 +60,26 @@ export async function adminRoutes(app: FastifyInstance) {
     async () => {
       const queue = getIndexingQueue();
 
-      const [active, waiting, completed, failed, delayed, repeatable] = await Promise.all([
+      const [active, waiting, prioritized, completed, failed, delayed, repeatable] = await Promise.all([
         queue.getActive(),
         queue.getWaiting(),
+        queue.getJobs(["prioritized"]),
         queue.getCompleted(0, 9),
         queue.getFailed(0, 9),
         queue.getDelayed(),
         queue.getRepeatableJobs(),
       ]);
 
+      const allWaiting = [...waiting, ...prioritized];
+
       return {
         counts: {
           active:    active.length,
-          waiting:   waiting.length,
+          waiting:   allWaiting.length,
           delayed:   delayed.length,
         },
         active: active.map(serializeJob),
-        waiting: waiting.map(serializeJob),
+        waiting: allWaiting.map(serializeJob),
         recentCompleted: completed.map(serializeJob),
         recentFailed: failed.map(serializeJob),
         scheduled: repeatable.map((j) => ({
