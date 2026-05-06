@@ -6,7 +6,7 @@ const SEARCH_SERVICE_URL = process.env.SEARCH_SERVICE_URL ?? "http://127.0.0.1:7
 
 const searchSchema = z.object({
   query: z.string().min(3),
-  caseId: z.string(),
+  caseId: z.string().optional(),
   area: z.enum(["TRIBUTARIO", "PREVIDENCIARIO", "ADMINISTRATIVO", "CRIMINAL", "AMBIENTAL", "TRABALHISTA", "CIVIL", "OUTRO"]).optional(),
   tribunais: z.array(z.string()).optional(),
   size: z.number().int().min(1).max(20).default(10),
@@ -37,10 +37,11 @@ export async function searchRoutes(app: FastifyInstance) {
     const body = searchSchema.safeParse(request.body);
     if (!body.success) return reply.status(400).send({ error: body.error.flatten() });
 
-    const caseData = await prisma.case.findFirst({
-      where: { id: body.data.caseId, userId: sub },
-    });
-    if (!caseData) return reply.status(404).send({ error: "Caso não encontrado" });
+    let caseData = null;
+    if (body.data.caseId) {
+      caseData = await prisma.case.findFirst({ where: { id: body.data.caseId, userId: sub } });
+      if (!caseData) return reply.status(404).send({ error: "Caso não encontrado" });
+    }
 
     const t0 = Date.now();
 
@@ -94,14 +95,16 @@ export async function searchRoutes(app: FastifyInstance) {
       textoIntegral: r.texto_integral ?? null,
     }));
 
-    await prisma.search.create({
-      data: {
-        caseId: body.data.caseId,
-        query: body.data.query,
-        area: body.data.area ?? caseData.area,
-        resultsJson: hits as any,
-      },
-    });
+    if (body.data.caseId && caseData) {
+      await prisma.search.create({
+        data: {
+          caseId: body.data.caseId,
+          query: body.data.query,
+          area: body.data.area ?? caseData.area,
+          resultsJson: hits as any,
+        },
+      });
+    }
 
     return {
       hits,

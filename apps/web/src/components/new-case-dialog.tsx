@@ -10,9 +10,10 @@ import type { Case, LegalArea } from "@/types";
 interface Props {
   token: string;
   onCreated: (c: Case) => void;
+  trigger?: React.ReactNode;
 }
 
-export function NewCaseDialog({ token, onCreated }: Props) {
+export function NewCaseDialog({ token, onCreated, trigger }: Props) {
   const [open, setOpen] = useState(false);
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
@@ -36,10 +37,12 @@ export function NewCaseDialog({ token, onCreated }: Props) {
   return (
     <Dialog.Root open={open} onOpenChange={setOpen}>
       <Dialog.Trigger asChild>
-        <button className="flex items-center gap-2 px-4 py-2 rounded-md bg-primary text-primary-foreground text-sm font-medium hover:bg-primary/90 transition-colors">
-          <Plus size={15} />
-          Novo caso
-        </button>
+        {trigger ?? (
+          <button className="flex items-center gap-2 px-4 py-2 rounded-md bg-primary text-primary-foreground text-sm font-medium hover:bg-primary/90 transition-colors">
+            <Plus size={15} />
+            Novo caso
+          </button>
+        )}
       </Dialog.Trigger>
 
       <Dialog.Portal>

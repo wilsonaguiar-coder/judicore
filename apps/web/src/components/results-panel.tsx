@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { ExternalLink, CheckSquare, Square, FileText, X } from "lucide-react";
+import { ExternalLink, CheckSquare, Square, FileText, X, Copy, Check } from "lucide-react";
 import type { Jurisprudencia } from "@/types";
 
 interface Props {
@@ -11,6 +11,14 @@ interface Props {
 }
 
 function TextoIntegralModal({ j, onClose }: { j: Jurisprudencia; onClose: () => void }) {
+  const [copied, setCopied] = useState(false);
+
+  function handleCopy() {
+    navigator.clipboard.writeText(j.textoIntegral || j.ementa || "");
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  }
+
   return (
     <div
       className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4"
@@ -32,9 +40,18 @@ function TextoIntegralModal({ j, onClose }: { j: Jurisprudencia; onClose: () => 
             </div>
             <p className="text-xs text-muted-foreground mt-0.5">{j.numero} · {j.relator}</p>
           </div>
-          <button onClick={onClose} className="text-muted-foreground hover:text-foreground ml-4">
-            <X size={16} />
-          </button>
+          <div className="flex items-center gap-2 ml-4">
+            <button
+              onClick={handleCopy}
+              className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-md text-xs border hover:bg-accent transition-colors"
+            >
+              {copied ? <Check size={12} className="text-green-500" /> : <Copy size={12} />}
+              {copied ? "Copiado!" : "Copiar"}
+            </button>
+            <button onClick={onClose} className="text-muted-foreground hover:text-foreground">
+              <X size={16} />
+            </button>
+          </div>
         </div>
         <div className="overflow-y-auto p-4 flex-1">
           <p className="text-xs leading-relaxed whitespace-pre-wrap text-foreground/90">
