@@ -16,11 +16,14 @@ from pydantic import BaseModel
 # Permite importar query.py do mesmo diretório
 sys.path.insert(0, str(Path(__file__).parent))
 
+# Carrega .env antes de qualquer import que leia variáveis de ambiente
+from dotenv import load_dotenv
+_env_file = Path(__file__).parent / ".env"
+load_dotenv(_env_file)
+
 # Aponta a base LanceDB para /opt/judicore/lancedb_store (configurável via env)
 LANCE_STORE = os.getenv("LANCE_DIR", str(Path(__file__).parent.parent.parent / "lancedb_store"))
 os.environ["RATIO_PROJECT_ROOT"] = str(Path(__file__).parent)
-# Sobrescreve o LANCE_DIR antes de importar query.py
-os.environ.setdefault("LANCE_DIR_OVERRIDE", LANCE_STORE)
 
 import query as rag
 
