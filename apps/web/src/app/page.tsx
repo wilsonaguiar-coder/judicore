@@ -96,7 +96,7 @@ export default function LandingPage() {
         className="fixed top-0 inset-x-0 z-50 flex items-center justify-between px-6 md:px-12 py-4 border-b border-white/5 backdrop-blur-xl bg-[#07070f]/80"
       >
         <div className="flex items-center gap-2">
-          <Image src="/logo01.png" alt="Judicore" width={28} height={28} className="rounded-lg" />
+          <Image src="/logo01.png" alt="Judicore" width={28} height={28} className="rounded-lg invert" />
           <span className="font-bold text-lg tracking-tight">Judicore</span>
         </div>
         <div className="flex items-center gap-4">
