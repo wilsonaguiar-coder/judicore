@@ -163,7 +163,7 @@ const QUERIES_BY_AREA: Record<LegalArea, string[]> = {
   ],
 };
 
-const ALL_SOURCES: IndexingSource[] = ["datajud", "stj", "stf", "lexml"];
+const ALL_SOURCES: IndexingSource[] = ["datajud", "stj", "stf"];
 
 export const SCHEDULE_CONFIG: Array<{
   area: LegalArea;

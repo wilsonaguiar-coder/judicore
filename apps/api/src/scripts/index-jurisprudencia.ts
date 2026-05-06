@@ -18,9 +18,9 @@ const ALL_AREAS: LegalArea[] = [
   "AMBIENTAL", "TRABALHISTA", "CIVIL", "OUTRO",
 ];
 
-const rawSources = getArg("sources")?.split(/[, ]+/) ?? ["datajud", "stj", "stf"];
+const rawSources = getArg("sources")?.split(/[, ]+/) ?? ["datajud", "stj", "stf", "lexml"];
 const sources = rawSources.filter((s): s is IndexingSource =>
-  ["datajud", "stj", "stf"].includes(s)
+  ["datajud", "stj", "stf", "lexml"].includes(s)
 );
 const maxPages = parseInt(getArg("pages") ?? "3", 10);
 const allAreas = hasFlag("all") || !getArg("area");

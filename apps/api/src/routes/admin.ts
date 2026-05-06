@@ -2,6 +2,7 @@ import type { FastifyInstance } from "fastify";
 import { z } from "zod";
 import { getIndexingQueue } from "../queues/queue.js";
 import { buildJobData, SCHEDULE_CONFIG } from "../queues/schedule-config.js";
+import { getElasticsearchClient, JURISPRUDENCIA_INDEX } from "@judicore/search";
 import type { LegalArea } from "@judicore/search";
 
 const triggerSchema = z.object({
@@ -22,6 +23,35 @@ export async function adminRoutes(app: FastifyInstance) {
       return reply.status(403).send({ error: "Acesso restrito a administradores" });
     }
   }
+
+  // GET /admin/stats — estatísticas do índice Elasticsearch
+  app.get(
+    "/stats",
+    { onRequest: [authenticate, requireAdmin] },
+    async () => {
+      const es = getElasticsearchClient();
+      const res = await es.search({
+        index: JURISPRUDENCIA_INDEX,
+        body: {
+          size: 0,
+          aggs: {
+            por_area: { terms: { field: "area", size: 20 } },
+            por_tribunal: { terms: { field: "tribunal", size: 40 } },
+          },
+        },
+      });
+
+      const total = (res.hits.total as any)?.value ?? 0;
+      const areasBuckets = (res.aggregations?.por_area as any)?.buckets ?? [];
+      const tribunaisBuckets = (res.aggregations?.por_tribunal as any)?.buckets ?? [];
+
+      return {
+        total,
+        porArea: areasBuckets.map((b: any) => ({ area: b.key, count: b.doc_count })),
+        porTribunal: tribunaisBuckets.map((b: any) => ({ tribunal: b.key, count: b.doc_count })),
+      };
+    }
+  );
 
   // GET /admin/jobs — lista status da fila
   app.get(

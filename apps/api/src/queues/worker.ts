@@ -2,14 +2,13 @@ import { Worker } from "bullmq";
 import { getRedisConnection } from "./redis.js";
 import { INDEXING_QUEUE } from "./types.js";
 import type { IndexingJobData, IndexingJobResult } from "./types.js";
-import { runIndexer, datajudAdapter, stjAdapter, stfAdapter, lexmlAdapter } from "@judicore/search";
+import { runIndexer, datajudAdapter, stjAdapter, stfAdapter } from "@judicore/search";
 import type { JurisprudenciaAdapter, IndexerOptions } from "@judicore/search";
 
 const ADAPTER_MAP: Record<string, JurisprudenciaAdapter> = {
   datajud: datajudAdapter,
   stj:     stjAdapter,
   stf:     stfAdapter,
-  lexml:   lexmlAdapter,
 };
 
 export function startIndexingWorker(): Worker<IndexingJobData, IndexingJobResult> {

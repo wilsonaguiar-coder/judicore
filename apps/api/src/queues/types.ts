@@ -1,6 +1,6 @@
 import type { LegalArea } from "@judicore/search";
 
-export type IndexingSource = "datajud" | "stj" | "stf" | "lexml";
+export type IndexingSource = "datajud" | "stj" | "stf";
 
 export interface IndexingJobData {
   area: LegalArea;

@@ -7,7 +7,7 @@ import { api } from "@/lib/api";
 import { Sidebar } from "@/components/sidebar";
 import { JobStatusBadge } from "@/components/job-status-badge";
 import { TriggerIndexDialog } from "@/components/trigger-index-dialog";
-import { RefreshCw, Loader2 } from "lucide-react";
+import { RefreshCw, Loader2, Database } from "lucide-react";
 
 interface RepeatableJob {
   key: string;
@@ -28,6 +28,12 @@ interface JobSummary {
   finishedOn: string | null;
 }
 
+interface IndexStats {
+  total: number;
+  porArea: { area: string; count: number }[];
+  porTribunal: { tribunal: string; count: number }[];
+}
+
 interface QueueStatus {
   counts: { active: number; waiting: number; delayed: number };
   active: JobSummary[];
@@ -41,14 +47,19 @@ export default function AdminPage() {
   const { token, user } = useAuthStore();
   const router = useRouter();
   const [status, setStatus] = useState<QueueStatus | null>(null);
+  const [stats, setStats] = useState<IndexStats | null>(null);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
 
   const load = useCallback(async () => {
     if (!token) return;
     try {
-      const data = await api.get<QueueStatus>("/admin/jobs", token);
+      const [data, indexStats] = await Promise.all([
+        api.get<QueueStatus>("/admin/jobs", token),
+        api.get<IndexStats>("/admin/stats", token),
+      ]);
       setStatus(data);
+      setStats(indexStats);
     } catch {
       router.push("/dashboard");
     } finally {
@@ -107,6 +118,27 @@ export default function AdminPage() {
               <TriggerIndexDialog token={token!} onTriggered={load} />
             </div>
           </div>
+
+          {/* Estatísticas do índice */}
+          {stats && (
+            <section className="rounded-lg border p-5 space-y-4">
+              <div className="flex items-center gap-2">
+                <Database size={14} className="text-muted-foreground" />
+                <h2 className="text-sm font-semibold">Índice de jurisprudência</h2>
+                <span className="ml-auto text-xs text-muted-foreground">
+                  {stats.total.toLocaleString("pt-BR")} documentos no total
+                </span>
+              </div>
+              <div className="grid grid-cols-4 gap-2">
+                {stats.porArea.map((a) => (
+                  <div key={a.area} className="rounded-md bg-muted/40 px-3 py-2">
+                    <p className="text-xs text-muted-foreground">{a.area}</p>
+                    <p className="text-sm font-semibold mt-0.5">{a.count.toLocaleString("pt-BR")}</p>
+                  </div>
+                ))}
+              </div>
+            </section>
+          )}
 
           {/* Contadores */}
           <div className="grid grid-cols-3 gap-4">
