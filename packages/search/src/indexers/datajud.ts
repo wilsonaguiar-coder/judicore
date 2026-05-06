@@ -9,6 +9,8 @@ const BASE_URL = "https://api-publica.datajud.cnj.jus.br";
 const TRIBUNAL_ALIAS: Record<string, string> = {
   // Tribunais Superiores
   TST:   "api_publica_tst",
+  TSE:   "api_publica_tse",
+  STM:   "api_publica_stm",
 
   // Tribunais Regionais Federais
   TRF1:  "api_publica_trf1",
@@ -72,6 +74,40 @@ const TRIBUNAL_ALIAS: Record<string, string> = {
   TJRR:  "api_publica_tjrr",
   TJAP:  "api_publica_tjap",
   TJTO:  "api_publica_tjto",
+
+  // Tribunais de Justiça Militar Estaduais
+  TJMMG: "api_publica_tjmmg",
+  TJMRS: "api_publica_tjmrs",
+  TJMSP: "api_publica_tjmsp",
+
+  // Tribunais Regionais Eleitorais
+  "TRE-AC": "api_publica_tre-ac",
+  "TRE-AL": "api_publica_tre-al",
+  "TRE-AM": "api_publica_tre-am",
+  "TRE-AP": "api_publica_tre-ap",
+  "TRE-BA": "api_publica_tre-ba",
+  "TRE-CE": "api_publica_tre-ce",
+  "TRE-DF": "api_publica_tre-dft",
+  "TRE-ES": "api_publica_tre-es",
+  "TRE-GO": "api_publica_tre-go",
+  "TRE-MA": "api_publica_tre-ma",
+  "TRE-MG": "api_publica_tre-mg",
+  "TRE-MS": "api_publica_tre-ms",
+  "TRE-MT": "api_publica_tre-mt",
+  "TRE-PA": "api_publica_tre-pa",
+  "TRE-PB": "api_publica_tre-pb",
+  "TRE-PE": "api_publica_tre-pe",
+  "TRE-PI": "api_publica_tre-pi",
+  "TRE-PR": "api_publica_tre-pr",
+  "TRE-RJ": "api_publica_tre-rj",
+  "TRE-RN": "api_publica_tre-rn",
+  "TRE-RO": "api_publica_tre-ro",
+  "TRE-RR": "api_publica_tre-rr",
+  "TRE-RS": "api_publica_tre-rs",
+  "TRE-SC": "api_publica_tre-sc",
+  "TRE-SE": "api_publica_tre-se",
+  "TRE-SP": "api_publica_tre-sp",
+  "TRE-TO": "api_publica_tre-to",
 };
 
 interface DataJudHit {
