@@ -27,8 +27,10 @@ os.environ["RATIO_PROJECT_ROOT"] = str(Path(__file__).parent)
 
 import query as rag
 
-# Patch: força o LANCE_DIR do query.py para o caminho configurado
+# Patch: força variáveis que o query.py lê no nível de módulo
 rag.LANCE_DIR = Path(LANCE_STORE)
+rag.GEMINI_KEY = os.environ.get("GEMINI_API_KEY", "")
+rag._CLIENT = None  # força recriar o client com a chave correta
 
 app = FastAPI(title="Judicore Search", version="1.0.0")
 
