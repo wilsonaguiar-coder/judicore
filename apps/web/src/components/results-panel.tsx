@@ -68,15 +68,19 @@ export function ResultsPanel({ results, selected, onToggle }: Props) {
                   <span className="text-xs text-muted-foreground">
                     {j.relator} · {j.dataJulgamento}
                   </span>
-                  <a
-                    href={j.url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    onClick={(e) => e.stopPropagation()}
-                    className="text-xs text-primary hover:underline flex items-center gap-1"
-                  >
-                    Ver original <ExternalLink size={10} />
-                  </a>
+                  {j.url ? (
+                    <a
+                      href={j.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      onClick={(e) => e.stopPropagation()}
+                      className="text-xs text-primary hover:underline flex items-center gap-1"
+                    >
+                      Ver original <ExternalLink size={10} />
+                    </a>
+                  ) : (
+                    <span className="text-xs text-muted-foreground/40">sem link</span>
+                  )}
                 </div>
               </div>
             </div>
