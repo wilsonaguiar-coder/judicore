@@ -1,7 +1,8 @@
 import type { FastifyInstance } from "fastify";
 import { z } from "zod";
 import { prisma } from "@judicore/db";
-import { searchJurisprudencia } from "@judicore/search";
+
+const SEARCH_SERVICE_URL = process.env.SEARCH_SERVICE_URL ?? "http://127.0.0.1:7860";
 
 const searchSchema = z.object({
   query: z.string().min(3),
@@ -11,6 +12,23 @@ const searchSchema = z.object({
   size: z.number().int().min(1).max(20).default(10),
 });
 
+interface RagResult {
+  doc_id: string;
+  tribunal: string;
+  tipo: string;
+  processo: string;
+  relator: string;
+  orgao_julgador: string;
+  data_julgamento: string;
+  ementa: string;
+  texto_integral: string | null;
+  inteiro_teor_url: string | null;
+  final_score: number;
+  authority_level: string;
+  authority_label: string;
+  source_label: string;
+}
+
 export async function searchRoutes(app: FastifyInstance) {
   const authenticate = (app as any).authenticate;
 
@@ -19,34 +37,60 @@ export async function searchRoutes(app: FastifyInstance) {
     const body = searchSchema.safeParse(request.body);
     if (!body.success) return reply.status(400).send({ error: body.error.flatten() });
 
-    // Verifica que o caso pertence ao usuário
     const caseData = await prisma.case.findFirst({
       where: { id: body.data.caseId, userId: sub },
     });
     if (!caseData) return reply.status(404).send({ error: "Caso não encontrado" });
 
-    // 1. Elasticsearch busca — SEM IA
-    const result = await searchJurisprudencia({
+    const t0 = Date.now();
+
+    const ragBody: Record<string, unknown> = {
       query: body.data.query,
-      ...(body.data.area ? { area: body.data.area } : {}),
-      ...(body.data.tribunais ? { tribunais: body.data.tribunais } : {}),
-      size: body.data.size,
+      top_k: body.data.size,
+    };
+    if (body.data.tribunais?.length) ragBody.tribunais = body.data.tribunais;
+
+    const ragRes = await fetch(`${SEARCH_SERVICE_URL}/search`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(ragBody),
     });
 
-    // 2. Persiste a busca para histórico
+    if (!ragRes.ok) {
+      const err = await ragRes.text();
+      return reply.status(502).send({ error: "Erro no serviço de busca", detail: err });
+    }
+
+    const ragHits: RagResult[] = await ragRes.json();
+
+    const hits = ragHits.map((r) => ({
+      id: r.doc_id,
+      tribunal: r.tribunal,
+      numero: r.processo,
+      ementa: r.ementa,
+      relator: r.relator,
+      dataJulgamento: r.data_julgamento,
+      area: "OUTRO",
+      url: r.inteiro_teor_url ?? "",
+      score: r.final_score,
+      tipo: r.tipo,
+      autoridade: r.authority_label,
+      fonte: r.source_label,
+    }));
+
     await prisma.search.create({
       data: {
         caseId: body.data.caseId,
         query: body.data.query,
         area: body.data.area ?? caseData.area,
-        resultsJson: result.hits as any,
+        resultsJson: hits as any,
       },
     });
 
     return {
-      hits: result.hits,
-      total: result.total,
-      took: result.took,
+      hits,
+      total: hits.length,
+      took: Date.now() - t0,
     };
   });
 }
