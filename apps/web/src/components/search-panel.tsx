@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { api } from "@/lib/api";
 import { Search, Loader2 } from "lucide-react";
 import { LEGAL_AREAS } from "@/types";
@@ -10,33 +10,51 @@ interface Props {
   caseId: string;
   token: string;
   defaultArea?: LegalArea;
+  defaultQuery?: string;
   onResults: (results: Jurisprudencia[]) => void;
 }
 
 const TRIBUNAIS = ["STJ", "STF", "TRF1", "TRF2", "TRF3", "TRF4", "TRF5", "TRF6"];
 
-export function SearchPanel({ caseId, token, defaultArea, onResults }: Props) {
-  const [query, setQuery] = useState("");
+export function SearchPanel({ caseId, token, defaultArea, defaultQuery, onResults }: Props) {
+  const [query, setQuery] = useState(defaultQuery ?? "");
   const [area, setArea] = useState<LegalArea | "">(defaultArea ?? "");
   const [tribunais, setTribunais] = useState<string[]>([]);
   const [loading, setLoading] = useState(false);
-  const [searched, setSearched] = useState(false);
+  const [error, setError] = useState("");
+  const autoSearched = useRef(false);
 
-  async function handleSearch(e: React.FormEvent) {
-    e.preventDefault();
-    if (!query.trim()) return;
+  async function runSearch(q: string) {
+    if (!q.trim()) return;
     setLoading(true);
+    setError("");
     try {
       const result = await api.post<{ hits: Jurisprudencia[]; total: number }>(
         "/search",
-        { query, caseId, area: area || undefined, tribunais: tribunais.length ? tribunais : undefined },
+        { query: q, caseId, area: area || undefined, tribunais: tribunais.length ? tribunais : undefined },
         token
       );
-      onResults(result.hits);
-      setSearched(true);
+      onResults(result.hits ?? []);
+    } catch {
+      setError("Erro ao buscar. Tente novamente.");
+      onResults([]);
     } finally {
       setLoading(false);
     }
+  }
+
+  // Auto-busca quando o caso carrega com descrição
+  useEffect(() => {
+    if (defaultQuery && !autoSearched.current) {
+      autoSearched.current = true;
+      setQuery(defaultQuery);
+      runSearch(defaultQuery);
+    }
+  }, [defaultQuery]);
+
+  async function handleSearch(e: React.FormEvent) {
+    e.preventDefault();
+    runSearch(query);
   }
 
   function toggleTribunal(t: string) {
@@ -50,11 +68,12 @@ export function SearchPanel({ caseId, token, defaultArea, onResults }: Props) {
         <form onSubmit={handleSearch} className="space-y-3">
           <div className="relative">
             <Search size={13} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
-            <input
+            <textarea
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               placeholder="Descreva o tema jurídico..."
-              className="w-full pl-8 pr-3 py-2 text-sm rounded-md border bg-background focus:outline-none focus:ring-2 focus:ring-ring"
+              rows={3}
+              className="w-full pl-8 pr-3 py-2 text-sm rounded-md border bg-background focus:outline-none focus:ring-2 focus:ring-ring resize-none"
             />
           </div>
 
@@ -68,6 +87,8 @@ export function SearchPanel({ caseId, token, defaultArea, onResults }: Props) {
               <option key={k} value={k}>{v}</option>
             ))}
           </select>
+
+          {error && <p className="text-xs text-destructive">{error}</p>}
 
           <button
             type="submit"
@@ -99,11 +120,9 @@ export function SearchPanel({ caseId, token, defaultArea, onResults }: Props) {
         </div>
       </div>
 
-      {searched && (
-        <p className="text-xs text-muted-foreground">
-          Selecione as decisões relevantes no painel central antes de gerar o documento.
-        </p>
-      )}
+      <p className="text-xs text-muted-foreground">
+        Selecione as decisões relevantes no painel central para gerar o documento.
+      </p>
     </div>
   );
 }
