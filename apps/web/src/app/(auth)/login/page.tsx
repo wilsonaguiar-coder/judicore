@@ -50,7 +50,7 @@ export default function LoginPage() {
 
       <div className="relative z-10 w-full max-w-sm px-6">
         {/* Voltar */}
-        <div className="mb-10">
+        <div className="mb-10 text-center">
           <Link
             href="/"
             className="inline-flex items-center gap-1.5 text-xs text-white/30 hover:text-white/60 transition-colors"
@@ -61,8 +61,8 @@ export default function LoginPage() {
         </div>
 
         {/* Logo + título */}
-        <div className="mb-8">
-          <div className="flex items-center gap-2.5 mb-5">
+        <div className="mb-8 text-center">
+          <div className="flex items-center justify-center gap-2.5 mb-5">
             <div className="w-9 h-9 rounded-xl bg-violet-600/15 border border-violet-500/25 flex items-center justify-center">
               <Scale size={16} className="text-violet-400" />
             </div>
