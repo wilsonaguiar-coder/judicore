@@ -18,14 +18,28 @@ export default function CasePage() {
 
   const [caseData, setCaseData] = useState<Case | null>(null);
   const [results, setResults] = useState<Jurisprudencia[]>([]);
+  const [autoQuery, setAutoQuery] = useState("");
   const [selected, setSelected] = useState<Set<string>>(new Set());
   const [activeDoc, setActiveDoc] = useState<string | null>(null);
   const [activeDocId, setActiveDocId] = useState<string | null>(null);
 
   useEffect(() => {
     if (!token) return;
-    api.get<Case>(`/cases/${id}`, token).then(setCaseData);
-  }, [id, token, router]);
+    api.get<Case>(`/cases/${id}`, token).then((data) => {
+      setCaseData(data);
+      // Auto-busca usando título + descrição do caso
+      const q = [data.title, data.description].filter(Boolean).join(" — ");
+      setAutoQuery(q);
+      api
+        .post<{ hits: Jurisprudencia[]; total: number }>(
+          "/search",
+          { query: q, caseId: id, area: data.area },
+          token
+        )
+        .then((r) => setResults(r.hits ?? []))
+        .catch(() => {});
+    });
+  }, [id, token]);
 
   const selectedJurisprudencias = results.filter((r) => selected.has(r.id));
 
@@ -51,7 +65,7 @@ export default function CasePage() {
               caseId={id}
               token={token!}
               defaultArea={caseData?.area}
-              defaultQuery={caseData ? `${caseData.title} ${caseData.description}`.trim() : undefined}
+              defaultQuery={autoQuery}
               onResults={setResults}
             />
           </div>
