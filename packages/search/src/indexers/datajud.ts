@@ -110,6 +110,20 @@ const TRIBUNAL_ALIAS: Record<string, string> = {
   "TRE-TO": "api_publica_tre-to",
 };
 
+function classifyArea(assuntos: Array<{ nome?: string }> = [], classe = ""): LegalArea {
+  const text = [...assuntos.map((a) => a.nome ?? ""), classe].join(" ").toLowerCase();
+
+  if (/tribut|fiscal|imposto|icms|iss\b|ipi\b|iof\b|iptu|ipva|pis\b|cofins|csll|irpj|irpf|\btaxa\b|execu.{1,5}fiscal|cr.dito tribut/.test(text)) return "TRIBUTARIO";
+  if (/previd.n|aposentadori|inss|benef.cio previd|pens.o por morte|aux.lio.doen|incapacidade|invalide|segurado especial|acidente.*trabalho|bpc\b|loas\b/.test(text)) return "PREVIDENCIARIO";
+  if (/trabalhist|v.nculo empregat|horas extras|sal.rio|rescis.o|fgts|clt\b|sindicato|insalubrid|periculosid|jornada|intervalo intrajornada|equipara..o salarial/.test(text)) return "TRABALHISTA";
+  if (/\bpenal\b|crime|delito|\bréu\b|pris.o|habeas corpus|tr.fico|roubo|furto|homic.dio|esteli|corrup..o|peculato|lavagem|execu..o penal|liberdade condicional/.test(text)) return "CRIMINAL";
+  if (/administrativo|licita..o|contrato admin|servidor p.blico|concurso p.blico|improbidade|desapropria..o|responsabilidade.*estado|concess.o|regula..o/.test(text)) return "ADMINISTRATIVO";
+  if (/ambiental|meio ambiente|polui..o|desmatamento|licen.a ambiental|.rea de prote..o|reserva legal|dano ambiental/.test(text)) return "AMBIENTAL";
+  if (/\bcivil\b|fam.lia|div.rcio|alimentos|guarda|invent.rio|heran.a|responsabilidade civil|dano moral|loca..o|usucapi.o|ado..o|uni.o est.vel/.test(text)) return "CIVIL";
+
+  return "OUTRO";
+}
+
 interface DataJudHit {
   _id: string;
   _source: {
@@ -159,7 +173,7 @@ function mapToJurisprudencia(hit: DataJudHit, tribunal: string): Jurisprudencia 
     ementa: assunto || src.classeProcessual?.nome || "Sem ementa disponível",
     relator: src.orgaoJulgador?.nome ?? "Não informado",
     dataJulgamento: ultimoMov?.dataHora?.slice(0, 10) ?? src.dataHoraUltimaAtualizacao?.slice(0, 10) ?? "",
-    area: "OUTRO" as LegalArea,
+    area: classifyArea(src.assuntos ?? [], src.classeProcessual?.nome ?? ""),
     url: getTribunalUrl(tribunal, src.numeroProcesso),
   };
 }

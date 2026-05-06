@@ -16,7 +16,7 @@ export async function runIndexer(
 
   for await (const batch of adapter.fetch(query, options)) {
     const batchFinal = options.area
-      ? batch.map((doc) => ({ ...doc, area: options.area! }))
+      ? batch.map((doc) => doc.area === "OUTRO" ? { ...doc, area: options.area! } : doc)
       : batch;
     try {
       await bulkIndexJurisprudencia(batchFinal);
