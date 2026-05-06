@@ -5,3 +5,7 @@ dist/
 *.env
 *.env.local
 .DS_Store
+temp/
+packages.zip
+*.tsbuildinfo
+pnpm-lock.yaml
