@@ -14,7 +14,7 @@ interface Props {
   onResults: (results: Jurisprudencia[]) => void;
 }
 
-const TRIBUNAIS = ["STJ", "STF", "TRF1", "TRF2", "TRF3", "TRF4", "TRF5", "TRF6"];
+const TRIBUNAIS = ["STF", "STJ", "TJSP"];
 
 export function SearchPanel({ caseId, token, defaultArea, defaultQuery, onResults }: Props) {
   const [query, setQuery] = useState(defaultQuery ?? "");
