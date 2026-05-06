@@ -70,18 +70,18 @@ export async function adminRoutes(app: FastifyInstance) {
         queue.getRepeatableJobs(),
       ]);
 
-      const allWaiting = [...waiting, ...prioritized];
+      const allWaiting = [...waiting, ...prioritized].filter(Boolean);
 
       return {
         counts: {
-          active:    active.length,
+          active:    active.filter(Boolean).length,
           waiting:   allWaiting.length,
-          delayed:   delayed.length,
+          delayed:   delayed.filter(Boolean).length,
         },
-        active: active.map(serializeJob),
+        active: active.filter(Boolean).map(serializeJob),
         waiting: allWaiting.map(serializeJob),
-        recentCompleted: completed.map(serializeJob),
-        recentFailed: failed.map(serializeJob),
+        recentCompleted: completed.filter(Boolean).map(serializeJob),
+        recentFailed: failed.filter(Boolean).map(serializeJob),
         scheduled: repeatable.map((j) => ({
           key:   j.key,
           name:  j.name,
