@@ -15,6 +15,7 @@ export interface GenerateDocumentParams {
   type: DocumentType;
   caseDescription: string;
   jurisprudencias: Jurisprudencia[];
+  instruction?: string;
 }
 
 export interface AnalyzeParams {

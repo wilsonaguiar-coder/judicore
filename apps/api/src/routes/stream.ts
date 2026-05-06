@@ -18,6 +18,7 @@ const streamSchema = z.object({
   caseId: z.string().optional(),
   type: z.enum(["DESPACHO", "DECISAO", "SENTENCA"]),
   jurisprudencias: z.array(jurisprudenciaSchema),
+  instruction: z.string().optional(),
 });
 
 export async function streamRoutes(app: FastifyInstance) {
@@ -52,6 +53,7 @@ export async function streamRoutes(app: FastifyInstance) {
         type: body.data.type,
         caseDescription,
         jurisprudencias: body.data.jurisprudencias as Jurisprudencia[],
+        instruction: body.data.instruction,
       });
 
       for await (const chunk of stream) {
@@ -65,6 +67,7 @@ export async function streamRoutes(app: FastifyInstance) {
             caseId: body.data.caseId,
             type: body.data.type,
             content: fullContent,
+            instruction: body.data.instruction ?? null,
             sourcesJson: body.data.jurisprudencias as any,
             modelUsed: "claude-sonnet-4-6",
           },

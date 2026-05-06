@@ -16,6 +16,7 @@ interface Props {
 
 export function DocumentPanel({ caseId, token, jurisprudencias, activeDoc, activeDocId, onDocGenerated }: Props) {
   const [docType, setDocType] = useState<DocumentType>("DECISAO");
+  const [instruction, setInstruction] = useState("");
   const [streaming, setStreaming] = useState(false);
   const [copied, setCopied] = useState(false);
   const [downloading, setDownloading] = useState(false);
@@ -40,7 +41,7 @@ export function DocumentPanel({ caseId, token, jurisprudencias, activeDoc, activ
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify({ caseId, type: docType, jurisprudencias }),
+        body: JSON.stringify({ caseId, type: docType, jurisprudencias, instruction: instruction.trim() || undefined }),
         signal: controller.signal,
       });
 
@@ -150,6 +151,16 @@ export function DocumentPanel({ caseId, token, jurisprudencias, activeDoc, activ
             </button>
           ))}
         </div>
+
+        {/* Instrução do magistrado */}
+        <textarea
+          value={instruction}
+          onChange={(e) => setInstruction(e.target.value)}
+          disabled={streaming}
+          placeholder="Orientação para a IA (opcional): entendimento a aplicar, artigos de lei relevantes, direcionamento da peça..."
+          rows={3}
+          className="w-full text-xs rounded-lg border bg-muted/30 px-3 py-2 resize-none placeholder:text-muted-foreground/50 focus:outline-none focus:ring-1 focus:ring-primary disabled:opacity-50"
+        />
 
         {/* Contador de selecionados */}
         <div

@@ -37,7 +37,8 @@ ${items.join("\n---")}`;
 export function buildDocumentPrompt(
   type: "DESPACHO" | "DECISAO" | "SENTENCA",
   caseDescription: string,
-  jurisprudencias: Jurisprudencia[]
+  jurisprudencias: Jurisprudencia[],
+  instruction?: string,
 ): string {
   const typeLabel: Record<string, string> = {
     DESPACHO: "despacho",
@@ -45,8 +46,12 @@ export function buildDocumentPrompt(
     SENTENCA: "sentença",
   };
 
-  return `${buildRagContext(jurisprudencias)}
+  const instructionBlock = instruction?.trim()
+    ? `\n---\nORIENTAÇÃO DO MAGISTRADO:\n${instruction.trim()}\nUse esta orientação como norte para a peça. Fundamente exclusivamente nas decisões acima — não invente precedentes, leis ou fatos não fornecidos.\n`
+    : "";
 
+  return `${buildRagContext(jurisprudencias)}
+${instructionBlock}
 ---
 CASO EM ANÁLISE:
 ${caseDescription}

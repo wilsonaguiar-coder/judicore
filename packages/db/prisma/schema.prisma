@@ -81,6 +81,7 @@ model Document {
   caseId       String       @map("case_id")
   type         DocumentType
   content      String       @db.Text
+  instruction  String?      @db.Text
   sourcesJson  Json         @map("sources_json") // citações usadas
   modelUsed    String       @map("model_used")
   createdAt    DateTime     @default(now()) @map("created_at")

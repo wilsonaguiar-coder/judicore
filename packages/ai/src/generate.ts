@@ -5,7 +5,7 @@ import type { GenerateDocumentParams, AnalyzeParams, AIResult } from "./types.js
 export async function* generateDocumentStream(
   params: GenerateDocumentParams
 ): AsyncGenerator<string> {
-  const { type, caseDescription, jurisprudencias } = params;
+  const { type, caseDescription, jurisprudencias, instruction } = params;
   const client = getGroqClient();
 
   const stream = await client.chat.completions.create({
@@ -13,7 +13,7 @@ export async function* generateDocumentStream(
     max_tokens: 4096,
     messages: [
       { role: "system", content: buildSystemPrompt() },
-      { role: "user", content: buildDocumentPrompt(type, caseDescription, jurisprudencias) },
+      { role: "user", content: buildDocumentPrompt(type, caseDescription, jurisprudencias, instruction) },
     ],
     stream: true,
   });
