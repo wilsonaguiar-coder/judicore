@@ -52,6 +52,7 @@ export interface Jurisprudencia {
   tipo?: string;
   autoridade?: string;
   fonte?: string;
+  textoIntegral?: string | null;
 }
 
 export interface Document {

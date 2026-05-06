@@ -91,6 +91,7 @@ export async function searchRoutes(app: FastifyInstance) {
       tipo: r.tipo,
       autoridade: r.authority_label,
       fonte: r.source_label,
+      textoIntegral: r.texto_integral ?? null,
     }));
 
     await prisma.search.create({
