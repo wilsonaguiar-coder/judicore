@@ -39,16 +39,21 @@ rag.GEMINI_KEY = os.environ.get("GEMINI_API_KEY", "")
 rag._CLIENT = None  # força recriar o client com a chave correta
 
 
+# Por padrão o Ratio só busca "ratio" (STF/STJ). Incluímos "tjsp" explicitamente.
+_DEFAULT_SOURCES = ["ratio", "tjsp"]
+
+
 def _search_merged(req: "SearchRequest", query_vector: list) -> list:
     """Quando múltiplos tribunais são selecionados, busca cada um separadamente
     para garantir representação de todos, depois ordena por _rrf_score."""
+    sources = req.sources or _DEFAULT_SOURCES
     tribunais = req.tribunais or []
     if len(tribunais) <= 1:
         return rag.search_lancedb(
             query=req.query,
             query_vector=query_vector,
             top_k=req.top_k,
-            sources=req.sources,
+            sources=sources,
             tribunais=tribunais or None,
             tipos=req.tipos,
             ramos=req.ramos,
@@ -64,7 +69,7 @@ def _search_merged(req: "SearchRequest", query_vector: list) -> list:
             query=req.query,
             query_vector=query_vector,
             top_k=per_trib,
-            sources=req.sources,
+            sources=sources,
             tribunais=[trib],
             tipos=req.tipos,
             ramos=req.ramos,
