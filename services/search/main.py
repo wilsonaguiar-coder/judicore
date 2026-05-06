@@ -3,9 +3,11 @@ Microserviço de busca jurisprudencial — wraper FastAPI sobre o motor RAG do R
 Roda em /opt/judicore/services/search/ com PM2 ou systemd.
 """
 
+import asyncio
 import os
 import sys
 import time
+from contextlib import asynccontextmanager
 from pathlib import Path
 from typing import Optional
 
@@ -36,7 +38,25 @@ rag.LANCE_DIR = Path(LANCE_STORE)
 rag.GEMINI_KEY = os.environ.get("GEMINI_API_KEY", "")
 rag._CLIENT = None  # força recriar o client com a chave correta
 
-app = FastAPI(title="Judicore Search", version="1.0.0")
+
+def _warmup_sync():
+    """Abre o LanceDB e aquece o client Gemini antes da primeira requisição."""
+    try:
+        vec = rag.embed_query("jurisprudência")
+        rag.search_lancedb(query="jurisprudência", query_vector=vec, top_k=1)
+        print("[startup] warmup LanceDB concluído")
+    except Exception as exc:
+        print(f"[startup] warmup falhou (não crítico): {exc}")
+
+
+@asynccontextmanager
+async def lifespan(_: FastAPI):
+    loop = asyncio.get_event_loop()
+    await loop.run_in_executor(None, _warmup_sync)
+    yield
+
+
+app = FastAPI(title="Judicore Search", version="1.0.0", lifespan=lifespan)
 
 app.add_middleware(
     CORSMiddleware,
@@ -124,7 +144,7 @@ def search(req: SearchRequest):
             ementa=str(row.get("texto_busca") or "")[:500],
             texto_integral=str(row.get("texto_integral") or "") or None,
             inteiro_teor_url=str(row.get("inteiro_teor_url") or "") or None,
-            final_score=float(row.get("final_score") or 0.0),
+            final_score=float(row.get("final_score") or row.get("_rrf_score") or row.get("score") or 0.0),
             authority_level=auth_level,
             authority_label=auth_label,
             source_label=str(row.get("source_label") or ""),

@@ -50,18 +50,33 @@ export async function searchRoutes(app: FastifyInstance) {
     };
     if (body.data.tribunais?.length) ragBody.tribunais = body.data.tribunais;
 
-    const ragRes = await fetch(`${SEARCH_SERVICE_URL}/search`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(ragBody),
-    });
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), 55_000);
+
+    let ragRes: Response;
+    try {
+      ragRes = await fetch(`${SEARCH_SERVICE_URL}/search`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(ragBody),
+        signal: controller.signal,
+      });
+    } catch (fetchErr: any) {
+      clearTimeout(timer);
+      if (fetchErr.name === "AbortError") {
+        return reply.status(504).send({ error: "Serviço de busca não respondeu em 55s — tente novamente" });
+      }
+      return reply.status(502).send({ error: "Erro ao conectar ao serviço de busca", detail: String(fetchErr) });
+    } finally {
+      clearTimeout(timer);
+    }
 
     if (!ragRes.ok) {
       const err = await ragRes.text();
       return reply.status(502).send({ error: "Erro no serviço de busca", detail: err });
     }
 
-    const ragHits: RagResult[] = await ragRes.json();
+    const ragHits = (await ragRes.json()) as RagResult[];
 
     const hits = ragHits.map((r) => ({
       id: r.doc_id,
