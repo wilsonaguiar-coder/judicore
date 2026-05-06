@@ -63,9 +63,8 @@ export default function LoginPage() {
 
         {/* Logo + título */}
         <div className="mb-8 text-center">
-          <div className="flex items-center justify-center gap-2.5 mb-5">
-            <Image src="/logo01.png" alt="Judicore" width={36} height={36} className="rounded-xl" />
-            <span className="font-semibold text-white tracking-tight">Judicore</span>
+          <div className="flex items-center justify-center mb-5">
+            <Image src="/logo01.png" alt="Judicore" width={144} height={144} className="rounded-xl" />
           </div>
           <h1 className="text-2xl font-semibold text-white leading-tight">
             Bem-vindo de volta

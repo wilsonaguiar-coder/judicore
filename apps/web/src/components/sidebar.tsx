@@ -37,9 +37,8 @@ export function Sidebar({ user }: { user: User | null }) {
     <aside className="w-56 border-r border-white/[0.06] flex flex-col bg-[#08080f]">
       {/* Logo */}
       <div className="px-4 py-5 border-b border-white/[0.06]">
-        <div className="flex items-center gap-2.5">
-          <Image src="/logo01.png" alt="Judicore" width={28} height={28} className="rounded-lg flex-shrink-0" />
-          <span className="font-semibold text-sm text-white tracking-tight">Judicore</span>
+        <div className="flex items-center">
+          <Image src="/logo01.png" alt="Judicore" width={112} height={112} className="rounded-lg flex-shrink-0" />
         </div>
       </div>
 
