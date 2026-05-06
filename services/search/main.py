@@ -16,10 +16,14 @@ from pydantic import BaseModel
 # Permite importar query.py do mesmo diretório
 sys.path.insert(0, str(Path(__file__).parent))
 
-# Carrega .env antes de qualquer import que leia variáveis de ambiente
-from dotenv import load_dotenv
+# Lê o .env manualmente — load_dotenv não funciona em alguns contextos PM2
 _env_file = Path(__file__).parent / ".env"
-load_dotenv(_env_file)
+if _env_file.exists():
+    for _line in _env_file.read_text(encoding="utf-8").splitlines():
+        _line = _line.strip()
+        if _line and not _line.startswith("#") and "=" in _line:
+            _k, _, _v = _line.partition("=")
+            os.environ[_k.strip()] = _v.strip()
 
 # Aponta a base LanceDB para /opt/judicore/lancedb_store (configurável via env)
 LANCE_STORE = os.getenv("LANCE_DIR", str(Path(__file__).parent.parent.parent / "lancedb_store"))
