@@ -2,7 +2,8 @@
 
 import { useRouter, usePathname } from "next/navigation";
 import { useAuthStore } from "@/store/auth";
-import { Scale, LogOut, Search, Settings } from "lucide-react";
+import { LogOut, Search, Settings } from "lucide-react";
+import Image from "next/image";
 import type { User } from "@/types";
 
 export function Sidebar({ user }: { user: User | null }) {
@@ -37,9 +38,7 @@ export function Sidebar({ user }: { user: User | null }) {
       {/* Logo */}
       <div className="px-4 py-5 border-b border-white/[0.06]">
         <div className="flex items-center gap-2.5">
-          <div className="w-7 h-7 rounded-lg bg-violet-600/15 border border-violet-500/25 flex items-center justify-center flex-shrink-0">
-            <Scale size={13} className="text-violet-400" />
-          </div>
+          <Image src="/logo01.png" alt="Judicore" width={28} height={28} className="rounded-lg flex-shrink-0" />
           <span className="font-semibold text-sm text-white tracking-tight">Judicore</span>
         </div>
       </div>

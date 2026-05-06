@@ -3,8 +3,9 @@
 import { motion, useInView, useScroll, useTransform } from "framer-motion";
 import { useRef, useState, useEffect } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import {
-  Search, FileText, Shield, Zap, Scale, Brain,
+  Search, FileText, Shield, Zap, Brain,
   ArrowRight, CheckCircle, Lock, BookOpen, BarChart3,
   Clock, Sparkles, Database, ChevronRight, AlertTriangle,
   Gavel, ScrollText, Download,
@@ -95,9 +96,7 @@ export default function LandingPage() {
         className="fixed top-0 inset-x-0 z-50 flex items-center justify-between px-6 md:px-12 py-4 border-b border-white/5 backdrop-blur-xl bg-[#07070f]/80"
       >
         <div className="flex items-center gap-2">
-          <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-violet-500 to-indigo-600 flex items-center justify-center">
-            <Scale size={14} className="text-white" />
-          </div>
+          <Image src="/logo01.png" alt="Judicore" width={28} height={28} className="rounded-lg" />
           <span className="font-bold text-lg tracking-tight">Judicore</span>
         </div>
         <div className="flex items-center gap-4">
@@ -464,9 +463,7 @@ export default function LandingPage() {
       <footer className="border-t border-white/5 py-10 px-6">
         <div className="max-w-5xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
           <div className="flex items-center gap-2">
-            <div className="w-6 h-6 rounded-md bg-gradient-to-br from-violet-500 to-indigo-600 flex items-center justify-center">
-              <Scale size={12} className="text-white" />
-            </div>
+            <Image src="/logo01.png" alt="Judicore" width={24} height={24} className="rounded-md" />
             <span className="font-bold text-sm">Judicore</span>
             <span className="text-white/20 text-sm ml-2">Sistema de apoio à decisão judicial</span>
           </div>

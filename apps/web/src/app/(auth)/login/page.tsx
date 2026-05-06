@@ -5,7 +5,8 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { useAuthStore } from "@/store/auth";
 import { api } from "@/lib/api";
-import { ArrowLeft, Scale } from "lucide-react";
+import { ArrowLeft } from "lucide-react";
+import Image from "next/image";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -63,9 +64,7 @@ export default function LoginPage() {
         {/* Logo + título */}
         <div className="mb-8 text-center">
           <div className="flex items-center justify-center gap-2.5 mb-5">
-            <div className="w-9 h-9 rounded-xl bg-violet-600/15 border border-violet-500/25 flex items-center justify-center">
-              <Scale size={16} className="text-violet-400" />
-            </div>
+            <Image src="/logo01.png" alt="Judicore" width={36} height={36} className="rounded-xl" />
             <span className="font-semibold text-white tracking-tight">Judicore</span>
           </div>
           <h1 className="text-2xl font-semibold text-white leading-tight">
