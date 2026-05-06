@@ -39,8 +39,48 @@ rag.GEMINI_KEY = os.environ.get("GEMINI_API_KEY", "")
 rag._CLIENT = None  # força recriar o client com a chave correta
 
 
+def _search_merged(req: "SearchRequest", query_vector: list) -> list:
+    """Quando múltiplos tribunais são selecionados, busca cada um separadamente
+    para garantir representação de todos, depois ordena por _rrf_score."""
+    tribunais = req.tribunais or []
+    if len(tribunais) <= 1:
+        return rag.search_lancedb(
+            query=req.query,
+            query_vector=query_vector,
+            top_k=req.top_k,
+            sources=req.sources,
+            tribunais=tribunais or None,
+            tipos=req.tipos,
+            ramos=req.ramos,
+            date_from=req.date_from,
+            date_to=req.date_to,
+        )
+
+    per_trib = max(3, -(-req.top_k // len(tribunais)))  # ceil division
+    seen: set[str] = set()
+    merged: list = []
+    for trib in tribunais:
+        rows = rag.search_lancedb(
+            query=req.query,
+            query_vector=query_vector,
+            top_k=per_trib,
+            sources=req.sources,
+            tribunais=[trib],
+            tipos=req.tipos,
+            ramos=req.ramos,
+            date_from=req.date_from,
+            date_to=req.date_to,
+        )
+        for row in rows:
+            doc_id = str(row.get("doc_id") or id(row))
+            if doc_id not in seen:
+                seen.add(doc_id)
+                merged.append(row)
+    merged.sort(key=lambda x: float(x.get("_rrf_score") or x.get("score") or 0.0), reverse=True)
+    return merged
+
+
 def _warmup_sync():
-    """Abre o LanceDB e aquece o client Gemini antes da primeira requisição."""
     try:
         vec = rag.embed_query("jurisprudência")
         rag.search_lancedb(query="jurisprudência", query_vector=vec, top_k=1)
@@ -107,23 +147,8 @@ def search(req: SearchRequest):
     t0 = time.perf_counter()
 
     try:
-        # 1. Embeda a query com Gemini (mesmo modelo usado na ingestão)
         query_vector = rag.embed_query(req.query)
-
-        # 2. Busca híbrida (vector + FTS + RRF) no LanceDB
-        # Reranker cross-encoder desativado — muito lento em CPU (>200s)
-        # RRF já entrega boa ordenação sem reranker
-        candidates = rag.search_lancedb(
-            query=req.query,
-            query_vector=query_vector,
-            top_k=req.top_k,
-            sources=req.sources,
-            tribunais=req.tribunais,
-            tipos=req.tipos,
-            ramos=req.ramos,
-            date_from=req.date_from,
-            date_to=req.date_to,
-        )
+        candidates = _search_merged(req, query_vector)
         ranked = candidates
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))

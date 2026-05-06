@@ -44,10 +44,25 @@ export function ResultsPanel({ results, selected, onToggle }: Props) {
                   : <Square size={14} />}
               </div>
               <div className="min-w-0 flex-1">
-                <div className="flex items-center gap-2 mb-1">
+                <div className="flex items-center gap-2 mb-1 flex-wrap">
                   <span className="text-xs font-semibold text-primary">{j.tribunal}</span>
-                  <span className="text-xs text-muted-foreground">{j.numero}</span>
+                  {j.tipo && (
+                    <span className="text-[10px] px-1.5 py-0.5 rounded bg-secondary text-secondary-foreground font-medium">
+                      {j.tipo.replace(/_/g, " ")}
+                    </span>
+                  )}
+                  {j.autoridade && (
+                    <span className="text-[10px] px-1.5 py-0.5 rounded bg-violet-500/15 text-violet-400 font-medium">
+                      {j.autoridade}
+                    </span>
+                  )}
+                  {j.score != null && j.score > 0 && (
+                    <span className="ml-auto text-[10px] text-muted-foreground tabular-nums">
+                      {j.score.toFixed(4)}
+                    </span>
+                  )}
                 </div>
+                <span className="text-[10px] text-muted-foreground/70 mb-1 block">{j.numero}</span>
                 <p className="text-xs leading-relaxed line-clamp-3 text-foreground/80">{j.ementa}</p>
                 <div className="flex items-center justify-between mt-2">
                   <span className="text-xs text-muted-foreground">

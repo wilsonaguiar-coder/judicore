@@ -49,6 +49,9 @@ export interface Jurisprudencia {
   dataJulgamento: string;
   url: string;
   score?: number;
+  tipo?: string;
+  autoridade?: string;
+  fonte?: string;
 }
 
 export interface Document {
