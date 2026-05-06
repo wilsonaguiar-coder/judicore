@@ -8,47 +8,8 @@ const SCON_BASE = "https://scon.stj.jus.br/SCON";
 // STJ usa certificado ICP-Brasil não reconhecido pelo trust store padrão do Node.js
 const tlsAgent = new Agent({ connect: { rejectUnauthorized: false } });
 
-interface SconResult {
-  documento: Array<{
-    "num-processo"?: string[];
-    "min-relator"?: string[];
-    "orgao-julgador"?: string[];
-    "data-julgamento"?: string[];
-    ementa?: string[];
-    "num-registro"?: string[];
-    "processo-formato"?: string[];
-  }>;
-  registros?: number;
-}
-
 function delay(ms: number) {
   return new Promise((r) => setTimeout(r, ms));
-}
-
-async function fetchInteiroTeor(numReg: string, dtPublicacao: string): Promise<string> {
-  try {
-    const url = `${SCON_BASE}/GetInteiroTeorDoAcordao?num_registro=${numReg}&dt_publicacao=${dtPublicacao}`;
-    const res = await fetch(url, {
-      dispatcher: tlsAgent as any,
-      headers: { "User-Agent": "Judicore/1.0", Accept: "text/html" },
-    });
-    if (!res.ok) return "";
-    const html = await res.text();
-    // Remove tags HTML, CDATA e normaliza espaços
-    return html
-      .replace(/<style[\s\S]*?<\/style>/gi, "")
-      .replace(/<script[\s\S]*?<\/script>/gi, "")
-      .replace(/<[^>]+>/g, " ")
-      .replace(/&nbsp;/g, " ")
-      .replace(/&amp;/g, "&")
-      .replace(/&lt;/g, "<")
-      .replace(/&gt;/g, ">")
-      .replace(/\s{2,}/g, " ")
-      .trim()
-      .slice(0, 50000); // ES limita text fields grandes
-  } catch {
-    return "";
-  }
 }
 
 async function fetchSconPage(
@@ -148,17 +109,7 @@ export const stjAdapter: JurisprudenciaAdapter = {
         const { items, total } = await fetchSconPage(query, start);
         if (items.length === 0) break;
 
-        // Busca inteiro teor sequencialmente para não saturar a conexão
-        const enriched: Jurisprudencia[] = [];
-        for (const item of items) {
-          const numReg = item.id.replace("stj-", "");
-          const dtPublicacao = item.dataJulgamento.replace(/-/g, "/");
-          const conteudoIntegral = await fetchInteiroTeor(numReg, dtPublicacao);
-          enriched.push(conteudoIntegral ? { ...item, conteudoIntegral } : item);
-          await delay(500);
-        }
-
-        yield enriched;
+        yield items;
 
         start += 20;
         if (start > total) break;
