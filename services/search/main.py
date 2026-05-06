@@ -90,11 +90,13 @@ def search(req: SearchRequest):
         # 1. Embeda a query com Gemini (mesmo modelo usado na ingestão)
         query_vector = rag.embed_query(req.query)
 
-        # 2. Busca híbrida (vector + FTS) no LanceDB
+        # 2. Busca híbrida (vector + FTS + RRF) no LanceDB
+        # Reranker cross-encoder desativado — muito lento em CPU (>200s)
+        # RRF já entrega boa ordenação sem reranker
         candidates = rag.search_lancedb(
             query=req.query,
             query_vector=query_vector,
-            top_k=80,
+            top_k=req.top_k,
             sources=req.sources,
             tribunais=req.tribunais,
             tipos=req.tipos,
@@ -102,13 +104,7 @@ def search(req: SearchRequest):
             date_from=req.date_from,
             date_to=req.date_to,
         )
-
-        # 3. Reranking: semântico + léxico + recência
-        ranked = rag.rerank_results(
-            query=req.query,
-            results=candidates,
-            top_k=req.top_k,
-        )
+        ranked = candidates
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
