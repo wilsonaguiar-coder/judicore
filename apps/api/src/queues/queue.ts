@@ -10,8 +10,8 @@ export function getIndexingQueue(): Queue<IndexingJobData> {
     _queue = new Queue<IndexingJobData>(INDEXING_QUEUE, {
       connection: getRedisConnection(),
       defaultJobOptions: {
-        attempts: 3,
-        backoff: { type: "exponential", delay: 60_000 }, // 1min, 2min, 4min
+        attempts: 10,
+        backoff: { type: "exponential", delay: 120_000 }, // 2min, 4min, 8min... até ~68h de tentativas
         removeOnComplete: { count: 100 },
         removeOnFail: { count: 50 },
       },
