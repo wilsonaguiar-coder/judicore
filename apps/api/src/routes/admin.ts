@@ -2,7 +2,7 @@ import type { FastifyInstance } from "fastify";
 import { z } from "zod";
 import { getIndexingQueue } from "../queues/queue.js";
 import { buildJobData, SCHEDULE_CONFIG } from "../queues/schedule-config.js";
-import { getElasticsearchClient, JURISPRUDENCIA_INDEX } from "@judicore/search";
+import { getElasticsearchClient, JURISPRUDENCIA_INDEX, ensureIndices } from "@judicore/search";
 import type { LegalArea } from "@judicore/search";
 
 const triggerSchema = z.object({
@@ -29,6 +29,7 @@ export async function adminRoutes(app: FastifyInstance) {
     "/stats",
     { onRequest: [authenticate, requireAdmin] },
     async () => {
+      await ensureIndices();
       const es = getElasticsearchClient();
       const res = await es.search({
         index: JURISPRUDENCIA_INDEX,
