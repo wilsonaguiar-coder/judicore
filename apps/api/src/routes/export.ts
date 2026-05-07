@@ -1,9 +1,36 @@
 import type { FastifyInstance } from "fastify";
+import { z } from "zod";
 import { prisma } from "@judicore/db";
 import { generateDocx } from "../lib/docx-export.js";
 
 export async function exportRoutes(app: FastifyInstance) {
   const authenticate = (app as any).authenticate;
+
+  // POST /export/raw — exporta conteúdo em memória (busca livre, sem caso associado)
+  const rawSchema = z.object({
+    type:    z.enum(["DESPACHO", "DECISAO", "SENTENCA", "PETICAO_INICIAL", "RECURSO"]),
+    content: z.string().min(1),
+  });
+
+  app.post("/raw", { onRequest: [authenticate] }, async (request, reply) => {
+    const body = rawSchema.safeParse(request.body);
+    if (!body.success) return reply.status(400).send({ error: body.error.flatten() });
+
+    const buffer = await generateDocx({
+      type:        body.data.type,
+      content:     body.data.content,
+      caseTitle:   "Pesquisa livre",
+      generatedAt: new Date(),
+      sources:     [],
+    });
+
+    const filename = `judicore_${body.data.type.toLowerCase()}_${Date.now()}.docx`;
+
+    reply
+      .header("Content-Type", "application/vnd.openxmlformats-officedocument.wordprocessingml.document")
+      .header("Content-Disposition", `attachment; filename="${filename}"`)
+      .send(buffer);
+  });
 
   // GET /export/:documentId — baixa o documento como .docx
   app.get("/:documentId", { onRequest: [authenticate] }, async (request, reply) => {

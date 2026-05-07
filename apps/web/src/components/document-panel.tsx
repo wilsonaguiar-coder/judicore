@@ -108,12 +108,18 @@ export function DocumentPanel({ caseId, token, userRole, jurisprudencias, active
   }
 
   async function handleDownload() {
-    if (!activeDocId || streaming) return;
+    if (!activeDoc || streaming) return;
     setDownloading(true);
     try {
-      const res = await fetch(`/api/export/${activeDocId}`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      const res = activeDocId
+        ? await fetch(`/api/export/${activeDocId}`, {
+            headers: { Authorization: `Bearer ${token}` },
+          })
+        : await fetch("/api/export/raw", {
+            method: "POST",
+            headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+            body: JSON.stringify({ type: docType, content: activeDoc }),
+          });
       if (!res.ok) throw new Error("Falha ao baixar documento");
       const blob = await res.blob();
       const url = URL.createObjectURL(blob);
@@ -224,9 +230,9 @@ export function DocumentPanel({ caseId, token, userRole, jurisprudencias, active
               </button>
               <button
                 onClick={handleDownload}
-                disabled={streaming || !activeDocId || downloading}
+                disabled={streaming || !activeDoc || downloading}
                 className="flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground transition-colors disabled:opacity-40"
-                title={!activeDocId ? "Aguarde a geração concluir para exportar" : "Baixar como .docx"}
+                title="Baixar como .docx"
               >
                 {downloading
                   ? <Loader2 size={12} className="animate-spin" />
