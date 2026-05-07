@@ -25,7 +25,7 @@ const TJs = ["TJRJ","TJMG","TJRS","TJPR","TJSC","TJBA","TJPE","TJCE","TJGO","TJD
 const TRIBUNAIS_BY_AREA: Record<LegalArea, string[]> = {
   TRABALHISTA:    ["TST", ...TRTs],
   OUTRO:          ["TSE", ...TREs],
-  CRIMINAL:       ["STM", ...TRFs],
+  CRIMINAL:       ["STM", ...TRFs, ...TJs],
   TRIBUTARIO:     TRFs,
   PREVIDENCIARIO: TRFs,
   ADMINISTRATIVO: TRFs,
@@ -60,8 +60,8 @@ export const SCHEDULE_CONFIG: Array<{
   { area: "CRIMINAL",       cron: "0 4 * * 5",   sources: ALL_SOURCES, maxPages: 5 },
   { area: "AMBIENTAL",      cron: "0 3 * * 0",   sources: ALL_SOURCES, maxPages: 5 },
   { area: "TRABALHISTA",    cron: "0 4 * * 0",   sources: ALL_SOURCES, maxPages: 5 },
-  { area: "CIVIL",          cron: "0 2 * * 6",   sources: ALL_SOURCES, maxPages: 3 },
-  { area: "OUTRO",          cron: "0 5 * * 0",   sources: ["datajud"], maxPages: 3 },
+  { area: "CIVIL",          cron: "0 2 * * 6",   sources: ALL_SOURCES, maxPages: 5 },
+  { area: "OUTRO",          cron: "0 5 * * 0",   sources: ["datajud"], maxPages: 5 },
 ];
 
 export function buildJobData(

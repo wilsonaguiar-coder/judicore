@@ -26,7 +26,7 @@ export function startIndexingWorker(): Worker<IndexingJobData, IndexingJobResult
       const options: IndexerOptions = {
         area,
         maxPages,
-        delayMs: 1200,
+        delayMs: 960,
         ...(tribunais ? { tribunais } : {}),
       };
 
