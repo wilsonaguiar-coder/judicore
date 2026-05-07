@@ -17,12 +17,12 @@ export async function* generateDocumentStream(
       { role: "user", content: buildDocumentPrompt(type, caseDescription, jurisprudencias, instruction) },
     ],
     stream: true,
-    stream_options: { include_usage: true },
+    ...({ stream_options: { include_usage: true } } as any),
   });
 
   for await (const chunk of stream) {
-    if (chunk.usage && onUsage)
-      onUsage(chunk.usage.prompt_tokens, chunk.usage.completion_tokens);
+    const c = chunk as any;
+    if (c.usage && onUsage) onUsage(c.usage.prompt_tokens, c.usage.completion_tokens);
     const text = chunk.choices[0]?.delta?.content ?? "";
     if (text) yield text;
   }
@@ -72,12 +72,12 @@ export async function* generatePremiumDocumentStream(
       },
     ],
     stream: true,
-    stream_options: { include_usage: true },
+    ...({ stream_options: { include_usage: true } } as any),
   });
 
   for await (const chunk of stream) {
-    if (chunk.usage && onUsage)
-      onUsage(chunk.usage.prompt_tokens, chunk.usage.completion_tokens);
+    const c = chunk as any;
+    if (c.usage && onUsage) onUsage(c.usage.prompt_tokens, c.usage.completion_tokens);
     const text = chunk.choices[0]?.delta?.content ?? "";
     if (text) yield text;
   }
