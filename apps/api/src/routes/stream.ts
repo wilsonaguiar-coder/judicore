@@ -14,9 +14,17 @@ const jurisprudenciaSchema = z.object({
   url: z.string(),
 });
 
+const ALL_DOC_TYPES = ["DESPACHO", "DECISAO", "SENTENCA", "PETICAO_INICIAL", "RECURSO"] as const;
+
+const DOC_TYPES_BY_ROLE: Record<string, readonly string[]> = {
+  COMUM:    ["PETICAO_INICIAL", "RECURSO"],
+  SERVIDOR: ["DESPACHO", "DECISAO", "SENTENCA"],
+  ADMIN:    ALL_DOC_TYPES,
+};
+
 const streamSchema = z.object({
   caseId: z.string().optional(),
-  type: z.enum(["DESPACHO", "DECISAO", "SENTENCA"]),
+  type: z.enum(ALL_DOC_TYPES),
   jurisprudencias: z.array(jurisprudenciaSchema),
   instruction: z.string().optional(),
 });
@@ -27,9 +35,14 @@ export async function streamRoutes(app: FastifyInstance) {
   // SSE: POST /stream/generate
   // Retorna Server-Sent Events com chunks de texto
   app.post("/generate", { onRequest: [authenticate] }, async (request, reply) => {
-    const { sub } = request.user as { sub: string };
+    const { sub, role } = request.user as { sub: string; role: string };
     const body = streamSchema.safeParse(request.body);
     if (!body.success) return reply.status(400).send({ error: body.error.flatten() });
+
+    const allowed = DOC_TYPES_BY_ROLE[role] ?? [];
+    if (!allowed.includes(body.data.type)) {
+      return reply.status(403).send({ error: `Seu perfil não permite gerar documentos do tipo ${body.data.type}` });
+    }
 
     let caseDescription = "";
     if (body.data.caseId) {

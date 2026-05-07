@@ -9,7 +9,7 @@ export interface Jurisprudencia {
   score?: number;
 }
 
-export type DocumentType = "DESPACHO" | "DECISAO" | "SENTENCA";
+export type DocumentType = "DESPACHO" | "DECISAO" | "SENTENCA" | "PETICAO_INICIAL" | "RECURSO";
 
 export interface GenerateDocumentParams {
   type: DocumentType;

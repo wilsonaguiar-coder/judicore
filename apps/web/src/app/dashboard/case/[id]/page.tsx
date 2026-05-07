@@ -90,6 +90,7 @@ export default function CasePage() {
             <DocumentPanel
               caseId={id}
               token={token!}
+              userRole={user?.role ?? "COMUM"}
               jurisprudencias={selectedJurisprudencias}
               activeDoc={activeDoc}
               activeDocId={activeDocId}

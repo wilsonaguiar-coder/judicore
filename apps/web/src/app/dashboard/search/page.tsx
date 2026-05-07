@@ -54,6 +54,7 @@ export default function SearchPage() {
             <DocumentPanel
               caseId=""
               token={token!}
+              userRole={user?.role ?? "COMUM"}
               jurisprudencias={selectedJurisprudencias}
               activeDoc={activeDoc}
               activeDocId={activeDocId}

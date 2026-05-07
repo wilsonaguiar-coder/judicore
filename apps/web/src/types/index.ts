@@ -13,20 +13,31 @@ export const LEGAL_AREAS: Record<LegalArea, string> = {
   OUTRO: "Outro",
 };
 
-export type DocumentType = "DESPACHO" | "DECISAO" | "SENTENCA";
+export type DocumentType = "DESPACHO" | "DECISAO" | "SENTENCA" | "PETICAO_INICIAL" | "RECURSO";
 
 export const DOCUMENT_TYPES: Record<DocumentType, string> = {
-  DESPACHO: "Despacho",
-  DECISAO: "Decisão",
-  SENTENCA: "Sentença",
+  DESPACHO:        "Despacho",
+  DECISAO:         "Decisão",
+  SENTENCA:        "Sentença",
+  PETICAO_INICIAL: "Petição Inicial",
+  RECURSO:         "Recurso",
+};
+
+export type UserRole = "COMUM" | "SERVIDOR" | "ADMIN";
+
+export const DOC_TYPES_BY_ROLE: Record<UserRole, DocumentType[]> = {
+  COMUM:    ["PETICAO_INICIAL", "RECURSO"],
+  SERVIDOR: ["DESPACHO", "DECISAO", "SENTENCA"],
+  ADMIN:    ["DESPACHO", "DECISAO", "SENTENCA", "PETICAO_INICIAL", "RECURSO"],
 };
 
 export interface User {
   id: string;
   email: string;
   name: string;
-  role: string;
+  role: UserRole;
   defaultArea?: LegalArea;
+  accessExpiresAt?: string | null;
 }
 
 export interface Case {

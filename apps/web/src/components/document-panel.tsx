@@ -2,20 +2,22 @@
 
 import { useState, useRef } from "react";
 import { FileText, Loader2, Copy, Check, Square, CheckSquare, Download } from "lucide-react";
-import { DOCUMENT_TYPES } from "@/types";
-import type { DocumentType, Jurisprudencia } from "@/types";
+import { DOCUMENT_TYPES, DOC_TYPES_BY_ROLE } from "@/types";
+import type { DocumentType, Jurisprudencia, UserRole } from "@/types";
 
 interface Props {
   caseId: string;
   token: string;
+  userRole: UserRole;
   jurisprudencias: Jurisprudencia[];
   activeDoc: string | null;
   activeDocId: string | null;
   onDocGenerated: (content: string, docId?: string) => void;
 }
 
-export function DocumentPanel({ caseId, token, jurisprudencias, activeDoc, activeDocId, onDocGenerated }: Props) {
-  const [docType, setDocType] = useState<DocumentType>("DECISAO");
+export function DocumentPanel({ caseId, token, userRole, jurisprudencias, activeDoc, activeDocId, onDocGenerated }: Props) {
+  const allowedTypes = DOC_TYPES_BY_ROLE[userRole] ?? DOC_TYPES_BY_ROLE["COMUM"];
+  const [docType, setDocType] = useState<DocumentType>(allowedTypes[0]);
   const [instruction, setInstruction] = useState("");
   const [streaming, setStreaming] = useState(false);
   const [copied, setCopied] = useState(false);
@@ -135,8 +137,8 @@ export function DocumentPanel({ caseId, token, jurisprudencias, activeDoc, activ
 
       <div className="space-y-3 mb-4">
         {/* Seletor de tipo */}
-        <div className="grid grid-cols-3 gap-1.5 p-1 rounded-lg bg-muted">
-          {(Object.entries(DOCUMENT_TYPES) as [DocumentType, string][]).map(([k, v]) => (
+        <div className={`grid gap-1.5 p-1 rounded-lg bg-muted ${allowedTypes.length <= 3 ? "grid-cols-3" : "grid-cols-5"}`}>
+          {allowedTypes.map((k) => (
             <button
               key={k}
               onClick={() => setDocType(k)}
@@ -147,7 +149,7 @@ export function DocumentPanel({ caseId, token, jurisprudencias, activeDoc, activ
                   : "text-muted-foreground hover:text-foreground disabled:opacity-50"
               }`}
             >
-              {v}
+              {DOCUMENT_TYPES[k]}
             </button>
           ))}
         </div>

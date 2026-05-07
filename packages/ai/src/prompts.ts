@@ -1,7 +1,7 @@
 import type { Jurisprudencia } from "./types.js";
 
 export function buildSystemPrompt(): string {
-  return `Você é um assistente jurídico especializado em apoio à decisão judicial no âmbito da Justiça Federal brasileira.
+  return `Você é um assistente jurídico especializado na redação de peças e atos processuais no âmbito do direito brasileiro.
 
 REGRAS ABSOLUTAS — NUNCA VIOLE:
 1. NUNCA cite número de processo que não esteja explicitamente no contexto fornecido.
@@ -11,10 +11,11 @@ REGRAS ABSOLUTAS — NUNCA VIOLE:
 5. Toda citação jurisprudencial deve indicar: tribunal, número do processo e data de julgamento — todos retirados do contexto.
 
 Você pode e deve:
+- Redigir minutas de despacho, decisão interlocutória e sentença com linguagem judicial precisa.
+- Redigir petições iniciais e recursos com linguagem postulatória adequada.
 - Analisar as decisões fornecidas e extrair os fundamentos relevantes ao caso.
-- Redigir minutas de despacho, decisão e sentença com linguagem jurídica precisa.
 - Estruturar a fundamentação com lógica dedutiva clara.
-- Adaptar o texto ao estilo formal dos atos judiciais brasileiros.`;
+- Adaptar o texto ao estilo formal exigido por cada tipo de peça processual.`;
 }
 
 export function buildRagContext(jurisprudencias: Jurisprudencia[]): string {
@@ -35,20 +36,35 @@ ${items.join("\n---")}`;
 }
 
 export function buildDocumentPrompt(
-  type: "DESPACHO" | "DECISAO" | "SENTENCA",
+  type: "DESPACHO" | "DECISAO" | "SENTENCA" | "PETICAO_INICIAL" | "RECURSO",
   caseDescription: string,
   jurisprudencias: Jurisprudencia[],
   instruction?: string,
 ): string {
   const typeLabel: Record<string, string> = {
-    DESPACHO: "despacho",
-    DECISAO: "decisão interlocutória",
-    SENTENCA: "sentença",
+    DESPACHO:        "despacho",
+    DECISAO:         "decisão interlocutória",
+    SENTENCA:        "sentença",
+    PETICAO_INICIAL: "petição inicial",
+    RECURSO:         "recurso",
   };
 
   const instructionBlock = instruction?.trim()
-    ? `\n---\nORIENTAÇÃO DO MAGISTRADO:\n${instruction.trim()}\nUse esta orientação como norte para a peça. Fundamente exclusivamente nas decisões acima — não invente precedentes, leis ou fatos não fornecidos.\n`
+    ? `\n---\nORIENTAÇÃO ADICIONAL:\n${instruction.trim()}\nUse esta orientação como norte para a peça. Fundamente exclusivamente nas decisões acima — não invente precedentes, leis ou fatos não fornecidos.\n`
     : "";
+
+  const tarefaByType: Record<string, string> = {
+    DESPACHO:
+      "Redija uma minuta de despacho baseada exclusivamente nas decisões acima.\nEstruture o documento com: relatório sumário, fundamentação e dispositivo.",
+    DECISAO:
+      "Redija uma minuta de decisão interlocutória baseada exclusivamente nas decisões acima.\nEstruture o documento com: relatório, fundamentação jurídica (citando apenas as decisões do contexto) e dispositivo.",
+    SENTENCA:
+      "Redija uma minuta de sentença baseada exclusivamente nas decisões acima.\nEstruture o documento com: relatório, fundamentação jurídica (citando apenas as decisões do contexto) e dispositivo.",
+    PETICAO_INICIAL:
+      "Redija uma petição inicial em nome da parte autora, baseada nas decisões jurisprudenciais acima como fundamento.\nEstruture o documento com: endereçamento, qualificação das partes, dos fatos, do direito (citando apenas as decisões do contexto), dos pedidos e do valor da causa.",
+    RECURSO:
+      "Redija um recurso em nome da parte recorrente, baseado nas decisões jurisprudenciais acima como fundamento.\nEstruture o documento com: endereçamento, tempestividade, cabimento, razões recursais (citando apenas as decisões do contexto) e pedido de provimento.",
+  };
 
   return `${buildRagContext(jurisprudencias)}
 ${instructionBlock}
@@ -58,8 +74,7 @@ ${caseDescription}
 
 ---
 TAREFA:
-Redija uma minuta de ${typeLabel[type] ?? type} baseada exclusivamente nas decisões acima.
-Estruture o documento com: relatório, fundamentação jurídica (citando apenas as decisões do contexto) e dispositivo.
+${tarefaByType[type]}
 Indique no rodapé quais decisões foram utilizadas como fundamento.`;
 }
 

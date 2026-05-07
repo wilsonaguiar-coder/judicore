@@ -22,11 +22,12 @@ enum DocumentType {
   DESPACHO
   DECISAO
   SENTENCA
+  PETICAO_INICIAL
+  RECURSO
 }
 
 enum UserRole {
-  MAGISTRADO
-  ASSESSOR
+  COMUM
   SERVIDOR
   ADMIN
 }
@@ -36,10 +37,11 @@ model User {
   email        String     @unique
   name         String
   passwordHash String     @map("password_hash")
-  role         UserRole   @default(SERVIDOR)
-  defaultArea  LegalArea? @map("default_area")
-  createdAt    DateTime   @default(now()) @map("created_at")
-  updatedAt    DateTime   @updatedAt @map("updated_at")
+  role            UserRole   @default(COMUM)
+  defaultArea     LegalArea? @map("default_area")
+  accessExpiresAt DateTime?  @map("access_expires_at")
+  createdAt       DateTime   @default(now()) @map("created_at")
+  updatedAt       DateTime   @updatedAt @map("updated_at")
 
   cases Case[]
 
