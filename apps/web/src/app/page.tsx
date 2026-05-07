@@ -77,7 +77,7 @@ const STEPS = [
   { num: "03", icon: FileText, title: "Minuta gerada com IA", desc: "A IA recebe apenas os acórdãos que você selecionou e gera o documento — sem inventar nada além do contexto." },
 ];
 
-const TRIBUNAIS = ["STJ", "STF", "TRF1", "TRF2", "TRF3", "TRF4", "TRF5", "TRF6", "DataJud/CNJ"];
+const TRIBUNAIS = ["STJ", "STF", "TRF1", "TRF2", "TRF3", "TRF4", "TRF5", "TRF6", "TST", "TSE", "STM", "TJs", "TRTs", "DataJud/CNJ"];
 
 export default function LandingPage() {
   const heroRef = useRef(null);
