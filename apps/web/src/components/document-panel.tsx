@@ -191,6 +191,16 @@ export function DocumentPanel({ caseId, token, userRole, jurisprudencias, active
           ))}
         </div>
 
+        {/* Instrução */}
+        <textarea
+          value={instruction}
+          onChange={(e) => setInstruction(e.target.value)}
+          disabled={streaming}
+          placeholder="Orientação para a IA (opcional): entendimento a aplicar, artigos relevantes, direcionamento..."
+          rows={3}
+          className="w-full text-xs rounded-lg border bg-muted/30 px-3 py-2 resize-none placeholder:text-muted-foreground/50 focus:outline-none focus:ring-1 focus:ring-primary disabled:opacity-50"
+        />
+
         {/* Upload de PDFs (modo premium) */}
         {mode === "premium" && (
           <div className="space-y-2">
@@ -233,16 +243,6 @@ export function DocumentPanel({ caseId, token, userRole, jurisprudencias, active
             </p>
           </div>
         )}
-
-        {/* Instrução */}
-        <textarea
-          value={instruction}
-          onChange={(e) => setInstruction(e.target.value)}
-          disabled={streaming}
-          placeholder="Orientação para a IA (opcional): entendimento a aplicar, artigos relevantes, direcionamento..."
-          rows={3}
-          className="w-full text-xs rounded-lg border bg-muted/30 px-3 py-2 resize-none placeholder:text-muted-foreground/50 focus:outline-none focus:ring-1 focus:ring-primary disabled:opacity-50"
-        />
 
         {/* Contador de jurisprudências */}
         {mode === "padrao" && (
