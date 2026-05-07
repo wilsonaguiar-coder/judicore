@@ -170,7 +170,7 @@ export function DocumentPanel({ caseId, token, userRole, jurisprudencias, active
           }`}
         >
           <Sparkles size={11} />
-          Premium
+          Avançado
         </button>
       </div>
 
