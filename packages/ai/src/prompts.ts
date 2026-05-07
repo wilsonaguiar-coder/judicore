@@ -59,11 +59,54 @@ export function buildDocumentPrompt(
     DECISAO:
       "Redija uma minuta de decisão interlocutória baseada exclusivamente nas decisões acima.\nEstruture o documento com: relatório, fundamentação jurídica (citando apenas as decisões do contexto) e dispositivo.",
     SENTENCA:
-      "Redija uma minuta de sentença baseada exclusivamente nas decisões acima.\nEstruture o documento com: relatório, fundamentação jurídica (citando apenas as decisões do contexto) e dispositivo.",
-    PETICAO_INICIAL:
-      "Redija uma petição inicial em nome da parte autora, baseada nas decisões jurisprudenciais acima como fundamento.\nEstruture o documento com: endereçamento, qualificação das partes, dos fatos, do direito (citando apenas as decisões do contexto), dos pedidos e do valor da causa.",
-    RECURSO:
-      "Redija um recurso em nome da parte recorrente, baseado nas decisões jurisprudenciais acima como fundamento.\nEstruture o documento com: endereçamento, tempestividade, cabimento, razões recursais (citando apenas as decisões do contexto) e pedido de provimento.",
+      "Redija uma minuta de sentença completa e fundamentada.\nEstruture o documento com: relatório, fundamentação jurídica (citando apenas as decisões do contexto) e dispositivo.",
+    PETICAO_INICIAL: `Redija uma PETIÇÃO INICIAL completa, extensa e tecnicamente fundamentada em favor da parte autora.
+
+ESTRUTURA OBRIGATÓRIA — use exatamente estas seções e nesta ordem:
+
+EXCELENTÍSSIMO(A) SENHOR(A) DOUTOR(A) JUIZ(A) [endereçamento conforme competência]
+
+I — DA QUALIFICAÇÃO DAS PARTES
+  Qualifique completamente autor e réu com os dados disponíveis.
+
+II — DOS FATOS
+  Narre os fatos de forma cronológica, detalhada e objetiva com base na descrição do caso.
+  Mencione datas, valores e todos os elementos relevantes.
+
+III — DO DIREITO
+  Fundamente juridicamente cada pretensão com dispositivos legais (Constituição Federal, legislação específica) e doutrina quando pertinente.
+  Cite a jurisprudência fornecida para reforçar cada argumento. Desenvolva cada argumento em subseção própria.
+
+IV — DA TUTELA DE URGÊNCIA (se aplicável)
+  Fundamente com base no art. 300 do CPC/2015 (fumus boni iuris e periculum in mora).
+
+V — DA GRATUIDADE DA JUSTIÇA (se aplicável)
+  Fundamente com base no art. 98 do CPC/2015 e art. 5º, LXXIV da CF/88.
+
+VI — DOS PEDIDOS
+  Liste TODOS os pedidos numerados com seus respectivos fundamentos legais.
+
+VII — DO VALOR DA CAUSA
+  Atribua valor à causa conforme os pedidos formulados (art. 292 CPC/2015).
+
+A peça deve ser EXTENSA e COMPLETA — desenvolva cada seção com profundidade técnica. Não resuma onde cabe fundamentar.
+Indique no rodapé quais decisões foram utilizadas como fundamento.`,
+
+    RECURSO: `Redija um RECURSO completo, extenso e tecnicamente fundamentado em favor da parte recorrente.
+
+ESTRUTURA OBRIGATÓRIA:
+
+I — DA TEMPESTIVIDADE
+II — DO CABIMENTO E PREPARO
+III — DOS FATOS E DA DECISÃO RECORRIDA
+  Identifique os erros jurídicos da decisão com base na descrição do caso.
+IV — DAS RAZÕES RECURSAIS
+  Para cada ponto impugnado, desenvolva um subitem com: o erro apontado, o fundamento legal correto e a jurisprudência de suporte.
+V — DO PEDIDO
+  Requeira o conhecimento e o provimento do recurso com reforma ou anulação da decisão.
+
+A peça deve ser EXTENSA e COMPLETA — desenvolva cada seção com profundidade técnica.
+Indique no rodapé quais decisões foram utilizadas como fundamento.`,
   };
 
   return `${buildRagContext(jurisprudencias)}
@@ -73,9 +116,13 @@ CASO EM ANÁLISE:
 ${caseDescription}
 
 ---
+REGRAS:
+1. Cite APENAS jurisprudência explicitamente listada acima.
+2. Nunca invente datas, ementas, processos ou fatos não fornecidos.
+3. Para petições e recursos: você PODE citar legislação com base no seu conhecimento jurídico — dispositivos legais são necessários para a completude da peça.
+
 TAREFA:
-${tarefaByType[type]}
-Indique no rodapé quais decisões foram utilizadas como fundamento.`;
+${tarefaByType[type]}`;
 }
 
 export function buildPremiumDocumentPrompt(
