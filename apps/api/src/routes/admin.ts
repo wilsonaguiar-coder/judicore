@@ -143,6 +143,42 @@ export async function adminRoutes(app: FastifyInstance) {
     }
   );
 
+  // POST /admin/jobs/trigger-all — dispara indexação para todas as áreas
+  app.post(
+    "/jobs/trigger-all",
+    { onRequest: [authenticate, requireAdmin] },
+    async (request, reply) => {
+      const body = z.object({
+        sources: z.array(z.enum(["datajud", "stj", "stf"])).optional(),
+        maxPages: z.number().int().min(1).max(10).optional(),
+      }).safeParse(request.body);
+      if (!body.success) return reply.status(400).send({ error: body.error.flatten() });
+
+      const { sources, maxPages } = body.data;
+      const queue = getIndexingQueue();
+
+      const areas: LegalArea[] = ["TRIBUTARIO", "PREVIDENCIARIO", "ADMINISTRATIVO", "CRIMINAL", "AMBIENTAL", "TRABALHISTA", "CIVIL", "OUTRO"];
+      const jobs = await Promise.all(
+        areas.map((area) => {
+          const defaultConfig = SCHEDULE_CONFIG.find((c) => c.area === area);
+          const jobData = buildJobData(
+            area,
+            sources ?? defaultConfig?.sources ?? ["datajud", "stj"],
+            maxPages ?? defaultConfig?.maxPages ?? 5,
+            "manual"
+          );
+          return queue.add(`manual:${area}`, jobData, { priority: 1 });
+        })
+      );
+
+      return reply.status(202).send({
+        enqueued: jobs.length,
+        jobIds: jobs.map((j) => j.id),
+        message: "Todas as áreas enfileiradas",
+      });
+    }
+  );
+
   // POST /admin/jobs/clean — remove completed e failed da fila
   app.post(
     "/jobs/clean",

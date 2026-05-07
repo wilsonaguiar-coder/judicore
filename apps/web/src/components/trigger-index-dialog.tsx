@@ -17,9 +17,10 @@ interface Props {
 
 export function TriggerIndexDialog({ token, onTriggered }: Props) {
   const [open, setOpen] = useState(false);
+  const [allAreas, setAllAreas] = useState(false);
   const [area, setArea] = useState<LegalArea>("TRIBUTARIO");
-  const [sources, setSources] = useState<Source[]>(["datajud", "stj", "stf"]);
-  const [maxPages, setMaxPages] = useState(3);
+  const [sources, setSources] = useState<Source[]>(["datajud", "stj"]);
+  const [maxPages, setMaxPages] = useState(5);
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<string | null>(null);
 
@@ -34,12 +35,21 @@ export function TriggerIndexDialog({ token, onTriggered }: Props) {
     setLoading(true);
     setResult(null);
     try {
-      const res = await api.post<{ jobId: string; indexed: number }>(
-        "/admin/jobs/trigger",
-        { area, sources, maxPages },
-        token
-      );
-      setResult(`Job enfileirado: #${res.jobId}`);
+      if (allAreas) {
+        const res = await api.post<{ enqueued: number }>(
+          "/admin/jobs/trigger-all",
+          { sources, maxPages },
+          token
+        );
+        setResult(`${res.enqueued} áreas enfileiradas`);
+      } else {
+        const res = await api.post<{ jobId: string }>(
+          "/admin/jobs/trigger",
+          { area, sources, maxPages },
+          token
+        );
+        setResult(`Job enfileirado: #${res.jobId}`);
+      }
       onTriggered();
     } catch (e: any) {
       setResult(`Erro: ${e.message}`);
@@ -68,18 +78,32 @@ export function TriggerIndexDialog({ token, onTriggered }: Props) {
           </div>
 
           <div className="space-y-4">
-            <div className="space-y-1.5">
-              <label className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Área</label>
-              <select
-                value={area}
-                onChange={(e) => setArea(e.target.value as LegalArea)}
-                className="w-full px-3 py-2 text-sm rounded-md border bg-background focus:outline-none focus:ring-2 focus:ring-ring"
-              >
-                {(Object.entries(LEGAL_AREAS) as [LegalArea, string][]).map(([k, v]) => (
-                  <option key={k} value={k}>{v}</option>
-                ))}
-              </select>
-            </div>
+            <button
+              onClick={() => setAllAreas((v) => !v)}
+              className={`w-full flex items-center justify-between px-3 py-2.5 rounded-md border text-sm transition-colors ${
+                allAreas
+                  ? "bg-primary text-primary-foreground border-primary"
+                  : "bg-background text-muted-foreground hover:text-foreground"
+              }`}
+            >
+              <span className="font-medium">Todas as áreas</span>
+              <span className="text-xs opacity-70">8 áreas de uma vez</span>
+            </button>
+
+            {!allAreas && (
+              <div className="space-y-1.5">
+                <label className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Área</label>
+                <select
+                  value={area}
+                  onChange={(e) => setArea(e.target.value as LegalArea)}
+                  className="w-full px-3 py-2 text-sm rounded-md border bg-background focus:outline-none focus:ring-2 focus:ring-ring"
+                >
+                  {(Object.entries(LEGAL_AREAS) as [LegalArea, string][]).map(([k, v]) => (
+                    <option key={k} value={k}>{v}</option>
+                  ))}
+                </select>
+              </div>
+            )}
 
             <div className="space-y-1.5">
               <label className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Fontes</label>
