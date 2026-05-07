@@ -19,9 +19,11 @@ interface ExportParams {
 }
 
 const TYPE_LABEL: Record<DocumentType, string> = {
-  DESPACHO: "DESPACHO",
-  DECISAO:  "DECISÃO INTERLOCUTÓRIA",
-  SENTENCA: "SENTENÇA",
+  DESPACHO:        "DESPACHO",
+  DECISAO:         "DECISÃO INTERLOCUTÓRIA",
+  SENTENCA:        "SENTENÇA",
+  PETICAO_INICIAL: "PETIÇÃO INICIAL",
+  RECURSO:         "RECURSO",
 };
 
 function makeHeader(params: ExportParams) {
