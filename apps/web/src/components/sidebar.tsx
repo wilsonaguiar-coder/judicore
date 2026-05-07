@@ -2,7 +2,7 @@
 
 import { useRouter, usePathname } from "next/navigation";
 import { useAuthStore } from "@/store/auth";
-import { LogOut, Search, Settings } from "lucide-react";
+import { LogOut, Search, Settings, BarChart2 } from "lucide-react";
 import Image from "next/image";
 import type { User } from "@/types";
 
@@ -47,6 +47,8 @@ export function Sidebar({ user }: { user: User | null }) {
         {navItem("Pesquisa", <Search size={15} />, "/dashboard")}
         {user?.role === "ADMIN" &&
           navItem("Indexação", <Settings size={15} />, "/dashboard/admin")}
+        {user?.role === "ADMIN" &&
+          navItem("Uso de IA", <BarChart2 size={15} />, "/dashboard/admin/uso")}
       </nav>
 
       {/* User / Logout */}

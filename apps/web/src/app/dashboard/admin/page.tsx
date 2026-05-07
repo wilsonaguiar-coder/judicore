@@ -7,7 +7,7 @@ import { api } from "@/lib/api";
 import { Sidebar } from "@/components/sidebar";
 import { JobStatusBadge } from "@/components/job-status-badge";
 import { TriggerIndexDialog } from "@/components/trigger-index-dialog";
-import { RefreshCw, Loader2, Database, Trash2, Cpu, Zap } from "lucide-react";
+import { RefreshCw, Loader2, Database, Trash2 } from "lucide-react";
 
 interface RepeatableJob {
   key: string;
@@ -34,12 +34,6 @@ interface IndexStats {
   porTribunal: { tribunal: string; count: number }[];
 }
 
-interface UsageData {
-  period: number;
-  totals: { groqInput: number; groqOutput: number; geminiInput: number };
-  byDay: { date: string; groqInput: number; groqOutput: number; geminiInput: number }[];
-  byDocType: Record<string, { input: number; output: number; count: number }>;
-}
 
 interface QueueStatus {
   counts: { active: number; waiting: number; delayed: number };
@@ -53,10 +47,8 @@ interface QueueStatus {
 export default function AdminPage() {
   const { token, user } = useAuthStore();
   const router = useRouter();
-  const [tab, setTab] = useState<"indexacao" | "uso">("indexacao");
   const [status, setStatus] = useState<QueueStatus | null>(null);
   const [stats, setStats] = useState<IndexStats | null>(null);
-  const [usage, setUsage] = useState<UsageData | null>(null);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [cleaning, setCleaning] = useState(false);
@@ -64,14 +56,12 @@ export default function AdminPage() {
   const load = useCallback(async () => {
     if (!token) return;
     try {
-      const [data, indexStats, usageData] = await Promise.all([
+      const [data, indexStats] = await Promise.all([
         api.get<QueueStatus>("/admin/jobs", token),
         api.get<IndexStats>("/admin/stats", token),
-        api.get<UsageData>("/admin/usage", token),
       ]);
       setStatus(data);
       setStats(indexStats);
-      setUsage(usageData);
     } catch {
       router.push("/dashboard");
     } finally {
@@ -121,25 +111,8 @@ export default function AdminPage() {
       <main className="flex-1 overflow-auto">
         <div className="max-w-5xl mx-auto px-8 py-10 space-y-8">
 
-          {/* Tabs */}
-          <div className="flex items-center gap-1 border-b">
-            {(["indexacao", "uso"] as const).map((t) => (
-              <button
-                key={t}
-                onClick={() => setTab(t)}
-                className={`px-4 py-2 text-sm font-medium transition-colors border-b-2 -mb-px ${
-                  tab === t
-                    ? "border-primary text-foreground"
-                    : "border-transparent text-muted-foreground hover:text-foreground"
-                }`}
-              >
-                {t === "indexacao" ? "Indexação" : "Uso de IA"}
-              </button>
-            ))}
-          </div>
-
-          {/* ── TAB: INDEXAÇÃO ── */}
-          {tab === "indexacao" && <>
+          {/* ── INDEXAÇÃO ── */}
+          {<>
           {/* Header */}
           <div className="flex items-center justify-between">
             <div>
@@ -262,151 +235,12 @@ export default function AdminPage() {
           )}
           </>}
 
-          {/* ── TAB: USO DE IA ── */}
-          {tab === "uso" && usage && <UsageTab usage={usage} />}
-
         </div>
       </main>
     </div>
   );
 }
 
-const DOC_LABELS: Record<string, string> = {
-  PETICAO_INICIAL: "Petição Inicial",
-  RECURSO: "Recurso",
-  SENTENCA: "Sentença",
-  DECISAO: "Decisão",
-  DESPACHO: "Despacho",
-};
-
-function fmt(n: number) {
-  if (n >= 1_000_000) return `${(n / 1_000_000).toFixed(2)}M`;
-  if (n >= 1_000)     return `${(n / 1_000).toFixed(1)}k`;
-  return String(n);
-}
-
-function UsageTab({ usage }: { usage: UsageData }) {
-  const { totals, byDay, byDocType } = usage;
-  const groqCostInput  = (totals.groqInput  / 1_000_000) * 0.05;
-  const groqCostOutput = (totals.groqOutput / 1_000_000) * 0.08;
-  const geminiCost     = (totals.geminiInput / 1_000)    * 0.00002;
-  const totalCost      = groqCostInput + groqCostOutput + geminiCost;
-
-  return (
-    <div className="space-y-8">
-      <div>
-        <h1 className="text-xl font-semibold">Uso de IA</h1>
-        <p className="text-sm text-muted-foreground mt-0.5">Consumo de tokens nos últimos {usage.period} dias</p>
-      </div>
-
-      {/* Totais */}
-      <div className="grid grid-cols-2 gap-4">
-        <div className="rounded-lg border p-5 space-y-3">
-          <div className="flex items-center gap-2 text-sm font-medium">
-            <Cpu size={14} className="text-muted-foreground" />
-            Groq — Geração de documentos
-          </div>
-          <div className="grid grid-cols-2 gap-3">
-            <div>
-              <p className="text-xs text-muted-foreground">Input</p>
-              <p className="text-xl font-semibold">{fmt(totals.groqInput)}</p>
-            </div>
-            <div>
-              <p className="text-xs text-muted-foreground">Output</p>
-              <p className="text-xl font-semibold">{fmt(totals.groqOutput)}</p>
-            </div>
-          </div>
-          <p className="text-xs text-muted-foreground border-t pt-2">
-            Custo estimado: <span className="font-medium text-foreground">US$ {(groqCostInput + groqCostOutput).toFixed(4)}</span>
-          </p>
-        </div>
-
-        <div className="rounded-lg border p-5 space-y-3">
-          <div className="flex items-center gap-2 text-sm font-medium">
-            <Zap size={14} className="text-muted-foreground" />
-            Gemini — Embeddings de busca
-          </div>
-          <div>
-            <p className="text-xs text-muted-foreground">Tokens estimados</p>
-            <p className="text-xl font-semibold">{fmt(totals.geminiInput)}</p>
-          </div>
-          <p className="text-xs text-muted-foreground border-t pt-2">
-            Custo estimado: <span className="font-medium text-foreground">US$ {geminiCost.toFixed(4)}</span>
-          </p>
-        </div>
-      </div>
-
-      <div className="rounded-lg border px-5 py-3 flex items-center justify-between">
-        <span className="text-sm text-muted-foreground">Custo total estimado no período</span>
-        <span className="text-lg font-semibold">US$ {totalCost.toFixed(4)}</span>
-      </div>
-
-      {/* Por tipo de documento */}
-      {Object.keys(byDocType).length > 0 && (
-        <section>
-          <h2 className="text-sm font-semibold mb-3">Uso por tipo de peça (Groq)</h2>
-          <div className="rounded-lg border overflow-hidden">
-            <table className="w-full text-xs">
-              <thead className="bg-muted/50 text-muted-foreground">
-                <tr>
-                  <th className="px-4 py-2.5 text-left font-medium">Tipo</th>
-                  <th className="px-4 py-2.5 text-right font-medium">Gerações</th>
-                  <th className="px-4 py-2.5 text-right font-medium">Input</th>
-                  <th className="px-4 py-2.5 text-right font-medium">Output</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y">
-                {Object.entries(byDocType).map(([type, d]) => (
-                  <tr key={type} className="hover:bg-muted/20">
-                    <td className="px-4 py-2.5 font-medium">{DOC_LABELS[type] ?? type}</td>
-                    <td className="px-4 py-2.5 text-right text-muted-foreground">{d.count}</td>
-                    <td className="px-4 py-2.5 text-right">{fmt(d.input)}</td>
-                    <td className="px-4 py-2.5 text-right">{fmt(d.output)}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </section>
-      )}
-
-      {/* Por dia */}
-      {byDay.length > 0 && (
-        <section>
-          <h2 className="text-sm font-semibold mb-3">Histórico diário</h2>
-          <div className="rounded-lg border overflow-hidden">
-            <table className="w-full text-xs">
-              <thead className="bg-muted/50 text-muted-foreground">
-                <tr>
-                  <th className="px-4 py-2.5 text-left font-medium">Data</th>
-                  <th className="px-4 py-2.5 text-right font-medium">Groq Input</th>
-                  <th className="px-4 py-2.5 text-right font-medium">Groq Output</th>
-                  <th className="px-4 py-2.5 text-right font-medium">Gemini Embeds</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y">
-                {[...byDay].reverse().map((d) => (
-                  <tr key={d.date} className="hover:bg-muted/20">
-                    <td className="px-4 py-2.5 text-muted-foreground">{new Date(d.date + "T12:00:00").toLocaleDateString("pt-BR")}</td>
-                    <td className="px-4 py-2.5 text-right">{fmt(d.groqInput)}</td>
-                    <td className="px-4 py-2.5 text-right">{fmt(d.groqOutput)}</td>
-                    <td className="px-4 py-2.5 text-right text-muted-foreground">{fmt(d.geminiInput)}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </section>
-      )}
-
-      {byDay.length === 0 && (
-        <div className="text-center py-12 text-sm text-muted-foreground">
-          Nenhum registro de uso ainda. Os dados aparecerão após a primeira geração de documento ou busca.
-        </div>
-      )}
-    </div>
-  );
-}
 
 function JobRow({ job, variant }: { job: JobSummary; variant: "active" | "completed" | "failed" }) {
   const result = job.returnvalue;
