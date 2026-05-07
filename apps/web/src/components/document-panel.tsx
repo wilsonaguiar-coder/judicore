@@ -145,7 +145,9 @@ export function DocumentPanel({ caseId, token, userRole, jurisprudencias, active
   const canGenerate = mode === "premium" ? pdfFiles.length > 0 : jurisprudencias.length > 0;
 
   return (
-    <div className="p-4 flex flex-col h-full">
+    <div className="flex flex-col h-full min-h-0">
+      {/* Controles — altura fixa, rola se necessário */}
+      <div className="flex-shrink-0 overflow-y-auto p-4 border-b">
       <h2 className="text-xs font-semibold uppercase tracking-wide text-muted-foreground mb-3">
         Gerar documento
       </h2>
@@ -284,10 +286,11 @@ export function DocumentPanel({ caseId, token, userRole, jurisprudencias, active
           </button>
         )}
       </div>
+      </div>{/* fim controles */}
 
-      {/* Área do documento */}
+      {/* Área do documento — expande o restante da coluna */}
       {activeDoc ? (
-        <div className="flex-1 flex flex-col min-h-0">
+        <div className="flex-1 flex flex-col min-h-0 p-4 pt-3">
           <div className="flex items-center justify-between mb-2">
             <span className="text-xs font-medium text-muted-foreground flex items-center gap-1.5">
               {mode === "premium" && <Sparkles size={10} className="text-primary" />}
@@ -322,7 +325,7 @@ export function DocumentPanel({ caseId, token, userRole, jurisprudencias, active
           </div>
         </div>
       ) : (
-        <div className="flex-1 flex items-center justify-center text-xs text-muted-foreground text-center px-4">
+        <div className="flex-1 flex items-center justify-center text-xs text-muted-foreground text-center p-4">
           {mode === "premium"
             ? "Adicione os PDFs do processo, selecione decisões e clique em gerar."
             : "Selecione decisões relevantes e clique em gerar para criar a peça."}

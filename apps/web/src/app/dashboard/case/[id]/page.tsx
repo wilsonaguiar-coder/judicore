@@ -86,7 +86,7 @@ export default function CasePage() {
           </div>
 
           {/* Coluna 3: Geração de documentos */}
-          <div className="w-96 overflow-auto">
+          <div className="w-96 flex flex-col overflow-hidden">
             <DocumentPanel
               caseId={id}
               token={token!}
