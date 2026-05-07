@@ -7,7 +7,7 @@ import { api } from "@/lib/api";
 import { Sidebar } from "@/components/sidebar";
 import { JobStatusBadge } from "@/components/job-status-badge";
 import { TriggerIndexDialog } from "@/components/trigger-index-dialog";
-import { RefreshCw, Loader2, Database } from "lucide-react";
+import { RefreshCw, Loader2, Database, Trash2 } from "lucide-react";
 
 interface RepeatableJob {
   key: string;
@@ -50,6 +50,7 @@ export default function AdminPage() {
   const [stats, setStats] = useState<IndexStats | null>(null);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
+  const [cleaning, setCleaning] = useState(false);
 
   const load = useCallback(async () => {
     if (!token) return;
@@ -79,6 +80,17 @@ export default function AdminPage() {
   function handleRefresh() {
     setRefreshing(true);
     load();
+  }
+
+  async function handleClean() {
+    if (!token) return;
+    setCleaning(true);
+    try {
+      await api.post("/admin/jobs/clean", {}, token);
+      await load();
+    } finally {
+      setCleaning(false);
+    }
   }
 
   if (loading) {
@@ -114,6 +126,14 @@ export default function AdminPage() {
               >
                 <RefreshCw size={13} className={refreshing ? "animate-spin" : ""} />
                 Atualizar
+              </button>
+              <button
+                onClick={handleClean}
+                disabled={cleaning}
+                className="flex items-center gap-2 px-3 py-1.5 rounded-md border text-sm text-muted-foreground hover:text-destructive hover:border-destructive transition-colors disabled:opacity-50"
+              >
+                <Trash2 size={13} className={cleaning ? "animate-pulse" : ""} />
+                Limpar histórico
               </button>
               <TriggerIndexDialog token={token!} onTriggered={load} />
             </div>

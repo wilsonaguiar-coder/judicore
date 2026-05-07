@@ -143,6 +143,20 @@ export async function adminRoutes(app: FastifyInstance) {
     }
   );
 
+  // POST /admin/jobs/clean — remove completed e failed da fila
+  app.post(
+    "/jobs/clean",
+    { onRequest: [authenticate, requireAdmin] },
+    async () => {
+      const queue = getIndexingQueue();
+      const [completed, failed] = await Promise.all([
+        queue.clean(0, 1000, "completed"),
+        queue.clean(0, 1000, "failed"),
+      ]);
+      return { removed: { completed: completed.length, failed: failed.length } };
+    }
+  );
+
   // DELETE /admin/jobs/:id — cancela job pendente
   app.delete(
     "/jobs/:id",
