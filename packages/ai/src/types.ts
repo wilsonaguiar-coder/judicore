@@ -23,6 +23,15 @@ export interface AnalyzeParams {
   jurisprudencias: Jurisprudencia[];
 }
 
+export interface PremiumGenerateParams {
+  type: DocumentType;
+  documents: string[];           // textos extraídos dos PDFs
+  jurisprudencias: Jurisprudencia[];
+  legislation: Record<string, string>; // lei → texto do Planalto
+  caseDescription?: string;
+  instruction?: string;
+}
+
 export interface AIResult {
   content: string;
   modelUsed: string;

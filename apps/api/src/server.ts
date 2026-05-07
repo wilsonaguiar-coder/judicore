@@ -3,6 +3,7 @@ import Fastify from "fastify";
 import cors from "@fastify/cors";
 import jwt from "@fastify/jwt";
 import rateLimit from "@fastify/rate-limit";
+import multipart from "@fastify/multipart";
 import { authRoutes } from "./routes/auth.js";
 import { casesRoutes } from "./routes/cases.js";
 import { searchRoutes } from "./routes/search.js";
@@ -28,6 +29,10 @@ await app.register(jwt, {
 await app.register(rateLimit, {
   max: 100,
   timeWindow: "1 minute",
+});
+
+await app.register(multipart, {
+  limits: { fileSize: 5 * 1024 * 1024, files: 5 },
 });
 
 app.decorate("authenticate", async function (request: any, reply: any) {

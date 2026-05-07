@@ -78,6 +78,82 @@ ${tarefaByType[type]}
 Indique no rodapé quais decisões foram utilizadas como fundamento.`;
 }
 
+export function buildPremiumDocumentPrompt(
+  type: "DESPACHO" | "DECISAO" | "SENTENCA" | "PETICAO_INICIAL" | "RECURSO",
+  documents: string[],
+  jurisprudencias: Jurisprudencia[],
+  legislation: Record<string, string>,
+  caseDescription?: string,
+  instruction?: string,
+): string {
+  const typeLabel: Record<string, string> = {
+    DESPACHO:        "despacho",
+    DECISAO:         "decisão interlocutória",
+    SENTENCA:        "sentença",
+    PETICAO_INICIAL: "petição inicial",
+    RECURSO:         "recurso",
+  };
+
+  const docsBlock = documents.length > 0
+    ? `DOCUMENTOS DO PROCESSO (leia com atenção — estes são os documentos reais do caso):\n\n${documents.join("\n\n---\n\n")}`
+    : "";
+
+  const legBlock = Object.keys(legislation).length > 0
+    ? `LEGISLAÇÃO VERIFICADA NA FONTE OFICIAL (Planalto):\n${
+        Object.entries(legislation)
+          .map(([lei, texto]) => `\n=== ${lei} ===\n${texto}`)
+          .join("\n\n")
+      }`
+    : "";
+
+  const jurBlock = buildRagContext(jurisprudencias);
+
+  const instructionBlock = instruction?.trim()
+    ? `\nORIENTAÇÃO ADICIONAL:\n${instruction.trim()}\n`
+    : "";
+
+  const caseBlock = caseDescription?.trim()
+    ? `\nCONTEXTO ADICIONAL DO CASO:\n${caseDescription.trim()}\n`
+    : "";
+
+  const tarefaByType: Record<string, string> = {
+    DESPACHO:
+      "Redija um despacho com base nos documentos do processo e na jurisprudência fornecida.\nEstrutura: identificação do processo, decisão fundamentada e dispositivo.",
+    DECISAO:
+      "Redija uma decisão interlocutória fundamentada.\nAnalise os argumentos das partes nos documentos, confronte com a jurisprudência e decida motivadamente.\nEstrutura: relatório, fundamentação jurídica e dispositivo.",
+    SENTENCA:
+      "Redija uma sentença completa e fundamentada.\nAnalise a petição inicial, a contestação e demais documentos. Confronte os argumentos com a jurisprudência e a legislação fornecida.\nEstrutura: relatório, fundamentação jurídica (com citação de jurisprudência e legislação do contexto) e dispositivo.",
+    PETICAO_INICIAL:
+      "Redija uma petição inicial em favor da parte autora.\nBaseie-se nos fatos descritos nos documentos, fundamente juridicamente com a legislação e jurisprudência fornecidas.\nEstrutura: endereçamento, qualificação das partes, fatos, direito, pedidos e valor da causa.",
+    RECURSO:
+      "Redija um recurso em favor da parte recorrente.\nAnalise os argumentos da decisão recorrida e confronte-os com a jurisprudência e legislação fornecidas.\nEstrutura: endereçamento, tempestividade, cabimento, razões recursais e pedido de provimento.",
+  };
+
+  return `${docsBlock}
+
+---
+
+${jurBlock}
+
+---
+
+${legBlock}
+
+---
+${caseBlock}${instructionBlock}
+---
+
+REGRAS ABSOLUTAS:
+1. Cite APENAS jurisprudência que esteja explicitamente listada acima.
+2. Cite APENAS legislação que esteja no bloco "LEGISLAÇÃO VERIFICADA" acima. Se uma lei não estiver nesse bloco, NÃO a cite — nem de memória, nem de treinamento.
+3. Se a legislação relevante não estiver disponível, fundamente exclusivamente na jurisprudência fornecida e indique: "[base legal não disponível no contexto — verificar legislação aplicável]".
+4. Nunca invente processos, nomes, datas ou fatos não presentes nos documentos.
+
+TAREFA:
+${tarefaByType[type]}
+Indique no rodapé quais decisões e dispositivos legais foram utilizados.`;
+}
+
 export function buildAnalysisPrompt(
   caseDescription: string,
   jurisprudencias: Jurisprudencia[]

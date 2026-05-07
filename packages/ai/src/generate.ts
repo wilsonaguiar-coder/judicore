@@ -1,6 +1,6 @@
 import { getGroqClient, MODEL } from "./client.js";
-import { buildSystemPrompt, buildDocumentPrompt, buildAnalysisPrompt } from "./prompts.js";
-import type { GenerateDocumentParams, AnalyzeParams, AIResult } from "./types.js";
+import { buildSystemPrompt, buildDocumentPrompt, buildAnalysisPrompt, buildPremiumDocumentPrompt } from "./prompts.js";
+import type { GenerateDocumentParams, AnalyzeParams, AIResult, PremiumGenerateParams } from "./types.js";
 
 export async function* generateDocumentStream(
   params: GenerateDocumentParams
@@ -36,6 +36,33 @@ export async function* analyzeCaseStream(
     messages: [
       { role: "system", content: buildSystemPrompt() },
       { role: "user", content: buildAnalysisPrompt(caseDescription, jurisprudencias) },
+    ],
+    stream: true,
+  });
+
+  for await (const chunk of stream) {
+    const text = chunk.choices[0]?.delta?.content ?? "";
+    if (text) yield text;
+  }
+}
+
+export async function* generatePremiumDocumentStream(
+  params: PremiumGenerateParams
+): AsyncGenerator<string> {
+  const { type, documents, jurisprudencias, legislation, caseDescription, instruction } = params;
+  const client = getGroqClient();
+
+  const stream = await client.chat.completions.create({
+    model: MODEL,
+    max_tokens: 8192,
+    messages: [
+      { role: "system", content: buildSystemPrompt() },
+      {
+        role: "user",
+        content: buildPremiumDocumentPrompt(
+          type, documents, jurisprudencias, legislation, caseDescription, instruction
+        ),
+      },
     ],
     stream: true,
   });
