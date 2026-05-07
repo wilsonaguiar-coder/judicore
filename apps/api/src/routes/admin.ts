@@ -34,6 +34,7 @@ export async function adminRoutes(app: FastifyInstance) {
         index: JURISPRUDENCIA_INDEX,
         body: {
           size: 0,
+          track_total_hits: true,
           aggs: {
             por_area: { terms: { field: "area", size: 20 } },
             por_tribunal: { terms: { field: "tribunal", size: 40 } },
