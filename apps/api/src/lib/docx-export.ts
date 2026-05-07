@@ -30,16 +30,9 @@ function makeHeader(params: ExportParams) {
   return [
     new Paragraph({
       alignment: AlignmentType.CENTER,
-      spacing: { after: 200 },
-      children: [
-        new TextRun({ text: "JUSTIÇA FEDERAL", bold: true, size: 28, font: "Times New Roman" }),
-      ],
-    }),
-    new Paragraph({
-      alignment: AlignmentType.CENTER,
       spacing: { after: 400 },
       children: [
-        new TextRun({ text: TYPE_LABEL[params.type], bold: true, size: 26, font: "Times New Roman" }),
+        new TextRun({ text: TYPE_LABEL[params.type], bold: true, size: 28, font: "Times New Roman" }),
       ],
     }),
     new Paragraph({
