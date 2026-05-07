@@ -62,51 +62,64 @@ export function buildDocumentPrompt(
       "Redija uma minuta de sentença completa e fundamentada.\nEstruture o documento com: relatório, fundamentação jurídica (citando apenas as decisões do contexto) e dispositivo.",
     PETICAO_INICIAL: `Redija uma PETIÇÃO INICIAL completa, extensa e tecnicamente fundamentada em favor da parte autora.
 
-ESTRUTURA OBRIGATÓRIA — use exatamente estas seções e nesta ordem:
+ESTRUTURA OBRIGATÓRIA — siga exatamente esta ordem, sem repetir conteúdo entre seções:
 
 EXCELENTÍSSIMO(A) SENHOR(A) DOUTOR(A) JUIZ(A) [endereçamento conforme competência]
 
 I — DA QUALIFICAÇÃO DAS PARTES
-  Qualifique completamente autor e réu com os dados disponíveis.
+  Qualifique completamente autor e réu com todos os dados disponíveis.
 
 II — DOS FATOS
-  Narre os fatos de forma cronológica, detalhada e objetiva com base na descrição do caso.
-  Mencione datas, valores e todos os elementos relevantes.
+  Narre os fatos de forma cronológica, detalhada e objetiva. Mencione datas, valores e todos os elementos relevantes.
 
 III — DO DIREITO
-  Fundamente juridicamente cada pretensão com dispositivos legais (Constituição Federal, legislação específica) e doutrina quando pertinente.
-  Cite a jurisprudência fornecida para reforçar cada argumento. Desenvolva cada argumento em subseção própria.
+  Fundamente EXCLUSIVAMENTE o mérito da pretensão principal: por que o direito existe e por que a parte autora tem razão no mérito.
+  NÃO trate aqui de tutela de urgência nem de gratuidade — essas têm seções próprias abaixo.
+  Desenvolva subseções numeradas (3.1, 3.2...) para cada argumento jurídico.
+  Cite os dispositivos legais aplicáveis e as decisões jurisprudenciais fornecidas para reforçar cada argumento.
+  Esta é a seção mais importante — seja extenso e tecnicamente preciso.
 
-IV — DA TUTELA DE URGÊNCIA (se aplicável)
-  Fundamente com base no art. 300 do CPC/2015 (fumus boni iuris e periculum in mora).
+IV — DA TUTELA DE URGÊNCIA (omita esta seção se não houver urgência no caso)
+  Demonstre fumus boni iuris e periculum in mora com fatos concretos do caso.
+  Fundamente no art. 300 do CPC/2015. NÃO repita argumentos já desenvolvidos na seção III.
 
-V — DA GRATUIDADE DA JUSTIÇA (se aplicável)
-  Fundamente com base no art. 98 do CPC/2015 e art. 5º, LXXIV da CF/88.
+V — DA GRATUIDADE DA JUSTIÇA (omita se não houver indícios de hipossuficiência)
+  Fundamente no art. 98 do CPC/2015 e art. 5º, LXXIV da CF/88.
+  Indique os elementos do caso que demonstram a condição econômica da parte. NÃO repita texto de outras seções.
 
 VI — DOS PEDIDOS
-  Liste TODOS os pedidos numerados com seus respectivos fundamentos legais.
+  Liste todos os pedidos numerados, cada um com seu fundamento legal direto.
+  Inclua: citação do réu, tutela (se cabível), gratuidade (se cabível), mérito principal, condenações acessórias.
 
 VII — DO VALOR DA CAUSA
-  Atribua valor à causa conforme os pedidos formulados (art. 292 CPC/2015).
+  Calcule e justifique o valor com base nos pedidos formulados (art. 292 CPC/2015).
 
-A peça deve ser EXTENSA e COMPLETA — desenvolva cada seção com profundidade técnica. Não resuma onde cabe fundamentar.
-Indique no rodapé quais decisões foram utilizadas como fundamento.`,
+ATENÇÃO: produza apenas o texto da peça. Não inclua notas, ressalvas, disclaimers ou comentários sobre ausência de dados no corpo da peça.`,
 
     RECURSO: `Redija um RECURSO completo, extenso e tecnicamente fundamentado em favor da parte recorrente.
 
-ESTRUTURA OBRIGATÓRIA:
+ESTRUTURA OBRIGATÓRIA — não repita conteúdo entre seções:
 
 I — DA TEMPESTIVIDADE
-II — DO CABIMENTO E PREPARO
-III — DOS FATOS E DA DECISÃO RECORRIDA
-  Identifique os erros jurídicos da decisão com base na descrição do caso.
-IV — DAS RAZÕES RECURSAIS
-  Para cada ponto impugnado, desenvolva um subitem com: o erro apontado, o fundamento legal correto e a jurisprudência de suporte.
-V — DO PEDIDO
-  Requeira o conhecimento e o provimento do recurso com reforma ou anulação da decisão.
+  Comprove que o recurso é tempestivo com base nas datas relevantes.
 
-A peça deve ser EXTENSA e COMPLETA — desenvolva cada seção com profundidade técnica.
-Indique no rodapé quais decisões foram utilizadas como fundamento.`,
+II — DO CABIMENTO E PREPARO
+  Demonstre que o recurso é cabível e que o preparo foi realizado (ou mencione isenção, se aplicável).
+
+III — DOS FATOS E DA DECISÃO RECORRIDA
+  Resuma os fatos e transcreva ou descreva com precisão os pontos da decisão recorrida que são impugnados.
+
+IV — DAS RAZÕES RECURSAIS
+  Para cada ponto impugnado, abra um subitem numerado (4.1, 4.2...) contendo:
+    - O erro específico da decisão
+    - O fundamento legal correto
+    - A jurisprudência de suporte (cite as decisões fornecidas)
+  Esta é a seção mais importante — seja extenso, técnico e preciso.
+
+V — DO PEDIDO
+  Requeira o conhecimento e o provimento do recurso, com a reforma ou anulação da decisão nos pontos impugnados.
+
+ATENÇÃO: produza apenas o texto da peça. Não inclua notas, ressalvas ou disclaimers no corpo da peça.`,
   };
 
   return `${buildRagContext(jurisprudencias)}
@@ -119,7 +132,8 @@ ${caseDescription}
 REGRAS:
 1. Cite APENAS jurisprudência explicitamente listada acima.
 2. Nunca invente datas, ementas, processos ou fatos não fornecidos.
-3. Para petições e recursos: você PODE citar legislação com base no seu conhecimento jurídico — dispositivos legais são necessários para a completude da peça.
+3. Você PODE citar legislação com base no seu conhecimento jurídico — dispositivos legais são necessários para a completude da peça.
+4. Não inclua no texto final notas, ressalvas ou comentários meta sobre o que não foi fornecido.
 
 TAREFA:
 ${tarefaByType[type]}`;
@@ -180,53 +194,66 @@ export function buildPremiumDocumentPrompt(
 Extraia dos documentos todos os dados das partes (nome, estado civil, CPF, RG, endereço) para a qualificação.
 Analise o processo administrativo ou documentos anexos para reconstituir os fatos com precisão e detalhe.
 
-ESTRUTURA OBRIGATÓRIA — use exatamente estas seções e nesta ordem:
+ESTRUTURA OBRIGATÓRIA — siga exatamente esta ordem, sem repetir conteúdo entre seções:
 
 EXCELENTÍSSIMO(A) SENHOR(A) DOUTOR(A) JUIZ(A) [endereçamento correto conforme competência]
 
 I — DA QUALIFICAÇÃO DAS PARTES
-  Qualifique completamente autor e réu com todos os dados disponíveis nos documentos.
+  Qualifique completamente autor e réu com todos os dados extraídos dos documentos.
 
 II — DOS FATOS
   Narre os fatos de forma cronológica, detalhada e objetiva com base nos documentos do processo.
-  Mencione datas, valores, protocolo administrativo e todos os elementos relevantes extraídos dos documentos.
+  Mencione datas, valores, protocolos e todos os elementos relevantes extraídos dos documentos.
 
 III — DO DIREITO
-  Fundamente juridicamente cada pretensão com dispositivos legais (Constituição Federal, legislação específica, CDC se aplicável) e doutrina quando pertinente.
-  Cite a jurisprudência fornecida para reforçar cada argumento. Desenvolva cada argumento em subseção própria.
+  Fundamente EXCLUSIVAMENTE o mérito da pretensão principal: por que o direito existe e por que a parte autora tem razão.
+  NÃO trate aqui de tutela de urgência nem de gratuidade — essas têm seções próprias abaixo.
+  Desenvolva subseções numeradas (3.1, 3.2...) para cada argumento jurídico.
+  Cite dispositivos legais (Constituição Federal, legislação específica verificada no Planalto) e as decisões jurisprudenciais fornecidas.
+  Esta é a seção mais importante — seja extenso e tecnicamente preciso.
 
-IV — DA TUTELA DE URGÊNCIA (se aplicável)
-  Fundamente com base no art. 300 do CPC/2015 (fumus boni iuris e periculum in mora).
-  Demonstre concretamente a urgência e o risco de dano irreparável com base nos fatos.
+IV — DA TUTELA DE URGÊNCIA (omita se não houver urgência no caso)
+  Demonstre fumus boni iuris e periculum in mora com fatos concretos extraídos dos documentos.
+  Fundamente no art. 300 do CPC/2015. NÃO repita argumentos já desenvolvidos na seção III.
 
-V — DA GRATUIDADE DA JUSTIÇA (se aplicável)
-  Fundamente com base no art. 98 do CPC/2015 e art. 5º, LXXIV da CF/88.
-  Indique os elementos dos documentos que comprovam a hipossuficiência.
+V — DA GRATUIDADE DA JUSTIÇA (omita se não houver indícios de hipossuficiência nos documentos)
+  Fundamente no art. 98 do CPC/2015 e art. 5º, LXXIV da CF/88.
+  Indique os elementos dos documentos que comprovam a condição econômica da parte. NÃO repita texto de outras seções.
 
 VI — DOS PEDIDOS
-  Liste TODOS os pedidos numerados, cada um com seu respectivo fundamento legal.
-  Inclua: citação do réu, tutela de urgência (se cabível), gratuidade, mérito principal, condenações acessórias e valor da causa.
+  Liste todos os pedidos numerados, cada um com seu fundamento legal direto.
+  Inclua: citação do réu, tutela (se cabível), gratuidade (se cabível), mérito principal, condenações acessórias.
 
 VII — DO VALOR DA CAUSA
-  Atribua valor à causa conforme os pedidos formulados (art. 292 CPC/2015).
+  Calcule e justifique o valor com base nos pedidos formulados (art. 292 CPC/2015).
 
-Ao final, indique as decisões jurisprudenciais e os dispositivos legais utilizados.`,
+ATENÇÃO: produza apenas o texto da peça. Não inclua notas, ressalvas, disclaimers ou comentários sobre ausência de dados.`,
 
     RECURSO: `Redija um RECURSO completo, extenso e tecnicamente fundamentado em favor da parte recorrente.
 Analise detalhadamente a decisão recorrida nos documentos e construa as razões recursais ponto a ponto.
 
-ESTRUTURA OBRIGATÓRIA:
+ESTRUTURA OBRIGATÓRIA — não repita conteúdo entre seções:
 
 I — DA TEMPESTIVIDADE
+  Comprove que o recurso é tempestivo com base nas datas dos documentos.
+
 II — DO CABIMENTO E PREPARO
+  Demonstre que o recurso é cabível e informe sobre o preparo.
+
 III — DOS FATOS E DA DECISÃO RECORRIDA
-  Resuma os fatos e identifique os erros jurídicos da decisão.
+  Resuma os fatos com base nos documentos e descreva com precisão os pontos impugnados da decisão.
+
 IV — DAS RAZÕES RECURSAIS
-  Para cada ponto impugnado, desenvolva um subitem com: o erro apontado, o fundamento legal correto e a jurisprudência de suporte.
+  Para cada ponto impugnado, abra um subitem numerado (4.1, 4.2...) contendo:
+    - O erro específico da decisão
+    - O fundamento legal correto (com base na legislação verificada)
+    - A jurisprudência de suporte (cite as decisões fornecidas)
+  Esta é a seção mais importante — seja extenso, técnico e preciso.
+
 V — DO PEDIDO
   Requeira o conhecimento e o provimento do recurso com reforma ou anulação da decisão.
 
-Ao final, indique as decisões e dispositivos utilizados.`,
+ATENÇÃO: produza apenas o texto da peça. Não inclua notas, ressalvas ou disclaimers.`,
   };
 
   return `${docsBlock}
