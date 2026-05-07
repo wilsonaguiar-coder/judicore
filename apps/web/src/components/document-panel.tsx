@@ -51,16 +51,12 @@ export function DocumentPanel({ caseId, token, userRole, jurisprudencias, active
       if (done) break;
       for (const line of decoder.decode(value, { stream: true }).split("\n")) {
         if (!line.startsWith("data: ")) continue;
-        try {
-          const parsed = JSON.parse(line.slice(6)) as {
-            chunk?: string; done?: boolean; error?: string;
-            status?: string; documentId?: string;
-          };
-          if (parsed.error) throw new Error(parsed.error);
-          if (parsed.status) setStatusMsg(parsed.status);
-          if (parsed.chunk) { accumulated += parsed.chunk; onDocGenerated(accumulated); }
-          if (parsed.done && parsed.documentId) onDocGenerated(accumulated, parsed.documentId);
-        } catch { /* linha incompleta */ }
+        let parsed: { chunk?: string; done?: boolean; error?: string; status?: string; documentId?: string };
+        try { parsed = JSON.parse(line.slice(6)); } catch { continue; }
+        if (parsed.error) throw new Error(parsed.error);
+        if (parsed.status) setStatusMsg(parsed.status);
+        if (parsed.chunk) { accumulated += parsed.chunk; onDocGenerated(accumulated); }
+        if (parsed.done) onDocGenerated(accumulated, parsed.documentId);
       }
     }
   }
