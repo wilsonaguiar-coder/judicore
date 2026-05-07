@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { useAuthStore } from "@/store/auth";
 import { api } from "@/lib/api";
 import { Sidebar } from "@/components/sidebar";
-import { Loader2, Cpu, Zap } from "lucide-react";
+import { Loader2, Cpu } from "lucide-react";
 
 interface UsageData {
   period: number;
@@ -13,6 +13,7 @@ interface UsageData {
   byDay: { date: string; groqInput: number; groqOutput: number; geminiInput: number }[];
   byDocType: Record<string, { input: number; output: number; count: number }>;
 }
+
 
 const DOC_LABELS: Record<string, string> = {
   PETICAO_INICIAL: "Petição Inicial",
@@ -67,10 +68,9 @@ export default function UsagePage() {
   const byDay = usage?.byDay ?? [];
   const byDocType = usage?.byDocType ?? {};
 
-  const groqCostInput  = (totals.groqInput  / 1_000_000) * 0.05;
-  const groqCostOutput = (totals.groqOutput / 1_000_000) * 0.08;
-  const geminiCost     = (totals.geminiInput / 1_000)    * 0.00002;
-  const totalCost      = groqCostInput + groqCostOutput + geminiCost;
+  const groqCostInput  = (totals.groqInput  / 1_000_000) * 0.15;
+  const groqCostOutput = (totals.groqOutput / 1_000_000) * 0.60;
+  const totalCost      = groqCostInput + groqCostOutput;
 
   return (
     <div className="flex h-screen bg-background">
@@ -85,59 +85,32 @@ export default function UsagePage() {
             </p>
           </div>
 
-          {/* Cards Groq / Gemini */}
-          <div className="grid grid-cols-2 gap-4">
-            <div className="rounded-lg border p-5 space-y-3">
-              <div className="flex items-center gap-2 text-sm font-medium">
-                <Cpu size={14} className="text-muted-foreground" />
-                DeepSeek R1 — Geração de documentos
-              </div>
-              <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <p className="text-xs text-muted-foreground">Input</p>
-                  <p className="text-2xl font-semibold">{fmt(totals.groqInput)}</p>
-                </div>
-                <div>
-                  <p className="text-xs text-muted-foreground">Output</p>
-                  <p className="text-2xl font-semibold">{fmt(totals.groqOutput)}</p>
-                </div>
-              </div>
-              <p className="text-xs text-muted-foreground border-t pt-2">
-                Custo estimado:{" "}
-                <span className="font-medium text-foreground">
-                  US$ {(groqCostInput + groqCostOutput).toFixed(4)}
-                </span>
-              </p>
+          {/* Card Groq */}
+          <div className="rounded-lg border p-5 space-y-3">
+            <div className="flex items-center gap-2 text-sm font-medium">
+              <Cpu size={14} className="text-muted-foreground" />
+              Groq — Geração de documentos
             </div>
-
-            <div className="rounded-lg border p-5 space-y-3">
-              <div className="flex items-center gap-2 text-sm font-medium">
-                <Zap size={14} className="text-muted-foreground" />
-                Gemini — Embeddings de busca
+            <div className="grid grid-cols-3 gap-3">
+              <div>
+                <p className="text-xs text-muted-foreground">Input</p>
+                <p className="text-2xl font-semibold">{fmt(totals.groqInput)}</p>
               </div>
               <div>
-                <p className="text-xs text-muted-foreground">Tokens estimados</p>
-                <p className="text-2xl font-semibold">{fmt(totals.geminiInput)}</p>
+                <p className="text-xs text-muted-foreground">Output</p>
+                <p className="text-2xl font-semibold">{fmt(totals.groqOutput)}</p>
               </div>
-              <p className="text-xs text-muted-foreground border-t pt-2">
-                Custo estimado:{" "}
-                <span className="font-medium text-foreground">
-                  US$ {geminiCost.toFixed(4)}
-                </span>
-              </p>
+              <div>
+                <p className="text-xs text-muted-foreground">Custo estimado</p>
+                <p className="text-2xl font-semibold">US$ {totalCost.toFixed(4)}</p>
+              </div>
             </div>
-          </div>
-
-          {/* Total */}
-          <div className="rounded-lg border px-5 py-3 flex items-center justify-between">
-            <span className="text-sm text-muted-foreground">Custo total estimado no período</span>
-            <span className="text-lg font-semibold">US$ {totalCost.toFixed(4)}</span>
           </div>
 
           {/* Por tipo de peça */}
           {Object.keys(byDocType).length > 0 && (
             <section>
-              <h2 className="text-sm font-semibold mb-3">Uso por tipo de peça (DeepSeek R1)</h2>
+              <h2 className="text-sm font-semibold mb-3">Uso por tipo de peça</h2>
               <div className="rounded-lg border overflow-hidden">
                 <table className="w-full text-xs">
                   <thead className="bg-muted/50 text-muted-foreground">
@@ -172,9 +145,8 @@ export default function UsagePage() {
                   <thead className="bg-muted/50 text-muted-foreground">
                     <tr>
                       <th className="px-4 py-2.5 text-left font-medium">Data</th>
-                      <th className="px-4 py-2.5 text-right font-medium">Groq Input</th>
-                      <th className="px-4 py-2.5 text-right font-medium">Groq Output</th>
-                      <th className="px-4 py-2.5 text-right font-medium">Gemini Embeds</th>
+                      <th className="px-4 py-2.5 text-right font-medium">Input</th>
+                      <th className="px-4 py-2.5 text-right font-medium">Output</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y">
@@ -185,7 +157,6 @@ export default function UsagePage() {
                         </td>
                         <td className="px-4 py-2.5 text-right">{fmt(d.groqInput)}</td>
                         <td className="px-4 py-2.5 text-right">{fmt(d.groqOutput)}</td>
-                        <td className="px-4 py-2.5 text-right text-muted-foreground">{fmt(d.geminiInput)}</td>
                       </tr>
                     ))}
                   </tbody>
