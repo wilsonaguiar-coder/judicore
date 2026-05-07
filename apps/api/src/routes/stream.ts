@@ -94,7 +94,7 @@ export async function streamRoutes(app: FastifyInstance) {
             content: fullContent,
             instruction: body.data.instruction ?? null,
             sourcesJson: body.data.jurisprudencias as any,
-            modelUsed: "deepseek-r1-distill-llama-70b",
+            modelUsed: "openai/gpt-oss-120b",
           },
         });
         reply.raw.write(`data: ${JSON.stringify({ done: true, documentId: doc.id })}\n\n`);
@@ -209,7 +209,7 @@ export async function streamRoutes(app: FastifyInstance) {
             content: fullContent,
             instruction: instruction || null,
             sourcesJson: jurisprudencias as any,
-            modelUsed: "deepseek-r1-distill-llama-70b",
+            modelUsed: "openai/gpt-oss-120b",
           },
         });
         reply.raw.write(`data: ${JSON.stringify({ done: true, documentId: doc.id })}\n\n`);
