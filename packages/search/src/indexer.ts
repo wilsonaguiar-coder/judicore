@@ -15,9 +15,7 @@ export async function runIndexer(
   console.log(`[${adapter.name}] Iniciando indexação para: "${query}"`);
 
   for await (const batch of adapter.fetch(query, options)) {
-    const batchFinal = options.area
-      ? batch.map((doc) => doc.area === "OUTRO" ? { ...doc, area: options.area! } : doc)
-      : batch;
+    const batchFinal = batch;
     try {
       await bulkIndexJurisprudencia(batchFinal);
       indexed += batch.length;

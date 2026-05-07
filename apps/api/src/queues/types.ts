@@ -5,8 +5,8 @@ export type IndexingSource = "datajud" | "stj" | "stf";
 export interface IndexingJobData {
   area: LegalArea;
   sources: IndexingSource[];
-  // termos de busca pré-definidos por área — ampliados ao longo do tempo
   queries: string[];
+  tribunais?: string[];
   maxPages: number;
   triggeredBy: "scheduler" | "manual";
 }

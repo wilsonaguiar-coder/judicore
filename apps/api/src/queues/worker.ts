@@ -15,7 +15,7 @@ export function startIndexingWorker(): Worker<IndexingJobData, IndexingJobResult
   const worker = new Worker<IndexingJobData, IndexingJobResult>(
     INDEXING_QUEUE,
     async (job) => {
-      const { area, sources = ["datajud", "stj"], queries, maxPages } = job.data;
+      const { area, sources = ["datajud", "stj"], queries, tribunais, maxPages } = job.data;
       const start = Date.now();
 
       console.log(`[worker] Iniciando job ${job.id} — área: ${area}, fontes: ${sources.join(", ")}`);
@@ -27,6 +27,7 @@ export function startIndexingWorker(): Worker<IndexingJobData, IndexingJobResult
         area,
         maxPages,
         delayMs: 1200,
+        ...(tribunais ? { tribunais } : {}),
       };
 
       for (const source of sources) {

@@ -46,8 +46,7 @@ const TRIBUNAL_ALIAS: Record<string, string> = {
   TRT23: "api_publica_trt23",
   TRT24: "api_publica_trt24",
 
-  // Tribunais de Justiça Estaduais
-  TJSP:  "api_publica_tjsp",
+  // Tribunais de Justiça Estaduais (TJSP excluído — já indexado via LanceDB com inteiro teor)
   TJRJ:  "api_publica_tjrj",
   TJMG:  "api_publica_tjmg",
   TJRS:  "api_publica_tjrs",
@@ -109,6 +108,13 @@ const TRIBUNAL_ALIAS: Record<string, string> = {
   "TRE-SP": "api_publica_tre-sp",
   "TRE-TO": "api_publica_tre-to",
 };
+
+function inferAreaFromTribunal(tribunal: string): LegalArea | null {
+  if (tribunal.startsWith("TRT") || tribunal === "TST") return "TRABALHISTA";
+  if (tribunal.startsWith("TRE") || tribunal === "TSE") return "OUTRO";
+  if (tribunal === "STM") return "CRIMINAL";
+  return null;
+}
 
 function classifyArea(assuntos: Array<{ nome?: string }> = [], classe = ""): LegalArea {
   const text = [...assuntos.map((a) => a.nome ?? ""), classe].join(" ").toLowerCase();
@@ -173,7 +179,7 @@ function mapToJurisprudencia(hit: DataJudHit, tribunal: string): Jurisprudencia 
     ementa: assunto || src.classeProcessual?.nome || "Sem ementa disponível",
     relator: src.orgaoJulgador?.nome ?? "Não informado",
     dataJulgamento: ultimoMov?.dataHora?.slice(0, 10) ?? src.dataHoraUltimaAtualizacao?.slice(0, 10) ?? "",
-    area: classifyArea(src.assuntos ?? [], src.classeProcessual?.nome ?? ""),
+    area: inferAreaFromTribunal(tribunal) ?? classifyArea(src.assuntos ?? [], src.classeProcessual?.nome ?? ""),
     url: getTribunalUrl(tribunal, src.numeroProcesso),
   };
 }
@@ -188,13 +194,9 @@ async function fetchPage(
 
   const body: Record<string, unknown> = {
     size: 20,
-    query: {
-      multi_match: {
-        query,
-        fields: ["assuntos.nome^2", "classeProcessual.nome", "movimentos.nome"],
-        fuzziness: "AUTO",
-      },
-    },
+    query: query.trim()
+      ? { multi_match: { query, fields: ["assuntos.nome^2", "classeProcessual.nome", "movimentos.nome"], fuzziness: "AUTO" } }
+      : { match_all: {} },
     sort: [{ dataHoraUltimaAtualizacao: "desc" }],
   };
 
