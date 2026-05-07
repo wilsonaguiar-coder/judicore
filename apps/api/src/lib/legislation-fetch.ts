@@ -50,23 +50,18 @@ function buildUrls(ref: string): string[] {
     if (lower === alias || lower.includes(alias)) return [url];
 
   const leiMatch = ref.match(/Lei\s+(?:n[oº°]?\s*\.?\s*)?([\d.]+)\/(\d{4})/i);
-  if (leiMatch) {
-    const num = leiMatch[1].replace(/\./g, "");
-    const year = parseInt(leiMatch[2]);
-    return buildLeiUrls(num, year);
+  if (leiMatch && leiMatch[1] && leiMatch[2]) {
+    return buildLeiUrls(leiMatch[1].replace(/\./g, ""), parseInt(leiMatch[2]));
   }
 
   const dlMatch = ref.match(/Decreto-Lei\s+(?:n[oº°]?\s*\.?\s*)?([\d.]+)\/(\d{4})/i);
-  if (dlMatch) {
-    const num = dlMatch[1].replace(/\./g, "");
-    return [`https://www.planalto.gov.br/ccivil_03/decreto-lei/del${num}.htm`];
+  if (dlMatch && dlMatch[1]) {
+    return [`https://www.planalto.gov.br/ccivil_03/decreto-lei/del${dlMatch[1].replace(/\./g, "")}.htm`];
   }
 
   const lcMatch = ref.match(/Lei\s+Complementar\s+(?:n[oº°]?\s*\.?\s*)?([\d]+)\/(\d{4})/i);
-  if (lcMatch) {
-    const num = lcMatch[1].replace(/\./g, "");
-    const year = parseInt(lcMatch[2]);
-    return buildLcUrls(num, year);
+  if (lcMatch && lcMatch[1] && lcMatch[2]) {
+    return buildLcUrls(lcMatch[1].replace(/\./g, ""), parseInt(lcMatch[2]));
   }
 
   return [];

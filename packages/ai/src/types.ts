@@ -28,8 +28,8 @@ export interface PremiumGenerateParams {
   documents: string[];           // textos extraídos dos PDFs
   jurisprudencias: Jurisprudencia[];
   legislation: Record<string, string>; // lei → texto do Planalto
-  caseDescription?: string;
-  instruction?: string;
+  caseDescription?: string | undefined;
+  instruction?: string | undefined;
 }
 
 export interface AIResult {
