@@ -90,7 +90,7 @@ export default function UsagePage() {
             <div className="rounded-lg border p-5 space-y-3">
               <div className="flex items-center gap-2 text-sm font-medium">
                 <Cpu size={14} className="text-muted-foreground" />
-                Groq — Geração de documentos
+                DeepSeek R1 — Geração de documentos
               </div>
               <div className="grid grid-cols-2 gap-3">
                 <div>

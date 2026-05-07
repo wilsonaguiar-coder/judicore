@@ -2,6 +2,52 @@ import { getGroqClient, MODEL } from "./client.js";
 import { buildSystemPrompt, buildDocumentPrompt, buildAnalysisPrompt, buildPremiumDocumentPrompt } from "./prompts.js";
 import type { GenerateDocumentParams, AnalyzeParams, AIResult, PremiumGenerateParams } from "./types.js";
 
+/** Remove blocos <think>...</think> gerados por modelos de raciocínio (DeepSeek R1, QwQ). */
+async function* filterThink(
+  chunks: AsyncIterable<any>,
+  onUsage?: (input: number, output: number) => void,
+): AsyncGenerator<string> {
+  let inThink = false;
+  let buf = "";
+
+  for await (const chunk of chunks) {
+    if (chunk.usage) {
+      if (onUsage) onUsage(chunk.usage.prompt_tokens, chunk.usage.completion_tokens);
+      continue;
+    }
+    const text: string = chunk.choices?.[0]?.delta?.content ?? "";
+    if (!text) continue;
+
+    buf += text;
+
+    while (buf.length > 0) {
+      if (inThink) {
+        const end = buf.indexOf("</think>");
+        if (end === -1) { buf = buf.slice(-20); break; }
+        buf = buf.slice(end + 8).replace(/^\n+/, "");
+        inThink = false;
+      } else {
+        const start = buf.indexOf("<think>");
+        if (start === -1) {
+          const tag = "<think>";
+          let partial = 0;
+          for (let i = 1; i < tag.length; i++)
+            if (buf.endsWith(tag.slice(0, i))) { partial = i; break; }
+          const safe = buf.slice(0, buf.length - partial);
+          buf = buf.slice(safe.length);
+          if (safe) yield safe;
+          break;
+        }
+        const before = buf.slice(0, start);
+        if (before) yield before;
+        buf = buf.slice(start + 7);
+        inThink = true;
+      }
+    }
+  }
+  if (buf && !inThink) yield buf;
+}
+
 export async function* generateDocumentStream(
   params: GenerateDocumentParams,
   onUsage?: (input: number, output: number) => void,
@@ -20,11 +66,7 @@ export async function* generateDocumentStream(
     stream_options: { include_usage: true },
   }) as AsyncIterable<any>;
 
-  for await (const chunk of stream) {
-    if (chunk.usage && onUsage) onUsage(chunk.usage.prompt_tokens, chunk.usage.completion_tokens);
-    const text: string = chunk.choices?.[0]?.delta?.content ?? "";
-    if (text) yield text;
-  }
+  yield* filterThink(stream, onUsage);
 }
 
 export async function* analyzeCaseStream(
@@ -74,11 +116,7 @@ export async function* generatePremiumDocumentStream(
     stream_options: { include_usage: true },
   }) as AsyncIterable<any>;
 
-  for await (const chunk of stream) {
-    if (chunk.usage && onUsage) onUsage(chunk.usage.prompt_tokens, chunk.usage.completion_tokens);
-    const text: string = chunk.choices?.[0]?.delta?.content ?? "";
-    if (text) yield text;
-  }
+  yield* filterThink(stream, onUsage);
 }
 
 export async function generateDocument(params: GenerateDocumentParams): Promise<AIResult> {

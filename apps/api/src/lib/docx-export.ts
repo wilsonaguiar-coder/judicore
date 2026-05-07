@@ -1,5 +1,5 @@
 import { createRequire } from "node:module";
-import type { DocumentType } from "@judicore/db";
+type DocumentType = "DESPACHO" | "DECISAO" | "SENTENCA" | "PETICAO_INICIAL" | "RECURSO";
 
 // docx é CJS sem suporte a NodeNext — any é necessário aqui
 const _req = createRequire(import.meta.url);

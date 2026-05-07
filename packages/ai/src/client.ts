@@ -11,4 +11,4 @@ export function getGroqClient(): Groq {
   return _client;
 }
 
-export const MODEL = "llama-3.3-70b-versatile";
+export const MODEL = "deepseek-r1-distill-llama-70b";

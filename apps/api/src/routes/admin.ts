@@ -228,7 +228,7 @@ export async function adminRoutes(app: FastifyInstance) {
 
       // Agrega por tipo de documento
       const byDocType: Record<string, { input: number; output: number; count: number }> = {};
-      for (const log of logs.filter(l => l.service === "groq" && l.docType)) {
+      for (const log of logs.filter((l: (typeof logs)[0]) => l.service === "groq" && l.docType)) {
         const k = log.docType!;
         if (!byDocType[k]) byDocType[k] = { input: 0, output: 0, count: 0 };
         byDocType[k].input  += log.inputTokens;
