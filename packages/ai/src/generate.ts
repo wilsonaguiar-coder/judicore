@@ -58,6 +58,7 @@ export async function* generateDocumentStream(
   const stream = await (client.chat.completions.create as any)({
     model: MODEL,
     max_tokens: 32768,
+    reasoning_effort: "high",
     messages: [
       { role: "system", content: buildSystemPrompt() },
       { role: "user", content: buildDocumentPrompt(type, caseDescription, jurisprudencias, instruction) },
@@ -103,6 +104,7 @@ export async function* generatePremiumDocumentStream(
   const stream = await (client.chat.completions.create as any)({
     model: MODEL,
     max_tokens: maxTokens,
+    reasoning_effort: "high",
     messages: [
       { role: "system", content: buildSystemPrompt() },
       {

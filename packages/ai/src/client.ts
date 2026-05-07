@@ -11,4 +11,4 @@ export function getGroqClient(): Groq {
   return _client;
 }
 
-export const MODEL = "qwen-qwq-32b";
+export const MODEL = "openai/gpt-oss-120b";
