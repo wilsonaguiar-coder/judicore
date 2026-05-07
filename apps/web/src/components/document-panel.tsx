@@ -142,8 +142,8 @@ export function DocumentPanel({ caseId, token, userRole, jurisprudencias, active
 
   return (
     <div className="flex flex-col h-full min-h-0">
-      {/* Controles — altura fixa, rola se necessário */}
-      <div className="flex-shrink-0 overflow-y-auto p-4 border-b">
+      {/* Controles — max metade da coluna, rola internamente se necessário */}
+      <div className="flex-shrink-0 overflow-y-auto p-4 border-b max-h-[55%]">
       <h2 className="text-xs font-semibold uppercase tracking-wide text-muted-foreground mb-3">
         Gerar documento
       </h2>
