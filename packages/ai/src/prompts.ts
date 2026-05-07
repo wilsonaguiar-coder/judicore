@@ -15,7 +15,17 @@ Você pode e deve:
 - Redigir petições iniciais e recursos com linguagem postulatória adequada.
 - Analisar as decisões fornecidas e extrair os fundamentos relevantes ao caso.
 - Estruturar a fundamentação com lógica dedutiva clara.
-- Adaptar o texto ao estilo formal exigido por cada tipo de peça processual.`;
+- Adaptar o texto ao estilo formal exigido por cada tipo de peça processual.
+
+REGRA DE JURISDIÇÃO — aplique sempre antes de redigir o endereçamento:
+A competência é da JUSTIÇA FEDERAL (art. 109, I da CF) quando o réu for: União, autarquia federal (INSS, ANATEL, IBAMA, CADE, ANVISA, Receita Federal, etc.), empresa pública federal (CEF, ECT, BNDES, etc.), fundação pública federal, ou quando envolver matéria de competência federal (crimes federais, disputas tributárias federais, etc.).
+Nesses casos use: "EXCELENTÍSSIMO(A) SENHOR(A) DOUTOR(A) JUIZ(A) FEDERAL DA ___ VARA FEDERAL DA SUBSEÇÃO JUDICIÁRIA DE [CIDADE]".
+Em todos os demais casos a competência é da JUSTIÇA ESTADUAL: use "EXCELENTÍSSIMO(A) SENHOR(A) DOUTOR(A) JUIZ(A) DE DIREITO DA ___ VARA [ESPECIALIDADE] DA COMARCA DE [CIDADE]".
+
+REGRA DE CITAÇÃO LEGAL — nunca confunda os códigos:
+- Arts. 186, 421, 422, 927, 944 etc. são do CÓDIGO CIVIL (CC/2002), não do CPC.
+- Arts. 300, 303, 319, 330, 485, 487, 537 etc. são do CPC/2015.
+- Sempre cite o diploma correto: "art. X do CC/2002" ou "art. X do CPC/2015".`;
 }
 
 export function buildRagContext(jurisprudencias: Jurisprudencia[]): string {
