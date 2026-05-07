@@ -62,19 +62,29 @@ export async function streamRoutes(app: FastifyInstance) {
     reply.raw.flushHeaders();
 
     let fullContent = "";
+    let usageInput = 0, usageOutput = 0;
 
     try {
-      const stream = generateDocumentStream({
-        type: body.data.type,
-        caseDescription,
-        jurisprudencias: body.data.jurisprudencias as Jurisprudencia[],
-        instruction: body.data.instruction,
-      });
+      const stream = generateDocumentStream(
+        {
+          type: body.data.type,
+          caseDescription,
+          jurisprudencias: body.data.jurisprudencias as Jurisprudencia[],
+          instruction: body.data.instruction,
+        },
+        (inp, out) => { usageInput = inp; usageOutput = out; },
+      );
 
       for await (const chunk of stream) {
         fullContent += chunk;
         reply.raw.write(`data: ${JSON.stringify({ chunk })}\n\n`);
       }
+
+      prisma.usageLog.create({ data: {
+        userId: sub, service: "groq", model: "llama-3.3-70b-versatile",
+        operation: "generate", inputTokens: usageInput, outputTokens: usageOutput,
+        docType: body.data.type,
+      }}).catch(() => {});
 
       if (body.data.caseId) {
         const doc = await prisma.document.create({
@@ -84,7 +94,7 @@ export async function streamRoutes(app: FastifyInstance) {
             content: fullContent,
             instruction: body.data.instruction ?? null,
             sourcesJson: body.data.jurisprudencias as any,
-            modelUsed: "claude-sonnet-4-6",
+            modelUsed: "llama-3.3-70b-versatile",
           },
         });
         reply.raw.write(`data: ${JSON.stringify({ done: true, documentId: doc.id })}\n\n`);
@@ -166,20 +176,30 @@ export async function streamRoutes(app: FastifyInstance) {
     reply.raw.write(`data: ${JSON.stringify({ status: `PDFs processados. Legislação encontrada: ${legislationFound} lei(s). Gerando documento...` })}\n\n`);
 
     let fullContent = "";
+    let usageInput = 0, usageOutput = 0;
     try {
-      const stream = generatePremiumDocumentStream({
-        type: docType as any,
-        documents: docTexts,
-        jurisprudencias,
-        legislation,
-        caseDescription,
-        instruction: instruction || undefined,
-      });
+      const stream = generatePremiumDocumentStream(
+        {
+          type: docType as any,
+          documents: docTexts,
+          jurisprudencias,
+          legislation,
+          caseDescription,
+          instruction: instruction || undefined,
+        },
+        (inp, out) => { usageInput = inp; usageOutput = out; },
+      );
 
       for await (const chunk of stream) {
         fullContent += chunk;
         reply.raw.write(`data: ${JSON.stringify({ chunk })}\n\n`);
       }
+
+      prisma.usageLog.create({ data: {
+        userId: sub, service: "groq", model: "llama-3.3-70b-versatile",
+        operation: "generate", inputTokens: usageInput, outputTokens: usageOutput,
+        docType,
+      }}).catch(() => {});
 
       if (caseId) {
         const doc = await prisma.document.create({

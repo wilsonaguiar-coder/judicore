@@ -4,6 +4,7 @@ import { getIndexingQueue } from "../queues/queue.js";
 import { buildJobData, SCHEDULE_CONFIG } from "../queues/schedule-config.js";
 import { getElasticsearchClient, JURISPRUDENCIA_INDEX, ensureIndices } from "@judicore/search";
 import type { LegalArea } from "@judicore/search";
+import { prisma } from "@judicore/db";
 
 const triggerSchema = z.object({
   area: z.enum([
@@ -192,6 +193,76 @@ export async function adminRoutes(app: FastifyInstance) {
       return { removed: { completed: completed.length, failed: failed.length } };
     }
   );
+
+  // GET /admin/usage — consumo de tokens por serviço/dia (últimos 30 dias)
+  app.get(
+    "/usage",
+    { onRequest: [authenticate, requireAdmin] },
+    async (request) => {
+      const { days } = (request.query as any);
+      const period = Math.min(parseInt(days ?? "30") || 30, 90);
+      const since = new Date(Date.now() - period * 24 * 60 * 60 * 1000);
+
+      const logs = await prisma.usageLog.findMany({
+        where: { createdAt: { gte: since } },
+        orderBy: { createdAt: "asc" },
+      });
+
+      // Agrega por dia + serviço
+      const byDay: Record<string, { date: string; groqInput: number; groqOutput: number; geminiInput: number }> = {};
+      let totalGroqInput = 0, totalGroqOutput = 0, totalGeminiInput = 0;
+
+      for (const log of logs) {
+        const date = log.createdAt.toISOString().slice(0, 10);
+        if (!byDay[date]) byDay[date] = { date, groqInput: 0, groqOutput: 0, geminiInput: 0 };
+        if (log.service === "groq") {
+          byDay[date].groqInput  += log.inputTokens;
+          byDay[date].groqOutput += log.outputTokens;
+          totalGroqInput  += log.inputTokens;
+          totalGroqOutput += log.outputTokens;
+        } else {
+          byDay[date].geminiInput += log.inputTokens;
+          totalGeminiInput += log.inputTokens;
+        }
+      }
+
+      // Agrega por tipo de documento
+      const byDocType: Record<string, { input: number; output: number; count: number }> = {};
+      for (const log of logs.filter(l => l.service === "groq" && l.docType)) {
+        const k = log.docType!;
+        if (!byDocType[k]) byDocType[k] = { input: 0, output: 0, count: 0 };
+        byDocType[k].input  += log.inputTokens;
+        byDocType[k].output += log.outputTokens;
+        byDocType[k].count  += 1;
+      }
+
+      return {
+        period,
+        totals: { groqInput: totalGroqInput, groqOutput: totalGroqOutput, geminiInput: totalGeminiInput },
+        byDay: Object.values(byDay),
+        byDocType,
+      };
+    }
+  );
+
+  // POST /admin/usage/log — endpoint interno para o serviço Python registrar uso do Gemini
+  app.post("/usage/log", async (request, reply) => {
+    const secret = process.env["INTERNAL_SECRET"] ?? process.env["JWT_SECRET"] ?? "";
+    const authHeader = (request.headers["x-internal-secret"] as string) ?? "";
+    if (authHeader !== secret) return reply.status(401).send({ error: "Não autorizado" });
+
+    const body = z.object({
+      service:      z.string(),
+      model:        z.string(),
+      operation:    z.string(),
+      inputTokens:  z.number().int().nonnegative(),
+      outputTokens: z.number().int().nonnegative().default(0),
+    }).safeParse(request.body);
+    if (!body.success) return reply.status(400).send({ error: body.error.flatten() });
+
+    await prisma.usageLog.create({ data: body.data });
+    return reply.status(201).send({ ok: true });
+  });
 
   // DELETE /admin/jobs/:id — cancela job pendente
   app.delete(

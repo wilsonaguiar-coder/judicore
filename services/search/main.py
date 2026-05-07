@@ -7,6 +7,9 @@ import asyncio
 import os
 import sys
 import time
+import threading
+import urllib.request
+import json as _json
 from contextlib import asynccontextmanager
 from pathlib import Path
 from typing import Optional
@@ -85,6 +88,32 @@ def _search_merged(req: "SearchRequest", query_vector: list) -> list:
     return merged
 
 
+_API_URL = os.getenv("API_URL", "http://127.0.0.1:3001")
+_INTERNAL_SECRET = os.getenv("INTERNAL_SECRET", os.getenv("JWT_SECRET", ""))
+
+def _log_usage_async(input_tokens: int):
+    """Registra uso do Gemini na API Node em thread separada (fire-and-forget)."""
+    def _post():
+        try:
+            payload = _json.dumps({
+                "service": "gemini",
+                "model": "text-embedding-004",
+                "operation": "embed",
+                "inputTokens": input_tokens,
+                "outputTokens": 0,
+            }).encode()
+            req = urllib.request.Request(
+                f"{_API_URL}/admin/usage/log",
+                data=payload,
+                headers={"Content-Type": "application/json", "x-internal-secret": _INTERNAL_SECRET},
+                method="POST",
+            )
+            urllib.request.urlopen(req, timeout=2)
+        except Exception:
+            pass
+    threading.Thread(target=_post, daemon=True).start()
+
+
 def _warmup_sync():
     try:
         vec = rag.embed_query("jurisprudência")
@@ -153,6 +182,7 @@ def search(req: SearchRequest):
 
     try:
         query_vector = rag.embed_query(req.query)
+        _log_usage_async(max(1, len(req.query.split())))
         candidates = _search_merged(req, query_vector)
         ranked = candidates
     except Exception as e:

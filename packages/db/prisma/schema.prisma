@@ -92,3 +92,17 @@ model Document {
 
   @@map("documents")
 }
+
+model UsageLog {
+  id           String   @id @default(cuid())
+  userId       String?  @map("user_id")
+  service      String   // "groq" | "gemini"
+  model        String
+  operation    String   // "generate" | "embed"
+  inputTokens  Int      @default(0) @map("input_tokens")
+  outputTokens Int      @default(0) @map("output_tokens")
+  docType      String?  @map("doc_type")
+  createdAt    DateTime @default(now()) @map("created_at")
+
+  @@map("usage_logs")
+}

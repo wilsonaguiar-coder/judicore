@@ -3,7 +3,8 @@ import { buildSystemPrompt, buildDocumentPrompt, buildAnalysisPrompt, buildPremi
 import type { GenerateDocumentParams, AnalyzeParams, AIResult, PremiumGenerateParams } from "./types.js";
 
 export async function* generateDocumentStream(
-  params: GenerateDocumentParams
+  params: GenerateDocumentParams,
+  onUsage?: (input: number, output: number) => void,
 ): AsyncGenerator<string> {
   const { type, caseDescription, jurisprudencias, instruction } = params;
   const client = getGroqClient();
@@ -16,9 +17,12 @@ export async function* generateDocumentStream(
       { role: "user", content: buildDocumentPrompt(type, caseDescription, jurisprudencias, instruction) },
     ],
     stream: true,
+    stream_options: { include_usage: true },
   });
 
   for await (const chunk of stream) {
+    if (chunk.usage && onUsage)
+      onUsage(chunk.usage.prompt_tokens, chunk.usage.completion_tokens);
     const text = chunk.choices[0]?.delta?.content ?? "";
     if (text) yield text;
   }
@@ -47,7 +51,8 @@ export async function* analyzeCaseStream(
 }
 
 export async function* generatePremiumDocumentStream(
-  params: PremiumGenerateParams
+  params: PremiumGenerateParams,
+  onUsage?: (input: number, output: number) => void,
 ): AsyncGenerator<string> {
   const { type, documents, jurisprudencias, legislation, caseDescription, instruction } = params;
   const client = getGroqClient();
@@ -67,9 +72,12 @@ export async function* generatePremiumDocumentStream(
       },
     ],
     stream: true,
+    stream_options: { include_usage: true },
   });
 
   for await (const chunk of stream) {
+    if (chunk.usage && onUsage)
+      onUsage(chunk.usage.prompt_tokens, chunk.usage.completion_tokens);
     const text = chunk.choices[0]?.delta?.content ?? "";
     if (text) yield text;
   }
