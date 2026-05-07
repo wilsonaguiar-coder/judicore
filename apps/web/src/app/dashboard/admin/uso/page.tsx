@@ -137,7 +137,7 @@ export default function UsagePage() {
           {/* Por tipo de peça */}
           {Object.keys(byDocType).length > 0 && (
             <section>
-              <h2 className="text-sm font-semibold mb-3">Uso por tipo de peça (Groq)</h2>
+              <h2 className="text-sm font-semibold mb-3">Uso por tipo de peça (DeepSeek R1)</h2>
               <div className="rounded-lg border overflow-hidden">
                 <table className="w-full text-xs">
                   <thead className="bg-muted/50 text-muted-foreground">

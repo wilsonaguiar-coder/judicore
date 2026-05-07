@@ -28,7 +28,7 @@ export type UserRole = "COMUM" | "SERVIDOR" | "ADMIN";
 export const DOC_TYPES_BY_ROLE: Record<UserRole, DocumentType[]> = {
   COMUM:    ["PETICAO_INICIAL", "RECURSO"],
   SERVIDOR: ["DESPACHO", "DECISAO", "SENTENCA"],
-  ADMIN:    ["DESPACHO", "DECISAO", "SENTENCA", "PETICAO_INICIAL", "RECURSO"],
+  ADMIN:    ["PETICAO_INICIAL", "RECURSO", "DESPACHO", "DECISAO", "SENTENCA"],
 };
 
 export interface User {
