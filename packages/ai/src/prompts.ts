@@ -116,6 +116,12 @@ export function buildPremiumDocumentPrompt(
     ? `\nCONTEXTO ADICIONAL DO CASO:\n${caseDescription.trim()}\n`
     : "";
 
+  const isPostulatorio = type === "PETICAO_INICIAL" || type === "RECURSO";
+
+  const regraLegislacao = isPostulatorio
+    ? `2. LEGISLAÇÃO: prefira sempre citar as leis que estão no bloco "LEGISLAÇÃO VERIFICADA" acima (texto conferido no Planalto). Para dispositivos não presentes nesse bloco, você PODE citá-los com base no seu conhecimento jurídico — eles são necessários para a completude da peça — mas sinalize com *(verificar redação atualizada)* apenas se tiver dúvida sobre a redação exata. Nunca invente números de artigos.`
+    : `2. Cite APENAS legislação que esteja no bloco "LEGISLAÇÃO VERIFICADA" acima. Se uma lei não estiver nesse bloco, NÃO a cite.`;
+
   const tarefaByType: Record<string, string> = {
     DESPACHO:
       "Redija um despacho com base nos documentos do processo e na jurisprudência fornecida.\nEstrutura: identificação do processo, decisão fundamentada e dispositivo.",
@@ -123,10 +129,57 @@ export function buildPremiumDocumentPrompt(
       "Redija uma decisão interlocutória fundamentada.\nAnalise os argumentos das partes nos documentos, confronte com a jurisprudência e decida motivadamente.\nEstrutura: relatório, fundamentação jurídica e dispositivo.",
     SENTENCA:
       "Redija uma sentença completa e fundamentada.\nAnalise a petição inicial, a contestação e demais documentos. Confronte os argumentos com a jurisprudência e a legislação fornecida.\nEstrutura: relatório, fundamentação jurídica (com citação de jurisprudência e legislação do contexto) e dispositivo.",
-    PETICAO_INICIAL:
-      "Redija uma petição inicial em favor da parte autora.\nBaseie-se nos fatos descritos nos documentos, fundamente juridicamente com a legislação e jurisprudência fornecidas.\nEstrutura: endereçamento, qualificação das partes, fatos, direito, pedidos e valor da causa.",
-    RECURSO:
-      "Redija um recurso em favor da parte recorrente.\nAnalise os argumentos da decisão recorrida e confronte-os com a jurisprudência e legislação fornecidas.\nEstrutura: endereçamento, tempestividade, cabimento, razões recursais e pedido de provimento.",
+    PETICAO_INICIAL: `Redija uma PETIÇÃO INICIAL completa, extensa e tecnicamente fundamentada em favor da parte autora.
+Extraia dos documentos todos os dados das partes (nome, estado civil, CPF, RG, endereço) para a qualificação.
+Analise o processo administrativo ou documentos anexos para reconstituir os fatos com precisão e detalhe.
+
+ESTRUTURA OBRIGATÓRIA — use exatamente estas seções e nesta ordem:
+
+EXCELENTÍSSIMO(A) SENHOR(A) DOUTOR(A) JUIZ(A) [endereçamento correto conforme competência]
+
+I — DA QUALIFICAÇÃO DAS PARTES
+  Qualifique completamente autor e réu com todos os dados disponíveis nos documentos.
+
+II — DOS FATOS
+  Narre os fatos de forma cronológica, detalhada e objetiva com base nos documentos do processo.
+  Mencione datas, valores, protocolo administrativo e todos os elementos relevantes extraídos dos documentos.
+
+III — DO DIREITO
+  Fundamente juridicamente cada pretensão com dispositivos legais (Constituição Federal, legislação específica, CDC se aplicável) e doutrina quando pertinente.
+  Cite a jurisprudência fornecida para reforçar cada argumento. Desenvolva cada argumento em subseção própria.
+
+IV — DA TUTELA DE URGÊNCIA (se aplicável)
+  Fundamente com base no art. 300 do CPC/2015 (fumus boni iuris e periculum in mora).
+  Demonstre concretamente a urgência e o risco de dano irreparável com base nos fatos.
+
+V — DA GRATUIDADE DA JUSTIÇA (se aplicável)
+  Fundamente com base no art. 98 do CPC/2015 e art. 5º, LXXIV da CF/88.
+  Indique os elementos dos documentos que comprovam a hipossuficiência.
+
+VI — DOS PEDIDOS
+  Liste TODOS os pedidos numerados, cada um com seu respectivo fundamento legal.
+  Inclua: citação do réu, tutela de urgência (se cabível), gratuidade, mérito principal, condenações acessórias e valor da causa.
+
+VII — DO VALOR DA CAUSA
+  Atribua valor à causa conforme os pedidos formulados (art. 292 CPC/2015).
+
+Ao final, indique as decisões jurisprudenciais e os dispositivos legais utilizados.`,
+
+    RECURSO: `Redija um RECURSO completo, extenso e tecnicamente fundamentado em favor da parte recorrente.
+Analise detalhadamente a decisão recorrida nos documentos e construa as razões recursais ponto a ponto.
+
+ESTRUTURA OBRIGATÓRIA:
+
+I — DA TEMPESTIVIDADE
+II — DO CABIMENTO E PREPARO
+III — DOS FATOS E DA DECISÃO RECORRIDA
+  Resuma os fatos e identifique os erros jurídicos da decisão.
+IV — DAS RAZÕES RECURSAIS
+  Para cada ponto impugnado, desenvolva um subitem com: o erro apontado, o fundamento legal correto e a jurisprudência de suporte.
+V — DO PEDIDO
+  Requeira o conhecimento e o provimento do recurso com reforma ou anulação da decisão.
+
+Ao final, indique as decisões e dispositivos utilizados.`,
   };
 
   return `${docsBlock}
@@ -145,13 +198,12 @@ ${caseBlock}${instructionBlock}
 
 REGRAS ABSOLUTAS:
 1. Cite APENAS jurisprudência que esteja explicitamente listada acima.
-2. Cite APENAS legislação que esteja no bloco "LEGISLAÇÃO VERIFICADA" acima. Se uma lei não estiver nesse bloco, NÃO a cite — nem de memória, nem de treinamento.
-3. Se a legislação relevante não estiver disponível, fundamente exclusivamente na jurisprudência fornecida e indique: "[base legal não disponível no contexto — verificar legislação aplicável]".
-4. Nunca invente processos, nomes, datas ou fatos não presentes nos documentos.
+${regraLegislacao}
+3. Nunca invente processos, nomes, CPF, datas ou fatos não presentes nos documentos.
+4. A peça deve ser EXTENSA e COMPLETA — desenvolva cada seção com profundidade técnica. Não resuma onde cabe fundamentar.
 
 TAREFA:
-${tarefaByType[type]}
-Indique no rodapé quais decisões e dispositivos legais foram utilizados.`;
+${tarefaByType[type]}`;
 }
 
 export function buildAnalysisPrompt(

@@ -22,6 +22,16 @@ const ALIASES: Record<string, string> = {
   "cp":                  "https://www.planalto.gov.br/ccivil_03/decreto-lei/del2848compilado.htm",
   "código de processo penal": "https://www.planalto.gov.br/ccivil_03/decreto-lei/del3689compilado.htm",
   "cpp":                 "https://www.planalto.gov.br/ccivil_03/decreto-lei/del3689compilado.htm",
+  // Previdência social
+  "lei 8.213":           "https://www.planalto.gov.br/ccivil_03/leis/l8213cons.htm",
+  "lei 8213":            "https://www.planalto.gov.br/ccivil_03/leis/l8213cons.htm",
+  "lei de benefícios":   "https://www.planalto.gov.br/ccivil_03/leis/l8213cons.htm",
+  "lei 8.212":           "https://www.planalto.gov.br/ccivil_03/leis/l8212cons.htm",
+  "lei 8212":            "https://www.planalto.gov.br/ccivil_03/leis/l8212cons.htm",
+  "loas":                "https://www.planalto.gov.br/ccivil_03/leis/l8742.htm",
+  "lei 8.742":           "https://www.planalto.gov.br/ccivil_03/leis/l8742.htm",
+  "lei orgânica da assistência social": "https://www.planalto.gov.br/ccivil_03/leis/l8742.htm",
+  "inss":                "https://www.planalto.gov.br/ccivil_03/leis/l8213cons.htm",
 };
 
 export function extractLawRefs(text: string): string[] {
@@ -36,9 +46,13 @@ export function extractLawRefs(text: string): string[] {
   for (const m of text.matchAll(/Lei\s+Complementar\s+(?:n[oº°]?\s*\.?\s*)?([\d]+)\/(\d{4})/gi))
     refs.add(`Lei Complementar ${m[1]}/${m[2]}`);
 
-  const abbrevs = ["CPC", "CLT", "CDC", "CTN", "CF", "CF/88"];
+  const abbrevs = ["CPC", "CLT", "CDC", "CTN", "CF", "CF/88", "LOAS"];
   for (const a of abbrevs)
     if (new RegExp(`\\b${a}\\b`, "i").test(text)) refs.add(a);
+
+  // Detecta matéria previdenciária para buscar Lei 8.213 automaticamente
+  if (/\bINSS\b|\bprevidên|\bbenefit|\baposentadoria\b|\bpensão\b|\bbenefício\b/i.test(text))
+    refs.add("Lei 8.213");
 
   return [...refs];
 }

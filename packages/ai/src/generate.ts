@@ -52,9 +52,11 @@ export async function* generatePremiumDocumentStream(
   const { type, documents, jurisprudencias, legislation, caseDescription, instruction } = params;
   const client = getGroqClient();
 
+  const maxTokens = (type === "PETICAO_INICIAL" || type === "RECURSO") ? 16384 : 8192;
+
   const stream = await client.chat.completions.create({
     model: MODEL,
-    max_tokens: 8192,
+    max_tokens: maxTokens,
     messages: [
       { role: "system", content: buildSystemPrompt() },
       {
