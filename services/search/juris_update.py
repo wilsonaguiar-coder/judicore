@@ -737,7 +737,15 @@ async def _collect_stf_documents_async(
         "latest_date": "",
         "by_base": {"acordaos": 0, "monocraticas": 0, "informativos": 0},
     }
-    launch_kwargs: dict[str, Any] = {"headless": not bool(visible_browser)}
+    launch_kwargs: dict[str, Any] = {
+        "headless": not bool(visible_browser),
+        "args": [
+            "--no-sandbox",
+            "--disable-setuid-sandbox",
+            "--disable-dev-shm-usage",
+            "--disable-blink-features=AutomationControlled",
+        ],
+    }
     if chromium_executable_path:
         launch_kwargs["executable_path"] = chromium_executable_path
 
@@ -749,11 +757,23 @@ async def _collect_stf_documents_async(
     from playwright.async_api import async_playwright
     async with async_playwright() as pw:
         browser = await pw.chromium.launch(**launch_kwargs)
-        context = await browser.new_context(ignore_https_errors=True)
+        context = await browser.new_context(
+            ignore_https_errors=True,
+            user_agent=(
+                "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 "
+                "(KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36"
+            ),
+            locale="pt-BR",
+        )
+        await context.add_init_script("""
+            Object.defineProperty(navigator, 'webdriver', {get: () => undefined});
+            Object.defineProperty(navigator, 'languages', {get: () => ['pt-BR', 'pt', 'en-US', 'en']});
+            Object.defineProperty(navigator, 'platform', {get: () => 'Linux x86_64'});
+        """)
         page = await context.new_page()
         try:
             await page.goto(STF_SEARCH_URL, wait_until="networkidle", timeout=90000)
-            await page.wait_for_timeout(4000)
+            await page.wait_for_timeout(8000)
 
             acordao_hits = await _stf_collect_base_hits_browser(
                 page=page, base="acordaos",
