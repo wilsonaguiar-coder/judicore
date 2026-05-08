@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import asyncio
 import hashlib
 import html
 import json
@@ -363,63 +362,22 @@ def _stf_hits_from_payload(payload: dict[str, Any]) -> list[dict[str, Any]]:
     return []
 
 
-async def _stf_fetch_api(page: Any, query: dict[str, Any]) -> dict[str, Any]:
-    last_status = 0
-    last_text = ""
+def _stf_fetch_api_requests(session: "requests.Session", query: dict[str, Any]) -> dict[str, Any]:
     for attempt in range(4):
-        result = await page.evaluate(
-            """
-            async (payload) => {
-              const controller = new AbortController();
-              const timeoutId = setTimeout(() => controller.abort(), 45000);
-              try {
-                const response = await fetch("https://jurisprudencia.stf.jus.br/api/search/search", {
-                  method: "POST",
-                  headers: { "Content-Type": "application/json" },
-                  body: JSON.stringify(payload),
-                  signal: controller.signal
-                });
-                const text = await response.text();
-                return { ok: response.ok, status: response.status, text };
-              } catch (error) {
-                return { ok: false, status: -1, text: String(error || "") };
-              } finally {
-                clearTimeout(timeoutId);
-              }
-            }
-            """,
-            query,
-        )
-        if not isinstance(result, dict):
-            raise RuntimeError("Resposta inesperada da API STF.")
-        status = int(result.get("status") or 0)
-        text = str(result.get("text") or "").strip()
-        last_status = status
-        last_text = text
-        if status == 202 and not text and attempt < 3:
-            await asyncio.sleep(2.0 + attempt)
-            continue
-        if not text:
-            break
         try:
-            return json.loads(text)
-        except Exception:
-            if attempt < 3:
-                await asyncio.sleep(1.5 + attempt)
-                continue
-            preview = text[:200].replace("\n", " ").strip()
-            raise RuntimeError(f"JSON invalido da API STF (status={status}): {preview}")
-
-    if last_status == 202 and not last_text:
-        raise RuntimeError(
-            "STF retornou status 202 sem conteudo. A janela do Chromium precisa ficar aberta para validacao no site."
-        )
-    raise RuntimeError(f"Resposta vazia da API STF (status={last_status}).")
+            resp = session.post(STF_API_URL, json=query, timeout=60)
+            resp.raise_for_status()
+            return resp.json()
+        except Exception as exc:
+            if attempt >= 3:
+                raise RuntimeError(f"STF API falhou apos 4 tentativas: {exc}") from exc
+            time.sleep(2.0 + attempt)
+    raise RuntimeError("STF API: falha inesperada")
 
 
-async def _stf_collect_base_hits(
+def _stf_collect_base_hits_requests(
     *,
-    page: Any,
+    session: "requests.Session",
     base: str,
     source_fields: list[str],
     year: int,
@@ -430,55 +388,44 @@ async def _stf_collect_base_hits(
     start_year = _resolve_stf_start_date(year=year, since_date=since_date)
     end_year = date(year, 12, 31)
 
-    async def process_range(start: date, end: date) -> None:
+    def process_range(start: date, end: date) -> None:
         count_query = _stf_build_query(
-            base=base,
-            source_fields=source_fields,
-            start=start,
-            end=end,
-            offset=0,
-            size=0,
+            base=base, source_fields=source_fields,
+            start=start, end=end, offset=0, size=0,
         )
-        payload = await _stf_fetch_api(page, count_query)
+        payload = _stf_fetch_api_requests(session, count_query)
         total = _stf_total_from_payload(payload)
         if total <= 0:
             return
-
         if total > ES_SAFE_WINDOW and start < end:
             mid = start + timedelta(days=(end - start).days // 2)
-            await process_range(start, mid)
-            await process_range(mid + timedelta(days=1), end)
+            process_range(start, mid)
+            process_range(mid + timedelta(days=1), end)
             return
-
         capped = min(total, MAX_ES_WINDOW)
         offset = 0
         while offset < capped:
             page_query = _stf_build_query(
-                base=base,
-                source_fields=source_fields,
-                start=start,
-                end=end,
-                offset=offset,
-                size=PAGE_SIZE,
+                base=base, source_fields=source_fields,
+                start=start, end=end, offset=offset, size=PAGE_SIZE,
             )
-            page_payload = await _stf_fetch_api(page, page_query)
+            page_payload = _stf_fetch_api_requests(session, page_query)
             page_hits = _stf_hits_from_payload(page_payload)
             if not page_hits:
                 break
             hits.extend(page_hits)
             offset += len(page_hits)
             _emit(
-                progress_cb,
-                "stf_fetch",
+                progress_cb, "stf_fetch",
                 f"STF {base}: {len(hits)} itens coletados.",
-                stf_base=base,
-                stf_collected=len(hits),
-                stf_offset=offset,
-                stf_total=capped,
+                stf_base=base, stf_collected=len(hits),
+                stf_offset=offset, stf_total=capped,
             )
 
-    await process_range(start_year, end_year)
+    process_range(start_year, end_year)
     return hits
+
+
 
 
 def _stf_doc_from_acordao(source: dict[str, Any]) -> UpdateDocument | None:
@@ -677,12 +624,12 @@ def _stf_doc_from_informativo(source: dict[str, Any]) -> UpdateDocument | None:
     )
 
 
-async def _collect_stf_documents_async(
+def _collect_stf_documents(
     *,
     year: int,
     since_date: str,
-    visible_browser: bool,
-    chromium_executable_path: str | None,
+    visible_browser: bool = False,
+    chromium_executable_path: str | None = None,
     progress_cb: ProgressCallback | None,
     log_cb: LogCallback | None,
 ) -> tuple[list[UpdateDocument], dict[str, Any]]:
@@ -692,62 +639,46 @@ async def _collect_stf_documents_async(
         "candidate_docs": 0,
         "from_date": _resolve_stf_start_date(year=year, since_date=since_date).isoformat(),
         "latest_date": "",
-        "by_base": {
-            "acordaos": 0,
-            "monocraticas": 0,
-            "informativos": 0,
-        },
+        "by_base": {"acordaos": 0, "monocraticas": 0, "informativos": 0},
     }
-    launch_kwargs: dict[str, Any] = {
-        "headless": not bool(visible_browser),
-    }
-    if chromium_executable_path:
-        launch_kwargs["executable_path"] = chromium_executable_path
 
-    _emit(
-        progress_cb,
-        "stf_bootstrap",
-        "STF: abrindo Chromium para coletar jurisprudencia de 2026+.",
-        stf_visible_browser=bool(visible_browser),
+    session = requests.Session()
+    session.headers.update({
+        "Content-Type": "application/json",
+        "Accept": "application/json, text/plain, */*",
+        "User-Agent": (
+            "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 "
+            "(KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36"
+        ),
+        "Referer": "https://jurisprudencia.stf.jus.br/pages/search",
+        "Origin": "https://jurisprudencia.stf.jus.br",
+    })
+    try:
+        session.get("https://jurisprudencia.stf.jus.br/pages/search", timeout=30)
+    except Exception:
+        pass
+
+    _emit(progress_cb, "stf_bootstrap", "STF: iniciando coleta via API direta (requests).")
+    _log(log_cb, "stf_api_start", year=year, since_date=summary["from_date"])
+
+    acordao_hits = _stf_collect_base_hits_requests(
+        session=session, base="acordaos",
+        source_fields=STF_ACORDAO_FIELDS,
+        year=year, since_date=summary["from_date"],
+        progress_cb=progress_cb,
     )
-    _log(log_cb, "stf_browser_launch", visible_browser=bool(visible_browser), executable_path=chromium_executable_path or "")
-
-    from playwright.async_api import async_playwright
-    async with async_playwright() as playwright:
-        browser = await playwright.chromium.launch(**launch_kwargs)
-        context = await browser.new_context(ignore_https_errors=True)
-        page = await context.new_page()
-        try:
-            await page.goto(STF_SEARCH_URL, wait_until="networkidle", timeout=90000)
-            await page.wait_for_timeout(4000)
-
-            acordao_hits = await _stf_collect_base_hits(
-                page=page,
-                base="acordaos",
-                source_fields=STF_ACORDAO_FIELDS,
-                year=year,
-                since_date=summary["from_date"],
-                progress_cb=progress_cb,
-            )
-            monocratica_hits = await _stf_collect_base_hits(
-                page=page,
-                base="decisoes",
-                source_fields=STF_MONOCRATICA_FIELDS,
-                year=year,
-                since_date=summary["from_date"],
-                progress_cb=progress_cb,
-            )
-            informativo_hits = await _stf_collect_base_hits(
-                page=page,
-                base="novo_informativo",
-                source_fields=STF_INFORMATIVO_FIELDS,
-                year=year,
-                since_date=summary["from_date"],
-                progress_cb=progress_cb,
-            )
-        finally:
-            await context.close()
-            await browser.close()
+    monocratica_hits = _stf_collect_base_hits_requests(
+        session=session, base="decisoes",
+        source_fields=STF_MONOCRATICA_FIELDS,
+        year=year, since_date=summary["from_date"],
+        progress_cb=progress_cb,
+    )
+    informativo_hits = _stf_collect_base_hits_requests(
+        session=session, base="novo_informativo",
+        source_fields=STF_INFORMATIVO_FIELDS,
+        year=year, since_date=summary["from_date"],
+        progress_cb=progress_cb,
+    )
 
     all_dates: list[str] = []
     for hit in acordao_hits:
@@ -755,9 +686,7 @@ async def _collect_stf_documents_async(
         if not isinstance(source, dict):
             continue
         doc = _stf_doc_from_acordao(source)
-        if doc is None:
-            continue
-        if _extract_year(doc.data_julgamento or "") != year:
+        if doc is None or _extract_year(doc.data_julgamento or "") != year:
             continue
         docs.append(doc)
         all_dates.append(doc.data_julgamento)
@@ -766,9 +695,7 @@ async def _collect_stf_documents_async(
         if not isinstance(source, dict):
             continue
         doc = _stf_doc_from_monocratica(source)
-        if doc is None:
-            continue
-        if _extract_year(doc.data_julgamento or "") != year:
+        if doc is None or _extract_year(doc.data_julgamento or "") != year:
             continue
         docs.append(doc)
         all_dates.append(doc.data_julgamento)
@@ -779,7 +706,10 @@ async def _collect_stf_documents_async(
         doc = _stf_doc_from_informativo(source)
         if doc is None:
             continue
-        info_year = _extract_year(doc.data_julgamento or "") or _extract_year(str(source.get("publicacao_data") or ""))
+        info_year = (
+            _extract_year(doc.data_julgamento or "")
+            or _extract_year(str(source.get("publicacao_data") or ""))
+        )
         if info_year != year:
             continue
         docs.append(doc)
@@ -795,27 +725,6 @@ async def _collect_stf_documents_async(
         "informativos": len([d for d in docs if d.source_key == "stf_informativos"]),
     }
     return docs, summary
-
-
-def _collect_stf_documents(
-    *,
-    year: int,
-    since_date: str,
-    visible_browser: bool,
-    chromium_executable_path: str | None,
-    progress_cb: ProgressCallback | None,
-    log_cb: LogCallback | None,
-) -> tuple[list[UpdateDocument], dict[str, Any]]:
-    return asyncio.run(
-        _collect_stf_documents_async(
-            year=year,
-            since_date=since_date,
-            visible_browser=visible_browser,
-            chromium_executable_path=chromium_executable_path,
-            progress_cb=progress_cb,
-            log_cb=log_cb,
-        )
-    )
 
 
 def _stj_parse_pt_br_date(raw: str) -> date | None:
