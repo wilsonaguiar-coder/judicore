@@ -897,31 +897,39 @@ def _stj_parse_pt_br_date(raw: str) -> date | None:
 
 
 def _stj_latest_edition(session: requests.Session) -> int:
-    response = session.get(STJ_LIST_URL, timeout=60)
-    response.raise_for_status()
-    html_text = response.text
-    editions = [int(x) for x in re.findall(r"GetPDFINFJ\?edicao=(\d{3,5})", html_text, flags=re.IGNORECASE)]
-    if not editions:
-        editions.extend(
-            int(x)
-            for x in re.findall(
-                r"Informativo\s+de\s+Jurisprud[êe]ncia\s*n\.\s*(\d{3,5})",
-                html_text,
-                flags=re.IGNORECASE,
-            )
-        )
-    if not editions:
-        editions.extend(
-            int(x)
-            for x in re.findall(
-                r"Informativo\s*n[ºo]?\s*(\d{3,5})",
-                html_text,
-                flags=re.IGNORECASE,
-            )
-        )
-    if not editions:
-        raise RuntimeError("Nao foi possivel identificar a ultima edicao do STJ.")
-    return max(editions)
+    # Tenta a página HTML de listagem primeiro
+    try:
+        response = session.get(STJ_LIST_URL, timeout=30)
+        if response.ok:
+            html_text = response.text
+            editions = [int(x) for x in re.findall(r"GetPDFINFJ\?edicao=(\d{3,5})", html_text, flags=re.IGNORECASE)]
+            if not editions:
+                editions = [int(x) for x in re.findall(r"Informativo\s*n[ºo.]?\s*(\d{3,5})", html_text, flags=re.IGNORECASE)]
+            if editions:
+                return max(editions)
+    except Exception:
+        pass
+
+    # Fallback: sonda URLs de PDF diretamente (não passa pela página bloqueada)
+    # STJ publica ~40 edições/ano; edição ~820 = início de 2026
+    last_found = 820
+    consecutive_misses = 0
+    for n in range(820, 960):
+        url = STJ_EDITION_PDF_URL.format(edition=n)
+        try:
+            resp = session.get(url, timeout=20)
+            if resp.ok and resp.content[:5] == b"%PDF-":
+                last_found = n
+                consecutive_misses = 0
+            else:
+                consecutive_misses += 1
+                if consecutive_misses >= 8:
+                    break
+        except Exception:
+            consecutive_misses += 1
+            if consecutive_misses >= 5:
+                break
+    return last_found
 
 
 def _stj_fetch_edition_meta(session: requests.Session, edition: int) -> dict[str, Any]:
@@ -1790,18 +1798,28 @@ def _collect_stj_documents(
             "SELECT MAX(CAST(informativo_numero AS INTEGER)) FROM stj_informativos"
         ).fetchone()
         max_in_db = int(max_in_db_row[0] or 0)
-        start_edition = max(max_in_db + 1, 1)
+        # Se o banco está vazio, começa da edição aproximada do ano alvo
+        # (STJ ~40 edições/ano; edição ~780 = 2024, ~820 = 2026)
+        if max_in_db == 0:
+            start_edition = max(1, latest_edition - 60)
+        else:
+            start_edition = max_in_db + 1
         all_row_ids: list[int] = []
         latest_dates: list[str] = []
         expected_editions: list[int] = []
 
         for edition in range(start_edition, latest_edition + 1):
-            meta = _stj_fetch_edition_meta(session, edition)
-            if not meta.get("found"):
-                continue
-            edition_date = str(meta.get("edition_date") or "")
-            if _extract_year(edition_date) != year:
-                continue
+            edition_date = ""
+            try:
+                meta = _stj_fetch_edition_meta(session, edition)
+                if not meta.get("found"):
+                    continue
+                edition_date = str(meta.get("edition_date") or "")
+                if edition_date and _extract_year(edition_date) != year:
+                    continue
+            except Exception:
+                # Página de meta bloqueada (403) — tenta baixar o PDF diretamente
+                pass
             expected_editions.append(int(edition))
             latest_dates.append(edition_date)
             pdf_path = docs_dir / f"Informativo_{edition:04d}.pdf"
