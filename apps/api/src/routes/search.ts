@@ -1,8 +1,12 @@
 import type { FastifyInstance } from "fastify";
 import { z } from "zod";
 import { prisma } from "@judicore/db";
+import { searchJurisprudencia } from "@judicore/search";
 
 const SEARCH_SERVICE_URL = process.env.SEARCH_SERVICE_URL ?? "http://127.0.0.1:7860";
+
+// Tribunais cobertos pelo LanceDB (vetor + inteiro teor)
+const LANCE_TRIBUNAIS = new Set(["STF", "STJ", "TJSP"]);
 
 const searchSchema = z.object({
   query: z.string().min(3),
@@ -29,6 +33,23 @@ interface RagResult {
   source_label: string;
 }
 
+// Reciprocal Rank Fusion — normaliza scores de fontes distintas
+function rrfMerge(lists: any[][], topK: number, k = 60): any[] {
+  const scores = new Map<string, { item: any; score: number }>();
+  for (const list of lists) {
+    list.forEach((item, rank) => {
+      const prev = scores.get(item.id);
+      const add = 1 / (k + rank + 1);
+      if (prev) prev.score += add;
+      else scores.set(item.id, { item, score: add });
+    });
+  }
+  return [...scores.values()]
+    .sort((a, b) => b.score - a.score)
+    .slice(0, topK)
+    .map((v) => ({ ...v.item, score: v.score }));
+}
+
 export async function searchRoutes(app: FastifyInstance) {
   const authenticate = (app as any).authenticate;
 
@@ -44,72 +65,95 @@ export async function searchRoutes(app: FastifyInstance) {
     }
 
     const t0 = Date.now();
+    const { query, area, size } = body.data;
+    const requestedTribunais = body.data.tribunais ?? [];
+    const queryAll = requestedTribunais.length === 0;
 
-    const ragBody: Record<string, unknown> = {
-      query: body.data.query,
-      top_k: body.data.size,
-    };
-    if (body.data.tribunais?.length) ragBody.tribunais = body.data.tribunais;
+    const lanceTribunais = queryAll ? [] : requestedTribunais.filter((t) => LANCE_TRIBUNAIS.has(t));
+    const esTribunais    = queryAll ? [] : requestedTribunais.filter((t) => !LANCE_TRIBUNAIS.has(t));
+    const needsLance = queryAll || lanceTribunais.length > 0;
+    const needsES    = queryAll || esTribunais.length > 0;
 
-    const controller = new AbortController();
-    const timer = setTimeout(() => controller.abort(), 55_000);
-
-    let ragRes: Response;
-    try {
-      ragRes = await fetch(`${SEARCH_SERVICE_URL}/search`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(ragBody),
-        signal: controller.signal,
-      });
-    } catch (fetchErr: any) {
-      clearTimeout(timer);
-      if (fetchErr.name === "AbortError") {
-        return reply.status(504).send({ error: "Serviço de busca não respondeu em 55s — tente novamente" });
+    async function queryLance(): Promise<any[]> {
+      const ragBody: Record<string, unknown> = { query, top_k: size };
+      if (lanceTribunais.length) ragBody.tribunais = lanceTribunais;
+      const controller = new AbortController();
+      const timer = setTimeout(() => controller.abort(), 55_000);
+      try {
+        const res = await fetch(`${SEARCH_SERVICE_URL}/search`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(ragBody),
+          signal: controller.signal,
+        });
+        if (!res.ok) return [];
+        const hits = (await res.json()) as RagResult[];
+        return hits.map((r) => ({
+          id: r.doc_id,
+          tribunal: r.tribunal,
+          numero: r.processo,
+          ementa: r.ementa,
+          relator: r.relator,
+          dataJulgamento: r.data_julgamento,
+          area: "OUTRO",
+          url: r.inteiro_teor_url ?? "",
+          score: r.final_score,
+          tipo: r.tipo,
+          autoridade: r.authority_label,
+          fonte: r.source_label,
+          textoIntegral: r.texto_integral ?? null,
+        }));
+      } catch {
+        return [];
+      } finally {
+        clearTimeout(timer);
       }
-      return reply.status(502).send({ error: "Erro ao conectar ao serviço de busca", detail: String(fetchErr) });
-    } finally {
-      clearTimeout(timer);
     }
 
-    if (!ragRes.ok) {
-      const err = await ragRes.text();
-      return reply.status(502).send({ error: "Erro no serviço de busca", detail: err });
+    async function queryES(): Promise<any[]> {
+      try {
+        const result = await searchJurisprudencia({
+          query,
+          ...(area ? { area } : {}),
+          ...(esTribunais.length ? { tribunais: esTribunais } : {}),
+          size,
+        });
+        return result.hits.map((h) => ({
+          ...h,
+          tipo: "",
+          autoridade: "",
+          fonte: "datajud",
+          textoIntegral: null,
+        }));
+      } catch {
+        return [];
+      }
     }
 
-    const ragHits = (await ragRes.json()) as RagResult[];
+    const [lanceHits, esHits] = await Promise.all([
+      needsLance ? queryLance() : Promise.resolve([]),
+      needsES    ? queryES()    : Promise.resolve([]),
+    ]);
 
-    const hits = ragHits.map((r) => ({
-      id: r.doc_id,
-      tribunal: r.tribunal,
-      numero: r.processo,
-      ementa: r.ementa,
-      relator: r.relator,
-      dataJulgamento: r.data_julgamento,
-      area: "OUTRO",
-      url: r.inteiro_teor_url ?? "",
-      score: r.final_score,
-      tipo: r.tipo,
-      autoridade: r.authority_label,
-      fonte: r.source_label,
-      textoIntegral: r.texto_integral ?? null,
-    }));
+    if (needsLance && needsES && lanceHits.length === 0 && esHits.length === 0) {
+      return reply.status(502).send({ error: "Nenhuma fonte de busca respondeu — tente novamente" });
+    }
+
+    const hits = (needsLance && needsES)
+      ? rrfMerge([lanceHits, esHits], size)
+      : [...lanceHits, ...esHits].slice(0, size);
 
     if (body.data.caseId && caseData) {
       await prisma.search.create({
         data: {
           caseId: body.data.caseId,
-          query: body.data.query,
-          area: body.data.area ?? caseData.area,
+          query,
+          area: area ?? caseData.area,
           resultsJson: hits as any,
         },
       });
     }
 
-    return {
-      hits,
-      total: hits.length,
-      took: Date.now() - t0,
-    };
+    return { hits, total: hits.length, took: Date.now() - t0 };
   });
 }
