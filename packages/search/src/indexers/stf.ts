@@ -1,6 +1,7 @@
 import { Agent } from "undici";
 import type { Jurisprudencia, LegalArea } from "../types.js";
 import type { JurisprudenciaAdapter, IndexerOptions } from "./types.js";
+import { classifyFromText } from "./classify.js";
 
 // Portal de Jurisprudência do STF — sem API formal, usa endpoint interno do portal
 const STF_BASE = "https://jurisprudencia.stf.jus.br";
@@ -75,7 +76,7 @@ async function fetchStfPage(
       ementa: src.ementa ?? src.descricao ?? "Ementa não disponível",
       relator: src.relator ?? "Não informado",
       dataJulgamento: src.dataJulgamento?.slice(0, 10) ?? "",
-      area: "OUTRO" as LegalArea,
+      area: classifyFromText(`${src.ementa ?? ""} ${src.descricao ?? ""} ${classe}`),
       url: src.link ?? `https://jurisprudencia.stf.jus.br/pages/search?base=acordaos&pesquisa_inteiro_teor=false&sinonimo=true&plural=true&radicais=false&buscaExata=false&page=1&pageSize=10&queryString=${encodeURIComponent(numero)}`,
     };
   });

@@ -1,6 +1,7 @@
 import { Agent } from "undici";
 import type { Jurisprudencia, LegalArea } from "../types.js";
 import type { JurisprudenciaAdapter, IndexerOptions } from "./types.js";
+import { classifyFromText } from "./classify.js";
 
 // SCON do STJ — interface web pública, retorna XML com ementa completa
 const SCON_BASE = "https://scon.stj.jus.br/SCON";
@@ -79,7 +80,7 @@ function parseSTJXml(xml: string): Jurisprudencia[] {
         ementa: ementa || "Ementa não disponível",
         relator,
         dataJulgamento: formatDate(dataJulg),
-        area: "OUTRO" as LegalArea,
+        area: classifyFromText(ementa),
         url: numReg
           ? `https://scon.stj.jus.br/SCON/GetInteiroTeorDoAcordao?num_registro=${numReg}&dt_publicacao=${dataJulg}`
           : `https://processo.stj.jus.br/processo/pesquisa/?tipoPesquisa=tipoPesquisaNumeroUnico&termo=${encodeURIComponent(numero)}`,
