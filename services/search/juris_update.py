@@ -1947,8 +1947,10 @@ def _collect_stj_documents(
                 if edition_date and _extract_year(edition_date) != year:
                     continue
             except Exception:
-                # Página de meta bloqueada (403) — tenta baixar o PDF diretamente
-                pass
+                # Meta bloqueado (403): só inclui como "esperado" se temos o PDF
+                pdf_check = docs_dir / f"Informativo_{edition:04d}.pdf"
+                if edition not in browser_downloaded and not pdf_check.exists():
+                    continue
             expected_editions.append(int(edition))
             latest_dates.append(edition_date)
             pdf_path = docs_dir / f"Informativo_{edition:04d}.pdf"
