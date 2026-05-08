@@ -10,7 +10,7 @@ Cobre **exclusivamente STF e STJ**.
 - Localização no servidor: `/opt/judicore/lancedb_store` (tabela `jurisprudencia`)
 - **Não indexar STF/STJ no Elasticsearch** — dados já estão aqui com cobertura total
 
-> A tabela `tjsp_jurisprudencia` existe no LanceDB mas contém apenas ~15k docs de 2013 (dataset parcial/obsoleto). Deve ser desconsiderada. TJSP será indexado no Elasticsearch quando o adaptador for implementado.
+> A tabela `tjsp_jurisprudencia` existe no LanceDB mas contém apenas ~15k docs de 2013 (dataset parcial/obsoleto). **Desconsiderada.** TJSP será indexado no Elasticsearch quando o adaptador for implementado.
 
 ---
 

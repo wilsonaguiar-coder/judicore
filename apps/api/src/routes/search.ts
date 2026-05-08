@@ -6,7 +6,8 @@ import { searchJurisprudencia } from "@judicore/search";
 const SEARCH_SERVICE_URL = process.env.SEARCH_SERVICE_URL ?? "http://127.0.0.1:7860";
 
 // Tribunais cobertos pelo LanceDB (vetor + inteiro teor)
-const LANCE_TRIBUNAIS = new Set(["STF", "STJ", "TJSP"]);
+// TJSP removido: tabela lancedb tem apenas dados de 2013 — será indexado no ES
+const LANCE_TRIBUNAIS = new Set(["STF", "STJ"]);
 
 const searchSchema = z.object({
   query: z.string().min(3),
