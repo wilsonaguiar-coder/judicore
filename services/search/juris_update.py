@@ -1721,6 +1721,43 @@ def _load_stj_docs_by_ids(conn: sqlite3.Connection, row_ids: list[int]) -> list[
     return docs
 
 
+async def _get_stj_browser_cookies(chromium_executable_path: str | None) -> list[dict[str, Any]]:
+    """Abre o Chrome, navega para o STJ e extrai os cookies estabelecidos pelo browser."""
+    from playwright.async_api import async_playwright
+    launch_kwargs: dict[str, Any] = {
+        "headless": True,
+        "args": ["--no-sandbox", "--disable-setuid-sandbox",
+                 "--disable-dev-shm-usage", "--disable-blink-features=AutomationControlled"],
+    }
+    if chromium_executable_path:
+        launch_kwargs["executable_path"] = chromium_executable_path
+    async with async_playwright() as pw:
+        browser = await pw.chromium.launch(**launch_kwargs)
+        context = await browser.new_context(
+            ignore_https_errors=True,
+            user_agent=(
+                "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 "
+                "(KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36"
+            ),
+            locale="pt-BR",
+        )
+        await context.add_init_script(
+            "Object.defineProperty(navigator, 'webdriver', {get: () => undefined});"
+        )
+        page = await context.new_page()
+        try:
+            await page.goto(
+                "https://processo.stj.jus.br/jurisprudencia/externo/informativo/",
+                wait_until="networkidle", timeout=60000,
+            )
+            await page.wait_for_timeout(6000)
+        except Exception:
+            pass
+        cookies = await context.cookies()
+        await browser.close()
+    return cookies
+
+
 def _collect_stj_documents(
     *,
     project_root: Path,
@@ -1730,6 +1767,7 @@ def _collect_stj_documents(
     repair_model: str,
     repair_min_confidence: float,
     repair_max_records_per_pdf: int,
+    chromium_executable_path: str | None = None,
     strict_completeness: bool,
     progress_cb: ProgressCallback | None,
     log_cb: LogCallback | None,
@@ -1765,19 +1803,24 @@ def _collect_stj_documents(
     session.verify = False
     session.headers.update({
         "User-Agent": (
-            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
-            "(KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36"
+            "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 "
+            "(KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36"
         ),
         "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
         "Accept-Language": "pt-BR,pt;q=0.9,en-US;q=0.8,en;q=0.7",
         "Accept-Encoding": "gzip, deflate, br",
         "Connection": "keep-alive",
-        "Upgrade-Insecure-Requests": "1",
     })
+
+    # Usa Chrome para resolver o desafio do STJ e extrai os cookies
+    _emit(progress_cb, "stj_browser_cookies", "STJ: obtendo cookies via Chrome.")
     try:
-        session.get("https://processo.stj.jus.br/", timeout=15)
-    except Exception:
-        pass
+        browser_cookies = asyncio.run(_get_stj_browser_cookies(chromium_executable_path))
+        for c in browser_cookies:
+            session.cookies.set(c["name"], c["value"], domain=c.get("domain", ""))
+        _log(log_cb, "stj_cookies_ok", count=len(browser_cookies))
+    except Exception as exc:
+        _log(log_cb, "stj_cookies_failed", error=str(exc))
 
     _emit(progress_cb, "stj_discovery", "STJ: verificando ultima edicao publicada.")
     latest_edition = _stj_latest_edition(session)
@@ -2146,6 +2189,7 @@ def run_jurisprudencia_incremental_update(
             repair_min_confidence=float(stj_repair_min_confidence or DEFAULT_STJ_REPAIR_MIN_CONFIDENCE),
             repair_max_records_per_pdf=int(stj_repair_max_records_per_pdf or DEFAULT_STJ_REPAIR_MAX_RECORDS_PER_PDF),
             strict_completeness=bool(strict_completeness),
+            chromium_executable_path=chromium_executable_path,
             progress_cb=progress_cb,
             log_cb=log_cb,
         )
