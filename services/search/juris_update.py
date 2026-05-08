@@ -642,7 +642,11 @@ def _collect_stf_documents(
         "by_base": {"acordaos": 0, "monocraticas": 0, "informativos": 0},
     }
 
+    import urllib3
+    urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
+
     session = requests.Session()
+    session.verify = False
     session.headers.update({
         "Content-Type": "application/json",
         "Accept": "application/json, text/plain, */*",
