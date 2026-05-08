@@ -22,15 +22,14 @@ const TJs = ["TJRJ","TJMG","TJRS","TJPR","TJSC","TJBA","TJPE","TJCE","TJGO","TJD
               "TJMA","TJPA","TJES","TJMT","TJMS","TJAL","TJSE","TJRN","TJPB","TJPI",
               "TJAM","TJAC","TJRO","TJRR","TJAP","TJTO"];
 
-const TRIBUNAIS_BY_AREA: Record<LegalArea, string[]> = {
-  TRABALHISTA:    ["TST", ...TRTs],
-  OUTRO:          [...TREs],
-  CRIMINAL:       [...TRFs, ...TJs],
+const TRIBUNAIS_BY_AREA: Partial<Record<LegalArea, string[]>> = {
+  TRABALHISTA:    ["TST"],
+  CRIMINAL:       TRFs,
   TRIBUTARIO:     TRFs,
   PREVIDENCIARIO: TRFs,
   ADMINISTRATIVO: TRFs,
   AMBIENTAL:      TRFs,
-  CIVIL:          TJs,
+  CIVIL:          TRFs,
 };
 
 // Queries por área: "" = match_all (para tribunais homogêneos)
@@ -46,8 +45,8 @@ const QUERIES_BY_AREA: Record<LegalArea, string[]> = {
   CIVIL:          [""],
 };
 
-const ALL_SOURCES: IndexingSource[] = ["datajud", "stj"];
-const TRABALHISTA_SOURCES: IndexingSource[] = ["tst", "datajud"];
+const ALL_SOURCES: IndexingSource[] = ["stj", "stf"];
+const TRABALHISTA_SOURCES: IndexingSource[] = ["tst"];
 
 export const SCHEDULE_CONFIG: Array<{
   area: LegalArea;
@@ -55,14 +54,13 @@ export const SCHEDULE_CONFIG: Array<{
   sources: IndexingSource[];
   maxPages: number;
 }> = [
-  { area: "TRIBUTARIO",     cron: "0 2 * * 2,5", sources: ALL_SOURCES, maxPages: 5 },
-  { area: "PREVIDENCIARIO", cron: "30 2 * * 1,4", sources: ALL_SOURCES, maxPages: 5 },
-  { area: "ADMINISTRATIVO", cron: "0 3 * * 3,6", sources: ALL_SOURCES, maxPages: 5 },
-  { area: "CRIMINAL",       cron: "0 4 * * 5",   sources: ALL_SOURCES, maxPages: 5 },
-  { area: "AMBIENTAL",      cron: "0 3 * * 0",   sources: ALL_SOURCES, maxPages: 5 },
-  { area: "TRABALHISTA",    cron: "0 4 * * 0",   sources: TRABALHISTA_SOURCES, maxPages: 5 },
-  { area: "CIVIL",          cron: "0 2 * * 6",   sources: ALL_SOURCES, maxPages: 5 },
-  { area: "OUTRO",          cron: "0 5 * * 0",   sources: ["datajud"], maxPages: 5 },
+  { area: "TRIBUTARIO",     cron: "0 2 * * 2,5",  sources: ALL_SOURCES,         maxPages: 10 },
+  { area: "PREVIDENCIARIO", cron: "30 2 * * 1,4",  sources: ALL_SOURCES,         maxPages: 10 },
+  { area: "ADMINISTRATIVO", cron: "0 3 * * 3,6",  sources: ALL_SOURCES,         maxPages: 10 },
+  { area: "CRIMINAL",       cron: "0 4 * * 5",    sources: ALL_SOURCES,         maxPages: 10 },
+  { area: "AMBIENTAL",      cron: "0 3 * * 0",    sources: ALL_SOURCES,         maxPages: 10 },
+  { area: "TRABALHISTA",    cron: "0 4 * * 0",    sources: TRABALHISTA_SOURCES, maxPages: 10 },
+  { area: "CIVIL",          cron: "0 2 * * 6",    sources: ALL_SOURCES,         maxPages: 10 },
 ];
 
 export function buildJobData(
@@ -75,7 +73,7 @@ export function buildJobData(
     area,
     sources,
     queries: QUERIES_BY_AREA[area] ?? [""],
-    tribunais: TRIBUNAIS_BY_AREA[area],
+    tribunais: TRIBUNAIS_BY_AREA[area] ?? undefined,
     maxPages,
     triggeredBy,
   };

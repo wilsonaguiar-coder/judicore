@@ -56,9 +56,11 @@ app.get("/health", async () => ({ status: "ok", timestamp: new Date().toISOStrin
 try {
   await ensureIndices();
 
-  // Inicia worker e agenda jobs recorrentes
-  startIndexingWorker();
-  await registerScheduledJobs();
+  // Worker iniciado apenas pelo processo judicore-search (não pela API)
+  if (process.env["START_WORKER"] === "true") {
+    startIndexingWorker();
+    await registerScheduledJobs();
+  }
 
   const port = Number(process.env["PORT"] ?? 3001);
   await app.listen({ port, host: "0.0.0.0" });
