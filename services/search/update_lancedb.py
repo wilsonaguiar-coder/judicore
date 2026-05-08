@@ -56,6 +56,9 @@ only_stf = os.getenv("ONLY_STF", "") == "1"
 only_stj = os.getenv("ONLY_STJ", "") == "1"
 include_stf = not only_stj
 include_stj = not only_stf
+# Chrome/Chromium executable para passar pelo AWS WAF do STF
+# Ex: CHROME_PATH=/usr/bin/google-chrome
+chrome_path = os.getenv("CHROME_PATH", "/usr/bin/google-chrome") or None
 
 print("=" * 60)
 print("LanceDB — Atualização Incremental STF/STJ")
@@ -66,6 +69,7 @@ print(f"  since_date   : {since_date}")
 print(f"  year         : {year}")
 print(f"  include_stf  : {include_stf}")
 print(f"  include_stj  : {include_stj}")
+print(f"  chrome_path  : {chrome_path}")
 print()
 
 result = run_jurisprudencia_incremental_update(
@@ -74,6 +78,7 @@ result = run_jurisprudencia_incremental_update(
     year=year,
     stf_since_date=since_date,
     stf_visible_browser=False,
+    chromium_executable_path=chrome_path,
     include_stf=include_stf,
     include_stj=include_stj,
 )
