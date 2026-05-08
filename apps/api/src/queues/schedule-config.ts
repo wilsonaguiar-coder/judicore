@@ -47,6 +47,7 @@ const QUERIES_BY_AREA: Record<LegalArea, string[]> = {
 };
 
 const ALL_SOURCES: IndexingSource[] = ["datajud", "stj"];
+const TRABALHISTA_SOURCES: IndexingSource[] = ["tst", "datajud"];
 
 export const SCHEDULE_CONFIG: Array<{
   area: LegalArea;
@@ -59,7 +60,7 @@ export const SCHEDULE_CONFIG: Array<{
   { area: "ADMINISTRATIVO", cron: "0 3 * * 3,6", sources: ALL_SOURCES, maxPages: 5 },
   { area: "CRIMINAL",       cron: "0 4 * * 5",   sources: ALL_SOURCES, maxPages: 5 },
   { area: "AMBIENTAL",      cron: "0 3 * * 0",   sources: ALL_SOURCES, maxPages: 5 },
-  { area: "TRABALHISTA",    cron: "0 4 * * 0",   sources: ALL_SOURCES, maxPages: 5 },
+  { area: "TRABALHISTA",    cron: "0 4 * * 0",   sources: TRABALHISTA_SOURCES, maxPages: 5 },
   { area: "CIVIL",          cron: "0 2 * * 6",   sources: ALL_SOURCES, maxPages: 5 },
   { area: "OUTRO",          cron: "0 5 * * 0",   sources: ["datajud"], maxPages: 5 },
 ];
