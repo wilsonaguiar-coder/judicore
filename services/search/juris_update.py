@@ -1721,41 +1721,116 @@ def _load_stj_docs_by_ids(conn: sqlite3.Connection, row_ids: list[int]) -> list[
     return docs
 
 
-async def _get_stj_browser_cookies(chromium_executable_path: str | None) -> list[dict[str, Any]]:
-    """Abre o Chrome, navega para o STJ e extrai os cookies estabelecidos pelo browser."""
-    from playwright.async_api import async_playwright
-    launch_kwargs: dict[str, Any] = {
-        "headless": True,
-        "args": ["--no-sandbox", "--disable-setuid-sandbox",
-                 "--disable-dev-shm-usage", "--disable-blink-features=AutomationControlled"],
-    }
-    if chromium_executable_path:
-        launch_kwargs["executable_path"] = chromium_executable_path
-    async with async_playwright() as pw:
-        browser = await pw.chromium.launch(**launch_kwargs)
-        context = await browser.new_context(
-            ignore_https_errors=True,
-            user_agent=(
-                "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 "
-                "(KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36"
-            ),
-            locale="pt-BR",
-        )
-        await context.add_init_script(
-            "Object.defineProperty(navigator, 'webdriver', {get: () => undefined});"
-        )
-        page = await context.new_page()
-        try:
-            await page.goto(
-                "https://processo.stj.jus.br/jurisprudencia/externo/informativo/",
-                wait_until="networkidle", timeout=60000,
+def _stj_browser_prepare(
+    *,
+    chromium_executable_path: str | None,
+    docs_dir: Path,
+    progress_cb: ProgressCallback | None,
+) -> tuple[int, set[int]]:
+    """Abre o Chrome, descobre a ultima edicao STJ e baixa os PDFs que faltam.
+    Retorna (latest_edition, conjunto de edicoes baixadas)."""
+
+    async def _run() -> tuple[int, set[int]]:
+        import base64
+        from playwright.async_api import async_playwright
+
+        launch_kwargs: dict[str, Any] = {
+            "headless": True,
+            "args": ["--no-sandbox", "--disable-setuid-sandbox",
+                     "--disable-dev-shm-usage", "--disable-blink-features=AutomationControlled"],
+        }
+        if chromium_executable_path:
+            launch_kwargs["executable_path"] = chromium_executable_path
+
+        downloaded: set[int] = set()
+        latest_edition = 0
+
+        async with async_playwright() as pw:
+            browser = await pw.chromium.launch(**launch_kwargs)
+            context = await browser.new_context(
+                ignore_https_errors=True,
+                user_agent=(
+                    "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 "
+                    "(KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36"
+                ),
+                locale="pt-BR",
             )
-            await page.wait_for_timeout(6000)
-        except Exception:
-            pass
-        cookies = await context.cookies()
-        await browser.close()
-    return cookies
+            await context.add_init_script(
+                "Object.defineProperty(navigator, 'webdriver', {get: () => undefined});"
+            )
+            page = await context.new_page()
+
+            # Navega para a listagem — resolve desafio e descobre ultima edicao
+            _emit(progress_cb, "stj_browser_init", "STJ: Chrome abrindo pagina de listagem.")
+            try:
+                await page.goto(STJ_LIST_URL, wait_until="networkidle", timeout=60000)
+                await page.wait_for_timeout(6000)
+                content = await page.content()
+                editions_html = [
+                    int(x) for x in re.findall(r"GetPDFINFJ\?edicao=(\d{3,5})", content, re.IGNORECASE)
+                ]
+                if editions_html:
+                    latest_edition = max(editions_html)
+            except Exception:
+                pass
+
+            # Fallback: sonda PDFs via fetch no browser
+            if not latest_edition:
+                _emit(progress_cb, "stj_browser_probe", "STJ: sondando edicoes via fetch.")
+                probe_last = 820
+                consecutive_misses = 0
+                for n in range(820, 960):
+                    ok = await page.evaluate(
+                        "async (u) => { try { const r = await fetch(u,{method:'HEAD'}); return r.ok; } catch { return false; } }",
+                        STJ_EDITION_PDF_URL.format(edition=n),
+                    )
+                    if ok:
+                        probe_last = n
+                        consecutive_misses = 0
+                    else:
+                        consecutive_misses += 1
+                        if consecutive_misses >= 8:
+                            break
+                latest_edition = probe_last
+
+            # Baixa PDFs que ainda nao estao em disco usando fetch do browser
+            start = max(820, latest_edition - 60)
+            _emit(progress_cb, "stj_browser_download",
+                  f"STJ: baixando edicoes {start}-{latest_edition} via Chrome.",
+                  stj_latest=latest_edition)
+
+            for edition in range(start, latest_edition + 1):
+                pdf_path = docs_dir / f"Informativo_{edition:04d}.pdf"
+                if pdf_path.exists():
+                    downloaded.add(edition)
+                    continue
+                _emit(progress_cb, "stj_download", f"STJ: edicao {edition:04d}.", stj_edition=edition)
+                b64 = await page.evaluate(
+                    """async (u) => {
+                        try {
+                            const r = await fetch(u);
+                            if (!r.ok) return null;
+                            const buf = await r.arrayBuffer();
+                            const bytes = new Uint8Array(buf);
+                            let bin = '';
+                            for (let i = 0; i < bytes.length; i++) bin += String.fromCharCode(bytes[i]);
+                            return btoa(bin);
+                        } catch { return null; }
+                    }""",
+                    STJ_EDITION_PDF_URL.format(edition=edition),
+                )
+                if not b64:
+                    continue
+                payload = base64.b64decode(b64)
+                if len(payload) >= 1000 and payload.startswith(b"%PDF-"):
+                    pdf_path.parent.mkdir(parents=True, exist_ok=True)
+                    pdf_path.write_bytes(payload)
+                    downloaded.add(edition)
+
+            await browser.close()
+        return latest_edition, downloaded
+
+    return asyncio.run(_run())
 
 
 def _collect_stj_documents(
@@ -1812,18 +1887,26 @@ def _collect_stj_documents(
         "Connection": "keep-alive",
     })
 
-    # Usa Chrome para resolver o desafio do STJ e extrai os cookies
-    _emit(progress_cb, "stj_browser_cookies", "STJ: obtendo cookies via Chrome.")
-    try:
-        browser_cookies = asyncio.run(_get_stj_browser_cookies(chromium_executable_path))
-        for c in browser_cookies:
-            session.cookies.set(c["name"], c["value"], domain=c.get("domain", ""))
-        _log(log_cb, "stj_cookies_ok", count=len(browser_cookies))
-    except Exception as exc:
-        _log(log_cb, "stj_cookies_failed", error=str(exc))
+    # processo.stj.jus.br bloqueia IPs de servidor em todos os paths.
+    # Com Chrome: usa browser fetch (in-context) para baixar PDFs diretamente.
+    # Sem Chrome: tenta via requests (pode falhar com 403 em produção).
+    browser_downloaded: set[int] = set()
+    if chromium_executable_path:
+        _emit(progress_cb, "stj_browser_prepare", "STJ: baixando PDFs via Chrome.")
+        try:
+            latest_edition, browser_downloaded = _stj_browser_prepare(
+                chromium_executable_path=chromium_executable_path,
+                docs_dir=docs_dir,
+                progress_cb=progress_cb,
+            )
+            _log(log_cb, "stj_browser_prepare_ok", latest_edition=latest_edition, downloaded=len(browser_downloaded))
+        except Exception as exc:
+            _log(log_cb, "stj_browser_prepare_failed", error=str(exc))
+            latest_edition = _stj_latest_edition(session)
+    else:
+        _emit(progress_cb, "stj_discovery", "STJ: verificando ultima edicao publicada.")
+        latest_edition = _stj_latest_edition(session)
 
-    _emit(progress_cb, "stj_discovery", "STJ: verificando ultima edicao publicada.")
-    latest_edition = _stj_latest_edition(session)
     summary["latest_edition"] = int(latest_edition)
     try:
         latest_meta = _stj_fetch_edition_meta(session, latest_edition)
@@ -1872,10 +1955,15 @@ def _collect_stj_documents(
                 f"STJ: baixando edicao {edition:04d}.",
                 stj_edition=edition,
             )
-            ok = _stj_download_pdf(session, edition, pdf_path)
-            if not ok:
-                _log(log_cb, "stj_pdf_missing", edition=edition)
-                continue
+            if edition in browser_downloaded:
+                if not pdf_path.exists():
+                    _log(log_cb, "stj_pdf_missing", edition=edition)
+                    continue
+            else:
+                ok = _stj_download_pdf(session, edition, pdf_path)
+                if not ok:
+                    _log(log_cb, "stj_pdf_missing", edition=edition)
+                    continue
             summary["downloaded_editions"] = int(summary["downloaded_editions"] or 0) + 1
             row_ids, repair_stats = _insert_stj_pdf_records(
                 conn,
