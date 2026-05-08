@@ -24,8 +24,8 @@ const TJs = ["TJRJ","TJMG","TJRS","TJPR","TJSC","TJBA","TJPE","TJCE","TJGO","TJD
 
 const TRIBUNAIS_BY_AREA: Record<LegalArea, string[]> = {
   TRABALHISTA:    ["TST", ...TRTs],
-  OUTRO:          ["TSE", ...TREs],
-  CRIMINAL:       ["STM", ...TRFs, ...TJs],
+  OUTRO:          [...TREs],
+  CRIMINAL:       [...TRFs, ...TJs],
   TRIBUTARIO:     TRFs,
   PREVIDENCIARIO: TRFs,
   ADMINISTRATIVO: TRFs,

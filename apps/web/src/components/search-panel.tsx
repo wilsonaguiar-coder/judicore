@@ -18,7 +18,7 @@ const TRTs = ["TRT1","TRT2","TRT3","TRT4","TRT5","TRT6","TRT7","TRT8","TRT9","TR
 const TJs = ["TJSP","TJRJ","TJMG","TJRS","TJPR","TJSC","TJBA","TJPE","TJCE","TJGO","TJDFT","TJMA","TJPA","TJES","TJMT","TJMS","TJAL","TJSE","TJRN","TJPB","TJPI","TJAM","TJAC","TJRO","TJRR","TJAP","TJTO"];
 
 const TRIBUNAL_GROUPS = [
-  { label: "Superiores",  tribunais: ["STF","STJ","TST","TSE","STM"] },
+  { label: "Superiores",  tribunais: ["STF","STJ","TST"] },
   { label: "Federais",    tribunais: ["TRF1","TRF2","TRF3","TRF4","TRF5","TRF6"] },
   { label: "Trabalhistas", tribunais: TRTs },
   { label: "Estaduais",   tribunais: TJs },
