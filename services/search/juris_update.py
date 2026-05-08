@@ -955,7 +955,8 @@ def _stj_fetch_edition_meta(session: requests.Session, edition: int) -> dict[str
 def _stj_download_pdf(session: requests.Session, edition: int, target_path: Path) -> bool:
     url = STJ_EDITION_PDF_URL.format(edition=edition)
     response = session.get(url, timeout=90)
-    response.raise_for_status()
+    if not response.ok:
+        return False
     payload = response.content or b""
     if len(payload) < 1000:
         return False
@@ -1924,10 +1925,12 @@ def _collect_stj_documents(
             "SELECT MAX(CAST(informativo_numero AS INTEGER)) FROM stj_informativos"
         ).fetchone()
         max_in_db = int(max_in_db_row[0] or 0)
-        # Se o banco está vazio, começa da edição aproximada do ano alvo
-        # (STJ ~40 edições/ano; edição ~780 = 2024, ~820 = 2026)
+        # Se o banco está vazio, começa de onde o browser preparou (>=820) ou estimativa pelo ano
         if max_in_db == 0:
-            start_edition = max(1, latest_edition - 60)
+            if browser_downloaded:
+                start_edition = min(browser_downloaded)
+            else:
+                start_edition = max(1, latest_edition - 60)
         else:
             start_edition = max_in_db + 1
         all_row_ids: list[int] = []
