@@ -61,7 +61,7 @@ export const tstAdapter: JurisprudenciaAdapter = {
         for (const { registro: r } of data.registros) {
           if (!r?.id) continue;
           const texto = stripHtml(r.txtConteudoDecisaoHighlight ?? "");
-          const ementa = texto.slice(0, 1500) || "Ementa não disponível";
+          const ementa = texto || "Ementa não disponível";
           const item: Jurisprudencia = {
             id: `tst-${r.id}`,
             tribunal: "TST",
@@ -72,7 +72,7 @@ export const tstAdapter: JurisprudenciaAdapter = {
             area: "TRABALHISTA",
             url: `https://jurisprudencia.tst.jus.br/#!/resultado?id=${r.id}`,
           };
-          if (texto.length > 0) item.conteudoIntegral = texto.slice(0, 10000);
+          if (texto.length > 0) item.conteudoIntegral = texto;
           items.push(item);
         }
 
