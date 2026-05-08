@@ -35,14 +35,22 @@ function delay(ms: number) {
   return new Promise((r) => setTimeout(r, ms));
 }
 
-async function fetchPage(query: string, page: number): Promise<TSTResponse> {
-  const res = await fetch(`${TST_BASE}/${page}/${PAGE_SIZE}`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(query.trim() ? { searchParameter: query } : {}),
-  });
-  if (!res.ok) throw new Error(`TST HTTP ${res.status}`);
-  return res.json() as Promise<TSTResponse>;
+async function fetchPage(query: string, page: number, retries = 3): Promise<TSTResponse> {
+  for (let attempt = 1; attempt <= retries; attempt++) {
+    try {
+      const res = await fetch(`${TST_BASE}/${page}/${PAGE_SIZE}`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(query.trim() ? { searchParameter: query } : {}),
+      });
+      if (!res.ok) throw new Error(`TST HTTP ${res.status}`);
+      return res.json() as Promise<TSTResponse>;
+    } catch (err) {
+      if (attempt === retries) throw err;
+      await delay(attempt * 5000);
+    }
+  }
+  throw new Error("TST: retries esgotados");
 }
 
 export const tstAdapter: JurisprudenciaAdapter = {
