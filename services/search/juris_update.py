@@ -1750,23 +1750,26 @@ def _collect_stj_documents(
     data_dir.mkdir(parents=True, exist_ok=True)
     docs_dir.mkdir(parents=True, exist_ok=True)
 
+    import urllib3
+    urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
+
     session = requests.Session()
-    session.headers.update(
-        {
-            "User-Agent": (
-                "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
-                "(KHTML, like Gecko) Chrome/123.0.0.0 Safari/537.36"
-            )
-        }
-    )
-    # Bundled Python (PyInstaller) may lack proper CA certs for Cloudflare-protected
-    # sites like STJ.  Try with default certs first; on SSL error fall back to
-    # verify=False so the pipeline isn't blocked.
+    session.verify = False
+    session.headers.update({
+        "User-Agent": (
+            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
+            "(KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36"
+        ),
+        "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+        "Accept-Language": "pt-BR,pt;q=0.9,en-US;q=0.8,en;q=0.7",
+        "Accept-Encoding": "gzip, deflate, br",
+        "Connection": "keep-alive",
+        "Upgrade-Insecure-Requests": "1",
+    })
     try:
         session.get("https://processo.stj.jus.br/", timeout=15)
-    except requests.exceptions.SSLError:
-        _log(log_cb, "stj_ssl_fallback", hint="SSL verification disabled for STJ requests (bundled cert issue)")
-        session.verify = False
+    except Exception:
+        pass
 
     _emit(progress_cb, "stj_discovery", "STJ: verificando ultima edicao publicada.")
     latest_edition = _stj_latest_edition(session)
