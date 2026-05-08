@@ -69,11 +69,12 @@ export function buildJobData(
   maxPages: number,
   triggeredBy: "scheduler" | "manual" = "scheduler"
 ): IndexingJobData {
+  const tribunais = TRIBUNAIS_BY_AREA[area];
   return {
     area,
     sources,
     queries: QUERIES_BY_AREA[area] ?? [""],
-    tribunais: TRIBUNAIS_BY_AREA[area] ?? undefined,
+    ...(tribunais ? { tribunais } : {}),
     maxPages,
     triggeredBy,
   };
