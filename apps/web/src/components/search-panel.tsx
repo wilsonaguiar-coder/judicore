@@ -14,7 +14,15 @@ interface Props {
   onResults: (results: Jurisprudencia[]) => void;
 }
 
-const TRIBUNAIS = ["STF", "STJ", "TJSP"];
+const TRTs = ["TRT1","TRT2","TRT3","TRT4","TRT5","TRT6","TRT7","TRT8","TRT9","TRT10","TRT11","TRT12","TRT13","TRT14","TRT15","TRT16","TRT17","TRT18","TRT19","TRT20","TRT21","TRT22","TRT23","TRT24"];
+const TJs = ["TJSP","TJRJ","TJMG","TJRS","TJPR","TJSC","TJBA","TJPE","TJCE","TJGO","TJDFT","TJMA","TJPA","TJES","TJMT","TJMS","TJAL","TJSE","TJRN","TJPB","TJPI","TJAM","TJAC","TJRO","TJRR","TJAP","TJTO"];
+
+const TRIBUNAL_GROUPS = [
+  { label: "Superiores",  tribunais: ["STF","STJ","TST","TSE","STM"] },
+  { label: "Federais",    tribunais: ["TRF1","TRF2","TRF3","TRF4","TRF5","TRF6"] },
+  { label: "Trabalhistas", tribunais: TRTs },
+  { label: "Estaduais",   tribunais: TJs },
+];
 
 export function SearchPanel({ caseId, token, defaultArea, defaultQuery, onResults }: Props) {
   const [query, setQuery] = useState(defaultQuery ?? "");
@@ -101,23 +109,63 @@ export function SearchPanel({ caseId, token, defaultArea, defaultQuery, onResult
         </form>
       </div>
 
-      <div>
-        <h3 className="text-xs font-semibold uppercase tracking-wide text-muted-foreground mb-2">Tribunais</h3>
-        <div className="flex flex-wrap gap-1.5">
-          {TRIBUNAIS.map((t) => (
-            <button
-              key={t}
-              onClick={() => toggleTribunal(t)}
-              className={`px-2 py-1 rounded text-xs font-medium transition-colors ${
-                tribunais.includes(t)
-                  ? "bg-primary text-primary-foreground"
-                  : "bg-secondary text-secondary-foreground hover:bg-secondary/80"
-              }`}
-            >
-              {t}
-            </button>
-          ))}
+      <div className="space-y-3">
+        <div className="flex items-center justify-between">
+          <h3 className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Tribunais</h3>
+          <button
+            onClick={() => setTribunais([])}
+            className={`text-[10px] px-2 py-0.5 rounded transition-colors ${
+              tribunais.length === 0
+                ? "bg-primary text-primary-foreground"
+                : "bg-secondary text-secondary-foreground hover:bg-secondary/80"
+            }`}
+          >
+            Todos
+          </button>
         </div>
+
+        {TRIBUNAL_GROUPS.map((group) => {
+          const allSelected = group.tribunais.every((t) => tribunais.includes(t));
+          function toggleGroup() {
+            if (allSelected) {
+              setTribunais((prev) => prev.filter((t) => !group.tribunais.includes(t)));
+            } else {
+              setTribunais((prev) => [...new Set([...prev, ...group.tribunais])]);
+            }
+          }
+          return (
+            <div key={group.label}>
+              <div className="flex items-center justify-between mb-1">
+                <span className="text-[10px] font-medium text-muted-foreground uppercase tracking-wide">{group.label}</span>
+                <button
+                  onClick={toggleGroup}
+                  className={`text-[10px] px-1.5 py-0.5 rounded transition-colors ${
+                    allSelected
+                      ? "bg-primary/20 text-primary"
+                      : "text-muted-foreground hover:text-foreground"
+                  }`}
+                >
+                  {allSelected ? "desmarcar" : "todos"}
+                </button>
+              </div>
+              <div className="flex flex-wrap gap-1">
+                {group.tribunais.map((t) => (
+                  <button
+                    key={t}
+                    onClick={() => toggleTribunal(t)}
+                    className={`px-1.5 py-0.5 rounded text-[10px] font-medium transition-colors ${
+                      tribunais.includes(t)
+                        ? "bg-primary text-primary-foreground"
+                        : "bg-secondary text-secondary-foreground hover:bg-secondary/80"
+                    }`}
+                  >
+                    {t}
+                  </button>
+                ))}
+              </div>
+            </div>
+          );
+        })}
       </div>
 
       <p className="text-xs text-muted-foreground">
