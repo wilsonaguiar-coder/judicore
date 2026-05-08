@@ -11,7 +11,7 @@ const triggerSchema = z.object({
     "TRIBUTARIO", "PREVIDENCIARIO", "ADMINISTRATIVO", "CRIMINAL",
     "AMBIENTAL", "TRABALHISTA", "CIVIL", "OUTRO",
   ]),
-  sources: z.array(z.enum(["stj", "stf", "tst"])).optional(),
+  sources: z.array(z.enum(["tst"])).optional(),
   maxPages: z.number().int().min(1).max(10).optional(),
 });
 
@@ -150,7 +150,7 @@ export async function adminRoutes(app: FastifyInstance) {
     { onRequest: [authenticate, requireAdmin] },
     async (request, reply) => {
       const body = z.object({
-        sources: z.array(z.enum(["stj", "stf", "tst"])).optional(),
+        sources: z.array(z.enum(["tst"])).optional(),
         maxPages: z.number().int().min(1).max(10).optional(),
       }).safeParse(request.body);
       if (!body.success) return reply.status(400).send({ error: body.error.flatten() });
@@ -164,7 +164,7 @@ export async function adminRoutes(app: FastifyInstance) {
           const defaultConfig = SCHEDULE_CONFIG.find((c) => c.area === area);
           const jobData = buildJobData(
             area,
-            sources ?? defaultConfig?.sources ?? ["stj", "stf"],
+            sources ?? defaultConfig?.sources ?? ["tst"],
             maxPages ?? defaultConfig?.maxPages ?? 5,
             "manual"
           );

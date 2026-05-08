@@ -7,7 +7,7 @@ import { api } from "@/lib/api";
 import { LEGAL_AREAS } from "@/types";
 import type { LegalArea } from "@/types";
 
-const SOURCES = ["stj", "stf", "tst"] as const;
+const SOURCES = ["tst"] as const;
 type Source = typeof SOURCES[number];
 
 interface Props {
@@ -19,7 +19,7 @@ export function TriggerIndexDialog({ token, onTriggered }: Props) {
   const [open, setOpen] = useState(false);
   const [allAreas, setAllAreas] = useState(false);
   const [area, setArea] = useState<LegalArea>("TRIBUTARIO");
-  const [sources, setSources] = useState<Source[]>(["stj", "stf"]);
+  const [sources, setSources] = useState<Source[]>(["tst"]);
   const [maxPages, setMaxPages] = useState(5);
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<string | null>(null);
