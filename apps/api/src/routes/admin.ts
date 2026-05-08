@@ -12,7 +12,7 @@ const triggerSchema = z.object({
     "AMBIENTAL", "TRABALHISTA", "CIVIL", "OUTRO",
   ]),
   sources: z.array(z.enum(["tst"])).optional(),
-  maxPages: z.number().int().min(1).max(10).optional(),
+  maxPages: z.number().int().min(1).max(10000).optional(),
 });
 
 export async function adminRoutes(app: FastifyInstance) {
@@ -151,7 +151,7 @@ export async function adminRoutes(app: FastifyInstance) {
     async (request, reply) => {
       const body = z.object({
         sources: z.array(z.enum(["tst"])).optional(),
-        maxPages: z.number().int().min(1).max(10).optional(),
+        maxPages: z.number().int().min(1).max(10000).optional(),
       }).safeParse(request.body);
       if (!body.success) return reply.status(400).send({ error: body.error.flatten() });
 

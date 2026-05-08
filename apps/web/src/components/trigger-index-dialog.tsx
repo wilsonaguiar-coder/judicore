@@ -125,17 +125,29 @@ export function TriggerIndexDialog({ token, onTriggered }: Props) {
             </div>
 
             <div className="space-y-1.5">
-              <label className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
-                Páginas por fonte (1–10)
-              </label>
+              <div className="flex items-center justify-between">
+                <label className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
+                  Páginas por fonte
+                </label>
+                <div className="flex gap-1">
+                  <button onClick={() => setMaxPages(200)} className="text-[10px] px-1.5 py-0.5 rounded bg-secondary text-secondary-foreground hover:bg-secondary/80">200</button>
+                  <button onClick={() => setMaxPages(1000)} className="text-[10px] px-1.5 py-0.5 rounded bg-secondary text-secondary-foreground hover:bg-secondary/80">1k</button>
+                  <button onClick={() => setMaxPages(5000)} className="text-[10px] px-1.5 py-0.5 rounded bg-primary/20 text-primary hover:bg-primary/30">5k</button>
+                </div>
+              </div>
               <input
                 type="number"
                 min={1}
-                max={10}
+                max={10000}
                 value={maxPages}
                 onChange={(e) => setMaxPages(Number(e.target.value))}
                 className="w-full px-3 py-2 text-sm rounded-md border bg-background focus:outline-none focus:ring-2 focus:ring-ring"
               />
+              {maxPages >= 1000 && (
+                <p className="text-[10px] text-muted-foreground">
+                  ~{Math.round(maxPages * 20).toLocaleString("pt-BR")} docs · ~{Math.round(maxPages * 1.5 / 60)} min estimados
+                </p>
+              )}
             </div>
 
             {result && (
