@@ -15,17 +15,13 @@ Cobre **exclusivamente STF e STJ**.
 ---
 
 ### Elasticsearch (busca BM25 / keyword)
-Cobre **todos os demais tribunais**: TST, TRF1-6, TJSP e demais tribunais estaduais.
+Cobre **todos os demais tribunais**: TST, TRT1-24, TRF1-6, TJSP e demais tribunais estaduais.
 
 | Tribunal | Adaptador | Status |
 |----------|-----------|--------|
 | TST | `tstAdapter` | ✅ Implementado |
-| TRF1 | — | ⏳ Pendente |
-| TRF2 | — | ⏳ Pendente |
-| TRF3 | — | ⏳ Pendente |
-| TRF4 | — | ⏳ Pendente |
-| TRF5 | — | ⏳ Pendente |
-| TRF6 | — | ⏳ Pendente |
+| TRT1–TRT24 | — | ⏳ Pendente |
+| TRF1–TRF6 | — | ⏳ Pendente |
 | TJSP | — | ⏳ Pendente |
 | Demais TJs | — | ⏳ Pendente |
 
@@ -39,7 +35,7 @@ Pesquisa do usuário
        ├─► LanceDB (STF + STJ) ──► busca vetorial via Python service
        │                           (http://127.0.0.1:7860)
        │
-       └─► Elasticsearch (TST, TRFs, TJs) ──► busca BM25
+       └─► Elasticsearch (TST, TRTs, TRFs, TJs) ──► busca BM25
                │
                └─► Merge via RRF (Reciprocal Rank Fusion)
                    quando ambas as bases são consultadas
