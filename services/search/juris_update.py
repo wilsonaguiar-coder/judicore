@@ -1891,22 +1891,29 @@ def _collect_stj_documents(
     # processo.stj.jus.br bloqueia IPs de servidor em todos os paths.
     # Com Chrome: usa browser fetch (in-context) para baixar PDFs diretamente.
     # Sem Chrome: tenta via requests (pode falhar com 403 em produção).
+    # PDFs já em disco (enviados manualmente ou baixados em run anterior)
     browser_downloaded: set[int] = set()
+    for _pdf in sorted(docs_dir.glob("Informativo_*.pdf")):
+        _m = re.match(r"Informativo_(\d+)\.pdf", _pdf.name)
+        if _m:
+            browser_downloaded.add(int(_m.group(1)))
+
     if chromium_executable_path:
         _emit(progress_cb, "stj_browser_prepare", "STJ: baixando PDFs via Chrome.")
         try:
-            latest_edition, browser_downloaded = _stj_browser_prepare(
+            _latest, _new = _stj_browser_prepare(
                 chromium_executable_path=chromium_executable_path,
                 docs_dir=docs_dir,
                 progress_cb=progress_cb,
             )
+            browser_downloaded |= _new
+            latest_edition = max(_latest, max(browser_downloaded) if browser_downloaded else 0)
             _log(log_cb, "stj_browser_prepare_ok", latest_edition=latest_edition, downloaded=len(browser_downloaded))
         except Exception as exc:
             _log(log_cb, "stj_browser_prepare_failed", error=str(exc))
-            latest_edition = _stj_latest_edition(session)
+            latest_edition = max(browser_downloaded) if browser_downloaded else _stj_latest_edition(session)
     else:
-        _emit(progress_cb, "stj_discovery", "STJ: verificando ultima edicao publicada.")
-        latest_edition = _stj_latest_edition(session)
+        latest_edition = max(browser_downloaded) if browser_downloaded else _stj_latest_edition(session)
 
     summary["latest_edition"] = int(latest_edition)
     try:
