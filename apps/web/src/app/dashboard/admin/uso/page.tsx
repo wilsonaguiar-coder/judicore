@@ -71,6 +71,7 @@ export default function UsagePage() {
   const groqCostInput  = (totals.groqInput  / 1_000_000) * 0.15;
   const groqCostOutput = (totals.groqOutput / 1_000_000) * 0.60;
   const totalCost      = groqCostInput + groqCostOutput;
+  const geminiCost     = (totals.geminiInput / 1_000_000) * 0.025;
 
   return (
     <div className="flex h-screen bg-background">
@@ -103,6 +104,24 @@ export default function UsagePage() {
               <div>
                 <p className="text-xs text-muted-foreground">Custo estimado</p>
                 <p className="text-2xl font-semibold">US$ {totalCost.toFixed(4)}</p>
+              </div>
+            </div>
+          </div>
+
+          {/* Card Gemini */}
+          <div className="rounded-lg border p-5 space-y-3">
+            <div className="flex items-center gap-2 text-sm font-medium">
+              <Cpu size={14} className="text-muted-foreground" />
+              Gemini — Embeddings de busca
+            </div>
+            <div className="grid grid-cols-2 gap-3">
+              <div>
+                <p className="text-xs text-muted-foreground">Input</p>
+                <p className="text-2xl font-semibold">{fmt(totals.geminiInput)}</p>
+              </div>
+              <div>
+                <p className="text-xs text-muted-foreground">Custo estimado</p>
+                <p className="text-2xl font-semibold">US$ {geminiCost.toFixed(4)}</p>
               </div>
             </div>
           </div>
@@ -145,8 +164,9 @@ export default function UsagePage() {
                   <thead className="bg-muted/50 text-muted-foreground">
                     <tr>
                       <th className="px-4 py-2.5 text-left font-medium">Data</th>
-                      <th className="px-4 py-2.5 text-right font-medium">Input</th>
-                      <th className="px-4 py-2.5 text-right font-medium">Output</th>
+                      <th className="px-4 py-2.5 text-right font-medium">Groq Input</th>
+                      <th className="px-4 py-2.5 text-right font-medium">Groq Output</th>
+                      <th className="px-4 py-2.5 text-right font-medium">Gemini Input</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y">
@@ -157,6 +177,7 @@ export default function UsagePage() {
                         </td>
                         <td className="px-4 py-2.5 text-right">{fmt(d.groqInput)}</td>
                         <td className="px-4 py-2.5 text-right">{fmt(d.groqOutput)}</td>
+                        <td className="px-4 py-2.5 text-right">{fmt(d.geminiInput)}</td>
                       </tr>
                     ))}
                   </tbody>
