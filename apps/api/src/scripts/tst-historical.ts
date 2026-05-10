@@ -1,20 +1,15 @@
 /**
- * Enfileira jobs de indexação TST histórica por semana.
- * Cada job cobre 7 dias — mantém-se dentro do limite de ~8.860 docs/query.
+ * Enfileira jobs de indexação TST histórica por mês.
+ * Cada job cobre 1 mês — evita sobreposição de r.id entre janelas.
+ * Query mensal = ~3.081 acórdãos (43 páginas), bem abaixo do limite de 524MB.
  *
  * Uso:
  *   cd /opt/judicore/apps/api
- *   npx tsx src/scripts/tst-historical.ts [--from 2022-01-01] [--to 2026-05-10]
+ *   npx tsx src/scripts/tst-historical.ts [--from 2020-01-01] [--to 2026-05-31]
  */
 import "dotenv/config";
 import { getIndexingQueue } from "../queues/queue.js";
 import type { IndexingJobData } from "../queues/types.js";
-
-function addDays(date: Date, days: number): Date {
-  const d = new Date(date);
-  d.setUTCDate(d.getUTCDate() + days);
-  return d;
-}
 
 function fmt(d: Date): string {
   return d.toISOString().slice(0, 10);
@@ -26,22 +21,34 @@ function parseArg(name: string, fallback: string): string {
   return val ?? fallback;
 }
 
+function firstDayOfMonth(date: Date): Date {
+  return new Date(Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), 1));
+}
+
+function lastDayOfMonth(date: Date): Date {
+  return new Date(Date.UTC(date.getUTCFullYear(), date.getUTCMonth() + 1, 0));
+}
+
+function nextMonth(date: Date): Date {
+  return new Date(Date.UTC(date.getUTCFullYear(), date.getUTCMonth() + 1, 1));
+}
+
 const fromStr = parseArg("--from", "2020-01-01");
 const toStr   = parseArg("--to",   fmt(new Date()));
 
-const fromDate = new Date(fromStr + "T00:00:00Z");
+const fromDate = firstDayOfMonth(new Date(fromStr + "T00:00:00Z"));
 const toDate   = new Date(toStr   + "T00:00:00Z");
 
-console.log(`TST histórico: ${fmt(fromDate)} → ${fmt(toDate)}`);
+console.log(`TST histórico (mensal): ${fmt(fromDate)} → ${fmt(toDate)}`);
 
 const queue = getIndexingQueue();
 let count = 0;
 let current = fromDate;
 
 while (current <= toDate) {
-  const weekEnd = addDays(current, 6);
+  const monthLast = lastDayOfMonth(current);
   const startDate = fmt(current);
-  const endDate   = fmt(weekEnd <= toDate ? weekEnd : toDate);
+  const endDate   = fmt(monthLast <= toDate ? monthLast : toDate);
 
   const jobData: IndexingJobData = {
     area: "TRABALHISTA",
@@ -55,14 +62,14 @@ while (current <= toDate) {
   };
 
   await queue.add(`tst-hist-${startDate}`, jobData, {
-    priority: 10,  // baixa prioridade — não interfere com jobs manuais
-    jobId: `tst-hist-${startDate}`,  // idempotente — evita duplicatas
+    priority: 10,
+    jobId: `tst-hist-${startDate}`,
   });
 
   count++;
-  current = addDays(current, 7);
+  current = nextMonth(current);
 }
 
-console.log(`✓ ${count} jobs enfileirados (${count * 7} dias de dados TST)`);
-console.log(`  Tempo estimado: ~${Math.round(count * 8)} minutos rodando em background`);
+console.log(`✓ ${count} jobs mensais enfileirados`);
+console.log(`  Estimativa: ~${Math.round(count * 3)} minutos (~${Math.round(count * 3 / 60)} horas)`);
 await queue.close();
