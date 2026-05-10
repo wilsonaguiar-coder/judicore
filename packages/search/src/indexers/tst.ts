@@ -30,13 +30,9 @@ function buildPdfUrl(r: TSTRegistro): string | undefined {
   const [y, m, d] = (datePart ?? "").split("-");
   const time = (timePart ?? "00:00:00").slice(0, 8);
   const dtaStr = `${d}/${m}/${y} ${time}`;
-  const params = new URLSearchParams({
-    anoProcInt: String(r.anoProcInt),
-    numProcInt: String(r.numProcInt),
-    dtaPublicacaoStr: dtaStr,
-    nia: String(r.numMinuta),
-  });
-  return `https://consultadocumento.tst.jus.br/consultaDocumento/acordao.do?${params}`;
+  // Servidor TST exige barras literais no dtaPublicacaoStr — só codifica o espaço
+  const dtaEncoded = dtaStr.replace(/ /g, "%20");
+  return `https://consultadocumento.tst.jus.br/consultaDocumento/acordao.do?anoProcInt=${r.anoProcInt}&numProcInt=${r.numProcInt}&dtaPublicacaoStr=${dtaEncoded}&nia=${r.numMinuta}`;
 }
 
 function stripHtml(html: string): string {
