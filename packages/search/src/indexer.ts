@@ -15,11 +15,11 @@ export async function runIndexer(
   console.log(`[${adapter.name}] Iniciando indexação para: "${query}"`);
 
   for await (const batch of adapter.fetch(query, options)) {
-    const batchFinal = batch;
     try {
-      await bulkIndexJurisprudencia(batchFinal);
-      indexed += batch.length;
-      console.log(`[${adapter.name}] +${batch.length} (total: ${indexed})`);
+      const result = await bulkIndexJurisprudencia(batch);
+      indexed += result.indexed;
+      failed += result.failed;
+      console.log(`[${adapter.name}] +${result.indexed} (total: ${indexed}${result.failed > 0 ? `, ES rejeitou: ${result.failed}` : ""})`);
     } catch (err) {
       failed += batch.length;
       console.error(`[${adapter.name}] Falha no batch:`, err);
