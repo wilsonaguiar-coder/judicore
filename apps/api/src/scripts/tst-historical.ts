@@ -59,7 +59,7 @@ while (current <= toDate) {
     triggeredBy: "manual",
     startDate,
     endDate,
-    delayMs: 2000,
+    delayMs: 12000,
   };
 
   await queue.add(`tst-hist-${startDate}`, jobData, {

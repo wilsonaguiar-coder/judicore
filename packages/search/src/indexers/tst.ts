@@ -105,7 +105,7 @@ export const tstAdapter: JurisprudenciaAdapter = {
 
     for (let page = 1; page <= maxPages; page++) {
       try {
-        const data = await fetchPage(query, page, 3, startDate, endDate);
+        const data = await fetchPage(query, page, 5, startDate, endDate);
         if (!data.registros?.length) break;
 
         const items: Jurisprudencia[] = [];
