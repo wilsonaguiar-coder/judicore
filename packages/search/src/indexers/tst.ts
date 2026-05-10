@@ -3,7 +3,6 @@ import type { JurisprudenciaAdapter, IndexerOptions } from "./types.js";
 
 const TST_BASE = "https://jurisprudencia-backend2.tst.jus.br/rest/pesquisa-textual";
 const PAGE_SIZE = 100;
-const TST_TIPOS = ["ACORDAO", "DESPACHO", "SUM", "PN", "OJ", "DESPGP", "DESPGVP", "DESPGCG"];
 
 interface TSTRegistro {
   id?: string;
@@ -50,8 +49,6 @@ async function fetchPage(
       const body: Record<string, unknown> = (startDate || endDate)
         ? {
             orgao: "TST",
-            orgaosJudicantes: [],
-            tipos: TST_TIPOS,
             termoExato: query.trim() || "",
             ...(startDate && { publicacaoInicial: startDate }),
             ...(endDate && { publicacaoFinal: endDate }),
