@@ -17,6 +17,7 @@ export interface Jurisprudencia {
   dataJulgamento: string;
   area: LegalArea;
   url: string;              // link para o documento original
+  urlPdf?: string;          // link direto para o PDF do inteiro teor
   conteudoIntegral?: string; // texto completo do acórdão (quando disponível)
   score?: number;           // relevância ES
 }

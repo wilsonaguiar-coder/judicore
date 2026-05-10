@@ -11,6 +11,7 @@ export interface IndexingJobData {
   triggeredBy: "scheduler" | "manual";
   startDate?: string;  // YYYY-MM-DD — filtro de data inicial (TST)
   endDate?: string;    // YYYY-MM-DD — filtro de data final (TST)
+  delayMs?: number;    // delay entre páginas (padrão: 2000ms para TST histórico)
 }
 
 export interface IndexingJobResult {

@@ -12,11 +12,30 @@ interface TSTRegistro {
   dtaPublicacao?: string;
   txtConteudoDecisaoHighlight?: string;
   tipo?: { codigoTipoJurisprudencia?: string };
+  anoProcInt?: number | string;
+  numProcInt?: number | string;
 }
 
 interface TSTResponse {
   totalRegistros: number;
   registros?: Array<{ registro: TSTRegistro }>;
+}
+
+function buildPdfUrl(r: TSTRegistro): string | undefined {
+  if (!r.anoProcInt || !r.numProcInt || !r.id || !r.dtaPublicacao) return undefined;
+  // Converte ISO "2020-01-31T07:00:00..." para "31/01/2020 07:00:00"
+  const iso = r.dtaPublicacao;
+  const [datePart, timePart] = iso.split("T");
+  const [y, m, d] = (datePart ?? "").split("-");
+  const time = (timePart ?? "00:00:00").slice(0, 8);
+  const dtaStr = `${d}/${m}/${y} ${time}`;
+  const params = new URLSearchParams({
+    anoProcInt: String(r.anoProcInt),
+    numProcInt: String(r.numProcInt),
+    dtaPublicacaoStr: dtaStr,
+    nia: String(r.id),
+  });
+  return `https://consultadocumento.tst.jus.br/consultaDocumento/acordao.do?${params}`;
 }
 
 function stripHtml(html: string): string {
@@ -38,15 +57,12 @@ function delay(ms: number) {
 async function fetchPage(
   query: string,
   page: number,
-  retries = 3,
+  retries = 5,
   startDate?: string,
   endDate?: string,
 ): Promise<TSTResponse> {
   for (let attempt = 1; attempt <= retries; attempt++) {
     try {
-      // Usa formato estruturado quando há filtro de data (suporta paginação completa)
-      // Sem data: usa searchParameter (busca textual simples, apenas docs recentes)
-      // Payload mínimo confirmado — sem tipos nem numeracaoUnica (retorna 4.241/mês corretos)
       const body: Record<string, unknown> = (startDate || endDate)
         ? {
             orgao: "TST",
@@ -68,7 +84,8 @@ async function fetchPage(
       return res.json() as Promise<TSTResponse>;
     } catch (err) {
       if (attempt === retries) throw err;
-      await delay(attempt * 5000);
+      // Backoff exponencial: 10s, 20s, 40s, 80s entre tentativas
+      await delay(10000 * Math.pow(2, attempt - 1));
     }
   }
   throw new Error("TST: retries esgotados");
@@ -83,6 +100,9 @@ export const tstAdapter: JurisprudenciaAdapter = {
     const startDate = options.startDate;
     const endDate   = options.endDate;
 
+    let consecutiveErrors = 0;
+    const MAX_CONSECUTIVE_ERRORS = 5;
+
     for (let page = 1; page <= maxPages; page++) {
       try {
         const data = await fetchPage(query, page, 3, startDate, endDate);
@@ -93,6 +113,7 @@ export const tstAdapter: JurisprudenciaAdapter = {
           if (!r?.id) continue;
           const texto = stripHtml(r.txtConteudoDecisaoHighlight ?? "");
           const ementa = texto || "Ementa não disponível";
+          const pdfUrl = buildPdfUrl(r);
           const item: Jurisprudencia = {
             id: `tst-${r.id}`,
             tribunal: "TST",
@@ -102,12 +123,15 @@ export const tstAdapter: JurisprudenciaAdapter = {
             dataJulgamento: r.dtaPublicacao?.slice(0, 10) ?? "",
             area: "TRABALHISTA",
             url: `https://jurisprudencia.tst.jus.br/#!/resultado?id=${r.id}`,
+            ...(pdfUrl ? { urlPdf: pdfUrl } : {}),
           };
           if (texto.length > 0) item.conteudoIntegral = texto;
           items.push(item);
         }
 
         if (items.length === 0) break;
+
+        consecutiveErrors = 0;
         yield items;
 
         const totalPages = Math.ceil(data.totalRegistros / PAGE_SIZE);
@@ -115,8 +139,13 @@ export const tstAdapter: JurisprudenciaAdapter = {
 
         await delay(delayMs);
       } catch (err) {
-        console.error(`TST p${page}:`, err);
-        break;
+        consecutiveErrors++;
+        console.error(`TST p${page} (erro ${consecutiveErrors}/${MAX_CONSECUTIVE_ERRORS}):`, err);
+        if (consecutiveErrors >= MAX_CONSECUTIVE_ERRORS) {
+          console.error(`TST: ${MAX_CONSECUTIVE_ERRORS} erros consecutivos — abortando.`);
+          break;
+        }
+        await delay(delayMs * 3);
       }
     }
   },
