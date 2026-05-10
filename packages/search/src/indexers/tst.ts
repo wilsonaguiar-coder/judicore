@@ -14,6 +14,7 @@ interface TSTRegistro {
   tipo?: { codigoTipoJurisprudencia?: string };
   anoProcInt?: number | string;
   numProcInt?: number | string;
+  numMinuta?: number | string;
 }
 
 interface TSTResponse {
@@ -22,7 +23,7 @@ interface TSTResponse {
 }
 
 function buildPdfUrl(r: TSTRegistro): string | undefined {
-  if (!r.anoProcInt || !r.numProcInt || !r.id || !r.dtaPublicacao) return undefined;
+  if (!r.anoProcInt || !r.numProcInt || !r.numMinuta || !r.dtaPublicacao) return undefined;
   // Converte ISO "2020-01-31T07:00:00..." para "31/01/2020 07:00:00"
   const iso = r.dtaPublicacao;
   const [datePart, timePart] = iso.split("T");
@@ -33,7 +34,7 @@ function buildPdfUrl(r: TSTRegistro): string | undefined {
     anoProcInt: String(r.anoProcInt),
     numProcInt: String(r.numProcInt),
     dtaPublicacaoStr: dtaStr,
-    nia: String(r.id),
+    nia: String(r.numMinuta),
   });
   return `https://consultadocumento.tst.jus.br/consultaDocumento/acordao.do?${params}`;
 }
