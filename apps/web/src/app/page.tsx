@@ -96,7 +96,7 @@ export default function LandingPage() {
         className="fixed top-0 inset-x-0 z-50 flex items-center justify-between px-6 md:px-12 py-4 border-b border-white/5 backdrop-blur-xl bg-[#07070f]/80"
       >
         <div className="flex items-center">
-          <Image src="/logo03.png" alt="Judicore" width={112} height={112} className="rounded-lg" />
+          <Image src="/logo.png" alt="Judicore" width={112} height={112} className="rounded-lg" />
         </div>
         <div className="flex items-center gap-4">
           <Link
@@ -462,7 +462,7 @@ export default function LandingPage() {
       <footer className="border-t border-white/5 py-10 px-6">
         <div className="max-w-5xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
           <div className="flex items-center gap-2">
-            <Image src="/logo03.png" alt="Judicore" width={96} height={96} className="rounded-md" />
+            <Image src="/logo.png" alt="Judicore" width={96} height={96} className="rounded-md" />
             <span className="text-white/20 text-sm ml-2">Sistema de apoio à decisão judicial</span>
           </div>
           <p className="text-xs text-white/20">

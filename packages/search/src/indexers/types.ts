@@ -5,6 +5,8 @@ export interface IndexerOptions {
   tribunais?: string[];
   maxPages?: number;
   delayMs?: number;       // pausa entre requisições (respeito ao servidor)
+  startDate?: string;     // YYYY-MM-DD — filtro de data inicial (suportado pelo TST)
+  endDate?: string;       // YYYY-MM-DD — filtro de data final
 }
 
 export interface IndexerResult {

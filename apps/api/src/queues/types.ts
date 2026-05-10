@@ -9,6 +9,8 @@ export interface IndexingJobData {
   tribunais?: string[];
   maxPages: number;
   triggeredBy: "scheduler" | "manual";
+  startDate?: string;  // YYYY-MM-DD — filtro de data inicial (TST)
+  endDate?: string;    // YYYY-MM-DD — filtro de data final (TST)
 }
 
 export interface IndexingJobResult {

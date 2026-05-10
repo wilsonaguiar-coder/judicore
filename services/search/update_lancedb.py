@@ -81,6 +81,7 @@ result = run_jurisprudencia_incremental_update(
     chromium_executable_path=chrome_path,
     include_stf=include_stf,
     include_stj=include_stj,
+    strict_completeness=False,
 )
 
 print()

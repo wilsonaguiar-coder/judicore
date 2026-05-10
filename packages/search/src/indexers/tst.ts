@@ -2,7 +2,8 @@ import type { Jurisprudencia } from "../types.js";
 import type { JurisprudenciaAdapter, IndexerOptions } from "./types.js";
 
 const TST_BASE = "https://jurisprudencia-backend2.tst.jus.br/rest/pesquisa-textual";
-const PAGE_SIZE = 20;
+const PAGE_SIZE = 100;
+const TST_TIPOS = ["ACORDAO", "DESPACHO", "SUM", "PN", "OJ", "DESPGP", "DESPGVP", "DESPGCG"];
 
 interface TSTRegistro {
   id?: string;
@@ -35,13 +36,35 @@ function delay(ms: number) {
   return new Promise((r) => setTimeout(r, ms));
 }
 
-async function fetchPage(query: string, page: number, retries = 3): Promise<TSTResponse> {
+async function fetchPage(
+  query: string,
+  page: number,
+  retries = 3,
+  startDate?: string,
+  endDate?: string,
+): Promise<TSTResponse> {
   for (let attempt = 1; attempt <= retries; attempt++) {
     try {
+      // Usa formato estruturado quando há filtro de data (suporta paginação completa)
+      // Sem data: usa searchParameter (busca textual simples, apenas docs recentes)
+      const body: Record<string, unknown> = (startDate || endDate)
+        ? {
+            orgao: "TST",
+            orgaosJudicantes: [],
+            tipos: TST_TIPOS,
+            termoExato: query.trim() || "",
+            ...(startDate && { publicacaoInicial: startDate }),
+            ...(endDate && { publicacaoFinal: endDate }),
+          }
+        : (query.trim() ? { searchParameter: query } : {});
+
       const res = await fetch(`${TST_BASE}/${page}/${PAGE_SIZE}`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(query.trim() ? { searchParameter: query } : {}),
+        headers: {
+          "Content-Type": "application/json",
+          "Referer": "https://jurisprudencia.tst.jus.br/",
+        },
+        body: JSON.stringify(body),
       });
       if (!res.ok) throw new Error(`TST HTTP ${res.status}`);
       return res.json() as Promise<TSTResponse>;
@@ -59,10 +82,12 @@ export const tstAdapter: JurisprudenciaAdapter = {
   async *fetch(query: string, options: IndexerOptions) {
     const maxPages = options.maxPages ?? 5;
     const delayMs  = options.delayMs ?? 1200;
+    const startDate = options.startDate;
+    const endDate   = options.endDate;
 
     for (let page = 1; page <= maxPages; page++) {
       try {
-        const data = await fetchPage(query, page);
+        const data = await fetchPage(query, page, 3, startDate, endDate);
         if (!data.registros?.length) break;
 
         const items: Jurisprudencia[] = [];
