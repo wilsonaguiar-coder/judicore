@@ -63,9 +63,9 @@ export function startIndexingWorker(): Worker<IndexingJobData, IndexingJobResult
     },
     {
       connection: getRedisConnection(),
-      concurrency: 1,
-      stalledInterval: 1800000, // verifica stall a cada 30 min — jobs TST levam ~13 min por semana
-      maxStalledCount: 5,       // permite 5 stalls antes de falhar
+      concurrency: 2,
+      stalledInterval: 1800000,
+      maxStalledCount: 5,
     }
   );
 
