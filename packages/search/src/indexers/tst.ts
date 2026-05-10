@@ -46,14 +46,9 @@ async function fetchPage(
     try {
       // Usa formato estruturado quando há filtro de data (suporta paginação completa)
       // Sem data: usa searchParameter (busca textual simples, apenas docs recentes)
-      // Payload idêntico ao que jurisprudencia.tst.jus.br envia via DevTools
+      // Payload mínimo confirmado — sem tipos nem numeracaoUnica (retorna 4.241/mês corretos)
       const body: Record<string, unknown> = (startDate || endDate)
         ? {
-            ou: null, e: null, naoContem: null, ementa: null, dispositivo: null,
-            numeracaoUnica: { numero: null, digito: null, ano: null, orgao: "5", tribunal: null, vara: null },
-            orgaosJudicantes: [], ministros: [], convocados: [],
-            classesProcessuais: [], indicadores: [], assuntos: [],
-            tipos: ["ACORDAO"],
             orgao: "TST",
             termoExato: query.trim() || "",
             ...(startDate && { publicacaoInicial: startDate }),
