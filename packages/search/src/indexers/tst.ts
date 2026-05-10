@@ -14,7 +14,6 @@ interface TSTRegistro {
   tipo?: { codigoTipoJurisprudencia?: string };
   anoProcInt?: number | string;
   numProcInt?: number | string;
-  numMinuta?: number | string;
 }
 
 interface TSTResponse {
@@ -22,18 +21,6 @@ interface TSTResponse {
   registros?: Array<{ registro: TSTRegistro }>;
 }
 
-function buildPdfUrl(r: TSTRegistro): string | undefined {
-  if (!r.anoProcInt || !r.numProcInt || !r.numMinuta || !r.dtaPublicacao) return undefined;
-  // Converte ISO "2020-01-31T07:00:00..." para "31/01/2020 07:00:00"
-  const iso = r.dtaPublicacao;
-  const [datePart, timePart] = iso.split("T");
-  const [y, m, d] = (datePart ?? "").split("-");
-  const time = (timePart ?? "00:00:00").slice(0, 8);
-  const dtaStr = `${d}/${m}/${y} ${time}`;
-  // Servidor TST exige barras literais no dtaPublicacaoStr — só codifica o espaço
-  const dtaEncoded = dtaStr.replace(/ /g, "%20");
-  return `https://consultadocumento.tst.jus.br/consultaDocumento/acordao.do?anoProcInt=${r.anoProcInt}&numProcInt=${r.numProcInt}&dtaPublicacaoStr=${dtaEncoded}&nia=${r.numMinuta}`;
-}
 
 function stripHtml(html: string): string {
   return html
@@ -110,7 +97,6 @@ export const tstAdapter: JurisprudenciaAdapter = {
           if (!r?.id) continue;
           const texto = stripHtml(r.txtConteudoDecisaoHighlight ?? "");
           const ementa = texto || "Ementa não disponível";
-          const pdfUrl = buildPdfUrl(r);
           const item: Jurisprudencia = {
             id: `tst-${r.id}`,
             tribunal: "TST",
@@ -120,7 +106,7 @@ export const tstAdapter: JurisprudenciaAdapter = {
             dataJulgamento: r.dtaPublicacao?.slice(0, 10) ?? "",
             area: "TRABALHISTA",
             url: `https://jurisprudencia.tst.jus.br/#!/resultado?id=${r.id}`,
-            ...(pdfUrl ? { urlPdf: pdfUrl } : {}),
+            urlPdf: `https://jurisprudencia-backend2.tst.jus.br/rest/documentos/${r.id}`,
           };
           if (texto.length > 0) item.conteudoIntegral = texto;
           items.push(item);
