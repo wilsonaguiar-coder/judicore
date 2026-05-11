@@ -50,7 +50,7 @@ async function collectWindow(start: string, end: string): Promise<{ inserted: nu
 
       const rows = (data.registros ?? [])
         .map(({ registro: r }) => r)
-        .filter((r: any) => r?.id && /^[0-9a-f]{32,64}$/i.test(r.id))
+        .filter((r: any) => r?.id && typeof r.id === "string" && r.id.length >= 8)
         .map((r: any) => `('${r.id}', '${(r.dtaPublicacao ?? start).slice(0, 10)}'::date)`);
 
       if (!rows.length) {
