@@ -1,127 +1,79 @@
 /**
- * Coleta IDs de acórdãos do TST e salva na tabela tst_ids_tmp.
- * Não usa BullMQ nem Elasticsearch — roda diretamente com npx tsx.
- *
- * A tabela é permanente. Após extrair os dados para o ES, limpe com:
- *   TRUNCATE TABLE tst_ids_tmp;
+ * Garimpagem de IDs do TST → tabela tst_ids_tmp (id, data_pub).
+ * Sem BullMQ, sem Elasticsearch. Só id e data.
  *
  * Uso:
  *   cd /opt/judicore/apps/api
  *   npx tsx src/scripts/tst-collect-ids.ts [--from 2020-01-01] [--to 2026-05-31]
+ *
+ * Limpar dados após uso no ES:
+ *   TRUNCATE TABLE tst_ids_tmp;
  */
 import "dotenv/config";
 import { prisma } from "@judicore/db";
 
-const TST_BASE = "https://jurisprudencia-backend2.tst.jus.br/rest/pesquisa-textual";
-const PAGE_SIZE = 100;
-const PAGE_DELAY_MS  = 12000; // entre páginas da mesma janela
-const WINDOW_DAYS    = 3;     // dias por janela
-const WINDOW_COOLDOWN_MS = 30000; // pausa entre janelas
+const TST_BASE   = "https://jurisprudencia-backend2.tst.jus.br/rest/pesquisa-textual";
+const PAGE_SIZE  = 100;
+const PAGE_DELAY = 12000;
+const WIN_DAYS   = 3;
+const WIN_PAUSE  = 30000;
 
-function delay(ms: number) {
-  return new Promise(r => setTimeout(r, ms));
+const delay = (ms: number) => new Promise(r => setTimeout(r, ms));
+const fmt   = (d: Date)    => d.toISOString().slice(0, 10);
+const addDays = (d: Date, n: number) =>
+  new Date(Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate() + n));
+
+function parseArg(name: string, fallback: string) {
+  const i = process.argv.indexOf(name);
+  return i !== -1 ? (process.argv[i + 1] ?? fallback) : fallback;
 }
 
-function fmt(d: Date): string {
-  return d.toISOString().slice(0, 10);
-}
-
-function addDays(d: Date, n: number): Date {
-  return new Date(Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate() + n));
-}
-
-function parseArg(name: string, fallback: string): string {
-  const idx = process.argv.indexOf(name);
-  return idx !== -1 ? (process.argv[idx + 1] ?? fallback) : fallback;
-}
-
-function isValidId(id: string): boolean {
-  return /^[0-9a-f]{32,64}$/i.test(id);
-}
-
-function isValidDate(s: string): boolean {
-  return /^\d{4}-\d{2}-\d{2}$/.test(s);
-}
-
-async function fetchPage(startDate: string, endDate: string, page: number) {
+async function fetchPage(start: string, end: string, page: number) {
   const res = await fetch(`${TST_BASE}/${page}/${PAGE_SIZE}`, {
     method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      "Referer": "https://jurisprudencia.tst.jus.br/",
-    },
-    body: JSON.stringify({
-      orgao: "TST",
-      termoExato: "",
-      publicacaoInicial: startDate,
-      publicacaoFinal: endDate,
-    }),
+    headers: { "Content-Type": "application/json", "Referer": "https://jurisprudencia.tst.jus.br/" },
+    body: JSON.stringify({ orgao: "TST", termoExato: "", publicacaoInicial: start, publicacaoFinal: end }),
   });
   if (!res.ok) throw new Error(`HTTP ${res.status}`);
   return res.json() as Promise<{ totalRegistros: number; registros?: Array<{ registro: any }> }>;
 }
 
-async function collectWindow(startDate: string, endDate: string): Promise<{ inserted: number; total: number }> {
-  let page = 1;
-  let totalPages = 1;
-  let totalRegistros = 0;
-  let inserted = 0;
-  let consecutiveErrors = 0;
+async function collectWindow(start: string, end: string): Promise<number> {
+  let page = 1, totalPages = 1, inserted = 0, errors = 0;
 
   while (page <= totalPages) {
     try {
-      const data = await fetchPage(startDate, endDate, page);
-      totalRegistros = data.totalRegistros ?? 0;
-      totalPages = Math.ceil(totalRegistros / PAGE_SIZE) || 1;
+      const data = await fetchPage(start, end, page);
+      totalPages = Math.ceil((data.totalRegistros ?? 0) / PAGE_SIZE) || 1;
 
-      const registros = data.registros ?? [];
+      const rows = (data.registros ?? [])
+        .map(({ registro: r }) => r)
+        .filter((r: any) => r?.id && /^[0-9a-f]{32,64}$/i.test(r.id))
+        .map((r: any) => `('${r.id}', '${(r.dtaPublicacao ?? start).slice(0, 10)}'::date)`);
 
-      if (!registros.length) {
-        if (totalRegistros > 0) {
-          consecutiveErrors++;
-          if (consecutiveErrors >= 3) break;
-          await delay(PAGE_DELAY_MS * 5);
-          continue;
-        }
+      if (!rows.length) {
+        if (data.totalRegistros > 0 && errors++ < 3) { await delay(PAGE_DELAY * 4); continue; }
         break;
       }
 
-      consecutiveErrors = 0;
-
-      const rows = registros
-        .map(({ registro: r }) => r)
-        .filter((r: any) => r?.id && isValidId(r.id))
-        .map((r: any) => {
-          const dataPub = (r.dtaPublicacao ?? startDate).slice(0, 10);
-          return { id: r.id as string, dataPub: isValidDate(dataPub) ? dataPub : startDate };
-        });
-
-      if (rows.length > 0) {
-        const values = rows.map(x => `('${x.id}', '${x.dataPub}'::date)`).join(",");
-        await prisma.$executeRawUnsafe(
-          `INSERT INTO tst_ids_tmp (id, data_pub) VALUES ${values} ON CONFLICT (id) DO NOTHING`
-        );
-        inserted += rows.length;
-      }
+      errors = 0;
+      await prisma.$executeRawUnsafe(
+        `INSERT INTO tst_ids_tmp (id, data_pub) VALUES ${rows.join(",")} ON CONFLICT (id) DO NOTHING`
+      );
+      inserted += rows.length;
 
       if (page >= totalPages) break;
       page++;
-      await delay(PAGE_DELAY_MS);
-    } catch (err) {
-      consecutiveErrors++;
-      console.error(`    Erro p${page} (${consecutiveErrors}/3):`, (err as Error).message);
-      if (consecutiveErrors >= 3) break;
-      await delay(PAGE_DELAY_MS * 5);
+      await delay(PAGE_DELAY);
+    } catch (e) {
+      if (errors++ >= 3) break;
+      await delay(PAGE_DELAY * 4);
     }
   }
-
-  return { inserted, total: totalRegistros };
+  return inserted;
 }
 
-// ── Main ──────────────────────────────────────────────────────────────────────
-
-const fromStr = parseArg("--from", "2020-01-01");
-const toStr   = parseArg("--to",   fmt(new Date()));
+// ── main ──────────────────────────────────────────────────────────────────────
 
 await prisma.$executeRaw`
   CREATE TABLE IF NOT EXISTS tst_ids_tmp (
@@ -130,51 +82,37 @@ await prisma.$executeRaw`
   )
 `;
 
-const [{ total_existente }] = await prisma.$queryRaw<[{ total_existente: bigint }]>`
-  SELECT COUNT(*) AS total_existente FROM tst_ids_tmp
-`;
+const from   = parseArg("--from", "2020-01-01");
+const to     = parseArg("--to",   fmt(new Date()));
+let current  = new Date(from + "T00:00:00Z");
+const toDate = new Date(to   + "T00:00:00Z");
+let win = 0;
 
-console.log(`TST coleta de IDs: ${fromStr} → ${toStr} (janelas de ${WINDOW_DAYS} dias)`);
-console.log(`Tabela tst_ids_tmp: ${total_existente} registros existentes\n`);
-
-let current  = new Date(fromStr + "T00:00:00Z");
-const toDate = new Date(toStr   + "T00:00:00Z");
-let windowNum   = 0;
-let totalInserted = 0;
+console.log(`TST coleta: ${from} → ${to} (janelas de ${WIN_DAYS} dias)\n`);
 
 while (current <= toDate) {
-  const end       = addDays(current, WINDOW_DAYS - 1);
-  const startDate = fmt(current);
-  const endDate   = fmt(end <= toDate ? end : toDate);
+  const endD  = addDays(current, WIN_DAYS - 1);
+  const start = fmt(current);
+  const end   = fmt(endD <= toDate ? endD : toDate);
+  win++;
 
-  // Resumabilidade: pula janela se já tiver dados nesse intervalo
-  const [{ count: existingInWindow }] = await prisma.$queryRaw<[{ count: bigint }]>`
-    SELECT COUNT(*) AS count FROM tst_ids_tmp
-    WHERE data_pub BETWEEN ${startDate}::date AND ${endDate}::date
+  // pula janelas já coletadas
+  const [{ n }] = await prisma.$queryRaw<[{ n: bigint }]>`
+    SELECT COUNT(*) AS n FROM tst_ids_tmp WHERE data_pub BETWEEN ${start}::date AND ${end}::date
   `;
-
-  windowNum++;
-
-  if (Number(existingInWindow) > 0) {
-    process.stdout.write(`[${windowNum}] ${startDate}→${endDate}: já coletado (${existingInWindow} docs) ✓\n`);
-    current = addDays(current, WINDOW_DAYS);
+  if (Number(n) > 0) {
+    console.log(`[${win}] ${start}→${end}: já coletado (${n}) ✓`);
+    current = addDays(current, WIN_DAYS);
     continue;
   }
 
-  const { inserted, total } = await collectWindow(startDate, endDate);
-  totalInserted += inserted;
+  const inserted = await collectWindow(start, end);
+  const [{ total }] = await prisma.$queryRaw<[{ total: bigint }]>`SELECT COUNT(*) AS total FROM tst_ids_tmp`;
+  console.log(`[${win}] ${start}→${end}: +${inserted} | total: ${total}`);
 
-  const [{ grand_total }] = await prisma.$queryRaw<[{ grand_total: bigint }]>`
-    SELECT COUNT(*) AS grand_total FROM tst_ids_tmp
-  `;
-
-  process.stdout.write(`[${windowNum}] ${startDate}→${endDate}: +${inserted}/${total} | DB total: ${grand_total}\n`);
-
-  current = addDays(current, WINDOW_DAYS);
-  if (current <= toDate) await delay(WINDOW_COOLDOWN_MS);
+  current = addDays(current, WIN_DAYS);
+  if (current <= toDate) await delay(WIN_PAUSE);
 }
 
-console.log(`\nConcluído. ${totalInserted} novos IDs inseridos nesta execução.`);
-console.log(`Total na tabela: SELECT COUNT(*) FROM tst_ids_tmp;`);
-
+console.log("\nConcluído.");
 await prisma.$disconnect();
