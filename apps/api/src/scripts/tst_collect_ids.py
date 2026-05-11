@@ -47,8 +47,13 @@ def criar_payload(data_inicio: str, data_fim: str) -> dict:
             "orgao": "", "tribunal": None, "vara": None
         },
         "orgaosJudicantes": [], "ministros": [], "convocados": [],
-        "classesProcessuais": [], "indicadores": [], "assuntos": [],
-        "tipos": ["ACORDAO"],
+        "classesProcessuais": [
+            {"codFase": "RR",  "desFase": "Recurso de Revista"},
+            {"codFase": "RO",  "desFase": "Recurso Ordinário"},
+            {"codFase": "ROT", "desFase": "Recurso Ordinário Trabalhista"},
+        ],
+        "indicadores": [], "assuntos": [],
+        "tipos": ["ACORDAO", "SUM"],
         "orgao": "TST",
         "publicacaoInicial": data_inicio,
         "publicacaoFinal": data_fim
@@ -108,23 +113,16 @@ def salvar_checkpoint(checkpoint: Dict):
         json.dump(checkpoint, f, indent=2, ensure_ascii=False)
 
 
-CLASSES_RELEVANTES = {"RR", "RO", "ROT"}  # Recurso de Revista, Recurso Ordinário
-
 def extrair_dados(registro: dict) -> Optional[Dict]:
     reg = registro.get("registro", {})
     doc_id = reg.get("id")
     if not doc_id:
         return None
-    num_formatado = reg.get("numFormatado") or ""
-    # Filtra apenas RR e RO (ex: "RR - 123...", "RO - 456...")
-    classe = num_formatado.split(" ")[0].split("-")[0].strip()
-    if classe not in CLASSES_RELEVANTES:
-        return None
     return {
         "id_hash": doc_id,
         "data_publicacao": (reg.get("dtaPublicacao") or "")[:10],
         "numero_processo": reg.get("numero"),
-        "num_formatado": num_formatado,
+        "num_formatado": reg.get("numFormatado") or "",
     }
 
 
