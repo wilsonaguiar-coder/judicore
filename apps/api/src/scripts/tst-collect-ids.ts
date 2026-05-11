@@ -8,18 +8,19 @@
  *
  * Limpar dados após uso no ES:
  *   TRUNCATE TABLE tst_ids_tmp;
+ *   TRUNCATE TABLE tst_windows_done;
  */
 import "dotenv/config";
 import { prisma } from "@judicore/db";
 
 const TST_BASE   = "https://jurisprudencia-backend2.tst.jus.br/rest/pesquisa-textual";
 const PAGE_SIZE  = 100;
-const PAGE_DELAY = 12000;
-const WIN_DAYS   = 3;
-const WIN_PAUSE  = 30000;
+const PAGE_DELAY = 12000;   // entre páginas
+const WIN_DAYS   = 1;       // janela de 1 dia para manter abaixo do rate limit
+const WIN_PAUSE  = 120000;  // 2 min entre janelas para resetar rate limit do TST
 
-const delay = (ms: number) => new Promise(r => setTimeout(r, ms));
-const fmt   = (d: Date)    => d.toISOString().slice(0, 10);
+const delay   = (ms: number) => new Promise(r => setTimeout(r, ms));
+const fmt     = (d: Date)    => d.toISOString().slice(0, 10);
 const addDays = (d: Date, n: number) =>
   new Date(Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate() + n));
 
@@ -38,13 +39,14 @@ async function fetchPage(start: string, end: string, page: number) {
   return res.json() as Promise<{ totalRegistros: number; registros?: Array<{ registro: any }> }>;
 }
 
-async function collectWindow(start: string, end: string): Promise<number> {
-  let page = 1, totalPages = 1, inserted = 0, errors = 0;
+async function collectWindow(start: string, end: string): Promise<{ inserted: number; total: number }> {
+  let page = 1, totalPages = 1, totalRegistros = 0, inserted = 0, errors = 0;
 
   while (page <= totalPages) {
     try {
       const data = await fetchPage(start, end, page);
-      totalPages = Math.ceil((data.totalRegistros ?? 0) / PAGE_SIZE) || 1;
+      totalRegistros = data.totalRegistros ?? 0;
+      totalPages = Math.ceil(totalRegistros / PAGE_SIZE) || 1;
 
       const rows = (data.registros ?? [])
         .map(({ registro: r }) => r)
@@ -52,7 +54,7 @@ async function collectWindow(start: string, end: string): Promise<number> {
         .map((r: any) => `('${r.id}', '${(r.dtaPublicacao ?? start).slice(0, 10)}'::date)`);
 
       if (!rows.length) {
-        if (data.totalRegistros > 0 && errors++ < 3) { await delay(PAGE_DELAY * 4); continue; }
+        if (totalRegistros > 0 && errors++ < 3) { await delay(PAGE_DELAY * 4); continue; }
         break;
       }
 
@@ -70,7 +72,8 @@ async function collectWindow(start: string, end: string): Promise<number> {
       await delay(PAGE_DELAY * 4);
     }
   }
-  return inserted;
+
+  return { inserted, total: totalRegistros };
 }
 
 // ── main ──────────────────────────────────────────────────────────────────────
@@ -82,13 +85,25 @@ await prisma.$executeRaw`
   )
 `;
 
+// Tabela de controle: registra quais janelas já foram processadas
+await prisma.$executeRaw`
+  CREATE TABLE IF NOT EXISTS tst_windows_done (
+    window_start DATE PRIMARY KEY,
+    collected_at TIMESTAMP DEFAULT NOW(),
+    inserted     INT NOT NULL DEFAULT 0,
+    total        INT NOT NULL DEFAULT 0
+  )
+`;
+
 const from   = parseArg("--from", "2020-01-01");
 const to     = parseArg("--to",   fmt(new Date()));
 let current  = new Date(from + "T00:00:00Z");
 const toDate = new Date(to   + "T00:00:00Z");
 let win = 0;
 
-console.log(`TST coleta: ${from} → ${to} (janelas de ${WIN_DAYS} dias)\n`);
+const [{ n: totalExist }] = await prisma.$queryRaw<[{ n: bigint }]>`SELECT COUNT(*) AS n FROM tst_ids_tmp`;
+console.log(`TST coleta: ${from} → ${to} (janelas de ${WIN_DAYS} dia(s))`);
+console.log(`IDs já na tabela: ${totalExist}\n`);
 
 while (current <= toDate) {
   const endD  = addDays(current, WIN_DAYS - 1);
@@ -96,22 +111,31 @@ while (current <= toDate) {
   const end   = fmt(endD <= toDate ? endD : toDate);
   win++;
 
-  // pula janelas já coletadas
-  const [{ n }] = await prisma.$queryRaw<[{ n: bigint }]>`
-    SELECT COUNT(*) AS n FROM tst_ids_tmp WHERE data_pub BETWEEN ${start}::date AND ${end}::date
+  // Pula janelas já processadas com base na tabela de controle
+  const done = await prisma.$queryRaw<{ window_start: Date }[]>`
+    SELECT window_start FROM tst_windows_done WHERE window_start = ${start}::date
   `;
-  if (Number(n) > 0) {
-    console.log(`[${win}] ${start}→${end}: já coletado (${n}) ✓`);
+
+  if (done.length > 0) {
+    process.stdout.write(`[${win}] ${start}: já processado ✓\n`);
     current = addDays(current, WIN_DAYS);
     continue;
   }
 
-  const inserted = await collectWindow(start, end);
-  const [{ total }] = await prisma.$queryRaw<[{ total: bigint }]>`SELECT COUNT(*) AS total FROM tst_ids_tmp`;
-  console.log(`[${win}] ${start}→${end}: +${inserted} | total: ${total}`);
+  const { inserted, total } = await collectWindow(start, end);
+
+  // Registra janela como concluída
+  await prisma.$executeRaw`
+    INSERT INTO tst_windows_done (window_start, inserted, total)
+    VALUES (${start}::date, ${inserted}, ${total})
+    ON CONFLICT (window_start) DO NOTHING
+  `;
+
+  const [{ grand }] = await prisma.$queryRaw<[{ grand: bigint }]>`SELECT COUNT(*) AS grand FROM tst_ids_tmp`;
+  process.stdout.write(`[${win}] ${start}: +${inserted}/${total} | DB: ${grand}\n`);
 
   current = addDays(current, WIN_DAYS);
-  if (current <= toDate) await delay(WIN_PAUSE);
+  if (current <= toDate && total > 0) await delay(WIN_PAUSE);
 }
 
 console.log("\nConcluído.");
