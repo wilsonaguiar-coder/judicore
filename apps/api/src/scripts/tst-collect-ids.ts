@@ -130,7 +130,7 @@ await prisma.$executeRaw`
   )
 `;
 
-const [[{ total_existente }]] = await prisma.$queryRaw<[[{ total_existente: bigint }]]>`
+const [{ total_existente }] = await prisma.$queryRaw<[{ total_existente: bigint }]>`
   SELECT COUNT(*) AS total_existente FROM tst_ids_tmp
 `;
 
@@ -148,7 +148,7 @@ while (current <= toDate) {
   const endDate   = fmt(end <= toDate ? end : toDate);
 
   // Resumabilidade: pula janela se já tiver dados nesse intervalo
-  const [[{ count: existingInWindow }]] = await prisma.$queryRaw<[[{ count: bigint }]]>`
+  const [{ count: existingInWindow }] = await prisma.$queryRaw<[{ count: bigint }]>`
     SELECT COUNT(*) AS count FROM tst_ids_tmp
     WHERE data_pub BETWEEN ${startDate}::date AND ${endDate}::date
   `;
@@ -164,7 +164,7 @@ while (current <= toDate) {
   const { inserted, total } = await collectWindow(startDate, endDate);
   totalInserted += inserted;
 
-  const [[{ grand_total }]] = await prisma.$queryRaw<[[{ grand_total: bigint }]]>`
+  const [{ grand_total }] = await prisma.$queryRaw<[{ grand_total: bigint }]>`
     SELECT COUNT(*) AS grand_total FROM tst_ids_tmp
   `;
 
