@@ -63,7 +63,7 @@ export function startIndexingWorker(): Worker<IndexingJobData, IndexingJobResult
     },
     {
       connection: getRedisConnection(),
-      concurrency: 2,
+      concurrency: 1,
       stalledInterval: 1800000,
       maxStalledCount: 5,
     }

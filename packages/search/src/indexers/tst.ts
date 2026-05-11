@@ -86,11 +86,29 @@ export const tstAdapter: JurisprudenciaAdapter = {
 
     let consecutiveErrors = 0;
     const MAX_CONSECUTIVE_ERRORS = 5;
+    let totalPages = maxPages;
 
-    for (let page = 1; page <= maxPages; page++) {
+    for (let page = 1; page <= Math.min(maxPages, totalPages); page++) {
       try {
         const data = await fetchPage(query, page, 5, startDate, endDate);
-        if (!data.registros?.length) break;
+
+        // registros vazio mas totalRegistros > 0 = throttle temporário (não é fim real)
+        if (!data.registros?.length) {
+          if (data.totalRegistros > 0) {
+            consecutiveErrors++;
+            console.warn(`TST p${page} retornou vazio (total=${data.totalRegistros}) — possível throttle (${consecutiveErrors}/${MAX_CONSECUTIVE_ERRORS})`);
+            if (consecutiveErrors >= MAX_CONSECUTIVE_ERRORS) {
+              console.error(`TST: ${MAX_CONSECUTIVE_ERRORS} páginas vazias consecutivas — abortando.`);
+              break;
+            }
+            page--; // repetir a mesma página
+            await delay(delayMs * 5);
+            continue;
+          }
+          break; // totalRegistros == 0: fim real dos resultados
+        }
+
+        totalPages = Math.ceil(data.totalRegistros / PAGE_SIZE);
 
         const items: Jurisprudencia[] = [];
         for (const { registro: r } of data.registros) {
@@ -117,7 +135,6 @@ export const tstAdapter: JurisprudenciaAdapter = {
         consecutiveErrors = 0;
         yield items;
 
-        const totalPages = Math.ceil(data.totalRegistros / PAGE_SIZE);
         if (page >= totalPages) break;
 
         await delay(delayMs);
@@ -128,7 +145,8 @@ export const tstAdapter: JurisprudenciaAdapter = {
           console.error(`TST: ${MAX_CONSECUTIVE_ERRORS} erros consecutivos — abortando.`);
           break;
         }
-        await delay(delayMs * 3);
+        page--; // repetir a mesma página após backoff
+        await delay(delayMs * 5);
       }
     }
   },
