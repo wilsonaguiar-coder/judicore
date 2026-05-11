@@ -48,7 +48,7 @@ def criar_payload(data_inicio: str, data_fim: str) -> dict:
         },
         "orgaosJudicantes": [], "ministros": [], "convocados": [],
         "classesProcessuais": [], "indicadores": [], "assuntos": [],
-        "tipos": ["ACORDAO","DESPACHO","SUM","PN","OJ","DESPGP","DESPGVP","DESPGCG"],
+        "tipos": ["ACORDAO"],
         "orgao": "TST",
         "publicacaoInicial": data_inicio,
         "publicacaoFinal": data_fim
@@ -108,33 +108,57 @@ def salvar_checkpoint(checkpoint: Dict):
         json.dump(checkpoint, f, indent=2, ensure_ascii=False)
 
 
+CLASSES_RELEVANTES = {"RR", "RO", "ROT"}  # Recurso de Revista, Recurso Ordinário
+
 def extrair_dados(registro: dict) -> Optional[Dict]:
     reg = registro.get("registro", {})
     doc_id = reg.get("id")
     if not doc_id:
         return None
+    num_formatado = reg.get("numFormatado") or ""
+    # Filtra apenas RR e RO (ex: "RR - 123...", "RO - 456...")
+    classe = num_formatado.split(" ")[0].split("-")[0].strip()
+    if classe not in CLASSES_RELEVANTES:
+        return None
     return {
         "id_hash": doc_id,
         "data_publicacao": (reg.get("dtaPublicacao") or "")[:10],
         "numero_processo": reg.get("numero"),
-        "tipo_documento": (reg.get("tipo") or {}).get("codigoTipoJurisprudencia"),
-        "num_formatado": reg.get("numFormatado"),
+        "num_formatado": num_formatado,
     }
 
 
-def salvar_em_csv(dados: List[Dict]):
-    if not dados:
-        return
-    fieldnames = list(dados[0].keys())
+def carregar_ids_existentes() -> set:
+    """Carrega todos os IDs já gravados no CSV para deduplicação."""
+    ids = set()
+    if not Path(OUTPUT_CSV).exists():
+        return ids
+    with open(OUTPUT_CSV, encoding="utf-8-sig") as f:
+        reader = csv.DictReader(f)
+        for row in reader:
+            if row.get("id_hash"):
+                ids.add(row["id_hash"])
+    return ids
+
+
+def salvar_em_csv(dados: List[Dict], ids_vistos: set) -> int:
+    """Salva registros novos no CSV, ignorando duplicatas. Retorna quantos foram salvos."""
+    novos = [d for d in dados if d["id_hash"] not in ids_vistos]
+    if not novos:
+        return 0
+    fieldnames = list(novos[0].keys())
     file_exists = Path(OUTPUT_CSV).exists()
     with open(OUTPUT_CSV, "a", newline="", encoding="utf-8-sig") as f:
         writer = csv.DictWriter(f, fieldnames=fieldnames)
         if not file_exists:
             writer.writeheader()
-        writer.writerows(dados)
+        writer.writerows(novos)
+    for d in novos:
+        ids_vistos.add(d["id_hash"])
+    return len(novos)
 
 
-def processar_dia(data_str: str, checkpoint: Dict, dry_run: bool = False) -> int:
+def processar_dia(data_str: str, checkpoint: Dict, ids_vistos: set, dry_run: bool = False) -> int:
     entrada = checkpoint.get(data_str, {})
     # Checkpoint guarda: {"paginas_total": N, "paginas_feitas": M}
     paginas_feitas = entrada.get("paginas_feitas", 0) if isinstance(entrada, dict) else 0
@@ -181,10 +205,10 @@ def processar_dia(data_str: str, checkpoint: Dict, dry_run: bool = False) -> int
             return registros_coletados
 
         dados = [extrair_dados(r) for r in resultado.get("registros", []) if extrair_dados(r)]
-        if dados:
-            salvar_em_csv(dados)
-            registros_coletados += len(dados)
-        print(f"✓ +{len(dados)}")
+        salvos = salvar_em_csv(dados, ids_vistos) if dados else 0
+        registros_coletados += salvos
+        total_pagina = len(resultado.get("registros", []))
+        print(f"✓ +{salvos} (de {total_pagina} — filtrados/dupl: {total_pagina - len(dados)}, dupl já vistos: {len(dados) - salvos})")
 
         checkpoint[data_str] = {"paginas_total": total_paginas, "paginas_feitas": pagina}
         salvar_checkpoint(checkpoint)
@@ -204,6 +228,8 @@ def coletar_periodo(data_inicio: str, data_fim: str, dry_run: bool = False):
     print(f"{'='*60}\n")
 
     checkpoint   = carregar_checkpoint()
+    ids_vistos   = carregar_ids_existentes()
+    print(f"IDs já no CSV: {len(ids_vistos)}")
     dt_inicio    = datetime.strptime(data_inicio, "%Y-%m-%d")
     dt_fim       = datetime.strptime(data_fim,    "%Y-%m-%d")
     total_geral  = 0
@@ -214,7 +240,7 @@ def coletar_periodo(data_inicio: str, data_fim: str, dry_run: bool = False):
         data_str  = dt_atual.strftime("%Y-%m-%d")
         dt_atual += timedelta(days=1)
 
-        count = processar_dia(data_str, checkpoint, dry_run)
+        count = processar_dia(data_str, checkpoint, ids_vistos, dry_run)
         total_geral += count
         dias_feitos += 1
 
