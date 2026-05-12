@@ -27,9 +27,11 @@ HEADERS = {
     "Referer": "https://jurisprudencia.tst.jus.br/"
 }
 
-DELAY_BASE = 12.0         # segundos entre páginas (TST bloqueia com < 10s)
-DELAY_DAY  = 120.0        # pausa entre dias (resetar rate limit)
-MAX_DELAY  = 60.0
+DELAY_BASE  = 12.0   # segundos entre páginas (TST bloqueia com < 10s)
+DELAY_DAY   = 120.0  # pausa entre meses (resetar rate limit)
+DELAY_BATCH = 90.0   # pausa extra a cada BATCH_SIZE páginas dentro do mês
+BATCH_SIZE  = 7      # páginas antes de pausar (TST bloqueia após ~7-8)
+MAX_DELAY   = 60.0
 BACKOFF_MULTIPLIER = 2.0
 MAX_TENTATIVAS = 5
 TIMEOUT = 45
@@ -224,7 +226,11 @@ def processar_dia(data_str: str, checkpoint: Dict, ids_vistos: set, dry_run: boo
             paginas_zero = 0
 
         if pagina < total_paginas:
-            time.sleep(DELAY_BASE + random.uniform(0, 1.5))
+            if pagina % BATCH_SIZE == 0:
+                print(f"  😴 Pausa anti-rate-limit ({DELAY_BATCH:.0f}s) após {pagina} páginas...")
+                time.sleep(DELAY_BATCH + random.uniform(0, 10))
+            else:
+                time.sleep(DELAY_BASE + random.uniform(0, 1.5))
 
     print(f"  ✅ {chave}: {registros_coletados} docs coletados")
     return registros_coletados
