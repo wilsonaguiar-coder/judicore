@@ -276,6 +276,11 @@ def processar_dia(data_str: str, checkpoint: Dict, ids_vistos: Set[str], dry_run
         checkpoint[data_str] = {"paginas_total": total_paginas, "paginas_feitas": pagina}
         salvar_checkpoint(checkpoint)
 
+        # Para na primeira página sem novos registros — paginação do TST é quebrada
+        # e todos os RR/RO/ROT de um dia cabem na página 1
+        if salvos == 0:
+            break
+
         if pagina < total_paginas:
             if pagina % BATCH_SIZE == 0:
                 log(f"  😴 Pausa anti-rate-limit ({DELAY_BATCH:.0f}s)...")
