@@ -182,21 +182,22 @@ def processar_dia(data_str: str, checkpoint: Dict, ids_vistos: set, dry_run: boo
 
     payload = criar_payload(inicio, fim)
     sessao  = nova_sessao()
-    res_inicial = requisitar_com_backoff(sessao, pagina=1, tamanho=1, payload=payload)
-    if not res_inicial or "totalRegistros" not in res_inicial:
-        print(f"  ❌ Não foi possível obter total para {data_str}")
+
+    # Primeira página com tamanho=100 — sem probe separado para não quebrar sessão
+    res_p1 = requisitar_com_backoff(sessao, pagina=1, tamanho=100, payload=payload)
+    if not res_p1 or "totalRegistros" not in res_p1:
+        print(f"  ❌ Não foi possível obter dados para {chave}")
         return 0
 
-    total_registros = res_inicial["totalRegistros"]
+    total_registros = res_p1["totalRegistros"]
     if total_registros == 0:
         print(f"  ⚪ {chave}: sem registros")
         checkpoint[chave] = {"paginas_total": 0, "paginas_feitas": 0}
         salvar_checkpoint(checkpoint)
         return 0
 
-    total_paginas  = (total_registros + 99) // 100
-    pag_inicio     = paginas_feitas + 1
-    print(f"  📊 {chave}: {total_registros} docs brutos | {total_paginas} págs | Retomando da pág {pag_inicio}")
+    total_paginas = (total_registros + 99) // 100
+    print(f"  📊 {chave}: {total_registros} docs | {total_paginas} págs")
 
     if dry_run:
         checkpoint[chave] = {"paginas_total": total_paginas, "paginas_feitas": total_paginas}
@@ -205,9 +206,14 @@ def processar_dia(data_str: str, checkpoint: Dict, ids_vistos: set, dry_run: boo
 
     registros_coletados = 0
 
-    for pagina in range(pag_inicio, total_paginas + 1):
+    # Processa página 1 já obtida, depois continua pelas demais
+    paginas_para_processar = [(1, res_p1)] + [(p, None) for p in range(max(2, paginas_feitas + 1), total_paginas + 1)]
+
+    for pagina, resultado_pre in paginas_para_processar:
+        if pagina < paginas_feitas + 1:
+            continue
         print(f"    📄 Página {pagina}/{total_paginas}...", end=" ", flush=True)
-        resultado = requisitar_com_backoff(sessao, pagina, 100, payload)
+        resultado = resultado_pre or requisitar_com_backoff(sessao, pagina, 100, payload)
 
         if not resultado or "registros" not in resultado:
             print("❌ Falha — salvando checkpoint e abortando este mês")
