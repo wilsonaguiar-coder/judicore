@@ -38,7 +38,7 @@ HEADERS = {
     "Pragma": "no-cache"
 }
 
-PAGE_SIZE    = 500    # registros por página (API suporta até ~500 sem timeout)
+PAGE_SIZE    = 1000   # registros por página (API suporta 1000 com timeout=90s)
 
 DELAY_BASE   = 5.0    # segundos entre dias
 DELAY_EXTRA  = 60.0   # pausa extra para dias com mais de 1 página
