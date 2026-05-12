@@ -46,7 +46,7 @@ DELAY_BATCH  = 90.0   # pausa a cada BATCH_SIZE páginas
 BATCH_SIZE   = 7
 MAX_DELAY    = 60.0
 BACKOFF_MULTIPLIER = 2.0
-MAX_TENTATIVAS = 5
+MAX_TENTATIVAS = 7
 TIMEOUT = 120         # aumentado para acomodar respostas com 2000 registros
 
 # Circuit breaker: detecta bloqueio silencioso da API
