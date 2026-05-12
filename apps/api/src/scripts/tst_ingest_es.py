@@ -262,10 +262,6 @@ def fetch_doc(session: requests.Session, id_hash: str, delay: float) -> Optional
 def nova_sessao() -> requests.Session:
     s = requests.Session()
     s.headers.update(HEADERS)
-    try:
-        s.get("https://jurisprudencia.tst.jus.br/", timeout=10)
-    except Exception:
-        pass
     return s
 
 # ─── Worker ───────────────────────────────────────────────────────────────────
