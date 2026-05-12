@@ -195,16 +195,14 @@ def processar_dia(data_str: str, checkpoint: Dict, ids_vistos: set, dry_run: boo
         return total_registros
 
     registros_coletados = 0
-    paginas_zero = 0
-    MAX_ZERO = 2  # para após 2 páginas consecutivas sem nenhum novo registro
 
     for pagina in range(pag_inicio, total_paginas + 1):
         print(f"    📄 Página {pagina}/{total_paginas}...", end=" ", flush=True)
         resultado = requisitar_com_backoff(pagina, 100, payload)
 
         if not resultado or "registros" not in resultado:
-            print("❌ Falha — salvando checkpoint e abortando este dia")
-            checkpoint[data_str] = {"paginas_total": total_paginas, "paginas_feitas": pagina - 1}
+            print("❌ Falha — salvando checkpoint e abortando este mês")
+            checkpoint[chave] = {"paginas_total": total_paginas, "paginas_feitas": pagina - 1}
             salvar_checkpoint(checkpoint)
             return registros_coletados
 
@@ -212,18 +210,10 @@ def processar_dia(data_str: str, checkpoint: Dict, ids_vistos: set, dry_run: boo
         salvos = salvar_em_csv(dados, ids_vistos) if dados else 0
         registros_coletados += salvos
         total_pagina = len(resultado.get("registros", []))
-        print(f"✓ +{salvos} (de {total_pagina} — sem id/tipo: {total_pagina - len(dados)}, dupl: {len(dados) - salvos})")
+        print(f"✓ +{salvos} (de {total_pagina} — dupl: {len(dados) - salvos})")
 
         checkpoint[chave] = {"paginas_total": total_paginas, "paginas_feitas": pagina}
         salvar_checkpoint(checkpoint)
-
-        if salvos == 0:
-            paginas_zero += 1
-            if paginas_zero >= MAX_ZERO:
-                print(f"  ⏹️  {paginas_zero} páginas sem novos registros — encerrando dia antecipadamente")
-                break
-        else:
-            paginas_zero = 0
 
         if pagina < total_paginas:
             if pagina % BATCH_SIZE == 0:
