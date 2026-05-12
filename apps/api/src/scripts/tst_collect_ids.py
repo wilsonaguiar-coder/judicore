@@ -192,6 +192,9 @@ def processar_dia(data_str: str, checkpoint: Dict, ids_vistos: set, dry_run: boo
         return total_registros
 
     registros_coletados = 0
+    paginas_zero = 0
+    MAX_ZERO = 2  # para após 2 páginas consecutivas sem nenhum novo registro
+
     for pagina in range(inicio, total_paginas + 1):
         print(f"    📄 Página {pagina}/{total_paginas}...", end=" ", flush=True)
         resultado = requisitar_com_backoff(pagina, 100, payload)
@@ -206,10 +209,18 @@ def processar_dia(data_str: str, checkpoint: Dict, ids_vistos: set, dry_run: boo
         salvos = salvar_em_csv(dados, ids_vistos) if dados else 0
         registros_coletados += salvos
         total_pagina = len(resultado.get("registros", []))
-        print(f"✓ +{salvos} (de {total_pagina} — filtrados/dupl: {total_pagina - len(dados)}, dupl já vistos: {len(dados) - salvos})")
+        print(f"✓ +{salvos} (de {total_pagina} — sem id/tipo: {total_pagina - len(dados)}, dupl: {len(dados) - salvos})")
 
         checkpoint[data_str] = {"paginas_total": total_paginas, "paginas_feitas": pagina}
         salvar_checkpoint(checkpoint)
+
+        if salvos == 0:
+            paginas_zero += 1
+            if paginas_zero >= MAX_ZERO:
+                print(f"  ⏹️  {paginas_zero} páginas sem novos registros — encerrando dia antecipadamente")
+                break
+        else:
+            paginas_zero = 0
 
         if pagina < total_paginas:
             time.sleep(DELAY_BASE + random.uniform(0, 1.5))
