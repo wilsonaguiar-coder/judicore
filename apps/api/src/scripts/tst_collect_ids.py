@@ -156,19 +156,21 @@ def salvar_em_csv(dados: List[Dict], ids_vistos: set) -> int:
     return len(novos)
 
 
-def processar_dia(data_str: str, checkpoint: Dict, ids_vistos: set, dry_run: bool = False) -> int:
-    entrada = checkpoint.get(data_str, {})
-    # Checkpoint guarda: {"paginas_total": N, "paginas_feitas": M}
+def processar_dia(data_str: str, checkpoint: Dict, ids_vistos: set, dry_run: bool = False,
+                  inicio_override: str = None, fim_override: str = None, chave_override: str = None) -> int:
+    chave  = chave_override or data_str
+    inicio = inicio_override or data_str
+    fim    = fim_override    or data_str
+
+    entrada = checkpoint.get(chave, {})
     paginas_feitas = entrada.get("paginas_feitas", 0) if isinstance(entrada, dict) else 0
     paginas_total  = entrada.get("paginas_total",  0) if isinstance(entrada, dict) else 0
 
-    # Se já completamos todas as páginas, pula sem chamar a API
     if paginas_total > 0 and paginas_feitas >= paginas_total:
-        print(f"  ⏭️  {data_str}: já coletado ({paginas_feitas}/{paginas_total} págs)")
+        print(f"  ⏭️  {chave}: já coletado ({paginas_feitas}/{paginas_total} págs)")
         return 0
 
-    # Primeiro fetch: descobre o total
-    payload = criar_payload(data_str, data_str)
+    payload = criar_payload(inicio, fim)
     res_inicial = requisitar_com_backoff(pagina=1, tamanho=1, payload=payload)
     if not res_inicial or "totalRegistros" not in res_inicial:
         print(f"  ❌ Não foi possível obter total para {data_str}")
@@ -176,18 +178,17 @@ def processar_dia(data_str: str, checkpoint: Dict, ids_vistos: set, dry_run: boo
 
     total_registros = res_inicial["totalRegistros"]
     if total_registros == 0:
-        print(f"  ⚪ {data_str}: sem registros")
-        checkpoint[data_str] = {"paginas_total": 0, "paginas_feitas": 0}
+        print(f"  ⚪ {chave}: sem registros")
+        checkpoint[chave] = {"paginas_total": 0, "paginas_feitas": 0}
         salvar_checkpoint(checkpoint)
         return 0
 
-    total_paginas = (total_registros + 99) // 100
-    paginas_total  = total_paginas  # atualiza com valor real
-    inicio = paginas_feitas + 1
-    print(f"  📊 {data_str}: {total_registros} docs | {total_paginas} págs | Retomando da pág {inicio}")
+    total_paginas  = (total_registros + 99) // 100
+    pag_inicio     = paginas_feitas + 1
+    print(f"  📊 {chave}: {total_registros} docs brutos | {total_paginas} págs | Retomando da pág {pag_inicio}")
 
     if dry_run:
-        checkpoint[data_str] = {"paginas_total": total_paginas, "paginas_feitas": total_paginas}
+        checkpoint[chave] = {"paginas_total": total_paginas, "paginas_feitas": total_paginas}
         salvar_checkpoint(checkpoint)
         return total_registros
 
@@ -195,7 +196,7 @@ def processar_dia(data_str: str, checkpoint: Dict, ids_vistos: set, dry_run: boo
     paginas_zero = 0
     MAX_ZERO = 2  # para após 2 páginas consecutivas sem nenhum novo registro
 
-    for pagina in range(inicio, total_paginas + 1):
+    for pagina in range(pag_inicio, total_paginas + 1):
         print(f"    📄 Página {pagina}/{total_paginas}...", end=" ", flush=True)
         resultado = requisitar_com_backoff(pagina, 100, payload)
 
@@ -211,7 +212,7 @@ def processar_dia(data_str: str, checkpoint: Dict, ids_vistos: set, dry_run: boo
         total_pagina = len(resultado.get("registros", []))
         print(f"✓ +{salvos} (de {total_pagina} — sem id/tipo: {total_pagina - len(dados)}, dupl: {len(dados) - salvos})")
 
-        checkpoint[data_str] = {"paginas_total": total_paginas, "paginas_feitas": pagina}
+        checkpoint[chave] = {"paginas_total": total_paginas, "paginas_feitas": pagina}
         salvar_checkpoint(checkpoint)
 
         if salvos == 0:
@@ -225,13 +226,13 @@ def processar_dia(data_str: str, checkpoint: Dict, ids_vistos: set, dry_run: boo
         if pagina < total_paginas:
             time.sleep(DELAY_BASE + random.uniform(0, 1.5))
 
-    print(f"  ✅ {data_str}: {registros_coletados} docs coletados")
+    print(f"  ✅ {chave}: {registros_coletados} docs coletados")
     return registros_coletados
 
 
 def coletar_periodo(data_inicio: str, data_fim: str, dry_run: bool = False):
     print(f"\n{'='*60}")
-    print(f"TST Jurisprudência — Coleta {'[DRY-RUN] ' if dry_run else ''}de IDs")
+    print(f"TST Jurisprudência — Coleta {'[DRY-RUN] ' if dry_run else ''}de IDs (janela mensal)")
     print(f"Período: {data_inicio} → {data_fim}")
     print(f"CSV: {OUTPUT_CSV} | Checkpoint: {CHECKPOINT_FILE}")
     print(f"{'='*60}\n")
@@ -239,27 +240,51 @@ def coletar_periodo(data_inicio: str, data_fim: str, dry_run: bool = False):
     checkpoint   = carregar_checkpoint()
     ids_vistos   = carregar_ids_existentes()
     print(f"IDs já no CSV: {len(ids_vistos)}")
-    dt_inicio    = datetime.strptime(data_inicio, "%Y-%m-%d")
-    dt_fim       = datetime.strptime(data_fim,    "%Y-%m-%d")
+
+    dt_inicio = datetime.strptime(data_inicio, "%Y-%m-%d")
+    dt_fim    = datetime.strptime(data_fim,    "%Y-%m-%d")
+    # Começa no primeiro dia do mês inicial
+    dt_atual  = dt_inicio.replace(day=1)
     total_geral  = 0
-    dias_feitos  = 0
-    dt_atual     = dt_inicio
+    meses_feitos = 0
 
     while dt_atual <= dt_fim:
-        data_str  = dt_atual.strftime("%Y-%m-%d")
-        dt_atual += timedelta(days=1)
+        # Último dia do mês corrente
+        if dt_atual.month == 12:
+            ultimo = dt_atual.replace(day=31)
+        else:
+            ultimo = dt_atual.replace(month=dt_atual.month + 1, day=1) - timedelta(days=1)
+        fim_janela = min(ultimo, dt_fim)
 
-        count = processar_dia(data_str, checkpoint, ids_vistos, dry_run)
-        total_geral += count
-        dias_feitos += 1
+        inicio_str = dt_atual.strftime("%Y-%m-%d")
+        fim_str    = fim_janela.strftime("%Y-%m-%d")
+        chave      = dt_atual.strftime("%Y-%m")  # chave do checkpoint: YYYY-MM
 
-        if dias_feitos % 10 == 0:
+        # Avança para o próximo mês
+        if dt_atual.month == 12:
+            dt_atual = dt_atual.replace(year=dt_atual.year + 1, month=1, day=1)
+        else:
+            dt_atual = dt_atual.replace(month=dt_atual.month + 1, day=1)
+
+        # Usa chave mensal no checkpoint
+        entrada = checkpoint.get(chave, {})
+        if isinstance(entrada, dict) and entrada.get("paginas_total", 0) > 0 and \
+                entrada.get("paginas_feitas", 0) >= entrada.get("paginas_total", 0):
+            print(f"  ⏭️  {chave}: já coletado")
+            continue
+
+        # Reutiliza processar_dia com janela mensal
+        count = processar_dia(f"{chave}-01", checkpoint, ids_vistos, dry_run,
+                              inicio_override=inicio_str, fim_override=fim_str, chave_override=chave)
+        total_geral  += count
+        meses_feitos += 1
+
+        if meses_feitos % 6 == 0:
             csv_lines = sum(1 for _ in open(OUTPUT_CSV, encoding="utf-8-sig")) - 1 if Path(OUTPUT_CSV).exists() else 0
-            print(f"\n  📈 {dias_feitos} dias | {total_geral} coletados nesta sessão | CSV total: {csv_lines}\n")
+            print(f"\n  📈 {meses_feitos} meses | {total_geral} coletados nesta sessão | CSV total: {csv_lines}\n")
 
-        # Pausa entre dias (só se o dia tinha dados) para resetar rate limit
         if count > 0 and dt_atual <= dt_fim:
-            print(f"  💤 Pausa de {DELAY_DAY:.0f}s entre dias...")
+            print(f"  💤 Pausa de {DELAY_DAY:.0f}s entre meses...")
             time.sleep(DELAY_DAY + random.uniform(0, 10))
 
     csv_total = 0
