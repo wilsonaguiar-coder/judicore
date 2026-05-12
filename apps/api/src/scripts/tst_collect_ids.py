@@ -62,17 +62,25 @@ def criar_payload(data_inicio: str, data_fim: str) -> dict:
     }
 
 
-def requisitar_com_backoff(pagina: int, tamanho: int, payload: dict) -> Optional[dict]:
+def nova_sessao() -> requests.Session:
+    """Cria sessão com cookies para paginação correta."""
+    s = requests.Session()
+    s.headers.update(HEADERS)
+    # Visita a página inicial para obter cookies de sessão
+    try:
+        s.get("https://jurisprudencia.tst.jus.br/", timeout=TIMEOUT)
+    except Exception:
+        pass
+    return s
+
+
+def requisitar_com_backoff(sessao: requests.Session, pagina: int, tamanho: int, payload: dict) -> Optional[dict]:
     delay = DELAY_BASE
     url = f"{BASE_URL}/{pagina}/{tamanho}"
-    params = {"a": f"{random.random():.16f}"}
 
     for tentativa in range(MAX_TENTATIVAS):
         try:
-            response = requests.post(
-                url, json=payload, headers=HEADERS,
-                params=params, timeout=TIMEOUT
-            )
+            response = sessao.post(url, json=payload, timeout=TIMEOUT)
 
             if response.status_code == 200:
                 return response.json()
@@ -173,7 +181,8 @@ def processar_dia(data_str: str, checkpoint: Dict, ids_vistos: set, dry_run: boo
         return 0
 
     payload = criar_payload(inicio, fim)
-    res_inicial = requisitar_com_backoff(pagina=1, tamanho=1, payload=payload)
+    sessao  = nova_sessao()
+    res_inicial = requisitar_com_backoff(sessao, pagina=1, tamanho=1, payload=payload)
     if not res_inicial or "totalRegistros" not in res_inicial:
         print(f"  ❌ Não foi possível obter total para {data_str}")
         return 0
@@ -198,7 +207,7 @@ def processar_dia(data_str: str, checkpoint: Dict, ids_vistos: set, dry_run: boo
 
     for pagina in range(pag_inicio, total_paginas + 1):
         print(f"    📄 Página {pagina}/{total_paginas}...", end=" ", flush=True)
-        resultado = requisitar_com_backoff(pagina, 100, payload)
+        resultado = requisitar_com_backoff(sessao, pagina, 100, payload)
 
         if not resultado or "registros" not in resultado:
             print("❌ Falha — salvando checkpoint e abortando este mês")
