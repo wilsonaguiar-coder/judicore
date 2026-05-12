@@ -38,7 +38,7 @@ HEADERS = {
     "Pragma": "no-cache"
 }
 
-PAGE_SIZE    = 1000   # registros por página (API suporta 1000 com timeout=90s)
+PAGE_SIZE    = 2000   # registros por página (API suporta 2000 com timeout=120s)
 
 DELAY_BASE   = 5.0    # segundos entre dias
 DELAY_EXTRA  = 60.0   # pausa extra para dias com mais de 1 página
@@ -47,7 +47,7 @@ BATCH_SIZE   = 7
 MAX_DELAY    = 60.0
 BACKOFF_MULTIPLIER = 2.0
 MAX_TENTATIVAS = 5
-TIMEOUT = 90          # aumentado para acomodar respostas com 500 registros
+TIMEOUT = 120         # aumentado para acomodar respostas com 2000 registros
 
 # Circuit breaker: detecta bloqueio silencioso da API
 CIRCUIT_BREAKER_LIMITE = 3    # páginas consecutivas com poucos registros
