@@ -38,6 +38,8 @@ HEADERS = {
     "Pragma": "no-cache"
 }
 
+PAGE_SIZE    = 500    # registros por página (API suporta até ~500 sem timeout)
+
 DELAY_BASE   = 5.0    # segundos entre dias
 DELAY_EXTRA  = 60.0   # pausa extra para dias com mais de 1 página
 DELAY_BATCH  = 90.0   # pausa a cada BATCH_SIZE páginas
@@ -45,7 +47,7 @@ BATCH_SIZE   = 7
 MAX_DELAY    = 60.0
 BACKOFF_MULTIPLIER = 2.0
 MAX_TENTATIVAS = 5
-TIMEOUT = 45
+TIMEOUT = 90          # aumentado para acomodar respostas com 500 registros
 
 # Circuit breaker: detecta bloqueio silencioso da API
 CIRCUIT_BREAKER_LIMITE = 3    # páginas consecutivas com poucos registros
@@ -290,7 +292,7 @@ def processar_dia(data_str: str, checkpoint: Dict, ids_vistos: Set[str],
 
     payload = criar_payload(data_str, data_str)
 
-    res_p1 = requisitar(sessao_ref[0], 1, 100, payload)
+    res_p1 = requisitar(sessao_ref[0], 1, PAGE_SIZE, payload)
     if not res_p1 or "totalRegistros" not in res_p1:
         log(f"❌ {data_str}: sem resposta válida da API")
         if res_p1:
@@ -303,7 +305,7 @@ def processar_dia(data_str: str, checkpoint: Dict, ids_vistos: Set[str],
         salvar_checkpoint(checkpoint)
         return 0
 
-    total_paginas = (total_registros + 99) // 100
+    total_paginas = (total_registros + PAGE_SIZE - 1) // PAGE_SIZE
     if total_paginas > 1:
         log(f"  📊 {data_str}: {total_registros} brutos | {total_paginas} págs")
 
@@ -319,7 +321,7 @@ def processar_dia(data_str: str, checkpoint: Dict, ids_vistos: Set[str],
         if pagina < paginas_feitas + 1:
             continue
 
-        resultado = resultado_pre or requisitar(sessao_ref[0], pagina, 100, payload)
+        resultado = resultado_pre or requisitar(sessao_ref[0], pagina, PAGE_SIZE, payload)
         if not resultado or "registros" not in resultado:
             log(f"❌ {data_str} p{pagina}: falha — salvando checkpoint")
             if resultado:
