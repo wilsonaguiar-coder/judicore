@@ -38,14 +38,19 @@ HEADERS = {
     "Pragma": "no-cache"
 }
 
-DELAY_BASE   = 5.0    # segundos entre dias (janela diária = 1 pág → sem risco de rate limit)
-DELAY_EXTRA  = 60.0   # pausa extra se um dia precisar de mais de 1 página
-DELAY_BATCH  = 90.0   # pausa a cada BATCH_SIZE páginas (para dias excepcionalmente volumosos)
+DELAY_BASE   = 5.0    # segundos entre dias
+DELAY_EXTRA  = 60.0   # pausa extra para dias com mais de 1 página
+DELAY_BATCH  = 90.0   # pausa a cada BATCH_SIZE páginas
 BATCH_SIZE   = 7
 MAX_DELAY    = 60.0
 BACKOFF_MULTIPLIER = 2.0
 MAX_TENTATIVAS = 5
 TIMEOUT = 45
+
+# Circuit breaker: detecta bloqueio silencioso da API
+CIRCUIT_BREAKER_LIMITE = 3    # páginas consecutivas com poucos registros
+CIRCUIT_MIN_BRUTOS     = 5    # abaixo disso considera "suspeito"
+CIRCUIT_PAUSA          = 300  # segundos de pausa ao acionar
 
 CHECKPOINT_FILE = "tst_checkpoint.json"
 OUTPUT_CSV      = "tst_jurisprudencia_rr_ro_rot.csv"
@@ -55,23 +60,26 @@ LOG_FILE        = "tst_coleta.log"
 # ================= FILTRO LOCAL =================
 
 def eh_recurso_desejado(registro: dict) -> bool:
-    """Filtra RR, RO e ROT localmente. Usa codFase (mais direto) com fallback em numFormatado."""
+    """Filtra RR, RO e ROT localmente via codFase, com fallback em numFormatado."""
     reg = registro.get("registro", {})
-
-    # Campo mais confiável: codFase direto no registro
     cod_fase = (reg.get("codFase") or "").strip()
     if cod_fase in {"RR", "RO", "ROT"}:
         return True
-
-    # Fallback: prefixo no numFormatado ("RR - 123...", "RO - 456...")
     num_fmt = (reg.get("numFormatado") or "").upper().strip()
     return num_fmt.startswith("RR ") or num_fmt.startswith("RO ") or num_fmt.startswith("ROT ")
 
 
 # ================= REQUISIÇÃO =================
 
+CLASSES_PROCESSUAIS = [
+    {"codFase": "RR",  "desFase": "Recurso de Revista"},
+    {"codFase": "RO",  "desFase": "Recurso Ordinário"},
+    {"codFase": "ROT", "desFase": "Recurso Ordinário Trabalhista"},
+]
+
+
 def criar_payload(data_inicio: str, data_fim: str) -> dict:
-    """Payload SEM filtro de classe — filtro feito localmente."""
+    """Payload com filtro de classe no formato exato do site — validado via F12."""
     return {
         "ou": None, "e": None, "termoExato": "", "naoContem": None,
         "ementa": None, "dispositivo": None,
@@ -80,12 +88,13 @@ def criar_payload(data_inicio: str, data_fim: str) -> dict:
             "orgao": "", "tribunal": None, "vara": None
         },
         "orgaosJudicantes": [], "ministros": [], "convocados": [],
-        "classesProcessuais": [],
+        "classesProcessuais": CLASSES_PROCESSUAIS,
         "indicadores": [], "assuntos": [],
         "tipos": ["ACORDAO"],
         "orgao": "TST",
         "publicacaoInicial": data_inicio,
-        "publicacaoFinal": data_fim
+        "publicacaoFinal": data_fim,
+        "ordenacao": None,
     }
 
 
@@ -108,11 +117,28 @@ def requisitar(sessao: requests.Session, pagina: int, tamanho: int, payload: dic
             response = sessao.post(url, json=payload, timeout=TIMEOUT)
 
             if response.status_code == 200:
-                try:
-                    return response.json()
-                except json.JSONDecodeError:
-                    log(f"❌ JSON inválido na página {pagina}")
+                # Detecta resposta HTML (bloqueio silencioso)
+                content_type = response.headers.get("Content-Type", "")
+                if "html" in content_type.lower():
+                    log(f"⚠️  Resposta HTML na p{pagina} — possível bloqueio | CT: {content_type}")
                     return None
+
+                try:
+                    data = response.json()
+                except json.JSONDecodeError:
+                    log(f"❌ JSON inválido na p{pagina} | início: {response.text[:150]!r}")
+                    return None
+
+                if not isinstance(data, dict):
+                    log(f"⚠️  Resposta não é dict na p{pagina}: {type(data).__name__}")
+                    return None
+
+                # Valida chaves esperadas
+                if "registros" not in data and "totalRegistros" not in data:
+                    log(f"⚠️  Estrutura inesperada na p{pagina} | chaves: {list(data.keys())}")
+                    return None
+
+                return data
 
             if response.status_code in [429, 500, 502, 503, 504]:
                 wait = delay + random.uniform(0, delay * 0.2)
@@ -126,14 +152,14 @@ def requisitar(sessao: requests.Session, pagina: int, tamanho: int, payload: dic
                 return None
 
         except requests.exceptions.Timeout:
-            log(f"⏱️  Timeout na página {pagina} (tentativa {tentativa+1})")
+            log(f"⏱️  Timeout na p{pagina} (tentativa {tentativa+1})")
         except requests.exceptions.RequestException as e:
             log(f"❌ Erro de rede: {type(e).__name__}: {e}")
 
         if tentativa < MAX_TENTATIVAS - 1:
             time.sleep(delay)
 
-    log(f"❌ Falha após {MAX_TENTATIVAS} tentativas na página {pagina}")
+    log(f"❌ Falha após {MAX_TENTATIVAS} tentativas na p{pagina}")
     return None
 
 
@@ -176,7 +202,7 @@ def extrair_dados(registro: dict) -> Optional[Dict]:
     if not doc_id:
         return None
     return {
-        "id_hash":       doc_id,
+        "id_hash":         doc_id,
         "data_publicacao": (reg.get("dtaPublicacao") or "")[:10],
         "numero_processo": reg.get("numero"),
         "num_formatado":   reg.get("numFormatado") or "",
@@ -218,9 +244,43 @@ def salvar_em_csv(dados: List[Dict], ids_vistos: Set[str]) -> int:
         return 0
 
 
+def log_fases(registros: list, prefixo: str = ""):
+    """Loga distribuição de codFase para debugging."""
+    fases: Dict[str, int] = {}
+    for r in registros:
+        fase = (r.get("registro", {}).get("codFase") or "N/A").strip()
+        fases[fase] = fases.get(fase, 0) + 1
+    log(f"  {prefixo}codFase: {dict(sorted(fases.items()))}")
+
+
+# ================= CIRCUIT BREAKER =================
+
+def checar_circuit_breaker(brutos: int, contador: list, sessao_ref: list) -> None:
+    """
+    contador = [int]  — lista mutável com contagem de páginas suspeitas consecutivas.
+    sessao_ref = [Session] — lista mutável; circuit breaker pode trocar a sessão.
+    """
+    if brutos <= CIRCUIT_MIN_BRUTOS:
+        contador[0] += 1
+        if contador[0] >= CIRCUIT_BREAKER_LIMITE:
+            log(f"🔴 CIRCUIT BREAKER: {contador[0]} páginas com ≤{CIRCUIT_MIN_BRUTOS} registros "
+                f"→ pausando {CIRCUIT_PAUSA}s e renovando sessão")
+            time.sleep(CIRCUIT_PAUSA)
+            sessao_ref[0] = nova_sessao()
+            contador[0] = 0
+            log("🟢 Sessão renovada, retomando coleta")
+    else:
+        contador[0] = 0
+
+
 # ================= COLETA POR DIA =================
 
-def processar_dia(data_str: str, checkpoint: Dict, ids_vistos: Set[str], dry_run: bool = False) -> int:
+def processar_dia(data_str: str, checkpoint: Dict, ids_vistos: Set[str],
+                  sessao_ref: list, cb_contador: list, dry_run: bool = False) -> int:
+    """
+    sessao_ref  = [Session] — sessão compartilhada; circuit breaker pode trocar.
+    cb_contador = [int]     — contador persistente de páginas suspeitas entre dias.
+    """
     entrada = checkpoint.get(data_str, {})
     paginas_feitas = entrada.get("paginas_feitas", 0) if isinstance(entrada, dict) else 0
     paginas_total  = entrada.get("paginas_total",  0) if isinstance(entrada, dict) else 0
@@ -229,11 +289,12 @@ def processar_dia(data_str: str, checkpoint: Dict, ids_vistos: Set[str], dry_run
         return 0  # já coletado, pula silenciosamente
 
     payload = criar_payload(data_str, data_str)
-    sessao  = nova_sessao()
 
-    res_p1 = requisitar(sessao, 1, 100, payload)
+    res_p1 = requisitar(sessao_ref[0], 1, 100, payload)
     if not res_p1 or "totalRegistros" not in res_p1:
-        log(f"❌ {data_str}: sem resposta da API")
+        log(f"❌ {data_str}: sem resposta válida da API")
+        if res_p1:
+            log(f"   chaves recebidas: {list(res_p1.keys())}")
         return 0
 
     total_registros = res_p1["totalRegistros"]
@@ -258,14 +319,24 @@ def processar_dia(data_str: str, checkpoint: Dict, ids_vistos: Set[str], dry_run
         if pagina < paginas_feitas + 1:
             continue
 
-        resultado = resultado_pre or requisitar(sessao, pagina, 100, payload)
+        resultado = resultado_pre or requisitar(sessao_ref[0], pagina, 100, payload)
         if not resultado or "registros" not in resultado:
             log(f"❌ {data_str} p{pagina}: falha — salvando checkpoint")
+            if resultado:
+                log(f"   chaves recebidas: {list(resultado.keys())}")
             checkpoint[data_str] = {"paginas_total": total_paginas, "paginas_feitas": pagina - 1}
             salvar_checkpoint(checkpoint)
             return registros_coletados
 
         brutos = resultado.get("registros", [])
+
+        # Circuit breaker: detecta bloqueio silencioso
+        checar_circuit_breaker(len(brutos), cb_contador, sessao_ref)
+
+        # Log de codFase nos dias com múltiplas páginas (ajuda a calibrar o filtro)
+        if total_paginas > 1 and pagina <= 2:
+            log_fases(brutos, prefixo=f"p{pagina} ")
+
         dados  = [extrair_dados(r) for r in brutos if extrair_dados(r)]
         salvos = salvar_em_csv(dados, ids_vistos) if dados else 0
         registros_coletados += salvos
@@ -275,11 +346,6 @@ def processar_dia(data_str: str, checkpoint: Dict, ids_vistos: Set[str], dry_run
 
         checkpoint[data_str] = {"paginas_total": total_paginas, "paginas_feitas": pagina}
         salvar_checkpoint(checkpoint)
-
-        # Para na primeira página sem novos registros — paginação do TST é quebrada
-        # e todos os RR/RO/ROT de um dia cabem na página 1
-        if salvos == 0:
-            break
 
         if pagina < total_paginas:
             if pagina % BATCH_SIZE == 0:
@@ -300,9 +366,13 @@ def coletar_periodo(data_inicio: str, data_fim: str, dry_run: bool = False):
     log(f"CSV: {OUTPUT_CSV} | Checkpoint: {CHECKPOINT_FILE}")
     log(f"{'='*60}")
 
-    checkpoint  = carregar_checkpoint()
-    ids_vistos  = carregar_ids_existentes()
+    checkpoint = carregar_checkpoint()
+    ids_vistos = carregar_ids_existentes()
     log(f"IDs já no CSV: {len(ids_vistos)}")
+
+    # Sessão compartilhada entre dias — encapsulada em lista para mutação pelo circuit breaker
+    sessao_ref  = [nova_sessao()]
+    cb_contador = [0]  # contador persistente do circuit breaker
 
     dt_atual = datetime.strptime(data_inicio, "%Y-%m-%d")
     dt_fim   = datetime.strptime(data_fim,    "%Y-%m-%d")
@@ -313,7 +383,7 @@ def coletar_periodo(data_inicio: str, data_fim: str, dry_run: bool = False):
         data_str  = dt_atual.strftime("%Y-%m-%d")
         dt_atual += timedelta(days=1)
 
-        count = processar_dia(data_str, checkpoint, ids_vistos, dry_run)
+        count = processar_dia(data_str, checkpoint, ids_vistos, sessao_ref, cb_contador, dry_run)
         if count > 0:
             total_geral += count
             log(f"  ✅ {data_str}: +{count} | total: {total_geral}")
@@ -357,6 +427,7 @@ if __name__ == "__main__":
             total  = len(resp["registros"])
             passou = sum(1 for r in resp["registros"] if eh_recurso_desejado(r))
             log(f"✅ {total} brutos | {passou} passaram no filtro ({passou/total*100:.1f}%)")
+            log_fases(resp["registros"])
             for i, reg in enumerate(resp["registros"][:5], 1):
                 r       = reg.get("registro", {})
                 num_fmt = r.get("numFormatado", "N/A")
@@ -365,6 +436,8 @@ if __name__ == "__main__":
                 log(f"  {ok} {i}. {num_fmt[:50]} | codFase: {cod}")
         else:
             log("❌ Falha ao buscar página de teste")
+            if resp:
+                log(f"   chaves recebidas: {list(resp.keys())}")
         sys.exit(0)
 
     coletar_periodo(args.inicio, args.fim, args.dry_run)
