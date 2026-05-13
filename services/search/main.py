@@ -302,7 +302,7 @@ def start_update(req: UpdateRequest):
     }
 
     threading.Thread(target=_run_update_job, args=(job_id, sources, since_date, year), daemon=True).start()
-    return {"job_id": job_id, "sources": sources, "since_date": since_date, "year": year}
+    return {"id": job_id, "sources": sources, "since_date": since_date, "year": year, "status": "pending"}
 
 
 @app.get("/update/{job_id}")
