@@ -84,17 +84,14 @@ export default function AdminPage() {
   const lancePollerRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const lancePrePopulatedRef = useRef(false);
 
-  // STJ PDF upload state
+  // STJ indexing state
+  const [stjIndexing, setStjIndexing] = useState(false);
+  const [stjIndexLog, setStjIndexLog] = useState<{ msg: string; type: "info" | "ok" | "err" }[]>([]);
+  const [stjIndexDone, setStjIndexDone] = useState<string | null>(null);
+
+  // STJ upload manual (fallback)
   const [stjFiles, setStjFiles] = useState<FileList | null>(null);
   const [stjUploading, setStjUploading] = useState(false);
-  const [stjUploadResult, setStjUploadResult] = useState<{
-    saved: number[]; errors: { file: string; reason: string }[]; pdf_editions_on_disk: number[];
-  } | null>(null);
-
-  // STJ download-and-send state
-  const [stjDownloadEnd, setStjDownloadEnd] = useState("");
-  const [stjDownloading, setStjDownloading] = useState(false);
-  const [stjDownloadLog, setStjDownloadLog] = useState<string[]>([]);
 
   const load = useCallback(async () => {
     if (!token) return;
@@ -156,54 +153,43 @@ export default function AdminPage() {
     }
   }
 
-  async function handleStjUpload() {
-    if (!token || !stjFiles || stjFiles.length === 0) return;
-    setStjUploading(true);
-    setStjUploadResult(null);
-    try {
-      const form = new FormData();
-      for (const file of Array.from(stjFiles)) form.append("files", file);
-      const res = await fetch(`/api/admin/lancedb/stj/upload`, {
-        method: "POST",
-        headers: { Authorization: `Bearer ${token}` },
-        body: form,
-      });
-      if (!res.ok) throw new Error(`HTTP ${res.status}`);
-      const data = await res.json();
-      setStjUploadResult(data);
-      // Atualiza info após upload
-      api.get<LanceDbInfo>("/admin/lancedb/info", token).then(setLanceInfo).catch(() => {});
-    } catch (e: any) {
-      alert(`Erro ao enviar PDFs: ${e.message}`);
-    } finally {
-      setStjUploading(false);
-    }
-  }
-
-  async function handleStjDownloadAndSend() {
+  async function handleStjIndex() {
     if (!token || !lanceInfo) return;
-    const start = (lanceInfo.stj_last_edition ?? 0) + 1;
-    const end = parseInt(stjDownloadEnd);
-    if (!end || end < start) return;
+    setStjIndexing(true);
+    setStjIndexLog([]);
+    setStjIndexDone(null);
 
-    setStjDownloading(true);
-    setStjDownloadLog([]);
+    const log = (msg: string, type: "info" | "ok" | "err" = "info") =>
+      setStjIndexLog((prev) => [...prev, { msg, type }]);
 
-    const log = (msg: string) => setStjDownloadLog((prev) => [...prev, msg]);
     const STJ_PDF_URL = "https://processo.stj.jus.br/SCON/GetPDFINFJ?edicao=";
+    const start = (lanceInfo.stj_last_edition ?? 0) + 1;
+    const MAX_MISSES = 3;
 
-    for (let ed = start; ed <= end; ed++) {
+    log(`Buscando informativos a partir da edição ${start}...`);
+
+    let misses = 0;
+    let uploaded = 0;
+    let lastUploaded = lanceInfo.stj_last_edition ?? 0;
+
+    for (let ed = start; misses < MAX_MISSES; ed++) {
       const num = String(ed).padStart(4, "0");
-      log(`[${num}] Baixando...`);
       try {
-        const res = await fetch(`${STJ_PDF_URL}${num}`, {
-          headers: { "User-Agent": "Mozilla/5.0" },
-        });
-        if (!res.ok) { log(`[${num}] Não encontrado (HTTP ${res.status})`); continue; }
+        const res = await fetch(`${STJ_PDF_URL}${num}`);
+        if (!res.ok) {
+          log(`Edição ${num} não encontrada`, "info");
+          misses++;
+          continue;
+        }
         const buf = await res.arrayBuffer();
         const header = new TextDecoder().decode(buf.slice(0, 4));
-        if (header !== "%PDF") { log(`[${num}] Resposta não é PDF`); continue; }
-
+        if (header !== "%PDF") {
+          log(`Edição ${num} — resposta não é PDF`, "err");
+          misses++;
+          continue;
+        }
+        misses = 0;
+        log(`Edição ${num} baixada (${Math.round(buf.byteLength / 1024)} KB) — enviando ao servidor...`);
         const form = new FormData();
         form.append("files", new Blob([buf], { type: "application/pdf" }), `Informativo_${num}.pdf`);
         const up = await fetch("/api/admin/lancedb/stj/upload", {
@@ -212,16 +198,61 @@ export default function AdminPage() {
           body: form,
         });
         if (up.ok) {
-          log(`[${num}] Enviado ao servidor`);
-          api.get<LanceDbInfo>("/admin/lancedb/info", token).then(setLanceInfo).catch(() => {});
+          log(`Edição ${num} salva no servidor`, "ok");
+          uploaded++;
+          lastUploaded = ed;
         } else {
-          log(`[${num}] Erro no upload (HTTP ${up.status})`);
+          log(`Edição ${num} — erro no upload (HTTP ${up.status})`, "err");
         }
       } catch (e: any) {
-        log(`[${num}] Erro: ${e.message}`);
+        // CORS ou falha de rede
+        log(`Edição ${num} — ${e.message.includes("Failed to fetch") ? "bloqueado por CORS (use upload manual)" : e.message}`, "err");
+        misses++;
       }
     }
-    setStjDownloading(false);
+
+    if (uploaded === 0) {
+      log("Nenhum PDF novo encontrado. Base já está atualizada.", "info");
+      setStjIndexDone("já atualizada");
+      setStjIndexing(false);
+      return;
+    }
+
+    log(`${uploaded} edição(ões) enviada(s). Iniciando embedding no servidor...`);
+    try {
+      const job = await api.post<LanceDbJob>("/admin/lancedb/update", { sources: ["stj"] }, token);
+      setLanceJob(job);
+      if (lancePollerRef.current) clearInterval(lancePollerRef.current);
+      lancePollerRef.current = setInterval(() => pollLanceJob(job.id), 4000);
+      log("Indexação iniciada — acompanhe o progresso abaixo.", "ok");
+      setStjIndexDone(`até edição #${lastUploaded}`);
+    } catch (e: any) {
+      log(`Erro ao iniciar indexação: ${e.message}`, "err");
+    }
+
+    api.get<LanceDbInfo>("/admin/lancedb/info", token).then(setLanceInfo).catch(() => {});
+    setStjIndexing(false);
+  }
+
+  async function handleStjManualUpload() {
+    if (!token || !stjFiles || stjFiles.length === 0) return;
+    setStjUploading(true);
+    try {
+      const form = new FormData();
+      for (const file of Array.from(stjFiles)) form.append("files", file);
+      const res = await fetch("/api/admin/lancedb/stj/upload", {
+        method: "POST",
+        headers: { Authorization: `Bearer ${token}` },
+        body: form,
+      });
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      api.get<LanceDbInfo>("/admin/lancedb/info", token).then(setLanceInfo).catch(() => {});
+      setStjFiles(null);
+    } catch (e: any) {
+      alert(`Erro ao enviar PDFs: ${e.message}`);
+    } finally {
+      setStjUploading(false);
+    }
   }
 
   useEffect(() => {
@@ -342,88 +373,60 @@ export default function AdminPage() {
               })}
             </div>
 
-            {/* STJ — download e upload de PDFs */}
+            {/* STJ — indexação automática */}
             <div className="rounded-md border border-dashed px-3 py-3 space-y-3">
-              <div className="flex items-start justify-between gap-4">
+              <div className="flex items-center justify-between gap-4">
                 <div className="space-y-0.5">
-                  <p className="text-xs font-medium">Informativos STJ — PDFs para indexação</p>
+                  <p className="text-xs font-medium">Informativos STJ</p>
                   <p className="text-[10px] text-muted-foreground">
                     Última edição indexada:{" "}
                     <span className="font-semibold text-foreground">
                       {lanceInfo?.stj_last_edition != null ? `#${lanceInfo.stj_last_edition}` : "nenhuma"}
                     </span>
                     {lanceInfo?.stj_pdf_editions && lanceInfo.stj_pdf_editions.length > 0 && (
-                      <> · PDFs em disco: {lanceInfo.stj_pdf_editions.length} ({lanceInfo.stj_pdf_editions[0]}–{lanceInfo.stj_pdf_editions[lanceInfo.stj_pdf_editions.length - 1]})</>
+                      <> · {lanceInfo.stj_pdf_editions.length} PDF(s) em disco</>
+                    )}
+                    {stjIndexDone && (
+                      <> · <span className="text-green-600 font-medium">atualizada {stjIndexDone}</span></>
                     )}
                   </p>
                 </div>
-
-                {/* Download automático */}
-                <div className="flex items-center gap-2 flex-shrink-0">
-                  <div className="flex flex-col">
-                    <label className="text-[10px] text-muted-foreground mb-0.5">
-                      Baixar até edição
-                    </label>
-                    <input
-                      type="number"
-                      placeholder={String((lanceInfo?.stj_last_edition ?? 0) + 1)}
-                      value={stjDownloadEnd}
-                      onChange={(e) => setStjDownloadEnd(e.target.value)}
-                      className="w-20 px-2 py-1 text-xs rounded border bg-background focus:outline-none focus:ring-1 focus:ring-ring"
-                    />
-                  </div>
+                <div className="flex items-center gap-2">
                   <button
-                    onClick={handleStjDownloadAndSend}
-                    disabled={stjDownloading || !stjDownloadEnd || !lanceInfo}
-                    className="flex items-center gap-1.5 px-2.5 py-1 rounded border text-xs font-medium bg-primary text-primary-foreground hover:bg-primary/90 disabled:opacity-50 transition-colors mt-4"
+                    onClick={handleStjIndex}
+                    disabled={stjIndexing || !lanceInfo}
+                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-primary text-primary-foreground text-xs font-medium hover:bg-primary/90 disabled:opacity-50 transition-colors"
                   >
-                    {stjDownloading ? <Loader2 size={11} className="animate-spin" /> : <Play size={11} />}
-                    Baixar e enviar
+                    {stjIndexing ? <Loader2 size={11} className="animate-spin" /> : <Play size={11} />}
+                    Indexar STJ
                   </button>
-
-                  <div className="h-4 w-px bg-border mx-1 mt-4" />
-
-                  {/* Upload manual */}
-                  <label className="cursor-pointer px-2.5 py-1 rounded border text-xs text-muted-foreground hover:text-foreground hover:border-foreground transition-colors mt-4">
-                    Selecionar PDFs
-                    <input
-                      type="file"
-                      accept=".pdf"
-                      multiple
-                      className="hidden"
-                      onChange={(e) => { setStjFiles(e.target.files); setStjUploadResult(null); }}
-                    />
+                  <div className="h-4 w-px bg-border" />
+                  <label className="cursor-pointer px-2.5 py-1.5 rounded border text-xs text-muted-foreground hover:text-foreground transition-colors">
+                    Upload manual
+                    <input type="file" accept=".pdf" multiple className="hidden"
+                      onChange={(e) => setStjFiles(e.target.files)} />
                   </label>
-                  <button
-                    onClick={handleStjUpload}
-                    disabled={stjUploading || !stjFiles || stjFiles.length === 0}
-                    className="flex items-center gap-1.5 px-2.5 py-1 rounded border text-xs text-muted-foreground hover:text-foreground disabled:opacity-50 transition-colors mt-4"
-                  >
-                    {stjUploading ? <Loader2 size={11} className="animate-spin" /> : <Play size={11} />}
-                    Enviar
-                  </button>
+                  {stjFiles && stjFiles.length > 0 && (
+                    <button
+                      onClick={handleStjManualUpload}
+                      disabled={stjUploading}
+                      className="flex items-center gap-1 px-2 py-1.5 rounded border text-xs text-muted-foreground hover:text-foreground disabled:opacity-50 transition-colors"
+                    >
+                      {stjUploading ? <Loader2 size={11} className="animate-spin" /> : <Play size={11} />}
+                      Enviar ({stjFiles.length})
+                    </button>
+                  )}
                 </div>
               </div>
 
-              {/* Log do download automático */}
-              {stjDownloadLog.length > 0 && (
-                <div className="rounded bg-muted/40 px-2 py-1.5 max-h-24 overflow-y-auto space-y-0.5">
-                  {stjDownloadLog.map((line, i) => (
-                    <p key={i} className={`text-[10px] font-mono ${line.includes("Erro") || line.includes("não") ? "text-destructive" : line.includes("Enviado") ? "text-green-600" : "text-muted-foreground"}`}>
-                      {line}
-                    </p>
-                  ))}
-                </div>
-              )}
-
-              {/* Resultado do upload manual */}
-              {stjUploadResult && (
-                <div className="text-[10px] space-y-0.5">
-                  {stjUploadResult.saved.length > 0 && (
-                    <p className="text-green-600">Enviados: edições {stjUploadResult.saved.join(", ")}</p>
-                  )}
-                  {stjUploadResult.errors.map((e, i) => (
-                    <p key={i} className="text-destructive">{e.file}: {e.reason}</p>
+              {stjIndexLog.length > 0 && (
+                <div className="rounded bg-muted/40 px-2 py-1.5 max-h-28 overflow-y-auto space-y-0.5">
+                  {stjIndexLog.map((entry, i) => (
+                    <p key={i} className={`text-[10px] font-mono ${
+                      entry.type === "err" ? "text-destructive" :
+                      entry.type === "ok"  ? "text-green-600" :
+                      "text-muted-foreground"
+                    }`}>{entry.msg}</p>
                   ))}
                 </div>
               )}
