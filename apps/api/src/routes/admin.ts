@@ -6,7 +6,7 @@ import { getElasticsearchClient, JURISPRUDENCIA_INDEX, ensureIndices } from "@ju
 import type { LegalArea } from "@judicore/search";
 import { prisma } from "@judicore/db";
 
-const SEARCH_SERVICE_URL = process.env["SEARCH_SERVICE_URL"] ?? "http://127.0.0.1:8001";
+const SEARCH_SERVICE_URL = process.env["SEARCH_SERVICE_URL"] ?? "http://127.0.0.1:7860";
 
 async function proxyToSearchService(path: string, options: RequestInit = {}) {
   const res = await fetch(`${SEARCH_SERVICE_URL}${path}`, {
