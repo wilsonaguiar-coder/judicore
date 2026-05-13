@@ -155,77 +155,29 @@ export default function AdminPage() {
 
   async function handleStjIndex() {
     if (!token || !lanceInfo) return;
+    const pdfsOnDisk = lanceInfo.stj_pdf_editions ?? [];
+    const lastIndexed = lanceInfo.stj_last_edition ?? 0;
+    const pending = pdfsOnDisk.filter((ed) => ed > lastIndexed);
+
+    if (pending.length === 0) {
+      setStjIndexLog([{ msg: "Nenhum PDF novo em disco. Use o script stj_indexar.mjs ou o upload manual.", type: "info" }]);
+      return;
+    }
+
     setStjIndexing(true);
-    setStjIndexLog([]);
+    setStjIndexLog([{ msg: `${pending.length} edição(ões) em disco aguardando embedding: ${pending.join(", ")}`, type: "info" }]);
     setStjIndexDone(null);
 
     const log = (msg: string, type: "info" | "ok" | "err" = "info") =>
       setStjIndexLog((prev) => [...prev, { msg, type }]);
 
-    const STJ_PDF_URL = "https://processo.stj.jus.br/SCON/GetPDFINFJ?edicao=";
-    const start = (lanceInfo.stj_last_edition ?? 0) + 1;
-    const MAX_MISSES = 3;
-
-    log(`Buscando informativos a partir da edição ${start}...`);
-
-    let misses = 0;
-    let uploaded = 0;
-    let lastUploaded = lanceInfo.stj_last_edition ?? 0;
-
-    for (let ed = start; misses < MAX_MISSES; ed++) {
-      const num = String(ed).padStart(4, "0");
-      try {
-        const res = await fetch(`${STJ_PDF_URL}${num}`);
-        if (!res.ok) {
-          log(`Edição ${num} não encontrada`, "info");
-          misses++;
-          continue;
-        }
-        const buf = await res.arrayBuffer();
-        const header = new TextDecoder().decode(buf.slice(0, 4));
-        if (header !== "%PDF") {
-          log(`Edição ${num} — resposta não é PDF`, "err");
-          misses++;
-          continue;
-        }
-        misses = 0;
-        log(`Edição ${num} baixada (${Math.round(buf.byteLength / 1024)} KB) — enviando ao servidor...`);
-        const form = new FormData();
-        form.append("files", new Blob([buf], { type: "application/pdf" }), `Informativo_${num}.pdf`);
-        const up = await fetch("/api/admin/lancedb/stj/upload", {
-          method: "POST",
-          headers: { Authorization: `Bearer ${token}` },
-          body: form,
-        });
-        if (up.ok) {
-          log(`Edição ${num} salva no servidor`, "ok");
-          uploaded++;
-          lastUploaded = ed;
-        } else {
-          log(`Edição ${num} — erro no upload (HTTP ${up.status})`, "err");
-        }
-      } catch (e: any) {
-        // CORS ou falha de rede
-        log(`Edição ${num} — ${e.message.includes("Failed to fetch") ? "bloqueado por CORS (use upload manual)" : e.message}`, "err");
-        misses++;
-      }
-    }
-
-    if (uploaded === 0) {
-      log("Nenhum PDF novo encontrado. Base já está atualizada.", "info");
-      setStjIndexDone("já atualizada");
-      setStjIndexing(false);
-      return;
-    }
-
-    log(`${uploaded} edição(ões) enviada(s). Iniciando embedding no servidor...`);
     try {
       const job = await api.post<LanceDbJob>("/admin/lancedb/update", { sources: ["stj"], skip_browser: true }, token);
       setLanceJob(job);
       if (lancePollerRef.current) clearInterval(lancePollerRef.current);
       lancePollerRef.current = setInterval(() => pollLanceJob(job.id), 4000);
-      log("Indexação iniciada — acompanhe o progresso abaixo.", "ok");
-      setStjIndexDone(`até edição #${lastUploaded}`);
+      log("Embedding iniciado — acompanhe o progresso abaixo.", "ok");
+      setStjIndexDone(`até edição #${Math.max(...pending)}`);
     } catch (e: any) {
       log(`Erro ao iniciar indexação: ${e.message}`, "err");
     }
