@@ -76,6 +76,7 @@ export default function AdminPage() {
   const [lanceInfo, setLanceInfo] = useState<LanceDbInfo | null>(null);
   const [lanceJob, setLanceJob] = useState<LanceDbJob | null>(null);
   const [lanceSources, setLanceSources] = useState<("stf" | "stj")[]>(["stf", "stj"]);
+  const [lanceSinceDate, setLanceSinceDate] = useState("");
   const [lanceTriggering, setLanceTriggering] = useState(false);
   const lancePollerRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
@@ -116,7 +117,9 @@ export default function AdminPage() {
     if (!token || lanceSources.length === 0) return;
     setLanceTriggering(true);
     try {
-      const res = await api.post<LanceDbJob>("/admin/lancedb/update", { sources: lanceSources }, token);
+      const body: Record<string, unknown> = { sources: lanceSources };
+      if (lanceSinceDate) body.since_date = lanceSinceDate;
+      const res = await api.post<LanceDbJob>("/admin/lancedb/update", body, token);
       setLanceJob(res);
       if (lancePollerRef.current) clearInterval(lancePollerRef.current);
       lancePollerRef.current = setInterval(() => pollLanceJob(res.id), 4000);
@@ -196,6 +199,15 @@ export default function AdminPage() {
                     {s.toUpperCase()}
                   </button>
                 ))}
+                <div className="flex flex-col">
+                  <label className="text-[10px] text-muted-foreground mb-0.5">Desde (opcional)</label>
+                  <input
+                    type="date"
+                    value={lanceSinceDate}
+                    onChange={(e) => setLanceSinceDate(e.target.value)}
+                    className="px-2 py-1 text-xs rounded border bg-background focus:outline-none focus:ring-1 focus:ring-ring"
+                  />
+                </div>
                 <button
                   onClick={handleLanceTrigger}
                   disabled={lanceTriggering || lanceSources.length === 0 || lanceJob?.status === "running" || lanceJob?.status === "pending"}
