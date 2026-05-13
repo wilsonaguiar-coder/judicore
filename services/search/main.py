@@ -13,7 +13,7 @@ import urllib.request
 import json as _json
 import uuid
 from contextlib import asynccontextmanager
-from datetime import date, datetime
+from datetime import date, datetime, timedelta
 from pathlib import Path
 from typing import Any, Optional
 
@@ -173,6 +173,29 @@ class SearchResult(BaseModel):
 
 _PROJECT_ROOT = Path(__file__).resolve().parent.parent.parent
 
+# ── Cursor persistente ─────────────────────────────────────────────────────
+# Salva em <LANCE_DIR>/.update_cursor.json → {"stf": "2026-05-10", "stj": "..."}
+_CURSOR_FILE = Path(LANCE_STORE) / ".update_cursor.json"
+
+
+def _read_cursor() -> dict:
+    try:
+        if _CURSOR_FILE.exists():
+            return _json.loads(_CURSOR_FILE.read_text(encoding="utf-8"))
+    except Exception:
+        pass
+    return {}
+
+
+def _write_cursor(updates: dict) -> None:
+    try:
+        current = _read_cursor()
+        current.update(updates)
+        _CURSOR_FILE.write_text(_json.dumps(current, ensure_ascii=False, indent=2), encoding="utf-8")
+    except Exception as e:
+        print(f"[cursor] erro ao salvar: {e}")
+
+
 # ── Job store (in-memory) ──────────────────────────────────────────────────
 _jobs: dict[str, dict[str, Any]] = {}
 
@@ -242,7 +265,18 @@ def _run_update_job(job_id: str, sources: list[str], since_date: str, year: int)
         )
         job["status"] = "completed"
         job["result"] = result
-        job["latest_dates"] = result.get("latest_dates", {})
+        # Cap latest_dates at today — evita datas futuras de docs com data errada
+        today = date.today()
+        raw_latest = result.get("latest_dates", {})
+        capped: dict = {}
+        for trib, ds in raw_latest.items():
+            d = _parse_date_flexible(str(ds or ""))
+            if d:
+                capped[trib] = min(d.date(), today).strftime("%Y-%m-%d")
+        job["latest_dates"] = capped
+        # Cursor: próxima atualização começa 3 dias antes de hoje
+        cursor_date = (today - timedelta(days=3)).strftime("%Y-%m-%d")
+        _write_cursor({s: cursor_date for s in sources})
     except Exception as exc:
         job["status"] = "failed"
         job["error"] = str(exc)
@@ -262,10 +296,15 @@ class UpdateRequest(BaseModel):
 
 @app.get("/index-info")
 def index_info():
-    """Retorna última data indexada por tribunal (nunca futura)."""
+    """Retorna última data indexada e cursor de próxima atualização por tribunal."""
+    cursor = _read_cursor()
     return {
         "stf": _query_last_date("STF"),
         "stj": _query_last_date("STJ"),
+        "next_since": {
+            "stf": cursor.get("stf", ""),
+            "stj": cursor.get("stj", ""),
+        },
     }
 
 
@@ -277,9 +316,13 @@ def start_update(req: UpdateRequest):
 
     year = req.year or date.today().year
 
-    # since_date: usa o que o usuário informou, ou deixa vazio para
-    # juris_update.py usar o padrão (1º de janeiro do ano corrente)
-    since_date = req.since_date or ""
+    # since_date: usa o que o usuário informou, ou cursor persistido, ou vazio
+    # (vazio → juris_update.py usa 1º de janeiro do ano corrente)
+    if req.since_date:
+        since_date = req.since_date
+    else:
+        cursor = _read_cursor()
+        since_date = next((cursor[s] for s in sources if cursor.get(s)), "")
 
     job_id = str(uuid.uuid4())[:8]
     _jobs[job_id] = {

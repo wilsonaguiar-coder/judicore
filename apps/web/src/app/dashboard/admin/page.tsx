@@ -37,6 +37,7 @@ interface IndexStats {
 interface LanceDbInfo {
   stf: string;
   stj: string;
+  next_since: { stf: string; stj: string };
 }
 
 interface LanceDbJob {
@@ -79,6 +80,7 @@ export default function AdminPage() {
   const [lanceSinceDate, setLanceSinceDate] = useState("");
   const [lanceTriggering, setLanceTriggering] = useState(false);
   const lancePollerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const lancePrePopulatedRef = useRef(false);
 
   const load = useCallback(async () => {
     if (!token) return;
@@ -90,7 +92,17 @@ export default function AdminPage() {
       ]);
       setStatus(data);
       setStats(indexStats);
-      if (lanceDbInfo) setLanceInfo(lanceDbInfo);
+      if (lanceDbInfo) {
+        setLanceInfo(lanceDbInfo);
+        // Pré-preenche o campo "Desde" com o cursor da última atualização (só na 1ª carga)
+        if (!lancePrePopulatedRef.current) {
+          const cursor = lanceDbInfo.next_since?.stf || lanceDbInfo.next_since?.stj || "";
+          if (cursor) {
+            setLanceSinceDate(cursor);
+            lancePrePopulatedRef.current = true;
+          }
+        }
+      }
     } catch {
       router.push("/dashboard");
     } finally {
@@ -224,7 +236,9 @@ export default function AdminPage() {
             {/* Datas de referência */}
             <div className="grid grid-cols-2 gap-3">
               {(["STF", "STJ"] as const).map((t) => {
-                const dateStr = lanceInfo?.[t.toLowerCase() as "stf" | "stj"];
+                const key = t.toLowerCase() as "stf" | "stj";
+                const dateStr = lanceInfo?.[key];
+                const cursorStr = lanceInfo?.next_since?.[key];
                 return (
                   <div key={t} className="rounded-md bg-muted/40 px-3 py-2">
                     <p className="text-xs text-muted-foreground">{t} · última data indexada</p>
@@ -233,6 +247,14 @@ export default function AdminPage() {
                         ? new Date(dateStr + "T12:00:00").toLocaleDateString("pt-BR")
                         : <span className="text-muted-foreground">—</span>}
                     </p>
+                    {cursorStr && (
+                      <p className="text-[10px] text-muted-foreground mt-1">
+                        próx. atualização desde{" "}
+                        <span className="font-medium text-foreground">
+                          {new Date(cursorStr + "T12:00:00").toLocaleDateString("pt-BR")}
+                        </span>
+                      </p>
+                    )}
                   </div>
                 );
               })}
