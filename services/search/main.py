@@ -6,6 +6,7 @@ Roda em /opt/judicore/services/search/ com PM2 ou systemd.
 import asyncio
 import os
 import re
+import sqlite3
 import sys
 import time
 import threading
@@ -17,7 +18,7 @@ from datetime import date, datetime, timedelta
 from pathlib import Path
 from typing import Any, Optional
 
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, File, HTTPException, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 
@@ -236,6 +237,47 @@ def _query_last_date(tribunal: str) -> str:
         return ""
 
 
+def _stj_docs_dir() -> Path:
+    internal = _PROJECT_ROOT / "_internal"
+    data_base = internal / "data" if (internal / "data").is_dir() else _PROJECT_ROOT / "data"
+    return data_base / "stj_informativos" / "docs"
+
+
+def _stj_db_path() -> Path:
+    internal = _PROJECT_ROOT / "_internal"
+    data_base = internal / "data" if (internal / "data").is_dir() else _PROJECT_ROOT / "data"
+    return data_base / "stj_informativos" / "stj_informativos.db"
+
+
+def _query_stj_last_edition() -> int | None:
+    """Retorna o maior número de informativo STJ já processado no SQLite."""
+    db = _stj_db_path()
+    if not db.exists():
+        return None
+    try:
+        conn = sqlite3.connect(str(db))
+        row = conn.execute(
+            "SELECT MAX(CAST(informativo_numero AS INTEGER)) FROM stj_informativos"
+        ).fetchone()
+        conn.close()
+        return int(row[0]) if row and row[0] is not None else None
+    except Exception:
+        return None
+
+
+def _query_stj_pdf_editions() -> list[int]:
+    """Lista os números de edição disponíveis como PDF em disco."""
+    docs = _stj_docs_dir()
+    if not docs.exists():
+        return []
+    editions = []
+    for p in docs.glob("Informativo_*.pdf"):
+        m = re.search(r"Informativo_(\d+)\.pdf", p.name)
+        if m:
+            editions.append(int(m.group(1)))
+    return sorted(editions)
+
+
 def _run_update_job(job_id: str, sources: list[str], since_date: str, year: int) -> None:
     job = _jobs[job_id]
     job["status"] = "running"
@@ -305,6 +347,45 @@ def index_info():
             "stf": cursor.get("stf", ""),
             "stj": cursor.get("stj", ""),
         },
+        "stj_last_edition": _query_stj_last_edition(),
+        "stj_pdf_editions": _query_stj_pdf_editions(),
+    }
+
+
+@app.post("/stj/upload")
+async def stj_upload_pdfs(files: list[UploadFile] = File(...)):
+    """Recebe PDFs de informativos STJ e salva em disco para indexação posterior."""
+    docs_dir = _stj_docs_dir()
+    docs_dir.mkdir(parents=True, exist_ok=True)
+
+    saved = []
+    skipped = []
+    errors = []
+
+    for upload in files:
+        name = upload.filename or ""
+        m = re.search(r"(\d{3,5})", name)
+        if not m:
+            errors.append({"file": name, "reason": "Nome não contém número de edição"})
+            continue
+
+        edition = int(m.group(1))
+        dest = docs_dir / f"Informativo_{edition:04d}.pdf"
+        try:
+            content = await upload.read()
+            if content[:4] != b"%PDF":
+                errors.append({"file": name, "reason": "Arquivo não é um PDF válido"})
+                continue
+            dest.write_bytes(content)
+            saved.append(edition)
+        except Exception as exc:
+            errors.append({"file": name, "reason": str(exc)})
+
+    return {
+        "saved": sorted(saved),
+        "skipped": skipped,
+        "errors": errors,
+        "pdf_editions_on_disk": _query_stj_pdf_editions(),
     }
 
 

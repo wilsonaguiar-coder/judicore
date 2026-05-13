@@ -247,6 +247,36 @@ export async function adminRoutes(app: FastifyInstance) {
     }
   );
 
+  // POST /admin/lancedb/stj/upload — recebe PDFs do cliente e envia ao serviço Python
+  app.post(
+    "/lancedb/stj/upload",
+    {
+      onRequest: [authenticate, requireAdmin],
+      config: { rawBody: true },
+    },
+    async (request, reply) => {
+      // Lê os arquivos via multipart e reconstrói um FormData para o serviço Python
+      const parts = (request as any).parts({ limits: { fileSize: 30 * 1024 * 1024, files: 50 } });
+      const form = new FormData();
+
+      for await (const part of parts) {
+        if (part.type === "file") {
+          const chunks: Buffer[] = [];
+          for await (const chunk of part.file) chunks.push(chunk);
+          const buf = Buffer.concat(chunks);
+          form.append("files", new Blob([buf], { type: part.mimetype }), part.filename);
+        }
+      }
+
+      const res = await fetch(`${SEARCH_SERVICE_URL}/stj/upload`, {
+        method: "POST",
+        body: form,
+      });
+      const body = await res.json().catch(() => ({}));
+      return reply.status(res.status).send(body);
+    }
+  );
+
   // GET /admin/usage — consumo de tokens por serviço/dia (últimos 30 dias)
   app.get(
     "/usage",
