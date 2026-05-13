@@ -78,7 +78,7 @@ export default function AdminPage() {
   // LanceDB state
   const [lanceInfo, setLanceInfo] = useState<LanceDbInfo | null>(null);
   const [lanceJob, setLanceJob] = useState<LanceDbJob | null>(null);
-  const [lanceSources, setLanceSources] = useState<("stf" | "stj")[]>(["stf", "stj"]);
+  const [lanceSources, setLanceSources] = useState<("stf" | "stj")[]>(["stf"]);
   const [lanceSinceDate, setLanceSinceDate] = useState("");
   const [lanceTriggering, setLanceTriggering] = useState(false);
   const lancePollerRef = useRef<ReturnType<typeof setInterval> | null>(null);
@@ -220,7 +220,7 @@ export default function AdminPage() {
 
     log(`${uploaded} edição(ões) enviada(s). Iniciando embedding no servidor...`);
     try {
-      const job = await api.post<LanceDbJob>("/admin/lancedb/update", { sources: ["stj"] }, token);
+      const job = await api.post<LanceDbJob>("/admin/lancedb/update", { sources: ["stj"], skip_browser: true }, token);
       setLanceJob(job);
       if (lancePollerRef.current) clearInterval(lancePollerRef.current);
       lancePollerRef.current = setInterval(() => pollLanceJob(job.id), 4000);
@@ -309,21 +309,7 @@ export default function AdminPage() {
                 <span className="text-xs text-muted-foreground">STF + STJ · embeddings Gemini</span>
               </div>
               <div className="flex items-center gap-2">
-                {(["stf", "stj"] as const).map((s) => (
-                  <button
-                    key={s}
-                    onClick={() => setLanceSources((prev) =>
-                      prev.includes(s) ? prev.filter((x) => x !== s) : [...prev, s]
-                    )}
-                    className={`px-2.5 py-1 rounded text-xs font-medium border transition-colors ${
-                      lanceSources.includes(s)
-                        ? "bg-primary text-primary-foreground border-primary"
-                        : "bg-background text-muted-foreground"
-                    }`}
-                  >
-                    {s.toUpperCase()}
-                  </button>
-                ))}
+                <span className="px-2.5 py-1 rounded text-xs font-medium border bg-primary text-primary-foreground border-primary">STF</span>
                 <div className="flex flex-col">
                   <label className="text-[10px] text-muted-foreground mb-0.5">Desde (padrão: 01/01/{new Date().getFullYear()})</label>
                   <input

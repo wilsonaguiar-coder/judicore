@@ -278,7 +278,7 @@ def _query_stj_pdf_editions() -> list[int]:
     return sorted(editions)
 
 
-def _run_update_job(job_id: str, sources: list[str], since_date: str, year: int) -> None:
+def _run_update_job(job_id: str, sources: list[str], since_date: str, year: int, skip_browser: bool = False) -> None:
     job = _jobs[job_id]
     job["status"] = "running"
     job["started_at"] = datetime.now().isoformat()
@@ -301,7 +301,7 @@ def _run_update_job(job_id: str, sources: list[str], since_date: str, year: int)
             include_stj="stj" in sources,
             stf_since_date=since_date,
             stf_visible_browser=False,
-            chromium_executable_path=os.environ.get("CHROME_PATH", "/usr/bin/google-chrome") or None,
+            chromium_executable_path=None if skip_browser else (os.environ.get("CHROME_PATH", "/usr/bin/google-chrome") or None),
             strict_completeness=False,
             progress_cb=on_progress,
         )
@@ -332,6 +332,7 @@ class UpdateRequest(BaseModel):
     sources: list[str] = ["stf", "stj"]
     since_date: Optional[str] = None  # YYYY-MM-DD; None = auto-detect
     year: Optional[int] = None         # default: ano corrente
+    skip_browser: bool = False         # True = não abre Chrome (STJ só usa PDFs em disco)
 
 
 # ── Endpoints de update/status ─────────────────────────────────────────────
@@ -405,6 +406,8 @@ def start_update(req: UpdateRequest):
         cursor = _read_cursor()
         since_date = next((cursor[s] for s in sources if cursor.get(s)), "")
 
+    skip_browser = req.skip_browser
+
     job_id = str(uuid.uuid4())[:8]
     _jobs[job_id] = {
         "id": job_id,
@@ -420,7 +423,7 @@ def start_update(req: UpdateRequest):
         "finished_at": None,
     }
 
-    threading.Thread(target=_run_update_job, args=(job_id, sources, since_date, year), daemon=True).start()
+    threading.Thread(target=_run_update_job, args=(job_id, sources, since_date, year, skip_browser), daemon=True).start()
     return {"id": job_id, "sources": sources, "since_date": since_date, "year": year, "status": "pending"}
 
 

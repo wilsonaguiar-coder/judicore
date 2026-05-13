@@ -221,9 +221,10 @@ export async function adminRoutes(app: FastifyInstance) {
     { onRequest: [authenticate, requireAdmin] },
     async (request, reply) => {
       const schema = z.object({
-        sources:    z.array(z.enum(["stf", "stj"])).min(1).default(["stf", "stj"]),
-        since_date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).optional(),
-        year:       z.number().int().min(2020).max(2030).optional(),
+        sources:      z.array(z.enum(["stf", "stj"])).min(1).default(["stf", "stj"]),
+        since_date:   z.string().regex(/^\d{4}-\d{2}-\d{2}$/).optional(),
+        year:         z.number().int().min(2020).max(2030).optional(),
+        skip_browser: z.boolean().default(false),
       });
       const parsed = schema.safeParse(request.body);
       if (!parsed.success) return reply.status(400).send({ error: parsed.error.flatten() });
