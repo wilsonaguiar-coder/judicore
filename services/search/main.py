@@ -277,14 +277,9 @@ def start_update(req: UpdateRequest):
 
     year = req.year or date.today().year
 
-    # since_date: explícito > auto-detect (capeado em hoje)
-    if req.since_date:
-        since_date = req.since_date
-    else:
-        # usa a menor data entre os tribunais selecionados para não perder nada
-        dates = [_query_last_date(t.upper()) for t in sources]
-        dates = [d for d in dates if d]
-        since_date = min(dates) if dates else f"{year}-01-01"
+    # since_date: usa o que o usuário informou, ou deixa vazio para
+    # juris_update.py usar o padrão (1º de janeiro do ano corrente)
+    since_date = req.since_date or ""
 
     job_id = str(uuid.uuid4())[:8]
     _jobs[job_id] = {

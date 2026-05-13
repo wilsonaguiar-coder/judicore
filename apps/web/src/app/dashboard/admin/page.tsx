@@ -200,7 +200,7 @@ export default function AdminPage() {
                   </button>
                 ))}
                 <div className="flex flex-col">
-                  <label className="text-[10px] text-muted-foreground mb-0.5">Desde (opcional)</label>
+                  <label className="text-[10px] text-muted-foreground mb-0.5">Desde (padrão: 01/01/{new Date().getFullYear()})</label>
                   <input
                     type="date"
                     value={lanceSinceDate}
