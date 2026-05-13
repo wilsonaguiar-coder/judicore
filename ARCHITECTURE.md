@@ -5,12 +5,15 @@
 ### LanceDB (busca vetorial / semântica)
 Cobre **exclusivamente STF e STJ**.
 
-- Base pré-carregada com ~540k documentos (inteiro teor + embeddings)
-- Período: 1995 → dezembro/2025
+- Base com ~573k documentos (STF ~567k + STJ ~6k) com embeddings Gemini (`gemini-embedding-001`, 768 dims)
+- STF: período 1995 → 2026, última data indexada: 2026-05-12
+- STJ: informativos #780–#888 (2020–2026-05-06), 1.176 registros no SQLite, ~5.534 docs no LanceDB
 - Localização no servidor: `/opt/judicore/lancedb_store` (tabela `jurisprudencia`)
 - **Não indexar STF/STJ no Elasticsearch** — dados já estão aqui com cobertura total
 
-> A tabela `tjsp_jurisprudencia` existe no LanceDB mas contém apenas ~15k docs de 2013 (dataset parcial/obsoleto). **Desconsiderada.** TJSP será indexado no Elasticsearch quando o adaptador for implementado.
+> A tabela `tjsp_jurisprudencia` foi **removida** do LanceDB (dados obsoletos de 2013). TJSP será indexado no Elasticsearch quando o adaptador for implementado.
+
+> **Filtro de data padrão:** a busca aplica `date_from = 2020-01-01` por padrão (configurável na UI). Acórdãos STF anteriores a 2020 existem no LanceDB mas não aparecem na busca sem alterar o filtro.
 
 ---
 
@@ -57,11 +60,22 @@ Pesquisa do usuário
 
 ## Infraestrutura (produção)
 
-| Serviço | pm2 | Função |
-|---------|-----|--------|
-| `judicore-api` | id 0 | API Fastify — **não** inicia worker (requer `START_WORKER=true`) |
-| `judicore-search` | id 2 | Worker BullMQ + scheduler de indexação ES |
-| `judicore-web` | id 1 | Frontend Next.js |
-| `judicore-search-py` | — | Serviço Python de busca vetorial no LanceDB |
+| id PM2 | Serviço | Função |
+|--------|---------|--------|
+| 4 | `judicore-api` | API Node.js (Fastify, porta 3001) + worker BullMQ (requer `START_WORKER=true`) |
+| 3 | `judicore-search` | Serviço Python de busca vetorial (uvicorn, porta 7860) |
+| 1 | `judicore-web` | Frontend Next.js |
 
 **ES index template**: criado em `/opt/judicore` — garante mapeamento correto (`area: keyword`) mesmo em recriações automáticas do índice.
+
+---
+
+## Deploy — comandos por serviço
+
+> O diretório `apps/api/dist/` está no `.gitignore`. Mudanças no código TypeScript da API **não são aplicadas pelo `git pull`** — é necessário recompilar no servidor.
+
+| Serviço alterado | Comandos no servidor |
+|------------------|----------------------|
+| `services/search/` (Python) | `git pull && pm2 restart judicore-search` |
+| `apps/api/src/` (Node.js) | `git pull && cd /opt/judicore/apps/api && npm run build && pm2 restart judicore-api` |
+| `apps/web/src/` (Next.js) | `git pull && cd /opt/judicore/apps/web && npm run build && pm2 restart judicore-web` |

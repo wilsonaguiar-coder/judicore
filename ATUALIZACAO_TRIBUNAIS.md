@@ -9,7 +9,7 @@ Guia operacional para atualização incremental da base de jurisprudência.
 | Tribunal | Base de dados | Método de coleta |
 |----------|--------------|-----------------|
 | STF | LanceDB (busca vetorial) | API pública + Chrome (bypass WAF) |
-| STJ | LanceDB (busca vetorial) | PDFs baixados localmente + upload via scp |
+| STJ | LanceDB (busca vetorial) | PDFs baixados localmente + upload via admin dashboard ou `stj_indexar.mjs` |
 | TST | Elasticsearch (busca textual) | API pública via BullMQ (jobs semanais) |
 
 ---
@@ -80,81 +80,120 @@ print('STF 2026 - embedding dims:', len(stf.column('vector').to_pylist()[0]))
 ### Frequência recomendada
 A cada nova edição do Informativo STJ publicada (geralmente quinzenal).
 
-### Por que baixar localmente?
-**O servidor VPS tem o IP bloqueado pelo STJ a nível de rede** — não é bot protection, é bloqueio de ASN de datacenter. Qualquer tentativa de download direto do servidor retorna 403 ou timeout. Os PDFs precisam ser baixados em uma máquina doméstica (IP residencial) e enviados ao servidor via scp.
+### Estado atual (2026-05-13)
+- SQLite: 1.176 registros (informativos #780–#888)
+- LanceDB: ~5.534 docs STJ, última data indexada: 2026-05-06 (informativo #888)
+- Edições #780–#819: PDFs obtidos localmente e indexados; edições #820–#888: indexadas progressivamente
 
-### Passo 1 — Verificar última edição indexada
-No servidor:
+### Por que baixar localmente?
+**O servidor VPS tem o IP bloqueado pelo STJ a nível de rede** — não é bot protection, é bloqueio de ASN de datacenter. Qualquer tentativa de download direto do servidor retorna 403 ou timeout. Os PDFs precisam ser baixados em uma máquina doméstica (IP residencial).
+
+---
+
+### Opção A — Automatizado (`stj_indexar.mjs`) — Recomendado
+
+O script `stj_indexar.mjs` na raiz do projeto faz tudo automaticamente: descobre a última edição indexada, baixa os PDFs novos, envia ao servidor via API e aguarda o embedding concluir.
+
+**Pré-requisito:** definir o token de admin.
+
+```powershell
+# No terminal Windows (na raiz do projeto):
+STJ_API_TOKEN=seu_token_admin node stj_indexar.mjs
+```
+
+O script:
+1. Consulta `GET /api/admin/lancedb/info` para saber a última edição
+2. Baixa PDFs novos de `processo.stj.jus.br` (para após 3 misses consecutivos)
+3. Envia via `POST /api/admin/lancedb/stj/upload`
+4. Dispara `POST /api/admin/lancedb/update` com `{ sources: ["stj"], skip_browser: true }`
+5. Faz polling do job até completar
+
+---
+
+### Opção B — Manual via admin dashboard
+
+#### Passo 1 — Verificar última edição indexada
+Acesse `/dashboard/admin` → painel STJ → mostra última edição e data indexada.
+
+Ou via servidor:
 ```bash
+ulimit -n 65536
+source /opt/judicore/services/search/venv/bin/activate
 python3 -c "
-import lancedb
-db = lancedb.connect('lancedb_store')
-t = db.open_table('jurisprudencia')
-stj = t.search().where(\"doc_id LIKE 'stj-%'\", prefilter=True).limit(10000).select(['doc_id']).to_arrow()
-ids = stj.column('doc_id').to_pylist()
-editions = sorted({int(i.split('-ed')[1]) for i in ids if '-ed' in i}, reverse=True)
-print('Edições no banco:', editions[:10], '...')
-print('Última edição:', editions[0] if editions else 'nenhuma')
+import sqlite3, pathlib
+db = pathlib.Path('/opt/judicore/_internal/data/stj_informativos/stj_informativos.db')
+conn = sqlite3.connect(db)
+rows = conn.execute('SELECT MAX(CAST(informativo_numero AS INTEGER)) FROM stj_informativos').fetchone()
+print('Última edição no SQLite:', rows[0])
 "
 ```
 
-### Passo 2 — Baixar PDFs localmente (máquina Windows/doméstica)
+#### Passo 2 — Baixar PDFs localmente (máquina Windows/doméstica)
 
-Na raiz do projeto, existe o script `download_stj.mjs`. Edite as constantes `START` e `END` para o intervalo de edições desejado:
+Na raiz do projeto existe o script `download_stj.mjs`. Edite as constantes `START` e `END`:
 
 ```javascript
 // download_stj.mjs
-const START = 888;  // próxima edição após a última indexada
+const START = 889;  // próxima edição após a última indexada
 const END = 920;    // última edição publicada (verificar em processo.stj.jus.br)
 ```
 
 Execute:
 ```powershell
-# No terminal Windows (na raiz do projeto):
 node download_stj.mjs
 ```
 
 Os PDFs são salvos em `stj_pdfs/` com o formato `Informativo_NNNN.pdf`.
 
-Alternativamente, use a versão Python:
-```bash
-python download_stj.py
-```
+#### Passo 3 — Enviar PDFs ao servidor via dashboard
 
-### Passo 3 — Enviar PDFs ao servidor
+Acesse `/dashboard/admin` → painel STJ → **"Enviar PDFs"** → selecione os arquivos em `stj_pdfs/`.
+
+Alternativamente, via scp:
 ```powershell
-# No terminal Windows:
-scp -i "$env:USERPROFILE\.ssh\judicore_vps" stj_pdfs\*.pdf root@2.24.75.193:/opt/judicore/_internal/data/stj_informativos/docs/
+scp stj_pdfs\*.pdf root@2.24.75.193:/opt/judicore/_internal/data/stj_informativos/docs/
 ```
 
-### Passo 4 — Rodar atualização no servidor
-O script detecta automaticamente os PDFs em disco antes de tentar o browser:
+#### Passo 4 — Indexar via dashboard
 
+No painel STJ do dashboard, clique em **"Indexar STJ"**. O job roda em background — a página mostra o progresso e a última data ao finalizar.
+
+Ou via linha de comando no servidor:
 ```bash
 cd /opt/judicore
 source services/search/venv/bin/activate
-
 PYTHONUNBUFFERED=1 ONLY_STJ=1 nohup python services/search/update_lancedb.py \
   > /tmp/lancedb_stj_$(date +%Y%m%d_%H%M).log 2>&1 &
 echo "PID: $!"
 ```
 
+### Como o pipeline STJ funciona internamente
+O script `services/search/juris_update.py` é o motor central:
+1. Detecta PDFs em `/opt/judicore/_internal/data/stj_informativos/docs/`
+2. Parseia PDFs ainda não presentes no SQLite (`stj_informativos.db`)
+3. Compara registros do SQLite com o LanceDB via campo `processo` — detecta registros obsoletos (`_stj_find_stale_ids`)
+4. Marca registros obsoletos com `force_reindex=True` para sobrescrever dados antigos no LanceDB
+5. Gera embeddings com Gemini e grava via `merge_insert` por `doc_id`
+
 ### Verificar resultado
 ```bash
 ulimit -n 65536
+source /opt/judicore/services/search/venv/bin/activate
 python3 -c "
 import lancedb
-db = lancedb.connect('lancedb_store')
+db = lancedb.connect('/opt/judicore/lancedb_store')
 t = db.open_table('jurisprudencia')
-stj = t.search().where(\"doc_id LIKE 'stj-%'\", prefilter=True).limit(10000).select(['doc_id']).to_arrow()
-print('STJ total:', stj.num_rows, 'docs')
+rows = t.search().where(\"doc_id LIKE 'stj-%'\", prefilter=True).select(['doc_id', 'data_julgamento']).limit(10000).to_list()
+print('STJ total:', len(rows), 'docs')
+datas = sorted([r['data_julgamento'] for r in rows if r.get('data_julgamento')], reverse=True)
+print('Mais recente:', datas[0] if datas else 'n/a')
 "
 ```
 
 ### Erros conhecidos
+- **Data STJ parada mesmo após indexação**: verificar se houve colisão de `doc_id` no LanceDB com dados antigos. O mecanismo `_stj_find_stale_ids` compara o campo `processo` — se os dados antigos tiverem mesmo processo, não são reindexados. Ver `juris_update.py`.
 - **403 ao baixar PDF**: Edição não existe ou ainda não foi publicada. O script pula automaticamente.
-- **Edições faltantes no banco após indexação**: Verifique se o PDF foi enviado corretamente ao servidor. O script só processa edições cujo PDF está em disco.
-- **`strict_completeness` RuntimeError**: Não deve mais ocorrer (`strict_completeness=False` configurado). Se ocorrer, verifique se o arquivo `update_lancedb.py` no servidor tem o parâmetro.
+- **Edições faltantes no banco após indexação**: Verifique se o PDF foi enviado ao servidor. O script só processa edições cujo PDF está em disco.
 
 ---
 
@@ -180,9 +219,8 @@ curl -s -X POST "http://localhost:9200/jurisprudencia/_delete_by_query?pretty" \
 
 **2. Buildar e reiniciar a API:**
 ```bash
-cd /opt/judicore
-pnpm --filter @judicore/search build
-pnpm --filter @judicore/api build
+cd /opt/judicore/apps/api
+npm run build
 pm2 restart judicore-api
 ```
 
@@ -248,10 +286,12 @@ python3 -c "
 import lancedb
 db = lancedb.connect('/opt/judicore/lancedb_store')
 t = db.open_table('jurisprudencia')
-stf = t.search().where(\"doc_id LIKE 'stf-%'\", prefilter=True).limit(1).to_arrow()
-stj = t.search().where(\"doc_id LIKE 'stj-%'\", prefilter=True).limit(1).to_arrow()
-print('STF embedding:', len(stf.column('vector').to_pylist()[0]), 'dims')
-print('STJ embedding:', len(stj.column('vector').to_pylist()[0]), 'dims')
+stf = t.search().where(\"doc_id LIKE 'stf-%'\", prefilter=True).select(['data_julgamento']).limit(1000000).to_list()
+stj = t.search().where(\"doc_id LIKE 'stj-%'\", prefilter=True).select(['data_julgamento']).limit(100000).to_list()
+print('STF:', len(stf), 'docs')
+print('STJ:', len(stj), 'docs')
+stj_datas = sorted([r['data_julgamento'] for r in stj if r.get('data_julgamento')], reverse=True)
+print('STJ mais recente:', stj_datas[0] if stj_datas else 'n/a')
 "
 
 # Dados no Elasticsearch (TST):
