@@ -11,6 +11,7 @@ module.exports = {
         LANCE_DIR: "/opt/judicore/lancedb_store",
         TOPK_RERANK: "11",
         TOPK_HYBRID: "80",
+        CHROME_PATH: process.env.CHROME_PATH || "",
       },
       error_file: "/opt/judicore/logs/search-error.log",
       out_file: "/opt/judicore/logs/search-out.log",
