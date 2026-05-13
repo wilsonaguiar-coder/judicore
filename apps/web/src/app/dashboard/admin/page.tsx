@@ -92,7 +92,6 @@ export default function AdminPage() {
   // STJ upload manual (fallback)
   const [stjFiles, setStjFiles] = useState<FileList | null>(null);
   const [stjUploading, setStjUploading] = useState(false);
-  const [stjBulkDownloading, setStjBulkDownloading] = useState(false);
 
   const load = useCallback(async () => {
     if (!token) return;
@@ -187,21 +186,14 @@ export default function AdminPage() {
     setStjIndexing(false);
   }
 
-  async function handleStjBulkDownload() {
+  function handleStjBulkDownload() {
     if (!lanceInfo) return;
-    setStjBulkDownloading(true);
     const start = (lanceInfo.stj_last_edition ?? 0) + 1;
     const STJ_PDF_BASE = "https://processo.stj.jus.br/SCON/GetPDFINFJ?edicao=";
     for (let ed = start; ed < start + 10; ed++) {
       const num = String(ed).padStart(4, "0");
-      const iframe = document.createElement("iframe");
-      iframe.style.display = "none";
-      iframe.src = `${STJ_PDF_BASE}${num}`;
-      document.body.appendChild(iframe);
-      setTimeout(() => document.body.removeChild(iframe), 15000);
-      await new Promise((r) => setTimeout(r, 400));
+      window.open(`${STJ_PDF_BASE}${num}`, `stj_${num}`);
     }
-    setStjBulkDownloading(false);
   }
 
   async function handleStjManualUpload() {
@@ -377,20 +369,23 @@ export default function AdminPage() {
                 </div>
               </div>
 
-              {/* Passo 1: baixar edições novas */}
+              {/* Passo 1: abrir PDFs para salvar */}
               {lanceInfo && (
-                <div className="flex items-center gap-3">
-                  <button
-                    onClick={handleStjBulkDownload}
-                    disabled={stjBulkDownloading}
-                    className="flex items-center gap-1.5 px-2.5 py-1.5 rounded border text-xs text-muted-foreground hover:text-foreground disabled:opacity-50 transition-colors"
-                  >
-                    {stjBulkDownloading ? <Loader2 size={11} className="animate-spin" /> : <Play size={11} />}
-                    Baixar próximas 10 edições
-                  </button>
-                  <p className="text-[10px] text-muted-foreground">
-                    Tenta baixar as edições #{(lanceInfo.stj_last_edition ?? 0) + 1}–#{(lanceInfo.stj_last_edition ?? 0) + 10}. As que existirem vão para a pasta Downloads.
-                  </p>
+                <div className="space-y-1">
+                  <div className="flex items-center gap-3">
+                    <button
+                      onClick={handleStjBulkDownload}
+                      className="flex items-center gap-1.5 px-2.5 py-1.5 rounded border text-xs text-muted-foreground hover:text-foreground transition-colors"
+                    >
+                      <Play size={11} />
+                      Abrir próximas 10 edições
+                    </button>
+                    <p className="text-[10px] text-muted-foreground">
+                      Abre as edições #{(lanceInfo.stj_last_edition ?? 0) + 1}–#{(lanceInfo.stj_last_edition ?? 0) + 10} em abas novas.
+                      As que existirem mostrarão o PDF — salve cada uma com <kbd className="px-1 py-0.5 rounded bg-muted text-[9px]">Ctrl+S</kbd> na pasta Downloads.
+                      As que não existirem mostrarão erro e podem ser fechadas.
+                    </p>
+                  </div>
                 </div>
               )}
 
