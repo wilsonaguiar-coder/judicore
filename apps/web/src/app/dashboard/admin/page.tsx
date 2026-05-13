@@ -159,13 +159,12 @@ export default function AdminPage() {
     const lastIndexed = lanceInfo.stj_last_edition ?? 0;
     const pending = pdfsOnDisk.filter((ed) => ed > lastIndexed);
 
-    if (pending.length === 0) {
-      setStjIndexLog([{ msg: "Nenhum PDF novo em disco. Use o script stj_indexar.mjs ou o upload manual.", type: "info" }]);
-      return;
-    }
-
     setStjIndexing(true);
-    setStjIndexLog([{ msg: `${pending.length} edição(ões) em disco aguardando embedding: ${pending.join(", ")}`, type: "info" }]);
+    setStjIndexLog([
+      pending.length > 0
+        ? { msg: `${pending.length} edição(ões) em disco aguardando embedding: ${pending.join(", ")}`, type: "info" as const }
+        : { msg: "Verificando dados obsoletos no servidor...", type: "info" as const },
+    ]);
     setStjIndexDone(null);
 
     const log = (msg: string, type: "info" | "ok" | "err" = "info") =>
