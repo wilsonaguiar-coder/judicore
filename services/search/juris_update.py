@@ -1976,6 +1976,7 @@ def _collect_stj_documents(
         else:
             start_edition = max_in_db + 1
         all_row_ids: list[int] = []
+        force_reindex_row_ids: list[int] = []  # PDFs antigos: forçam upsert mesmo se doc_id já existe no LanceDB
         latest_dates: list[str] = []
         expected_editions: list[int] = []
 
@@ -1999,7 +2000,7 @@ def _collect_stj_documents(
                 log_cb=log_cb,
             )
             if _row_ids:
-                all_row_ids.extend(_row_ids)
+                force_reindex_row_ids.extend(_row_ids)
                 summary["inserted_rows"] = int(summary["inserted_rows"] or 0) + len(_row_ids)
                 summary["repair_attempted"] = int(summary.get("repair_attempted") or 0) + int(_rs.get("attempted") or 0)
                 summary["repair_applied"] = int(summary.get("repair_applied") or 0) + int(_rs.get("applied") or 0)
@@ -2069,6 +2070,13 @@ def _collect_stj_documents(
             )
 
         docs = _load_stj_docs_by_ids(conn, all_row_ids)
+
+        # Carrega registros de PDFs antigos com force_reindex=True (colisão com dados velhos no LanceDB)
+        if force_reindex_row_ids:
+            force_docs = _load_stj_docs_by_ids(conn, force_reindex_row_ids)
+            for _d in force_docs:
+                _d.force_reindex = True
+            docs.extend(force_docs)
 
         # ── Reconciliation: include records in SQLite whose LanceDB data is stale ──
         # Handles: failed embedding runs, SQLite rebuild (ID collision with old LanceDB data),
