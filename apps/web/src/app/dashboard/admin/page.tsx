@@ -311,7 +311,7 @@ export default function AdminPage() {
               })}
             </div>
 
-            {/* STJ — indexação automática */}
+            {/* STJ — indexação */}
             <div className="rounded-md border border-dashed px-3 py-3 space-y-3">
               <div className="flex items-center justify-between gap-4">
                 <div className="space-y-0.5">
@@ -322,7 +322,7 @@ export default function AdminPage() {
                       {lanceInfo?.stj_last_edition != null ? `#${lanceInfo.stj_last_edition}` : "nenhuma"}
                     </span>
                     {lanceInfo?.stj_pdf_editions && lanceInfo.stj_pdf_editions.length > 0 && (
-                      <> · {lanceInfo.stj_pdf_editions.length} PDF(s) em disco</>
+                      <> · {lanceInfo.stj_pdf_editions.filter(e => e > (lanceInfo.stj_last_edition ?? 0)).length} PDF(s) aguardando embedding</>
                     )}
                     {stjIndexDone && (
                       <> · <span className="text-green-600 font-medium">atualizada {stjIndexDone}</span></>
@@ -330,6 +330,24 @@ export default function AdminPage() {
                   </p>
                 </div>
                 <div className="flex items-center gap-2">
+                  {/* Passo 2: selecionar PDFs baixados e enviar */}
+                  <label className="cursor-pointer px-2.5 py-1.5 rounded border text-xs text-muted-foreground hover:text-foreground transition-colors">
+                    {stjFiles && stjFiles.length > 0 ? `${stjFiles.length} PDF(s) selecionado(s)` : "Selecionar PDFs"}
+                    <input type="file" accept=".pdf" multiple className="hidden"
+                      onChange={(e) => { setStjFiles(e.target.files); setStjIndexLog([]); }} />
+                  </label>
+                  {stjFiles && stjFiles.length > 0 && (
+                    <button
+                      onClick={handleStjManualUpload}
+                      disabled={stjUploading}
+                      className="flex items-center gap-1 px-2.5 py-1.5 rounded border text-xs font-medium text-primary border-primary hover:bg-primary/10 disabled:opacity-50 transition-colors"
+                    >
+                      {stjUploading ? <Loader2 size={11} className="animate-spin" /> : <Play size={11} />}
+                      Enviar ao servidor
+                    </button>
+                  )}
+                  <div className="h-4 w-px bg-border" />
+                  {/* Passo 3: disparar embedding */}
                   <button
                     onClick={handleStjIndex}
                     disabled={stjIndexing || !lanceInfo}
@@ -338,24 +356,13 @@ export default function AdminPage() {
                     {stjIndexing ? <Loader2 size={11} className="animate-spin" /> : <Play size={11} />}
                     Indexar STJ
                   </button>
-                  <div className="h-4 w-px bg-border" />
-                  <label className="cursor-pointer px-2.5 py-1.5 rounded border text-xs text-muted-foreground hover:text-foreground transition-colors">
-                    Upload manual
-                    <input type="file" accept=".pdf" multiple className="hidden"
-                      onChange={(e) => setStjFiles(e.target.files)} />
-                  </label>
-                  {stjFiles && stjFiles.length > 0 && (
-                    <button
-                      onClick={handleStjManualUpload}
-                      disabled={stjUploading}
-                      className="flex items-center gap-1 px-2 py-1.5 rounded border text-xs text-muted-foreground hover:text-foreground disabled:opacity-50 transition-colors"
-                    >
-                      {stjUploading ? <Loader2 size={11} className="animate-spin" /> : <Play size={11} />}
-                      Enviar ({stjFiles.length})
-                    </button>
-                  )}
                 </div>
               </div>
+
+              {/* Passo 1: links de download das edições novas */}
+              {lanceInfo && (
+                <StjDownloadLinks lastEdition={lanceInfo.stj_last_edition ?? 0} />
+              )}
 
               {stjIndexLog.length > 0 && (
                 <div className="rounded bg-muted/40 px-2 py-1.5 max-h-28 overflow-y-auto space-y-0.5">
@@ -537,6 +544,38 @@ export default function AdminPage() {
   );
 }
 
+
+const STJ_PDF_BASE = "https://processo.stj.jus.br/SCON/GetPDFINFJ?edicao=";
+const STJ_PREVIEW_COUNT = 5;
+
+function StjDownloadLinks({ lastEdition }: { lastEdition: number }) {
+  const editions = Array.from({ length: STJ_PREVIEW_COUNT }, (_, i) => lastEdition + 1 + i);
+  return (
+    <div className="space-y-1">
+      <p className="text-[10px] text-muted-foreground">
+        <span className="font-medium">Passo 1</span> — baixe os PDFs novos clicando nos links abaixo, depois selecione-os e clique em "Enviar ao servidor":
+      </p>
+      <div className="flex flex-wrap gap-1.5">
+        {editions.map((ed) => {
+          const num = String(ed).padStart(4, "0");
+          return (
+            <a
+              key={ed}
+              href={`${STJ_PDF_BASE}${num}`}
+              download={`Informativo_${num}.pdf`}
+              target="_blank"
+              rel="noreferrer"
+              className="px-2 py-1 rounded border text-[10px] font-mono text-muted-foreground hover:text-foreground hover:border-foreground transition-colors"
+            >
+              #{num}
+            </a>
+          );
+        })}
+        <span className="text-[10px] text-muted-foreground self-center">(edições que não existirem não baixarão)</span>
+      </div>
+    </div>
+  );
+}
 
 function JobRow({ job, variant }: { job: JobSummary; variant: "active" | "completed" | "failed" }) {
   const result = job.returnvalue;
