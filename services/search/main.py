@@ -5,14 +5,17 @@ Roda em /opt/judicore/services/search/ com PM2 ou systemd.
 
 import asyncio
 import os
+import re
 import sys
 import time
 import threading
 import urllib.request
 import json as _json
+import uuid
 from contextlib import asynccontextmanager
+from datetime import date, datetime
 from pathlib import Path
-from typing import Optional
+from typing import Any, Optional
 
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
@@ -166,6 +169,162 @@ class SearchResult(BaseModel):
     authority_level: str
     authority_label: str
     source_label: str
+
+
+_PROJECT_ROOT = Path(__file__).resolve().parent.parent.parent
+
+# ── Job store (in-memory) ──────────────────────────────────────────────────
+_jobs: dict[str, dict[str, Any]] = {}
+
+
+def _parse_date_flexible(s: str) -> datetime | None:
+    s = str(s or "").strip()
+    m = re.match(r"(\d{4})-(\d{2})-(\d{2})", s)
+    if m:
+        try: return datetime(int(m[1]), int(m[2]), int(m[3]))
+        except: pass
+    m = re.match(r"(\d{1,2})/(\d{1,2})/(\d{4})", s)
+    if m:
+        try: return datetime(int(m[3]), int(m[2]), int(m[1]))
+        except: pass
+    return None
+
+
+def _query_last_date(tribunal: str) -> str:
+    """Retorna a última data de julgamento indexada para o tribunal, nunca futura."""
+    try:
+        import lancedb
+        db = lancedb.connect(str(rag.LANCE_DIR))
+        tbl = db.open_table("jurisprudencia")
+        rows = (
+            tbl.search()
+               .where(f"tribunal = '{tribunal}'")
+               .select(["data_julgamento"])
+               .limit(5_000_000)
+               .to_list()
+        )
+        today = datetime.combine(date.today(), datetime.min.time())
+        dates = [
+            d for r in rows
+            if (d := _parse_date_flexible(r.get("data_julgamento", ""))) and d <= today
+        ]
+        return max(dates).strftime("%Y-%m-%d") if dates else ""
+    except Exception:
+        return ""
+
+
+def _run_update_job(job_id: str, sources: list[str], since_date: str, year: int) -> None:
+    job = _jobs[job_id]
+    job["status"] = "running"
+    job["started_at"] = datetime.now().isoformat()
+    job["progress"] = []
+
+    def on_progress(stage: str, message: str, fields: dict) -> None:
+        job["progress"].append({"stage": stage, "message": message, **fields})
+
+    try:
+        from google import genai as _genai
+        gemini_key = os.environ.get("GEMINI_API_KEY", "")
+        gemini_client = _genai.Client(api_key=gemini_key)
+
+        from juris_update import run_jurisprudencia_incremental_update
+        result = run_jurisprudencia_incremental_update(
+            project_root=_PROJECT_ROOT,
+            gemini_client=gemini_client,
+            year=year,
+            include_stf="stf" in sources,
+            include_stj="stj" in sources,
+            stf_since_date=since_date,
+            stf_visible_browser=False,
+            chromium_executable_path=os.environ.get("CHROME_PATH", "/usr/bin/google-chrome") or None,
+            strict_completeness=False,
+            progress_cb=on_progress,
+        )
+        job["status"] = "completed"
+        job["result"] = result
+        job["latest_dates"] = result.get("latest_dates", {})
+    except Exception as exc:
+        job["status"] = "failed"
+        job["error"] = str(exc)
+    finally:
+        job["finished_at"] = datetime.now().isoformat()
+
+
+# ── Models ─────────────────────────────────────────────────────────────────
+
+class UpdateRequest(BaseModel):
+    sources: list[str] = ["stf", "stj"]
+    since_date: Optional[str] = None  # YYYY-MM-DD; None = auto-detect
+    year: Optional[int] = None         # default: ano corrente
+
+
+# ── Endpoints de update/status ─────────────────────────────────────────────
+
+@app.get("/index-info")
+def index_info():
+    """Retorna última data indexada por tribunal (nunca futura)."""
+    return {
+        "stf": _query_last_date("STF"),
+        "stj": _query_last_date("STJ"),
+    }
+
+
+@app.post("/update")
+def start_update(req: UpdateRequest):
+    sources = [s.lower() for s in (req.sources or ["stf", "stj"]) if s.lower() in ("stf", "stj")]
+    if not sources:
+        raise HTTPException(status_code=400, detail="Informe ao menos uma fonte: stf, stj")
+
+    year = req.year or date.today().year
+
+    # since_date: explícito > auto-detect (capeado em hoje)
+    if req.since_date:
+        since_date = req.since_date
+    else:
+        # usa a menor data entre os tribunais selecionados para não perder nada
+        dates = [_query_last_date(t.upper()) for t in sources]
+        dates = [d for d in dates if d]
+        since_date = min(dates) if dates else f"{year}-01-01"
+
+    job_id = str(uuid.uuid4())[:8]
+    _jobs[job_id] = {
+        "id": job_id,
+        "sources": sources,
+        "since_date": since_date,
+        "year": year,
+        "status": "pending",
+        "progress": [],
+        "result": None,
+        "latest_dates": {},
+        "error": None,
+        "started_at": None,
+        "finished_at": None,
+    }
+
+    threading.Thread(target=_run_update_job, args=(job_id, sources, since_date, year), daemon=True).start()
+    return {"job_id": job_id, "sources": sources, "since_date": since_date, "year": year}
+
+
+@app.get("/update/{job_id}")
+def get_update_status(job_id: str):
+    job = _jobs.get(job_id)
+    if not job:
+        raise HTTPException(status_code=404, detail="Job não encontrado")
+    # retorna sem o histórico completo de progresso para não sobrecarregar
+    last_progress = job["progress"][-1] if job["progress"] else None
+    return {
+        "id": job["id"],
+        "sources": job["sources"],
+        "since_date": job["since_date"],
+        "year": job["year"],
+        "status": job["status"],
+        "last_progress": last_progress,
+        "progress_count": len(job["progress"]),
+        "latest_dates": job["latest_dates"],
+        "error": job["error"],
+        "started_at": job["started_at"],
+        "finished_at": job["finished_at"],
+    }
 
 
 @app.get("/health")

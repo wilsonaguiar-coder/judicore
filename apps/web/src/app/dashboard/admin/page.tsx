@@ -1,13 +1,13 @@
 "use client";
 
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { useAuthStore } from "@/store/auth";
 import { api } from "@/lib/api";
 import { Sidebar } from "@/components/sidebar";
 import { JobStatusBadge } from "@/components/job-status-badge";
 import { TriggerIndexDialog } from "@/components/trigger-index-dialog";
-import { RefreshCw, Loader2, Database, Trash2 } from "lucide-react";
+import { RefreshCw, Loader2, Database, Trash2, Play, CheckCircle, XCircle, Clock } from "lucide-react";
 
 interface RepeatableJob {
   key: string;
@@ -34,6 +34,25 @@ interface IndexStats {
   porTribunal: { tribunal: string; count: number }[];
 }
 
+interface LanceDbInfo {
+  stf: string;
+  stj: string;
+}
+
+interface LanceDbJob {
+  id: string;
+  sources: string[];
+  since_date: string;
+  year: number;
+  status: "pending" | "running" | "completed" | "failed";
+  last_progress: { stage: string; message: string } | null;
+  progress_count: number;
+  latest_dates: { stf?: string; stj?: string };
+  error: string | null;
+  started_at: string | null;
+  finished_at: string | null;
+}
+
 
 interface QueueStatus {
   counts: { active: number; waiting: number; delayed: number };
@@ -53,15 +72,24 @@ export default function AdminPage() {
   const [refreshing, setRefreshing] = useState(false);
   const [cleaning, setCleaning] = useState(false);
 
+  // LanceDB state
+  const [lanceInfo, setLanceInfo] = useState<LanceDbInfo | null>(null);
+  const [lanceJob, setLanceJob] = useState<LanceDbJob | null>(null);
+  const [lanceSources, setLanceSources] = useState<("stf" | "stj")[]>(["stf", "stj"]);
+  const [lanceTriggering, setLanceTriggering] = useState(false);
+  const lancePollerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
   const load = useCallback(async () => {
     if (!token) return;
     try {
-      const [data, indexStats] = await Promise.all([
+      const [data, indexStats, lanceDbInfo] = await Promise.all([
         api.get<QueueStatus>("/admin/jobs", token),
         api.get<IndexStats>("/admin/stats", token),
+        api.get<LanceDbInfo>("/admin/lancedb/info", token).catch(() => null),
       ]);
       setStatus(data);
       setStats(indexStats);
+      if (lanceDbInfo) setLanceInfo(lanceDbInfo);
     } catch {
       router.push("/dashboard");
     } finally {
@@ -69,6 +97,39 @@ export default function AdminPage() {
       setRefreshing(false);
     }
   }, [token, router]);
+
+  const pollLanceJob = useCallback(async (jobId: string) => {
+    if (!token) return;
+    try {
+      const job = await api.get<LanceDbJob>(`/admin/lancedb/update/${jobId}`, token);
+      setLanceJob(job);
+      if (job.status === "completed" || job.status === "failed") {
+        if (lancePollerRef.current) clearInterval(lancePollerRef.current);
+        lancePollerRef.current = null;
+        // atualiza as datas após conclusão
+        api.get<LanceDbInfo>("/admin/lancedb/info", token).then(setLanceInfo).catch(() => {});
+      }
+    } catch {}
+  }, [token]);
+
+  async function handleLanceTrigger() {
+    if (!token || lanceSources.length === 0) return;
+    setLanceTriggering(true);
+    try {
+      const res = await api.post<LanceDbJob>("/admin/lancedb/update", { sources: lanceSources }, token);
+      setLanceJob(res);
+      if (lancePollerRef.current) clearInterval(lancePollerRef.current);
+      lancePollerRef.current = setInterval(() => pollLanceJob(res.id), 4000);
+    } catch (e: any) {
+      alert(`Erro ao iniciar atualização LanceDB: ${e.message}`);
+    } finally {
+      setLanceTriggering(false);
+    }
+  }
+
+  useEffect(() => {
+    return () => { if (lancePollerRef.current) clearInterval(lancePollerRef.current); };
+  }, []);
 
   useEffect(() => {
     if (!token) return;
@@ -111,14 +172,105 @@ export default function AdminPage() {
       <main className="flex-1 overflow-auto">
         <div className="max-w-5xl mx-auto px-8 py-10 space-y-8">
 
-          {/* ── INDEXAÇÃO ── */}
+          {/* ── LANCEDB ── */}
+          <section className="rounded-lg border p-5 space-y-4">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <Database size={14} className="text-muted-foreground" />
+                <h2 className="text-sm font-semibold">Base semântica (LanceDB)</h2>
+                <span className="text-xs text-muted-foreground">STF + STJ · embeddings Gemini</span>
+              </div>
+              <div className="flex items-center gap-2">
+                {(["stf", "stj"] as const).map((s) => (
+                  <button
+                    key={s}
+                    onClick={() => setLanceSources((prev) =>
+                      prev.includes(s) ? prev.filter((x) => x !== s) : [...prev, s]
+                    )}
+                    className={`px-2.5 py-1 rounded text-xs font-medium border transition-colors ${
+                      lanceSources.includes(s)
+                        ? "bg-primary text-primary-foreground border-primary"
+                        : "bg-background text-muted-foreground"
+                    }`}
+                  >
+                    {s.toUpperCase()}
+                  </button>
+                ))}
+                <button
+                  onClick={handleLanceTrigger}
+                  disabled={lanceTriggering || lanceSources.length === 0 || lanceJob?.status === "running" || lanceJob?.status === "pending"}
+                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-primary text-primary-foreground text-xs font-medium hover:bg-primary/90 disabled:opacity-50 transition-colors"
+                >
+                  {lanceTriggering || lanceJob?.status === "running" || lanceJob?.status === "pending"
+                    ? <Loader2 size={11} className="animate-spin" />
+                    : <Play size={11} />}
+                  Atualizar agora
+                </button>
+              </div>
+            </div>
+
+            {/* Datas de referência */}
+            <div className="grid grid-cols-2 gap-3">
+              {(["STF", "STJ"] as const).map((t) => {
+                const dateStr = lanceInfo?.[t.toLowerCase() as "stf" | "stj"];
+                return (
+                  <div key={t} className="rounded-md bg-muted/40 px-3 py-2">
+                    <p className="text-xs text-muted-foreground">{t} · última data indexada</p>
+                    <p className="text-sm font-semibold mt-0.5">
+                      {dateStr
+                        ? new Date(dateStr + "T12:00:00").toLocaleDateString("pt-BR")
+                        : <span className="text-muted-foreground">—</span>}
+                    </p>
+                  </div>
+                );
+              })}
+            </div>
+
+            {/* Status do job em andamento */}
+            {lanceJob && (
+              <div className={`rounded-md border px-3 py-2.5 text-xs space-y-1 ${
+                lanceJob.status === "failed" ? "border-destructive/40 bg-destructive/5" :
+                lanceJob.status === "completed" ? "border-green-500/30 bg-green-500/5" :
+                "border-blue-500/30 bg-blue-500/5"
+              }`}>
+                <div className="flex items-center gap-2">
+                  {lanceJob.status === "completed" && <CheckCircle size={12} className="text-green-500" />}
+                  {lanceJob.status === "failed"    && <XCircle size={12} className="text-destructive" />}
+                  {(lanceJob.status === "running" || lanceJob.status === "pending") && <Loader2 size={12} className="animate-spin text-blue-500" />}
+                  <span className="font-medium">
+                    {lanceJob.status === "pending"   && "Aguardando início..."}
+                    {lanceJob.status === "running"   && `Processando... (${lanceJob.progress_count} etapas)`}
+                    {lanceJob.status === "completed" && "Atualização concluída"}
+                    {lanceJob.status === "failed"    && "Falha na atualização"}
+                  </span>
+                  <span className="text-muted-foreground ml-auto">job #{lanceJob.id}</span>
+                </div>
+                {lanceJob.last_progress && (
+                  <p className="text-muted-foreground truncate">{lanceJob.last_progress.message}</p>
+                )}
+                {lanceJob.status === "completed" && lanceJob.latest_dates && (
+                  <div className="flex gap-4 pt-1">
+                    {lanceJob.latest_dates.stf && (
+                      <span>STF até <strong>{new Date(lanceJob.latest_dates.stf + "T12:00:00").toLocaleDateString("pt-BR")}</strong></span>
+                    )}
+                    {lanceJob.latest_dates.stj && (
+                      <span>STJ até <strong>{new Date(lanceJob.latest_dates.stj + "T12:00:00").toLocaleDateString("pt-BR")}</strong></span>
+                    )}
+                  </div>
+                )}
+                {lanceJob.error && <p className="text-destructive">{lanceJob.error}</p>}
+              </div>
+            )}
+          </section>
+
+          {/* ── INDEXAÇÃO ES ── */}
           {<>
           {/* Header */}
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-xl font-semibold">Indexação</h1>
+              <h1 className="text-xl font-semibold">Indexação Elasticsearch</h1>
               <p className="text-sm text-muted-foreground mt-0.5">
-                Status da fila e agendamento de indexação de jurisprudência
+                Fila BullMQ · TST, DataJud e demais tribunais
               </p>
             </div>
             <div className="flex items-center gap-3">

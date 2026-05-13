@@ -6,6 +6,17 @@ import { getElasticsearchClient, JURISPRUDENCIA_INDEX, ensureIndices } from "@ju
 import type { LegalArea } from "@judicore/search";
 import { prisma } from "@judicore/db";
 
+const SEARCH_SERVICE_URL = process.env["SEARCH_SERVICE_URL"] ?? "http://127.0.0.1:8001";
+
+async function proxyToSearchService(path: string, options: RequestInit = {}) {
+  const res = await fetch(`${SEARCH_SERVICE_URL}${path}`, {
+    ...options,
+    headers: { "Content-Type": "application/json", ...options.headers },
+  });
+  const body = await res.json().catch(() => ({}));
+  return { status: res.status, body };
+}
+
 const triggerSchema = z.object({
   area: z.enum([
     "TRIBUTARIO", "PREVIDENCIARIO", "ADMINISTRATIVO", "CRIMINAL",
@@ -191,6 +202,48 @@ export async function adminRoutes(app: FastifyInstance) {
         queue.clean(0, 1000, "failed"),
       ]);
       return { removed: { completed: completed.length, failed: failed.length } };
+    }
+  );
+
+  // GET /admin/lancedb/info — última data indexada por tribunal no LanceDB
+  app.get(
+    "/lancedb/info",
+    { onRequest: [authenticate, requireAdmin] },
+    async (_request, reply) => {
+      const { status, body } = await proxyToSearchService("/index-info");
+      return reply.status(status).send(body);
+    }
+  );
+
+  // POST /admin/lancedb/update — dispara atualização incremental do LanceDB
+  app.post(
+    "/lancedb/update",
+    { onRequest: [authenticate, requireAdmin] },
+    async (request, reply) => {
+      const schema = z.object({
+        sources:    z.array(z.enum(["stf", "stj"])).min(1).default(["stf", "stj"]),
+        since_date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).optional(),
+        year:       z.number().int().min(2020).max(2030).optional(),
+      });
+      const parsed = schema.safeParse(request.body);
+      if (!parsed.success) return reply.status(400).send({ error: parsed.error.flatten() });
+
+      const { status, body } = await proxyToSearchService("/update", {
+        method: "POST",
+        body: JSON.stringify(parsed.data),
+      });
+      return reply.status(status).send(body);
+    }
+  );
+
+  // GET /admin/lancedb/update/:jobId — status de um job de atualização LanceDB
+  app.get(
+    "/lancedb/update/:jobId",
+    { onRequest: [authenticate, requireAdmin] },
+    async (request, reply) => {
+      const { jobId } = request.params as { jobId: string };
+      const { status, body } = await proxyToSearchService(`/update/${jobId}`);
+      return reply.status(status).send(body);
     }
   );
 
