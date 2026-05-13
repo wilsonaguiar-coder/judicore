@@ -176,7 +176,7 @@ export default function AdminPage() {
       if (lancePollerRef.current) clearInterval(lancePollerRef.current);
       lancePollerRef.current = setInterval(() => pollLanceJob(job.id), 4000);
       log("Embedding iniciado — acompanhe o progresso abaixo.", "ok");
-      setStjIndexDone(`até edição #${Math.max(...pending)}`);
+      setStjIndexDone(pending.length > 0 ? `até edição #${Math.max(...pending)}` : "dados atualizados");
     } catch (e: any) {
       log(`Erro ao iniciar indexação: ${e.message}`, "err");
     }
