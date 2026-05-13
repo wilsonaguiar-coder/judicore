@@ -23,6 +23,7 @@ export function SearchPanel({ caseId, token, defaultArea, defaultQuery, onResult
   const [query, setQuery] = useState(defaultQuery ?? "");
   const [area, setArea] = useState<LegalArea | "">(defaultArea ?? "");
   const [tribunais, setTribunais] = useState<string[]>([]);
+  const [dateFrom, setDateFrom] = useState("2020-01-01");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const autoSearched = useRef(false);
@@ -34,7 +35,13 @@ export function SearchPanel({ caseId, token, defaultArea, defaultQuery, onResult
     try {
       const result = await api.post<{ hits: Jurisprudencia[]; total: number }>(
         "/search",
-        { query: q, caseId, area: area || undefined, tribunais: tribunais.length ? tribunais : undefined },
+        {
+          query: q,
+          caseId,
+          area: area || undefined,
+          tribunais: tribunais.length ? tribunais : undefined,
+          date_from: dateFrom || undefined,
+        },
         token
       );
       onResults(result.hits ?? []);
@@ -90,6 +97,16 @@ export function SearchPanel({ caseId, token, defaultArea, defaultQuery, onResult
               <option key={k} value={k}>{v}</option>
             ))}
           </select>
+
+          <div>
+            <label className="text-xs text-muted-foreground mb-1 block">A partir de</label>
+            <input
+              type="date"
+              value={dateFrom}
+              onChange={(e) => setDateFrom(e.target.value)}
+              className="w-full px-3 py-2 text-sm rounded-md border bg-background focus:outline-none focus:ring-2 focus:ring-ring"
+            />
+          </div>
 
           {error && <p className="text-xs text-destructive">{error}</p>}
 
