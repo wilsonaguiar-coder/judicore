@@ -1979,6 +1979,32 @@ def _collect_stj_documents(
         latest_dates: list[str] = []
         expected_editions: list[int] = []
 
+        # ── Pré-processa PDFs mais antigos em disco que ainda não estão no SQLite ──
+        _already_parsed: set[int] = {
+            int(r[0]) for r in conn.execute(
+                "SELECT DISTINCT CAST(informativo_numero AS INTEGER) FROM stj_informativos WHERE informativo_numero IS NOT NULL"
+            ).fetchall() if r[0]
+        }
+        for _ed in sorted(ed for ed in browser_downloaded if ed not in _already_parsed and ed < start_edition):
+            _pdf = docs_dir / f"Informativo_{_ed:04d}.pdf"
+            if not _pdf.exists():
+                continue
+            _row_ids, _rs = _insert_stj_pdf_records(
+                conn, _pdf,
+                gemini_client=gemini_client if repair_with_gemini else None,
+                repair_model=repair_model,
+                repair_min_confidence=repair_min_confidence,
+                repair_max_records=repair_max_records_per_pdf,
+                progress_cb=progress_cb,
+                log_cb=log_cb,
+            )
+            if _row_ids:
+                all_row_ids.extend(_row_ids)
+                summary["inserted_rows"] = int(summary["inserted_rows"] or 0) + len(_row_ids)
+                summary["repair_attempted"] = int(summary.get("repair_attempted") or 0) + int(_rs.get("attempted") or 0)
+                summary["repair_applied"] = int(summary.get("repair_applied") or 0) + int(_rs.get("applied") or 0)
+                _emit(progress_cb, "stj_parse_older", f"STJ: edição {_ed:04d} parseada do disco ({len(_row_ids)} registros).", stj_edition=_ed)
+
         for edition in range(start_edition, latest_edition + 1):
             edition_date = ""
             try:
