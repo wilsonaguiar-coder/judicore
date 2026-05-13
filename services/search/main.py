@@ -465,6 +465,13 @@ def search(req: SearchRequest):
         query_vector = rag.embed_query(req.query)
         _log_usage_async(max(1, len(req.query.split())))
         candidates = _search_merged(req, query_vector)
+        if req.date_from:
+            cutoff = _parse_date_flexible(req.date_from)
+            if cutoff:
+                candidates = [
+                    r for r in candidates
+                    if (d := _parse_date_flexible(str(r.get("data_julgamento") or ""))) is not None and d >= cutoff
+                ]
         ranked = candidates
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))

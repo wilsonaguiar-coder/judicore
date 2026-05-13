@@ -14,6 +14,7 @@ const searchSchema = z.object({
   caseId: z.string().optional(),
   area: z.enum(["TRIBUTARIO", "PREVIDENCIARIO", "ADMINISTRATIVO", "CRIMINAL", "AMBIENTAL", "TRABALHISTA", "CIVIL", "OUTRO"]).optional(),
   tribunais: z.array(z.string()).optional(),
+  date_from: z.string().optional(),
   size: z.number().int().min(1).max(20).default(10),
 });
 
@@ -66,7 +67,7 @@ export async function searchRoutes(app: FastifyInstance) {
     }
 
     const t0 = Date.now();
-    const { query, area, size } = body.data;
+    const { query, area, size, date_from } = body.data;
     const requestedTribunais = body.data.tribunais ?? [];
     const queryAll = requestedTribunais.length === 0;
 
@@ -78,6 +79,7 @@ export async function searchRoutes(app: FastifyInstance) {
     async function queryLance(): Promise<any[]> {
       const ragBody: Record<string, unknown> = { query, top_k: size };
       if (lanceTribunais.length) ragBody.tribunais = lanceTribunais;
+      if (date_from) ragBody.date_from = date_from;
       const controller = new AbortController();
       const timer = setTimeout(() => controller.abort(), 55_000);
       try {
