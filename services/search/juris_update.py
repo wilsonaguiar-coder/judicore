@@ -123,6 +123,7 @@ class UpdateDocument:
     url: str
     metadata_extra: str
     source_key: str
+    force_reindex: bool = False
 
 
 def _clean_legal_text(raw: Any) -> str:
@@ -1834,6 +1835,40 @@ def _stj_browser_prepare(
     return asyncio.run(_run())
 
 
+def _stj_find_stale_ids(project_root: Path, conn: sqlite3.Connection, candidate_ids: list[int]) -> list[int]:
+    """Retorna IDs cujo processo no SQLite difere do LanceDB (obsoletos ou ausentes)."""
+    if not candidate_ids:
+        return []
+    try:
+        tbl = _lancedb_open_ratio_table(project_root)
+        doc_ids = [f"stj-info-{rid}" for rid in candidate_ids]
+
+        lance_proc: dict[str, str] = {}
+        for i in range(0, len(doc_ids), 100):
+            batch = doc_ids[i : i + 100]
+            where = "doc_id IN (" + ", ".join(f"'{did}'" for did in batch) + ")"
+            try:
+                rows = tbl.search().where(where, prefilter=True).select(["doc_id", "processo"]).limit(len(batch)).to_list()
+                for row in rows:
+                    lance_proc[row["doc_id"]] = row.get("processo") or ""
+            except Exception:
+                pass
+
+        placeholders = ",".join("?" for _ in candidate_ids)
+        sqlite_rows = conn.execute(
+            f"SELECT id, processo FROM stj_informativos WHERE id IN ({placeholders})",
+            candidate_ids,
+        ).fetchall()
+        sqlite_proc = {f"stj-info-{r[0]}": (r[1] or "") for r in sqlite_rows}
+
+        return [
+            rid for rid in candidate_ids
+            if lance_proc.get(f"stj-info-{rid}") != sqlite_proc.get(f"stj-info-{rid}", "")
+        ]
+    except Exception:
+        return candidate_ids
+
+
 def _collect_stj_documents(
     *,
     project_root: Path,
@@ -2009,21 +2044,25 @@ def _collect_stj_documents(
 
         docs = _load_stj_docs_by_ids(conn, all_row_ids)
 
-        # ── Reconciliation: include orphan records (in SQLite but not in LanceDB) ──
-        # This handles cases where a previous run downloaded editions to SQLite
-        # but the embedding/upsert step failed (e.g., API quota, crash).
+        # ── Reconciliation: include records in SQLite whose LanceDB data is stale ──
+        # Handles: failed embedding runs, SQLite rebuild (ID collision with old LanceDB data),
+        # or any case where SQLite processo != LanceDB processo for the same doc_id.
         try:
             all_sqlite_rows = conn.execute(
                 "SELECT id FROM stj_informativos ORDER BY id"
             ).fetchall()
             all_sqlite_ids = [int(r[0]) for r in all_sqlite_rows]
             already_loaded = {int(d.doc_id.replace("stj-info-", "")) for d in docs if d.doc_id.startswith("stj-info-")}
-            orphan_ids = [rid for rid in all_sqlite_ids if rid not in already_loaded]
-            if orphan_ids:
-                orphan_docs = _load_stj_docs_by_ids(conn, orphan_ids)
-                docs.extend(orphan_docs)
-                _log(log_cb, "stj_reconcile", orphan_count=len(orphan_docs),
-                     hint=f"Reconciling {len(orphan_docs)} orphan STJ records from SQLite")
+            candidate_orphan_ids = [rid for rid in all_sqlite_ids if rid not in already_loaded]
+            if candidate_orphan_ids:
+                stale_ids = _stj_find_stale_ids(project_root, conn, candidate_orphan_ids)
+                if stale_ids:
+                    orphan_docs = _load_stj_docs_by_ids(conn, stale_ids)
+                    for doc in orphan_docs:
+                        doc.force_reindex = True
+                    docs.extend(orphan_docs)
+                    _log(log_cb, "stj_reconcile", stale_count=len(stale_ids), orphan_count=len(orphan_docs),
+                         hint=f"Reconciling {len(stale_ids)} STJ records with stale/missing LanceDB data")
         except Exception as exc:
             _log(log_cb, "stj_reconcile_error", error=str(exc))
 
@@ -2309,7 +2348,10 @@ def run_jurisprudencia_incremental_update(
         unique_by_id[doc.doc_id] = doc
     deduped_docs = list(unique_by_id.values())
     existing_ids = _existing_doc_ids(table, list(unique_by_id.keys()))
-    docs_to_index = [doc for doc in deduped_docs if doc.doc_id not in existing_ids]
+    docs_to_index = [
+        doc for doc in deduped_docs
+        if doc.doc_id not in existing_ids or doc.force_reindex
+    ]
 
     if not docs_to_index:
         summary["message"] = (
