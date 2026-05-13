@@ -92,6 +92,7 @@ export default function AdminPage() {
   // STJ upload manual (fallback)
   const [stjFiles, setStjFiles] = useState<FileList | null>(null);
   const [stjUploading, setStjUploading] = useState(false);
+  const [stjBulkDownloading, setStjBulkDownloading] = useState(false);
 
   const load = useCallback(async () => {
     if (!token) return;
@@ -184,6 +185,23 @@ export default function AdminPage() {
 
     api.get<LanceDbInfo>("/admin/lancedb/info", token).then(setLanceInfo).catch(() => {});
     setStjIndexing(false);
+  }
+
+  async function handleStjBulkDownload() {
+    if (!lanceInfo) return;
+    setStjBulkDownloading(true);
+    const start = (lanceInfo.stj_last_edition ?? 0) + 1;
+    const STJ_PDF_BASE = "https://processo.stj.jus.br/SCON/GetPDFINFJ?edicao=";
+    for (let ed = start; ed < start + 10; ed++) {
+      const num = String(ed).padStart(4, "0");
+      const iframe = document.createElement("iframe");
+      iframe.style.display = "none";
+      iframe.src = `${STJ_PDF_BASE}${num}`;
+      document.body.appendChild(iframe);
+      setTimeout(() => document.body.removeChild(iframe), 15000);
+      await new Promise((r) => setTimeout(r, 400));
+    }
+    setStjBulkDownloading(false);
   }
 
   async function handleStjManualUpload() {
@@ -359,9 +377,21 @@ export default function AdminPage() {
                 </div>
               </div>
 
-              {/* Passo 1: links de download das edições novas */}
+              {/* Passo 1: baixar edições novas */}
               {lanceInfo && (
-                <StjDownloadLinks lastEdition={lanceInfo.stj_last_edition ?? 0} />
+                <div className="flex items-center gap-3">
+                  <button
+                    onClick={handleStjBulkDownload}
+                    disabled={stjBulkDownloading}
+                    className="flex items-center gap-1.5 px-2.5 py-1.5 rounded border text-xs text-muted-foreground hover:text-foreground disabled:opacity-50 transition-colors"
+                  >
+                    {stjBulkDownloading ? <Loader2 size={11} className="animate-spin" /> : <Play size={11} />}
+                    Baixar próximas 10 edições
+                  </button>
+                  <p className="text-[10px] text-muted-foreground">
+                    Tenta baixar as edições #{(lanceInfo.stj_last_edition ?? 0) + 1}–#{(lanceInfo.stj_last_edition ?? 0) + 10}. As que existirem vão para a pasta Downloads.
+                  </p>
+                </div>
               )}
 
               {stjIndexLog.length > 0 && (
@@ -545,37 +575,6 @@ export default function AdminPage() {
 }
 
 
-const STJ_PDF_BASE = "https://processo.stj.jus.br/SCON/GetPDFINFJ?edicao=";
-const STJ_PREVIEW_COUNT = 5;
-
-function StjDownloadLinks({ lastEdition }: { lastEdition: number }) {
-  const editions = Array.from({ length: STJ_PREVIEW_COUNT }, (_, i) => lastEdition + 1 + i);
-  return (
-    <div className="space-y-1">
-      <p className="text-[10px] text-muted-foreground">
-        <span className="font-medium">Passo 1</span> — baixe os PDFs novos clicando nos links abaixo, depois selecione-os e clique em "Enviar ao servidor":
-      </p>
-      <div className="flex flex-wrap gap-1.5">
-        {editions.map((ed) => {
-          const num = String(ed).padStart(4, "0");
-          return (
-            <a
-              key={ed}
-              href={`${STJ_PDF_BASE}${num}`}
-              download={`Informativo_${num}.pdf`}
-              target="_blank"
-              rel="noreferrer"
-              className="px-2 py-1 rounded border text-[10px] font-mono text-muted-foreground hover:text-foreground hover:border-foreground transition-colors"
-            >
-              #{num}
-            </a>
-          );
-        })}
-        <span className="text-[10px] text-muted-foreground self-center">(edições que não existirem não baixarão)</span>
-      </div>
-    </div>
-  );
-}
 
 function JobRow({ job, variant }: { job: JobSummary; variant: "active" | "completed" | "failed" }) {
   const result = job.returnvalue;
