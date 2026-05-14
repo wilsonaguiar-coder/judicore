@@ -351,55 +351,53 @@ def main() -> None:
     log.info("=" * 60)
 
     buffer: list[dict] = []
-    batch_done: set[str] = set()
+    SUBMIT_CHUNK = 2000  # submete em lotes para evitar fila de 184k itens de uma vez
 
     with ProcessPoolExecutor(max_workers=args.workers) as pool:
-        futures = {pool.submit(parse_html_file, f): f.name for f in pending}
+        for chunk_start in range(0, len(pending), SUBMIT_CHUNK):
+            chunk = pending[chunk_start: chunk_start + SUBMIT_CHUNK]
+            futures = {pool.submit(parse_html_file, f): f.name for f in chunk}
 
-        for future in as_completed(futures):
-            fname = futures[future]
-            try:
-                doc = future.result()
-            except Exception as e:
-                log.error(f"{fname}: {e}")
-                counters["failed_parse"] += 1
-                done.add(fname)
-                batch_done.add(fname)
-                continue
+            for future in as_completed(futures):
+                fname = futures[future]
+                try:
+                    doc = future.result()
+                except Exception as e:
+                    log.error(f"{fname}: {e}")
+                    counters["failed_parse"] += 1
+                    done.add(fname)
+                    continue
 
-            if doc is None:
-                counters["failed_parse"] += 1
-            else:
-                counters["processed"] += 1
-                if args.dry_run:
-                    if counters["processed"] <= 8:
-                        log.info(
-                            f"  [dry-run] {doc['numero']} | {doc['relator'] or '(sem relator)'} "
-                            f"| {doc['dataJulgamento']} | {doc['orgaoJulgador'] or '(sem turma)'}"
-                        )
-                        log.info(f"            ementa: {doc['ementa'][:120]}")
+                if doc is None:
+                    counters["failed_parse"] += 1
                 else:
-                    buffer.append(doc)
-                    if len(buffer) >= args.batch:
-                        bulk_insert(es, buffer, counters)
-                        buffer.clear()
+                    counters["processed"] += 1
+                    if args.dry_run:
+                        if counters["processed"] <= 8:
+                            log.info(
+                                f"  [dry-run] {doc['numero']} | {doc['relator'] or '(sem relator)'} "
+                                f"| {doc['dataJulgamento']} | {doc['orgaoJulgador'] or '(sem turma)'}"
+                            )
+                            log.info(f"            ementa: {doc['ementa'][:120]}")
+                    else:
+                        buffer.append(doc)
+                        if len(buffer) >= args.batch:
+                            bulk_insert(es, buffer, counters)
+                            buffer.clear()
 
-            done.add(fname)
-            batch_done.add(fname)
+                done.add(fname)
 
-            if len(batch_done) % CHECKPOINT_INTERVAL == 0:
-                save_checkpoint(done)
-                pct = 100 * len(done) / len(files)
-                log.info(
-                    f"  Progresso: {len(done)}/{len(files)} ({pct:.1f}%)  "
-                    f"indexados={counters['indexed']}  falhas={counters['failed_parse']}"
-                )
-                batch_done.clear()
+            # flush e checkpoint após cada chunk
+            if not args.dry_run and buffer:
+                bulk_insert(es, buffer, counters)
+                buffer.clear()
 
-    if not args.dry_run and buffer:
-        bulk_insert(es, buffer, counters)
-
-    save_checkpoint(done)
+            save_checkpoint(done)
+            pct = 100 * len(done) / len(files)
+            log.info(
+                f"  Progresso: {len(done)}/{len(files)} ({pct:.1f}%)  "
+                f"indexados={counters['indexed']}  falhas={counters['failed_parse']}"
+            )
 
     log.info("=" * 60)
     log.info(f"Concluido: {counters['processed']} processados | {counters['indexed']} indexados")
