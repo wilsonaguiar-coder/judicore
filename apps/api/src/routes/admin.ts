@@ -462,7 +462,7 @@ export async function adminRoutes(app: FastifyInstance) {
           job.lines.push("Ambiente pronto. Processando PDFs…");
 
           const proc = spawn(TRF_PYTHON, [
-            scriptPath, "--folder", tmpDir, "--es-url", ES_URL_DEFAULT, "--batch", "50",
+            scriptPath, "--folder", tmpDir, "--es-url", ES_URL_DEFAULT, "--batch", "50", "--reset",
           ]);
 
           proc.stdout.on("data", (data: Buffer) => {
