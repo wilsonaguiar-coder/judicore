@@ -424,7 +424,7 @@ export async function adminRoutes(app: FastifyInstance) {
       const tmpDir = `/tmp/trf_upload_${jobId}`;
       await fsp.mkdir(tmpDir, { recursive: true });
 
-      const parts = (request as any).parts({ limits: { fileSize: 50 * 1024 * 1024, files: 20 } });
+      const parts = (request as any).parts({ limits: { fileSize: 50 * 1024 * 1024, files: 100 } });
       let fileCount = 0;
 
       for await (const part of parts) {
