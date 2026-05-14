@@ -237,35 +237,66 @@ export default function AdminPage() {
     setTrfJob(null);
     if (trfPollerRef.current) clearInterval(trfPollerRef.current);
 
-    try {
-      const form = new FormData();
-      for (const file of Array.from(trfFiles)) form.append("files", file);
-      const res = await fetch(`/api/admin/trf/upload?tribunal=${trfTribunal}`, {
-        method: "POST",
-        headers: { Authorization: `Bearer ${token}` },
-        body: form,
-      });
-      if (!res.ok) {
-        const err = await res.json().catch(() => ({}));
-        throw new Error((err as any).error ?? `HTTP ${res.status}`);
+    // Divide em lotes de no máximo 80 MB para não estourar limites de rede
+    const MAX_BATCH_BYTES = 80 * 1024 * 1024;
+    const allFiles = Array.from(trfFiles);
+    const batches: File[][] = [];
+    let cur: File[] = [], curSize = 0;
+    for (const file of allFiles) {
+      if (curSize + file.size > MAX_BATCH_BYTES && cur.length > 0) {
+        batches.push(cur); cur = []; curSize = 0;
       }
-      const data = await res.json() as { jobId: string };
-      setTrfJob({ id: data.jobId, tribunal: trfTribunal, status: "running", lines: ["Aguardando servidor…"], indexed: 0, startedAt: new Date().toISOString(), finishedAt: null });
+      cur.push(file); curSize += file.size;
+    }
+    if (cur.length > 0) batches.push(cur);
 
-      trfPollerRef.current = setInterval(async () => {
-        try {
-          const job = await api.get<TrfIngestJob>(`/admin/trf/job/${data.jobId}`, token!);
-          setTrfJob(job);
-          if (job.status === "completed" || job.status === "failed") {
-            if (trfPollerRef.current) clearInterval(trfPollerRef.current);
-            trfPollerRef.current = null;
-            setTrfFiles(null);
-            api.get<IndexStats>("/admin/stats", token!).then(setStats).catch(() => {});
-          }
-        } catch {}
-      }, 3000);
+    const waitForJob = (jobId: string): Promise<TrfIngestJob> =>
+      new Promise((resolve, reject) => {
+        const iv = setInterval(async () => {
+          try {
+            const job = await api.get<TrfIngestJob>(`/admin/trf/job/${jobId}`, token!);
+            setTrfJob(job);
+            if (job.status === "completed" || job.status === "failed") {
+              clearInterval(iv);
+              job.status === "completed" ? resolve(job) : reject(new Error(`Lote falhou: ${job.lines.slice(-1)[0] ?? ""}`));
+            }
+          } catch { clearInterval(iv); reject(new Error("Polling falhou")); }
+        }, 3000);
+        trfPollerRef.current = iv;
+      });
+
+    try {
+      let totalIndexed = 0;
+      for (let i = 0; i < batches.length; i++) {
+        const batch = batches[i];
+        const batchMB = (batch.reduce((s, f) => s + f.size, 0) / 1024 / 1024).toFixed(0);
+        setTrfJob((prev) => ({
+          ...(prev ?? { id: "", tribunal: trfTribunal, status: "running" as const, indexed: 0, startedAt: new Date().toISOString(), finishedAt: null }),
+          status: "running",
+          lines: [...(prev?.lines ?? []), `Lote ${i + 1}/${batches.length} — ${batch.length} PDF(s) (${batchMB} MB)…`],
+        }));
+
+        const form = new FormData();
+        for (const file of batch) form.append("files", file);
+        const res = await fetch(`/api/admin/trf/upload?tribunal=${trfTribunal}`, {
+          method: "POST",
+          headers: { Authorization: `Bearer ${token}` },
+          body: form,
+        });
+        if (!res.ok) {
+          const err = await res.json().catch(() => ({}));
+          throw new Error((err as any).error ?? `HTTP ${res.status}`);
+        }
+        const { jobId } = await res.json() as { jobId: string };
+        const finished = await waitForJob(jobId);
+        totalIndexed += finished.indexed;
+      }
+
+      setTrfFiles(null);
+      setTrfJob((prev) => prev ? { ...prev, status: "completed", indexed: totalIndexed, finishedAt: new Date().toISOString() } : prev);
+      api.get<IndexStats>("/admin/stats", token!).then(setStats).catch(() => {});
     } catch (e: any) {
-      alert(`Erro ao enviar PDFs: ${e.message}`);
+      setTrfJob((prev) => prev ? { ...prev, status: "failed", finishedAt: new Date().toISOString(), lines: [...(prev.lines ?? []), `Erro: ${e.message}`] } : prev);
     }
   }
 
