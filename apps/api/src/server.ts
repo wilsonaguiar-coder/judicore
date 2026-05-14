@@ -32,7 +32,7 @@ await app.register(rateLimit, {
 });
 
 await app.register(multipart, {
-  limits: { fileSize: 5 * 1024 * 1024, files: 5 },
+  limits: { fileSize: 50 * 1024 * 1024, files: 50 },
 });
 
 app.decorate("authenticate", async function (request: any, reply: any) {
