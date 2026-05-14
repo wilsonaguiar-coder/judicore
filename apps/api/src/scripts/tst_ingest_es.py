@@ -1,72 +1,296 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Ingestão de acórdãos TST no Elasticsearch.
+Ingestão das decisões do TST (184k arquivos HTML em disco) no Elasticsearch.
 
-Lê tst_jurisprudencia_rr_ro_rot.csv, busca o HTML de cada acórdão em
-  https://jurisprudencia-backend2.tst.jus.br/rest/documentos/{id}
-extrai ementa, relator, data e inteiro teor, e faz bulk-insert no ES.
+Cada HTML é um acórdão único. O nome do arquivo é um hash MD5 (sem relação
+com o número do processo). Dois formatos identificados:
+
+  Formato A — classes CSS semânticas (Ementa, Autoridade, Date, Relatario…)
+  Formato B — apenas p.Normal, ementa como texto bold antes de "Vistos"
 
 Uso:
-    cd /opt/judicore/apps/api/src/scripts
-    pip install requests beautifulsoup4 elasticsearch
-    python tst_ingest_es.py [--workers 3] [--delay 1.0] [--batch 100]
-
-Flags:
-    --workers   N de threads simultâneas (padrão: 3)
-    --delay     Segundos entre requisições por worker (padrão: 1.0)
-    --batch     Documentos por bulk insert no ES (padrão: 100)
-    --es-url    URL do Elasticsearch (padrão: http://localhost:9200)
-    --reset     Apaga o checkpoint e recomeça do zero
+    python tst_ingest_es.py [--folder e:/judicore/temp/tst]
+    python tst_ingest_es.py --dry-run --sample 500
+    python tst_ingest_es.py --reset --workers 4
+    python tst_ingest_es.py --es-url http://localhost:9200
 """
 
 import argparse
-import csv
 import json
 import logging
 import os
-import random
 import re
 import sys
-import time
-import threading
-from concurrent.futures import ThreadPoolExecutor, as_completed
-from datetime import datetime
+import unicodedata
+from concurrent.futures import ProcessPoolExecutor, as_completed
+from html.parser import HTMLParser
 from pathlib import Path
 from typing import Optional
 
-import requests
-from bs4 import BeautifulSoup
 from elasticsearch import Elasticsearch, helpers
 
-# ─── Configurações ────────────────────────────────────────────────────────────
+# ── Configuração ──────────────────────────────────────────────────────────────
 
-SCRIPT_DIR      = Path(__file__).parent
-CSV_FILE        = SCRIPT_DIR / "tst_jurisprudencia_rr_ro_rot.csv"
+SCRIPT_DIR = Path(__file__).parent
+PROJECT_ROOT = SCRIPT_DIR.parent.parent.parent.parent
+DEFAULT_FOLDER = PROJECT_ROOT / "temp" / "tst"
 CHECKPOINT_FILE = SCRIPT_DIR / "tst_ingest_checkpoint.json"
-LOG_FILE        = SCRIPT_DIR / "tst_ingest_es.log"
+LOG_FILE = SCRIPT_DIR / "tst_ingest_es.log"
+ES_INDEX = "jurisprudencia"
+CHECKPOINT_INTERVAL = 5_000
 
-DOC_URL         = "https://jurisprudencia-backend2.tst.jus.br/rest/documentos/{id}"
-ES_INDEX        = "jurisprudencia"
+# ── Regexes ───────────────────────────────────────────────────────────────────
 
-HEADERS = {
-    "Referer": "https://jurisprudencia.tst.jus.br/",
-    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
-}
+PROCESSO_RE = re.compile(
+    r"TST\s*[-–]\s*(?:[A-Z]{1,6}\s*[-–]\s*)+\d{3,7}[-–]\d{2}\.\d{4}\.\d\.\d{2}\.\d{4}",
+    re.IGNORECASE,
+)
 
-MAX_RETRIES        = 6
-BACKOFF_BASE       = 5.0
-MAX_BACKOFF        = 120.0
-CIRCUIT_LIMIT      = 5    # falhas consecutivas por worker antes de pausa longa
-CIRCUIT_PAUSE      = 300  # segundos de pausa ao acionar circuit breaker
+
+def _normalize_processo(raw: str) -> str:
+    return re.sub(r"\s*[-–]\s*", "-", raw).upper()
+
+DATE_RE = re.compile(
+    r"Bras[íi]lia[,\s]+(\d{1,2})\s+de\s+(\w+)\s+de\s+(\d{4})",
+    re.IGNORECASE,
+)
+
+TURMA_RE = re.compile(
+    r"\d[ªa°º]?\s*[Tt]urma|SBDI[-–\s]\d|Pleno|Se[çc][aã]o\s+Especializada",
+    re.IGNORECASE,
+)
+
+RELATOR_ROLE_RE = re.compile(
+    r"Ministr[oa]\s+Relator[a]?(?:\s+Designad[oa])?$",
+    re.IGNORECASE,
+)
 
 MESES = {
-    "janeiro": "01", "fevereiro": "02", "março": "03", "abril": "04",
-    "maio": "05", "junho": "06", "julho": "07", "agosto": "08",
-    "setembro": "09", "outubro": "10", "novembro": "11", "dezembro": "12",
+    "janeiro": "01", "fevereiro": "02", "marco": "03",
+    "abril": "04", "maio": "05", "junho": "06", "julho": "07",
+    "agosto": "08", "setembro": "09", "outubro": "10",
+    "novembro": "11", "dezembro": "12",
 }
 
-# ─── Logging ──────────────────────────────────────────────────────────────────
+
+def _normalize(s: str) -> str:
+    return unicodedata.normalize("NFD", s).encode("ascii", "ignore").decode().lower()
+
+
+def _parse_date(text: str) -> Optional[str]:
+    m = DATE_RE.search(text)
+    if not m:
+        return None
+    day, month_name, year = m.groups()
+    mes = MESES.get(_normalize(month_name))
+    if not mes:
+        return None
+    return f"{year}-{mes}-{int(day):02d}"
+
+
+# ── HTML Parser ───────────────────────────────────────────────────────────────
+
+class _TstParser(HTMLParser):
+    """Coleta parágrafos por classe CSS: lista de (class, text, has_bold)."""
+
+    def __init__(self):
+        super().__init__()
+        self.paragraphs: list[tuple[str, str, bool]] = []
+        self._cur_class = ""
+        self._cur_text: list[str] = []
+        self._cur_bold = False
+        self._in_p = False
+        self._in_bold = False
+
+    def handle_starttag(self, tag, attrs):
+        if tag == "p":
+            self._in_p = True
+            self._cur_class = ""
+            self._cur_text = []
+            self._cur_bold = False
+            for name, val in attrs:
+                if name == "class":
+                    self._cur_class = (val or "").strip()
+        elif tag in ("b", "strong") and self._in_p:
+            self._in_bold = True
+            self._cur_bold = True
+
+    def handle_endtag(self, tag):
+        if tag == "p" and self._in_p:
+            text = " ".join("".join(self._cur_text).split())
+            if text:
+                self.paragraphs.append((self._cur_class, text, self._cur_bold))
+            self._in_p = False
+            self._in_bold = False
+        elif tag in ("b", "strong"):
+            self._in_bold = False
+
+    def handle_data(self, data):
+        if self._in_p:
+            self._cur_text.append(data)
+
+
+# ── Parsing principal ─────────────────────────────────────────────────────────
+
+def parse_html_file(path: Path) -> Optional[dict]:
+    try:
+        raw = path.read_text(encoding="utf-8", errors="replace")
+    except Exception:
+        return None
+
+    if len(raw) < 1500:
+        return None
+
+    parser = _TstParser()
+    try:
+        parser.feed(raw)
+    except Exception:
+        return None
+
+    paragraphs = parser.paragraphs
+    if not paragraphs:
+        return None
+
+    classes = {cls for cls, _, _ in paragraphs}
+    fmt_a = "Ementa" in classes
+
+    ementa_parts: list[str] = []
+    processo = ""
+    relator = ""
+    data_str = ""
+    orgao = ""
+    full_parts: list[str] = []
+
+    if fmt_a:
+        # ── Formato A: classes semânticas ─────────────────────────────────────
+        autoridades: list[str] = []
+
+        for cls, text, bold in paragraphs:
+            full_parts.append(text)
+
+            if cls == "Ementa":
+                ementa_parts.append(text)
+            elif cls == "Autoridade" and bold:
+                autoridades.append(text)
+            elif cls == "Date" and not data_str:
+                data_str = text
+            elif cls == "Identificaaao" and not orgao:
+                if TURMA_RE.search(text):
+                    orgao = text.strip("() ")
+
+            if not processo:
+                m = PROCESSO_RE.search(text)
+                if m:
+                    processo = _normalize_processo(m.group(0))
+
+        relator = autoridades[-1] if autoridades else ""
+
+    else:
+        # ── Formato B: p.Normal (Courier) ─────────────────────────────────────
+        bold_initial: list[str] = []
+        found_vistos = False
+        prev_text = ""
+
+        for cls, text, bold in paragraphs:
+            full_parts.append(text)
+
+            if not found_vistos:
+                if "vistos, relatados" in text.lower():
+                    found_vistos = True
+                elif bold and len(text) > 30:
+                    bold_initial.append(text)
+
+            if not processo:
+                m = PROCESSO_RE.search(text)
+                if m:
+                    processo = _normalize_processo(m.group(0))
+
+            if not data_str and DATE_RE.search(text):
+                data_str = text
+
+            if RELATOR_ROLE_RE.search(text) and prev_text:
+                relator = prev_text
+
+            if not orgao and bold and TURMA_RE.search(text):
+                orgao = text.strip("() ")
+
+            prev_text = text
+
+        ementa_parts = bold_initial
+
+    full_text = " ".join(full_parts)
+
+    # ── Fallbacks ─────────────────────────────────────────────────────────────
+    if not processo:
+        m = PROCESSO_RE.search(full_text)
+        if m:
+            processo = _normalize_processo(m.group(0))
+
+    if not data_str:
+        m = DATE_RE.search(full_text)
+        if m:
+            data_str = full_text
+
+    if not ementa_parts:
+        for cls, text, bold in paragraphs[:40]:
+            if bold and len(text) > 60:
+                ementa_parts.append(text)
+                break
+
+    ementa = " ".join(ementa_parts)[:3000].strip()
+    conteudo = full_text[:80_000]
+
+    return {
+        "_id": f"tst-{path.stem}",
+        "tribunal": "TST",
+        "numero": processo or path.stem,
+        "ementa": ementa,
+        "relator": relator.strip(),
+        "dataJulgamento": _parse_date(data_str) if data_str else None,
+        "area": "TRABALHISTA",
+        "orgaoJulgador": orgao.strip(),
+        "url": "https://jurisprudencia.tst.jus.br/",
+        "conteudoIntegral": conteudo,
+    }
+
+
+# ── Checkpoint ────────────────────────────────────────────────────────────────
+
+def load_checkpoint() -> set[str]:
+    if CHECKPOINT_FILE.exists():
+        try:
+            return set(json.loads(CHECKPOINT_FILE.read_text(encoding="utf-8")))
+        except Exception:
+            pass
+    return set()
+
+
+def save_checkpoint(done: set[str]) -> None:
+    CHECKPOINT_FILE.write_text(
+        json.dumps(sorted(done), ensure_ascii=False, indent=2), encoding="utf-8"
+    )
+
+
+# ── ES bulk insert ────────────────────────────────────────────────────────────
+
+def bulk_insert(es: Elasticsearch, docs: list[dict], counters: dict) -> None:
+    actions = [
+        {"_index": ES_INDEX, "_id": d["_id"], **{k: v for k, v in d.items() if k != "_id"}}
+        for d in docs
+    ]
+    try:
+        ok, errors = helpers.bulk(es, actions, raise_on_error=False)
+        counters["indexed"] += ok
+        counters["es_errors"] += len(errors) if errors else 0
+        if errors:
+            for err in errors[:3]:
+                log.warning(f"  ES erro: {err}")
+    except Exception as e:
+        log.error(f"Bulk insert falhou: {e}")
+
+
+# ── Main ──────────────────────────────────────────────────────────────────────
 
 logging.basicConfig(
     level=logging.INFO,
@@ -79,335 +303,109 @@ logging.basicConfig(
 )
 log = logging.getLogger(__name__)
 
-# ─── Checkpoint (thread-safe) ─────────────────────────────────────────────────
 
-_ckpt_lock = threading.Lock()
+def main() -> None:
+    ap = argparse.ArgumentParser(description="Ingestao TST HTML -> Elasticsearch")
+    ap.add_argument("--folder", default=str(DEFAULT_FOLDER))
+    ap.add_argument("--batch", type=int, default=200)
+    ap.add_argument("--workers", type=int, default=os.cpu_count() or 4)
+    ap.add_argument("--es-url", default=os.getenv("ELASTICSEARCH_URL", "http://localhost:9200"))
+    ap.add_argument("--reset", action="store_true")
+    ap.add_argument("--dry-run", action="store_true")
+    ap.add_argument("--sample", type=int, default=0, help="Processar apenas N arquivos (teste)")
+    args = ap.parse_args()
 
-def checkpoint_load() -> set:
-    if not CHECKPOINT_FILE.exists():
-        return set()
-    try:
-        data = json.loads(CHECKPOINT_FILE.read_text(encoding="utf-8"))
-        return set(data.get("done", []))
-    except Exception:
-        return set()
+    folder = Path(args.folder)
+    if not folder.exists():
+        sys.exit(f"Pasta nao encontrada: {folder}")
 
-def checkpoint_save(done: set):
-    with _ckpt_lock:
-        CHECKPOINT_FILE.write_text(
-            json.dumps({"done": list(done), "updated_at": datetime.now().isoformat()},
-                       ensure_ascii=False),
-            encoding="utf-8",
-        )
-
-# ─── HTML → documento ─────────────────────────────────────────────────────────
-
-def _paragraphs(soup: BeautifulSoup) -> list[tuple]:
-    """Retorna lista de (elemento_p, texto_limpo) para todos os <p> com conteúdo."""
-    result = []
-    for p in soup.find_all("p"):
-        text = re.sub(r"\s+", " ", p.get_text(separator=" ", strip=True)).strip()
-        if text:
-            result.append((p, text))
-    return result
-
-
-def _extract_ementa(paragraphs: list[tuple]) -> str:
-    """
-    A ementa fica entre o cabeçalho (ACÓRDÃO / turma / siglas) e
-    a linha 'Vistos, relatados e discutidos'.
-    """
-    ementa_parts = []
-    collecting = False
-
-    for p, text in paragraphs:
-        # Para de coletar ao encontrar o corpo do acórdão
-        if re.match(r"^Vistos,?\s+relatados", text, re.IGNORECASE):
-            break
-
-        if not collecting:
-            # Pula cabeçalho: título, turma entre parênteses, siglas de servidor
-            if re.search(r"A\s*C\s*Ó\s*R\s*D\s*Ã\s*O", text, re.IGNORECASE):
-                continue
-            if re.match(r"^\s*\(", text):   # "(8ª Turma)"
-                continue
-            if re.match(r"^[A-Z]{2,}/", text):  # "GMDMC/Fc/gl/wa"
-                continue
-            # Primeiro parágrafo substantivo = início da ementa
-            if p.find("b") or re.match(r"^[A-Z]\)", text):
-                collecting = True
-
-        if collecting:
-            ementa_parts.append(text)
-
-    return " ".join(ementa_parts).strip()
-
-
-def _extract_relator(paragraphs: list[tuple]) -> str:
-    """
-    O relator aparece como <b>Nome</b> no parágrafo imediatamente antes
-    de 'Ministra Relatora' / 'Ministro Relator'.
-    """
-    for i, (p, text) in enumerate(paragraphs):
-        if re.search(r"Ministr[ao][- ]Relator[a]?", text, re.IGNORECASE):
-            if i > 0:
-                prev_p, prev_text = paragraphs[i - 1]
-                b = prev_p.find("b")
-                return b.get_text(strip=True) if b else prev_text
-    return "Não informado"
-
-
-def _extract_data(paragraphs: list[tuple], fallback: str) -> str:
-    """Extrai 'Brasília, DD de MMMM de YYYY' e converte para YYYY-MM-DD."""
-    full = " ".join(t for _, t in paragraphs)
-    m = re.search(
-        r"Bras[íi]lia,\s+(\d{1,2})\s+de\s+(\w+)\s+de\s+(\d{4})",
-        full,
-        re.IGNORECASE,
-    )
-    if m:
-        day, month_name, year = m.groups()
-        month = MESES.get(month_name.lower())
-        if month:
-            return f"{year}-{month}-{int(day):02d}"
-    return fallback
-
-
-def _extract_orgao(paragraphs: list[tuple]) -> str:
-    for _, text in paragraphs[:6]:
-        m = re.search(r"\(([^)]*Turma[^)]*|Pleno|Órgão Especial[^)]*)\)", text, re.IGNORECASE)
-        if m:
-            return m.group(1).strip()
-    return ""
-
-
-def parse_html(
-    html: str,
-    id_hash: str,
-    num_formatado: str,
-    data_publicacao: str,
-) -> Optional[dict]:
-    try:
-        soup = BeautifulSoup(html, "html.parser")
-        paragraphs = _paragraphs(soup)
-        if not paragraphs:
-            return None
-
-        ementa        = _extract_ementa(paragraphs) or "Ementa não disponível"
-        relator       = _extract_relator(paragraphs)
-        data_julg     = _extract_data(paragraphs, data_publicacao)
-        inteiro_teor  = "\n".join(t for _, t in paragraphs)
-
-        return {
-            "_id":             f"tst-{id_hash}",
-            "tribunal":        "TST",
-            "numero":          num_formatado,
-            "ementa":          ementa[:10000],
-            "relator":         relator,
-            "dataJulgamento":  data_julg,
-            "area":            "TRABALHISTA",
-            "url":             f"https://jurisprudencia.tst.jus.br/#!/resultado?id={id_hash}",
-            "conteudoIntegral": inteiro_teor[:80000],
-        }
-    except Exception as e:
-        log.warning(f"parse_html erro [{id_hash}]: {e}")
-        return None
-
-# ─── HTTP fetch com retry + circuit breaker ───────────────────────────────────
-
-def fetch_doc(session: requests.Session, id_hash: str, delay: float) -> Optional[str]:
-    url     = DOC_URL.format(id=id_hash)
-    backoff = BACKOFF_BASE
-
-    for attempt in range(1, MAX_RETRIES + 1):
-        try:
-            resp = session.get(url, timeout=30)
-
-            if resp.status_code == 200:
-                ct = resp.headers.get("Content-Type", "")
-                if "html" not in ct.lower() and len(resp.text) < 200:
-                    log.warning(f"⚠️  [{id_hash}] Resposta suspeita (CT={ct}, len={len(resp.text)})")
-                    return None
-                return resp.text
-
-            if resp.status_code in (429, 500, 502, 503, 504):
-                wait = backoff + random.uniform(0, backoff * 0.2)
-                log.warning(f"⚠️  [{id_hash}] HTTP {resp.status_code} → retry em {wait:.1f}s (t{attempt})")
-                time.sleep(wait)
-                backoff = min(backoff * 2, MAX_BACKOFF)
-                continue
-
-            log.warning(f"❌ [{id_hash}] HTTP {resp.status_code} — pulando")
-            return None
-
-        except requests.exceptions.Timeout:
-            log.warning(f"⏱️  [{id_hash}] Timeout (t{attempt})")
-        except requests.exceptions.RequestException as e:
-            log.warning(f"❌ [{id_hash}] {type(e).__name__}: {e} (t{attempt})")
-
-        if attempt < MAX_RETRIES:
-            time.sleep(backoff)
-            backoff = min(backoff * 2, MAX_BACKOFF)
-
-    log.error(f"❌ [{id_hash}] Falhou após {MAX_RETRIES} tentativas")
-    return None
-
-
-def nova_sessao() -> requests.Session:
-    s = requests.Session()
-    s.headers.update(HEADERS)
-    return s
-
-# ─── Worker ───────────────────────────────────────────────────────────────────
-
-def worker(
-    rows: list[dict],
-    delay: float,
-    es: Elasticsearch,
-    done: set,
-    counters: dict,
-    lock: threading.Lock,
-    batch_size: int,
-    worker_id: int,
-):
-    session       = nova_sessao()
-    buffer        = []
-    fail_streak   = 0
-    session_count = 0
-
-    for row in rows:
-        id_hash      = row["id_hash"]
-        num_fmt      = row["num_formatado"]
-        data_pub     = row["data_publicacao"]
-
-        with lock:
-            if id_hash in done:
-                counters["skipped"] += 1
-                continue
-
-        # Renova sessão a cada 500 documentos
-        session_count += 1
-        if session_count % 500 == 0:
-            session = nova_sessao()
-            log.info(f"[w{worker_id}] Sessão renovada ({session_count} docs)")
-
-        html = fetch_doc(session, id_hash, delay)
-
-        if html is None:
-            fail_streak += 1
-            with lock:
-                counters["failed"] += 1
-            if fail_streak >= CIRCUIT_LIMIT:
-                log.warning(f"[w{worker_id}] 🔴 Circuit breaker ({fail_streak} falhas) → pausa {CIRCUIT_PAUSE}s")
-                time.sleep(CIRCUIT_PAUSE)
-                session = nova_sessao()
-                fail_streak = 0
-                log.info(f"[w{worker_id}] 🟢 Retomando")
-            time.sleep(delay)
-            continue
-
-        fail_streak = 0
-        doc = parse_html(html, id_hash, num_fmt, data_pub)
-
-        if doc:
-            buffer.append(doc)
-
-        with lock:
-            done.add(id_hash)
-            counters["processed"] += 1
-
-        # Flush buffer
-        if len(buffer) >= batch_size:
-            _bulk_insert(es, buffer, lock, counters)
-            buffer.clear()
-            checkpoint_save(done)
-
-        time.sleep(delay + random.uniform(0, delay * 0.3))
-
-    # Flush restante
-    if buffer:
-        _bulk_insert(es, buffer, lock, counters)
-        checkpoint_save(done)
-
-
-def _bulk_insert(es: Elasticsearch, docs: list[dict], lock: threading.Lock, counters: dict):
-    actions = [
-        {"_index": ES_INDEX, "_id": d["_id"], **{k: v for k, v in d.items() if k != "_id"}}
-        for d in docs
-    ]
-    try:
-        ok, errors = helpers.bulk(es, actions, raise_on_error=False)
-        with lock:
-            counters["indexed"] += ok
-            counters["es_errors"] += len(errors) if errors else 0
-        if errors:
-            log.warning(f"⚠️  Bulk: {len(errors)} erros ES")
-    except Exception as e:
-        log.error(f"❌ Bulk insert falhou: {e}")
-
-# ─── Main ─────────────────────────────────────────────────────────────────────
-
-def main():
-    parser = argparse.ArgumentParser(description="Ingestão TST → Elasticsearch")
-    parser.add_argument("--workers",  type=int,   default=3)
-    parser.add_argument("--delay",    type=float, default=1.0)
-    parser.add_argument("--batch",    type=int,   default=100)
-    parser.add_argument("--es-url",   default=os.getenv("ELASTICSEARCH_URL", "http://localhost:9200"))
-    parser.add_argument("--reset",    action="store_true")
-    args = parser.parse_args()
+    files = sorted(folder.glob("*.html"))
+    if not files:
+        sys.exit(f"Nenhum HTML em: {folder}")
 
     if args.reset and CHECKPOINT_FILE.exists():
         CHECKPOINT_FILE.unlink()
-        log.info("🗑️  Checkpoint removido")
+        log.info("Checkpoint removido")
 
-    # Lê CSV
-    if not CSV_FILE.exists():
-        sys.exit(f"CSV não encontrado: {CSV_FILE}")
+    done = load_checkpoint()
 
-    with open(CSV_FILE, encoding="utf-8-sig") as f:
-        all_rows = list(csv.DictReader(f))
+    pending = [f for f in files if f.name not in done]
+    if args.sample:
+        pending = pending[: args.sample]
 
-    total = len(all_rows)
-    done  = checkpoint_load()
+    es = None if args.dry_run else Elasticsearch(args.es_url)
+
+    counters = {
+        "processed": 0, "indexed": 0, "failed_parse": 0,
+        "es_errors": 0, "skipped": 0,
+    }
+    counters["skipped"] = len(files) - len(pending)
 
     log.info("=" * 60)
-    log.info(f"TST → ES  |  total: {total}  |  já feitos: {len(done)}")
-    log.info(f"workers={args.workers}  delay={args.delay}s  batch={args.batch}")
-    log.info(f"ES: {args.es_url}  índice: {ES_INDEX}")
-    estimativa_h = ((total - len(done)) * args.delay) / args.workers / 3600
-    log.info(f"Estimativa: ~{estimativa_h:.1f}h")
+    log.info(f"TST -> ES  |  {len(files)} HTMLs totais  |  pendentes: {len(pending)}")
+    log.info(f"Pasta: {folder}")
+    if args.dry_run:
+        log.info(f"DRY-RUN: nao indexa no ES  (workers={args.workers})")
+    else:
+        log.info(f"ES: {args.es_url}  indice: {ES_INDEX}  workers={args.workers}")
     log.info("=" * 60)
 
-    es = Elasticsearch(args.es_url)
+    buffer: list[dict] = []
+    batch_done: set[str] = set()
 
-    # Divide as linhas entre os workers (round-robin preserva ordem)
-    partitions = [all_rows[i::args.workers] for i in range(args.workers)]
+    with ProcessPoolExecutor(max_workers=args.workers) as pool:
+        futures = {pool.submit(parse_html_file, f): f.name for f in pending}
 
-    counters = {"processed": 0, "indexed": 0, "failed": 0, "skipped": 0, "es_errors": 0}
-    lock     = threading.Lock()
+        for future in as_completed(futures):
+            fname = futures[future]
+            try:
+                doc = future.result()
+            except Exception as e:
+                log.error(f"{fname}: {e}")
+                counters["failed_parse"] += 1
+                done.add(fname)
+                batch_done.add(fname)
+                continue
 
-    t_start = time.time()
+            if doc is None:
+                counters["failed_parse"] += 1
+            else:
+                counters["processed"] += 1
+                if args.dry_run:
+                    if counters["processed"] <= 8:
+                        log.info(
+                            f"  [dry-run] {doc['numero']} | {doc['relator'] or '(sem relator)'} "
+                            f"| {doc['dataJulgamento']} | {doc['orgaoJulgador'] or '(sem turma)'}"
+                        )
+                        log.info(f"            ementa: {doc['ementa'][:120]}")
+                else:
+                    buffer.append(doc)
+                    if len(buffer) >= args.batch:
+                        bulk_insert(es, buffer, counters)
+                        buffer.clear()
 
-    with ThreadPoolExecutor(max_workers=args.workers) as executor:
-        futures = [
-            executor.submit(worker, part, args.delay, es, done, counters, lock, args.batch, i + 1)
-            for i, part in enumerate(partitions)
-        ]
-        try:
-            for f in as_completed(futures):
-                f.result()  # propaga exceções não tratadas
-        except KeyboardInterrupt:
-            log.info("\n⛔ Interrompido — checkpoint salvo")
-            checkpoint_save(done)
+            done.add(fname)
+            batch_done.add(fname)
 
-    elapsed = time.time() - t_start
+            if len(batch_done) % CHECKPOINT_INTERVAL == 0:
+                save_checkpoint(done)
+                pct = 100 * len(done) / len(files)
+                log.info(
+                    f"  Progresso: {len(done)}/{len(files)} ({pct:.1f}%)  "
+                    f"indexados={counters['indexed']}  falhas={counters['failed_parse']}"
+                )
+                batch_done.clear()
+
+    if not args.dry_run and buffer:
+        bulk_insert(es, buffer, counters)
+
+    save_checkpoint(done)
+
     log.info("=" * 60)
-    log.info(f"Concluído em {elapsed/3600:.1f}h")
-    log.info(f"  Processados : {counters['processed']}")
-    log.info(f"  Indexados   : {counters['indexed']}")
-    log.info(f"  Pulados     : {counters['skipped']}")
-    log.info(f"  Falhas HTTP : {counters['failed']}")
-    log.info(f"  Erros ES    : {counters['es_errors']}")
+    log.info(f"Concluido: {counters['processed']} processados | {counters['indexed']} indexados")
+    log.info(f"  Pulados    : {counters['skipped']}")
+    log.info(f"  Falhas HTML: {counters['failed_parse']}")
+    log.info(f"  Erros ES   : {counters['es_errors']}")
     log.info("=" * 60)
 
 
