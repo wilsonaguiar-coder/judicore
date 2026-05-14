@@ -1,0 +1,4 @@
+*_checkpoint.json
+*.log
+__pycache__/
+response.json
