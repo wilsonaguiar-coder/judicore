@@ -405,6 +405,7 @@ export async function adminRoutes(app: FastifyInstance) {
     {
       onRequest: [authenticate, requireAdmin],
       config: { rawBody: true },
+      bodyLimit: 200 * 1024 * 1024, // 200 MB — suficiente para um lote mensal
     },
     async (request, reply) => {
       const tribunal = ((request.query as any).tribunal as string)?.toUpperCase();
