@@ -8,7 +8,6 @@ import { CaseCard } from "@/components/case-card";
 import { NewCaseDialog } from "@/components/new-case-dialog";
 import { Sidebar } from "@/components/sidebar";
 import { Search, FolderPlus } from "lucide-react";
-import { JurisprudenciaStats } from "@/components/jurisprudencia-stats";
 import type { Case } from "@/types";
 
 export default function DashboardPage() {
@@ -34,10 +33,6 @@ export default function DashboardPage() {
 
       <main className="flex-1 overflow-auto">
         <div className="max-w-4xl mx-auto px-8 py-10">
-
-          <div className="mb-8 -mx-8 px-8 py-4 bg-muted/30 border-y">
-            <JurisprudenciaStats token={token!} inline />
-          </div>
 
           {/* Opções principais */}
           <div className="grid grid-cols-2 gap-4 mb-10">
