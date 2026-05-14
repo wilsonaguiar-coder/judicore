@@ -220,7 +220,10 @@ def extract_decisions(text: str, filename: str) -> list[dict]:
         data_raw = match.group("data_raw").replace("\n", " ").strip()
         data = parse_date(data_raw) or (parse_date(session_date) if session_date else None)
 
-        ementa = decision_text[:600].strip()
+        # TRF1 BIJs: ementa = keywords antes do 1º parágrafo narrativo (começa com artigo + verbo)
+        body_m = re.search(r"\.\n([AO]s?\s+|[Tt]rata-se|[Cc]uida-se|[Nn]o\s+caso|[Ee]m\s+que\s+pese)", decision_text)
+        ementa_raw = decision_text[:body_m.start() + 1] if body_m else re.split(r"\n\s*\n", decision_text.strip(), maxsplit=1)[0]
+        ementa = re.sub(r"-\s*\n\s*", "", re.sub(r"\s*\n\s*", " ", ementa_raw)).strip()
         conteudo = (decision_text + "\n" + citation_text)[:80000]
 
         doc = {
@@ -249,7 +252,7 @@ def _make_fallback_doc(text: str, filename: str, edition: Optional[str]) -> dict
         "_id": f"trf1-boleti-{edition or name}",
         "tribunal": "TRF1",
         "numero": edition or name,
-        "ementa": body[:600].strip(),
+        "ementa": re.sub(r"\s*\n\s*", " ", re.split(r"\n\s*\n", body.strip(), maxsplit=1)[0]).strip(),
         "relator": "Não informado",
         "dataJulgamento": None,
         "area": classify_area(body),
@@ -289,9 +292,9 @@ def bulk_insert(es: Elasticsearch, docs: list[dict], counters: dict) -> None:
         counters["es_errors"] += len(errors) if errors else 0
         if errors:
             for err in errors[:3]:
-                log.warning(f"  ⚠️  ES erro: {err}")
+                log.warning(f"  ES erro: {err}")
     except Exception as e:
-        log.error(f"❌ Bulk insert falhou: {e}")
+        log.error(f"Bulk insert falhou: {e}")
 
 
 # ── Main ──────────────────────────────────────────────────────────────────────
@@ -319,15 +322,15 @@ def main() -> None:
 
     folder = Path(args.folder)
     if not folder.exists():
-        sys.exit(f"❌ Pasta não encontrada: {folder}")
+        sys.exit(f"Pasta nao encontrada: {folder}")
 
     pdfs = sorted(folder.glob("*.pdf"))
     if not pdfs:
-        sys.exit(f"❌ Nenhum PDF em: {folder}")
+        sys.exit(f"Nenhum PDF em: {folder}")
 
     if args.reset and CHECKPOINT_FILE.exists():
         CHECKPOINT_FILE.unlink()
-        log.info("🗑️  Checkpoint removido")
+        log.info("Checkpoint removido")
 
     done = load_checkpoint()
     es = None if args.dry_run else Elasticsearch(args.es_url)
@@ -339,12 +342,12 @@ def main() -> None:
     buffer: list[dict] = []
 
     log.info("=" * 60)
-    log.info(f"TRF1 → ES  |  {len(pdfs)} PDFs  |  já feitos: {len(done)}")
+    log.info(f"TRF1 -> ES  |  {len(pdfs)} PDFs  |  ja feitos: {len(done)}")
     log.info(f"Pasta: {folder}")
     if args.dry_run:
-        log.info("⚠️  DRY-RUN: não indexa no ES")
+        log.info("DRY-RUN: nao indexa no ES")
     else:
-        log.info(f"ES: {args.es_url}  índice: {ES_INDEX}")
+        log.info(f"ES: {args.es_url}  indice: {ES_INDEX}")
     log.info("=" * 60)
 
     for pdf_path in pdfs:
@@ -355,16 +358,15 @@ def main() -> None:
             continue
 
         try:
-            log.info(f"📄 {fname}")
+            log.info(f"{fname}")
             text = pdf_to_text(str(pdf_path))
             decisions = extract_decisions(text, fname)
             counters["decisions"] += len(decisions)
 
             if args.dry_run:
-                # Mostra amostra da primeira decisão
-                if decisions:
-                    d = decisions[0]
-                    log.info(f"  [dry-run] Exemplo: {d['numero']} | {d['relator']} | {d['dataJulgamento']} | {d['area']}")
+                for d in decisions[:2]:
+                    log.info(f"  [dry-run] {d['numero']} | {d['relator']} | {d['dataJulgamento']} | {d['area']}")
+                    log.info(f"            ementa: {d['ementa'][:200]}")
             else:
                 buffer.extend(decisions)
                 if len(buffer) >= args.batch:
@@ -376,7 +378,7 @@ def main() -> None:
             counters["pdfs"] += 1
 
         except Exception as e:
-            log.error(f"❌ {fname}: {e}")
+            log.error(f"{fname}: {e}")
             counters["failed"] += 1
 
     # Flush restante

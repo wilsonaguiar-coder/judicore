@@ -245,17 +245,18 @@ def extract_decisions(text: str, filename: str) -> list[dict]:
         volta_pos = block.lower().find("volta")
         if volta_pos >= 0:
             after_volta = block[volta_pos + 5:]
-            ementa_lines: list[str] = []
-            for line in after_volta.split("\n"):
-                stripped = line.strip()
-                # Para na primeira linha que parece ser parágrafo de texto corrido
-                if ementa_lines and (len(stripped) > 120 or stripped.lower().startswith("trata-se")):
-                    break
-                if stripped and not re.match(r"^(INFOJUR|Coordenadoria|Secretaria)", stripped, re.IGNORECASE):
-                    ementa_lines.append(stripped)
-                if len(" ".join(ementa_lines)) >= 400:
-                    break
-            ementa = " ".join(ementa_lines)[:600]
+            # Corpo inicia em "Cuida-se de", "Trata-se de" ou parágrafo longo
+            body_m = re.search(
+                r"(?m)^(?:[Cc]uida-se\s+de|[Tt]rata-se\s+de|[Nn]o\s+caso\s+dos\s+autos|"
+                r"[Ee]m\s+que\s+pese|[Vv]ersa\s+os\s+autos|[Aa]nalisando\s+os\s+autos)",
+                after_volta,
+            )
+            if body_m:
+                ementa_raw = after_volta[:body_m.start()].strip()
+            else:
+                # fallback: primeira linha não-vazia (título da ementa)
+                ementa_raw = after_volta.strip().split("\n")[0].strip()
+            ementa = re.sub(r"-\s*\n\s*", "", re.sub(r"\s*\n\s*", " ", ementa_raw)).strip()
             decision_text = after_volta
         else:
             ementa = ""

@@ -167,12 +167,18 @@ def classify_area(text: str, current_section: str = "") -> str:
 
 
 def clean_block(text: str) -> str:
-    """Remove cabeçalhos de página e ruídos do bloco de decisão."""
-    # Remove cabeçalho padrão TRF4: "Boletim Jurídico\nNúmero XXX"
+    # Remove caixas de cabecalho de pagina com bordas | ... |
+    # ex: "| Boletim Juridico nº 211|" e "| Escola da Magistratura...|"
+    text = re.sub(r"(?m)^\s*\|[^\n]*\|\s*$", "", text)
+    # Remove | solitario residual apos remocao das caixas
+    text = re.sub(r"(?m)^\s*\|\s*$", "", text)
+    # Remove cabecalho padrao TRF4: "Boletim Juridico\nNumero XXX"
     text = re.sub(r"Boletim\s+Jur[íi]dico[^\n]*\n[^\n]*\n?", "", text, flags=re.IGNORECASE)
-    # Remove números de página soltos
+    # Remove cabecalho editorial EMAGIS: "mes/YYYY emagis | trf4 Headline..."
+    text = re.sub(r"(?im)^\w+/\d{4}\s+emagis[^\n]*\n?", "", text)
+    # Remove numeros de pagina soltos
     text = re.sub(r"(?m)^\s*\d{1,3}\s*$", "", text)
-    # Colapsa múltiplos newlines
+    # Colapsa multiplos newlines
     text = re.sub(r"\n{3,}", "\n\n", text)
     return text.strip()
 
@@ -202,8 +208,13 @@ def extract_decisions(text: str, filename: str) -> list[dict]:
     citations = list(CITATION_RE.finditer(text))
 
     if not citations:
-        log.warning(f"  Nenhuma citação encontrada em {filename}")
+        log.warning(f"  Nenhuma citacao encontrada em {filename}")
         return []
+
+    # Regex para localizar início de decisão real (ALL CAPS após número-travessão)
+    _REAL_ENTRY_RE = re.compile(
+        r"(?m)^\s*\d{1,3}\s*[-–]\s+[A-Z\xc1\xc0\xc3\xc2\xc9\xca\xcd\xd3\xd4\xd5\xda\xc7]{3}",
+    )
 
     decisions = []
     prev_end = 0
@@ -212,6 +223,13 @@ def extract_decisions(text: str, filename: str) -> list[dict]:
     for match in citations:
         block_text = text[prev_end:match.start()]
         citation_text = match.group(0)
+
+        # Primeiro bloco: contém capa + editorial + sumário antes da 1ª decisão real.
+        # Localiza o último entry ALL CAPS (= ementa) para pular o material de capa.
+        if prev_end == 0:
+            real_entries = list(_REAL_ENTRY_RE.finditer(block_text))
+            if real_entries:
+                block_text = block_text[real_entries[-1].start():]
 
         # Atualiza seção de área caso haja cabeçalho no bloco atual
         section_matches = list(SECTION_RE.finditer(block_text))
@@ -235,7 +253,37 @@ def extract_decisions(text: str, filename: str) -> list[dict]:
         relator = clean_relator(match.group("relator").strip())
         data = parse_date(match.group("data"))
 
-        ementa = body[:600].strip()
+        # EMAGIS: blocos sempre começam com ")" do parêntese não capturado + espaço
+        # Formatos: (a) "NN – ALL CAPS KEYWORD.\n1. corpo" (bol200-204)
+        #           (b) "NN - ALL CAPS KEYWORD. Corpo em prosa." (bol205+, inline)
+        body_stripped = body.strip()
+        # Remove ")" residual do final da citação anterior
+        body_stripped = re.sub(r"^\s*\)\s*\n?", "", body_stripped).strip()
+        # Remove | residual de caixas de cabecalho (ex: "| Escola da Magistratura |" já removido mas deixa "|")
+        body_stripped = re.sub(r"^\s*\|[^\n]*\n", "", body_stripped).strip()
+        # Remove letra de índice alfabético solta ("H", "A", etc.)
+        body_stripped = re.sub(r"^[A-Z]\s*\n", "", body_stripped).strip()
+
+        # Ementa = sentenças ALL CAPS; corpo = primeira sentença com palavras minúsculas
+        # Divide nas quebras de sentenças (. ! ?) e acumula até encontrar prosa
+        _LOWER_PT = re.compile(r"[a-záàâãéêíóôõúüç]{3,}")
+        _BODY_NUM = re.compile(r"^\d+\.?$")  # marcador de parágrafo: "1.", "2.", etc.
+        sentences = re.split(r"(?<=[.!?])\s+", body_stripped)
+        ementa_parts: list[str] = []
+        for sent in sentences:
+            sent = sent.strip()
+            if not sent:
+                continue
+            # Para antes de marcadores de parágrafo do corpo ("1.", "2.") ou prosa
+            if _BODY_NUM.match(sent) or _LOWER_PT.search(sent):
+                break
+            ementa_parts.append(sent)
+
+        if ementa_parts and len(" ".join(ementa_parts)) >= 15:
+            ementa_raw = " ".join(ementa_parts)
+        else:
+            ementa_raw = re.split(r"\n\s*\n", body_stripped, maxsplit=1)[0]
+        ementa = re.sub(r"-\s*\n\s*", "", re.sub(r"\s*\n\s*", " ", ementa_raw)).strip()
         conteudo = (body + "\n" + citation_text)[:80_000]
 
         doc = {
@@ -253,7 +301,7 @@ def extract_decisions(text: str, filename: str) -> list[dict]:
         decisions.append(doc)
         prev_end = match.end()
 
-    log.info(f"  {len(decisions)} decisões extraídas de {filename} (ed. {edition})")
+    log.info(f"  {len(decisions)} decisoes extraidas de {filename} (ed. {edition})")
     return decisions
 
 
@@ -285,9 +333,9 @@ def bulk_insert(es: Elasticsearch, docs: list[dict], counters: dict) -> None:
         counters["es_errors"] += len(errors) if errors else 0
         if errors:
             for err in errors[:3]:
-                log.warning(f"  ⚠️  ES erro: {err}")
+                log.warning(f"  ES erro: {err}")
     except Exception as e:
-        log.error(f"❌ Bulk insert falhou: {e}")
+        log.error(f"Bulk insert falhou: {e}")
 
 
 # ── Main ──────────────────────────────────────────────────────────────────────
@@ -315,15 +363,15 @@ def main() -> None:
 
     folder = Path(args.folder)
     if not folder.exists():
-        sys.exit(f"❌ Pasta não encontrada: {folder}")
+        sys.exit(f"Pasta nao encontrada: {folder}")
 
     pdfs = sorted(folder.glob("*.pdf"))
     if not pdfs:
-        sys.exit(f"❌ Nenhum PDF em: {folder}")
+        sys.exit(f"Nenhum PDF em: {folder}")
 
     if args.reset and CHECKPOINT_FILE.exists():
         CHECKPOINT_FILE.unlink()
-        log.info("🗑️  Checkpoint removido")
+        log.info("Checkpoint removido")
 
     done = load_checkpoint()
     es = None if args.dry_run else Elasticsearch(args.es_url)
@@ -332,12 +380,12 @@ def main() -> None:
     buffer: list[dict] = []
 
     log.info("=" * 60)
-    log.info(f"TRF4 → ES  |  {len(pdfs)} PDFs  |  já feitos: {len(done)}")
+    log.info(f"TRF4 -> ES  |  {len(pdfs)} PDFs  |  ja feitos: {len(done)}")
     log.info(f"Pasta: {folder}")
     if args.dry_run:
-        log.info("⚠️  DRY-RUN: não indexa no ES")
+        log.info("DRY-RUN: nao indexa no ES")
     else:
-        log.info(f"ES: {args.es_url}  índice: {ES_INDEX}")
+        log.info(f"ES: {args.es_url}  indice: {ES_INDEX}")
     log.info("=" * 60)
 
     for pdf_path in pdfs:
@@ -348,7 +396,7 @@ def main() -> None:
             continue
 
         try:
-            log.info(f"📄 {fname}")
+            log.info(f"PDF {fname}")
             text = pdf_to_text(str(pdf_path))
             decisions = extract_decisions(text, fname)
             counters["decisions"] += len(decisions)
@@ -369,14 +417,14 @@ def main() -> None:
             counters["pdfs"] += 1
 
         except Exception as e:
-            log.error(f"❌ {fname}: {e}")
+            log.error(f"{fname}: {e}")
             counters["failed"] += 1
 
     if not args.dry_run and buffer:
         bulk_insert(es, buffer, counters)
 
     log.info("=" * 60)
-    log.info(f"Concluído: {counters['pdfs']} PDFs | {counters['decisions']} decisões")
+    log.info(f"Concluido: {counters['pdfs']} PDFs | {counters['decisions']} decisoes")
     log.info(f"  Indexados  : {counters['indexed']}")
     log.info(f"  Pulados    : {counters['skipped']}")
     log.info(f"  Falhas PDF : {counters['failed']}")

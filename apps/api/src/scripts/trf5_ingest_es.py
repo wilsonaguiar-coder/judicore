@@ -187,15 +187,27 @@ def classify_area(text: str, current_section: str = "") -> str:
     return "OUTRO"
 
 
+def _clean_ementa_text(raw: str) -> str:
+    """Remove hifenização de fim de linha do PDF e normaliza espaços."""
+    # "BENE-\nFÍCIO" → "BENEFÍCIO"
+    text = re.sub(r"-\s*\n\s*", "", raw)
+    # demais quebras de linha → espaço
+    return re.sub(r"\s*\n\s*", " ", text).strip()
+
+
 def extract_ementa(block: str) -> str:
-    """Extrai o texto da ementa marcada com 'EMENTA:' ou usa o início do bloco."""
+    """Extrai a ementa completa: após 'EMENTA:' se presente, ou tudo antes do corpo ('- ')."""
     m = EMENTA_RE.search(block)
-    if m:
-        after = block[m.end():].strip()
-        # Pega até 600 caracteres ou até linha em branco dupla
-        snippet = re.split(r"\n\s*\n", after, maxsplit=1)[0]
-        return snippet[:600].strip()
-    return block[:600].strip()
+    after = block[m.end():].strip() if m else block
+
+    # Corpo do acórdão começa na primeira linha que inicia com "- " ou "– "
+    body_m = re.search(r"(?m)^[-–]\s", after)
+    if body_m and body_m.start() > 10:
+        ementa_raw = after[:body_m.start()].strip()
+    else:
+        ementa_raw = re.split(r"\n\s*\n", after.strip(), maxsplit=1)[0]
+
+    return _clean_ementa_text(ementa_raw)
 
 
 def extract_turma(block: str) -> str:

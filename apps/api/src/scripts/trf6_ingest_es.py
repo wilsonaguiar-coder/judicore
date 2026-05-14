@@ -179,12 +179,28 @@ def extract_decisions(text: str, filename: str) -> list[dict]:
         log.warning(f"  Nenhuma citacao encontrada em {filename}")
         return []
 
+    _LOWER_PT6 = re.compile(r"[a-záàâãéêíóôõúüç]{3,}")
+
     decisions = []
     prev_end = 0
 
     for match in citations:
         block_text = text[prev_end:match.start()]
         citation_text = match.group(0)
+
+        # Primeiro bloco: contém capa do BIJ antes da 1ª decisão real.
+        # Pula capa localizando o último marcador de decisão no bloco.
+        if prev_end == 0:
+            # Formato antigo: último "Assuntos:" é o início da 1ª decisão
+            assuntos_ms = list(re.finditer(r"Assuntos\s*:", block_text, re.IGNORECASE))
+            if assuntos_ms:
+                block_text = block_text[assuntos_ms[-1].start():]
+            else:
+                # Formato novo: último parágrafo numerado "N. TEXTO" = 1ª ementa
+                num_ms = list(re.finditer(r"(?m)^\d+\.\s+[A-Z\xc0-\xd6\xd8-\xde]", block_text))
+                if num_ms:
+                    block_text = block_text[num_ms[-1].start():]
+
         body = clean_block(block_text)
 
         if len(body.strip()) < 40:
@@ -196,7 +212,44 @@ def extract_decisions(text: str, filename: str) -> list[dict]:
         orgao = re.sub(r"\s+", " ", match.group("orgao").replace("\n", " ")).strip()
         data = parse_date(match.group("data"))
 
-        ementa = body[:600].strip()
+        # Normaliza body: remove artefato ")" ou ")." do parêntese não capturado
+        body_stripped = body.strip()
+        body_stripped = re.sub(r"^\s*\)\s*\.?\s*\n?", "", body_stripped).strip()
+        # Remove cabecalhos de turma/secao e area do direito no inicio do bloco
+        # ex: "3ª Turma", "2ª Seção", "TRIBUTÁRIO" (linhas standalone entre citacoes)
+        body_stripped = re.sub(
+            r"(?im)^\d+[ªa-z°]*\s*(Turma|Se[cç][aã]o|C[aâ]mara)\s*$\n?", "", body_stripped
+        )
+        body_stripped = re.sub(
+            r"(?im)^(?:DIREITO\s+)?(ADMINISTRATIVO|TRIBUT[ÁA]R[IO]O?|PENAL|"
+            r"PREVIDENCI[ÁA]RIO|CIVIL|AMBIENTAL|PROCESSUAL|CRIMINAL|CONSTITUCIONAL)\s*$\n?",
+            "",
+            body_stripped,
+        )
+        body_stripped = re.sub(r"\n{3,}", "\n\n", body_stripped).strip()
+
+        # Formato antigo (BIJ1-BIJ21): ementa termina em "Decisão:"
+        decisao_m = re.search(r"Decis[aã]o\s*:", body_stripped, re.IGNORECASE)
+        if decisao_m and decisao_m.start() > 20:
+            ementa_raw = body_stripped[:decisao_m.start()].strip()
+        else:
+            # Formato novo (BIJ22+): ementa = sentenças ALL CAPS; corpo = primeira sentença com prosa
+            sentences = re.split(r"(?<=[.!?])\s+", body_stripped)
+            ementa_parts: list[str] = []
+            for sent in sentences:
+                sent = sent.strip()
+                if not sent:
+                    continue
+                if _LOWER_PT6.search(sent):
+                    break
+                ementa_parts.append(sent)
+
+            if ementa_parts and len(" ".join(ementa_parts)) >= 15:
+                ementa_raw = " ".join(ementa_parts)
+            else:
+                ementa_raw = re.split(r"\n\s*\n", body_stripped, maxsplit=1)[0]
+
+        ementa = re.sub(r"-\s*\n\s*", "", re.sub(r"\s*\n\s*", " ", ementa_raw)).strip()
         conteudo = (body + "\n" + citation_text)[:80_000]
 
         doc = {
@@ -318,6 +371,7 @@ def main() -> None:
                 for d in decisions[:2]:
                     log.info(f"  [dry-run] {d['numero']} | {d['relator']} | {d['dataJulgamento']} | {d['area']}")
                     log.info(f"            orgao: {d['orgaoJulgador']}")
+                    log.info(f"            ementa: {d['ementa'][:200]}")
             else:
                 buffer.extend(decisions)
                 if len(buffer) >= args.batch:
