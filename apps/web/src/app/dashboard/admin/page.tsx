@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { useAuthStore } from "@/store/auth";
 import { api } from "@/lib/api";
 import { Sidebar } from "@/components/sidebar";
-import { Loader2, Database, Play, CheckCircle, XCircle } from "lucide-react";
+import { Loader2, Database, Play, CheckCircle, XCircle, Save } from "lucide-react";
 
 interface IndexStats {
   total: number;
@@ -66,6 +66,45 @@ export default function AdminPage() {
   const [trfFiles, setTrfFiles] = useState<FileList | null>(null);
   const [trfJob, setTrfJob] = useState<TrfIngestJob | null>(null);
   const trfPollerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
+  // Observações de indexação
+  const NOTES_KEY = "judicore_index_notes";
+  const INITIAL_NOTES = `TRF1
+Último boletim pego 777
+https://www.trf1.jus.br/trf1/pesquisa/boletim-informativo-de-jurisprudencia?secao_id=187&pagina_atual_lista_atos=1
+
+TRF2
+Último boletim pego 256
+https://www.trf2.jus.br/trf2/consultas-e-servicos/infojur-informativos-de-jurisprudencia-do-trf2
+
+TRF3
+???
+
+TRF4
+Último boletim pego 270
+https://www.trf4.jus.br/trf4/boletimjuridico/arquivos/bol270.pdf
+
+TRF5
+Último boletim pego março / abril de 2026
+https://arquivos.trf5.jus.br/TRF5/Gabinete%20Boletins/2020/02/01/boletim-jurisprudencia-A2020_02_1.pdf (exemplo)
+
+TRF6
+Último boletim pego 23
+https://portal.trf6.jus.br/institucional/nugepnac/boletins-e-informativos-2/boletins-informativos-de-jurisprudencia/
+
+TST
+Última atualização em`;
+  const [notes, setNotes] = useState<string>(() => {
+    if (typeof window === "undefined") return INITIAL_NOTES;
+    return localStorage.getItem(NOTES_KEY) ?? INITIAL_NOTES;
+  });
+  const [notesSaved, setNotesSaved] = useState(false);
+
+  function handleSaveNotes() {
+    localStorage.setItem(NOTES_KEY, notes);
+    setNotesSaved(true);
+    setTimeout(() => setNotesSaved(false), 2000);
+  }
 
   // STJ indexing state
   const [stjIndexing, setStjIndexing] = useState(false);
@@ -581,6 +620,29 @@ export default function AdminPage() {
               </div>
             </section>
           )}
+
+          {/* ── OBSERVAÇÕES ── */}
+          <section className="rounded-lg border p-5 space-y-3">
+            <div className="flex items-center justify-between">
+              <h2 className="text-sm font-semibold">Observações de indexação</h2>
+              <button
+                onClick={handleSaveNotes}
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-md border text-xs font-medium text-primary border-primary hover:bg-primary/10 transition-colors"
+              >
+                {notesSaved
+                  ? <CheckCircle size={11} className="text-green-500" />
+                  : <Save size={11} />}
+                {notesSaved ? "Salvo!" : "Salvar"}
+              </button>
+            </div>
+            <textarea
+              value={notes}
+              onChange={(e) => setNotes(e.target.value)}
+              rows={16}
+              className="w-full rounded-md border bg-muted/20 px-3 py-2.5 text-xs font-mono text-foreground focus:outline-none focus:ring-1 focus:ring-ring resize-y"
+              spellCheck={false}
+            />
+          </section>
 
         </div>
       </main>
