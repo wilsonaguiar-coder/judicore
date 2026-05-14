@@ -133,6 +133,20 @@ class _TstParser(HTMLParser):
 
 # ── Parsing principal ─────────────────────────────────────────────────────────
 
+_CDATA_RE = re.compile(r"<!\[CDATA\[(.*?)(?:\]\]>|$)", re.DOTALL)
+
+
+def _unwrap_cdata(raw: str) -> str:
+    """Extrai conteúdo de <![CDATA[...]]> e o envolve em <html><body>."""
+    m = _CDATA_RE.search(raw)
+    if not m:
+        return raw
+    inner = m.group(1)
+    # Normaliza <br/> para não confundir o parser com tags auto-fechantes
+    inner = re.sub(r"<br\s*/?>", " ", inner, flags=re.IGNORECASE)
+    return f"<html><body>{inner}</body></html>"
+
+
 def parse_html_file(path: Path) -> Optional[dict]:
     try:
         raw = path.read_text(encoding="utf-8", errors="replace")
@@ -141,6 +155,10 @@ def parse_html_file(path: Path) -> Optional[dict]:
 
     if len(raw) < 1500:
         return None
+
+    # Formato CDATA: conteúdo embutido em <![CDATA[...]]> sem estrutura html/body
+    if raw.lstrip().startswith("<![CDATA["):
+        raw = _unwrap_cdata(raw)
 
     parser = _TstParser()
     try:
