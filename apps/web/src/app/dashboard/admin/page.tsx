@@ -19,6 +19,7 @@ interface LanceDbInfo {
   next_since: { stf: string; stj: string };
   stj_last_edition: number | null;
   stj_pdf_editions: number[];
+  total: number;
 }
 
 interface TrfIngestJob {
@@ -334,6 +335,29 @@ TST
       <Sidebar user={user} />
       <main className="flex-1 overflow-auto">
         <div className="max-w-5xl mx-auto px-8 py-10 space-y-8">
+
+          {/* ── TOTAIS ── */}
+          {(stats || lanceInfo) && (() => {
+            const esTotal = stats?.total ?? 0;
+            const lanceTotal = lanceInfo?.total ?? 0;
+            return (
+              <div className="grid grid-cols-3 gap-3">
+                {[
+                  { label: "Elasticsearch", value: esTotal, sub: "TRFs + Superiores" },
+                  { label: "LanceDB", value: lanceTotal, sub: "STF + STJ · embeddings" },
+                  { label: "Total geral", value: esTotal + lanceTotal, sub: "todos os índices", highlight: true },
+                ].map(({ label, value, sub, highlight }) => (
+                  <div key={label} className={`rounded-lg border px-4 py-3 ${highlight ? "border-primary/40 bg-primary/5" : ""}`}>
+                    <p className="text-xs text-muted-foreground">{label}</p>
+                    <p className={`text-2xl font-bold mt-0.5 ${highlight ? "text-primary" : ""}`}>
+                      {value.toLocaleString("pt-BR")}
+                    </p>
+                    <p className="text-[10px] text-muted-foreground mt-0.5">{sub}</p>
+                  </div>
+                ))}
+              </div>
+            );
+          })()}
 
           {/* ── LANCEDB ── */}
           <section className="rounded-lg border p-5 space-y-4">

@@ -214,6 +214,17 @@ def _parse_date_flexible(s: str) -> datetime | None:
     return None
 
 
+def _query_lancedb_total() -> int:
+    """Retorna o total de documentos na tabela LanceDB jurisprudencia."""
+    try:
+        import lancedb
+        db = lancedb.connect(str(rag.LANCE_DIR))
+        tbl = db.open_table("jurisprudencia")
+        return int(tbl.count_rows())
+    except Exception:
+        return 0
+
+
 def _query_last_date(tribunal: str) -> str:
     """Retorna a última data de julgamento indexada para o tribunal, nunca futura."""
     try:
@@ -350,6 +361,7 @@ def index_info():
         },
         "stj_last_edition": _query_stj_last_edition(),
         "stj_pdf_editions": _query_stj_pdf_editions(),
+        "total": _query_lancedb_total(),
     }
 
 
