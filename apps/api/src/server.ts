@@ -15,7 +15,7 @@ import { ensureIndices } from "@judicore/search";
 import { startIndexingWorker } from "./queues/worker.js";
 import { registerScheduledJobs } from "./queues/scheduler.js";
 
-const app = Fastify({ logger: true });
+const app = Fastify({ logger: true, bodyLimit: 200 * 1024 * 1024 });
 
 await app.register(cors, {
   origin: process.env["FRONTEND_URL"] ?? "http://localhost:3000",
