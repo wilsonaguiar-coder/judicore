@@ -1,7 +1,7 @@
 import type { FastifyInstance } from "fastify";
 import { z } from "zod";
 import { prisma } from "@judicore/db";
-import { searchJurisprudencia } from "@judicore/search";
+import { searchJurisprudencia, getElasticsearchClient, JURISPRUDENCIA_INDEX, ensureIndices } from "@judicore/search";
 
 const SEARCH_SERVICE_URL = process.env.SEARCH_SERVICE_URL ?? "http://127.0.0.1:7860";
 
@@ -158,5 +158,51 @@ export async function searchRoutes(app: FastifyInstance) {
     }
 
     return { hits, total: hits.length, took: Date.now() - t0 };
+  });
+
+  // GET /search/stats — contagens públicas por grupo de tribunal (todos os usuários autenticados)
+  app.get("/stats", { onRequest: [authenticate] }, async () => {
+    await ensureIndices();
+    const es = getElasticsearchClient();
+
+    const [esRes, lanceRes] = await Promise.allSettled([
+      es.search({
+        index: JURISPRUDENCIA_INDEX,
+        body: {
+          size: 0,
+          track_total_hits: true,
+          aggs: { por_tribunal: { terms: { field: "tribunal", size: 60 } } },
+        },
+      }),
+      fetch(`${SEARCH_SERVICE_URL}/index-info`).then((r) => r.json() as Promise<{ total?: number }>),
+    ]);
+
+    const tribunaisBuckets: { tribunal: string; count: number }[] =
+      esRes.status === "fulfilled"
+        ? ((esRes.value.aggregations?.por_tribunal as any)?.buckets ?? []).map((b: any) => ({
+            tribunal: b.key as string,
+            count: b.doc_count as number,
+          }))
+        : [];
+
+    const lanceTotal: number =
+      lanceRes.status === "fulfilled" ? (lanceRes.value?.total ?? 0) : 0;
+
+    // Agrupamento
+    let tst_trfs = 0;
+    let tj_trts = 0;
+    for (const { tribunal, count } of tribunaisBuckets) {
+      const t = tribunal.toUpperCase();
+      if (t === "TST" || t.startsWith("TRF")) tst_trfs += count;
+      else if (t.startsWith("TJ") || t.startsWith("TRT")) tj_trts += count;
+    }
+
+    const stf_stj = lanceTotal;
+    return {
+      stf_stj,
+      tst_trfs,
+      tj_trts,
+      total: stf_stj + tst_trfs + tj_trts,
+    };
   });
 }

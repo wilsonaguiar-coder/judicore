@@ -6,6 +6,7 @@ import { SearchPanel } from "@/components/search-panel";
 import { ResultsPanel } from "@/components/results-panel";
 import { DocumentPanel } from "@/components/document-panel";
 import { Sidebar } from "@/components/sidebar";
+import { JurisprudenciaStats } from "@/components/jurisprudencia-stats";
 import type { Jurisprudencia } from "@/types";
 
 export default function SearchPage() {
@@ -26,6 +27,8 @@ export default function SearchPage() {
           <h1 className="text-sm font-semibold">Busca livre</h1>
           <p className="text-xs text-muted-foreground">Pesquise jurisprudência sem criar um caso</p>
         </header>
+
+        <JurisprudenciaStats token={token!} />
 
         <div className="flex-1 flex overflow-hidden">
           <div className="w-72 border-r flex flex-col overflow-auto">

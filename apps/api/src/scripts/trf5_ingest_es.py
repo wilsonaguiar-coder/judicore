@@ -52,15 +52,15 @@ ES_INDEX = "jurisprudencia"
 # (Julgado por unanimidade; data da assinatura eletrônica: 29 de maio de 2024)
 CITATION_RE = re.compile(
     r"Processo\s+n[º°\.o]?\s*"
-    r"(?P<processo>\d{7}-\d{2}\.\d{4}\.\d\.\d{2}\.\d{4})"
+    r"(?P<processo>\d{7}-\d{2}\.\d{4}\.\d\.\d{2}\.\d{4}"
+    r"|\d{4}\.\d{2}\.\d{2}\.\d+[-–]\d+)"
     r"[^\n]*\n"
-    r"Relator[^:]*:\s*(?P<relator>[^\n]+)\n"
-    r"\((?P<julgamento>Julgad[ao][^\)]{0,300})\)",
+    r"Relator[^:]*:\s*(?P<relator>.+?)(?=\n\s*\(Julgad)"
+    r"\n\s*\((?P<julgamento>Julgad[ao][^\)]{0,300})\)",
     re.IGNORECASE | re.DOTALL,
 )
 
-# Seção de área do direito — detecta cabeçalhos como
-# "JURISPRUDÊNCIA DE DIREITO ADMINISTRATIVO" (com ou sem espaçamento decorativo)
+# Seção de área — versão normal e versão com letras espaçadas do PDF
 SECTION_RE = re.compile(
     r"JURISPRUD[ÊE]NCIA\s+DE\s+DIRE[IT]TO\s+"
     r"(?P<area>ADMINISTRATIVO|AMBIENTAL|CIVIL|CONSTITUCIONAL|PENAL|"
@@ -69,14 +69,17 @@ SECTION_RE = re.compile(
     re.IGNORECASE,
 )
 
+# Cabeçalho de seção com letras espaçadas: "J U R I S P R U D Ê N C I A ..."
+SPACED_HEADER_RE = re.compile(
+    r"(?:[A-ZÁÀÃÂÉÊÍÓÔÕÚÇÀ-ÿ]\s){4,}[A-ZÁÀÃÂÉÊÍÓÔÕÚÇÀ-ÿ]"
+)
+
 # Turma no corpo da decisão
 TURMA_RE = re.compile(
     r"\b(\d)[ªa°]\.?\s+TURMA\b",
     re.IGNORECASE,
 )
 
-# Ementa explícita
-EMENTA_RE = re.compile(r"EMENTA\s*:", re.IGNORECASE)
 
 # ── Mapeamento seção → área canônica ─────────────────────────────────────────
 
@@ -86,6 +89,7 @@ SECTION_AREA_MAP = {
     "CIVIL": "CIVIL",
     "CONSTITUCIONAL": "ADMINISTRATIVO",
     "PENAL": "CRIMINAL",
+    "CRIMINAL": "CRIMINAL",
     "PREVIDENCIARIO": "PREVIDENCIARIO",
     "PREVIDENCIÁRIO": "PREVIDENCIARIO",
     "PROCESSUAL": "OUTRO",
@@ -161,7 +165,8 @@ def parse_date(julgamento: str) -> Optional[str]:
 
 def clean_relator(raw: str) -> str:
     """Remove 'Desembargador(a) Federal' e normaliza espaços não-quebráveis."""
-    s = raw.replace("\xa0", " ").strip()
+    s = re.sub(r"\s*\n\s*", " ", raw).replace("\xa0", " ").strip()
+    s = re.sub(r"\s*\([^)]*\)\s*$", "", s).strip()
     return re.sub(
         r"^(?:Des(?:embargador[a]?)?\.?\s+Federal|Ju[íi]z[a]?\s+Federal(?:\s+Convocad[oa])?)\s+",
         "",
@@ -187,27 +192,44 @@ def classify_area(text: str, current_section: str = "") -> str:
     return "OUTRO"
 
 
+_SPACED_AREA_MAP = [
+    ("ADMINISTRATIVO", r"ADMINISTRATIV"),
+    ("AMBIENTAL",      r"AMBIENTAL"),
+    ("CIVIL",          r"CIVIL"),
+    ("CRIMINAL",       r"PENAL"),
+    ("PREVIDENCIARIO", r"PREVIDENCI"),
+    ("TRIBUTARIO",     r"TRIBUT"),
+    ("OUTRO",          r"PROCESSUAL"),
+]
+
+def _area_from_spaced_header(text: str) -> str:
+    """Detecta área de seção em cabeçalho espaçado: 'J U R I S P R U D Ê N C I A D E D I R E I T O A D M I N I S T R A T I V O'"""
+    for m in SPACED_HEADER_RE.finditer(text):
+        collapsed = m.group(0).replace(" ", "")
+        if not re.search(r"JURISPRUD|DIREITO", collapsed, re.IGNORECASE):
+            continue
+        for area, pattern in _SPACED_AREA_MAP:
+            if re.search(pattern, collapsed, re.IGNORECASE):
+                return area
+    return ""
+
+
 def _clean_ementa_text(raw: str) -> str:
     """Remove hifenização de fim de linha do PDF e normaliza espaços."""
-    # "BENE-\nFÍCIO" → "BENEFÍCIO"
-    text = re.sub(r"-\s*\n\s*", "", raw)
-    # demais quebras de linha → espaço
-    return re.sub(r"\s*\n\s*", " ", text).strip()
+    text = re.sub(r"-\s*\n\s*", "", raw)        # "BENE-\nFÍCIO" → "BENEFÍCIO"
+    text = re.sub(r"\xad\s*", "", text)          # soft hyphen: "SELE­ TIVO" → "SELETIVO"
+    text = re.sub(r"\s*\n\s*", " ", text)        # demais quebras de linha → espaço
+    return re.sub(r" {2,}", " ", text).strip()
+
+
+EMENTA_RE = re.compile(r"EMENTA\s*:", re.IGNORECASE)
 
 
 def extract_ementa(block: str) -> str:
-    """Extrai a ementa completa: após 'EMENTA:' se presente, ou tudo antes do corpo ('- ')."""
+    """Texto completo da decisão (TRF5 não separa ementa de conteúdo)."""
     m = EMENTA_RE.search(block)
-    after = block[m.end():].strip() if m else block
-
-    # Corpo do acórdão começa na primeira linha que inicia com "- " ou "– "
-    body_m = re.search(r"(?m)^[-–]\s", after)
-    if body_m and body_m.start() > 10:
-        ementa_raw = after[:body_m.start()].strip()
-    else:
-        ementa_raw = re.split(r"\n\s*\n", after.strip(), maxsplit=1)[0]
-
-    return _clean_ementa_text(ementa_raw)
+    text = block[m.end():].strip() if m else block
+    return _clean_ementa_text(text)
 
 
 def extract_turma(block: str) -> str:
@@ -219,6 +241,10 @@ def extract_turma(block: str) -> str:
 def clean_block(text: str) -> str:
     text = re.sub(r"Boletim de Jurisprud[êe]ncia[^\n]*\n?", "", text, flags=re.IGNORECASE)
     text = re.sub(r"(?m)^\s*\d{1,3}\s*$", "", text)
+    text = re.sub(r"-\s*\n\s*", "", text)        # hifenização de fim de linha
+    text = re.sub(r"\xad\s*", "", text)           # soft hyphen
+    text = re.sub(r"\d+\s+[ÍI]ndice[^\n]*", "", text, flags=re.IGNORECASE)  # entradas de índice
+    text = SPACED_HEADER_RE.sub("", text)         # cabeçalhos com letras espaçadas
     text = re.sub(r"\n{3,}", "\n\n", text)
     return text.strip()
 
@@ -253,13 +279,21 @@ def extract_decisions(text: str, filename: str) -> list[dict]:
         block_text = text[prev_end:match.start()]
         citation_text = match.group(0)
 
-        # Atualiza seção de área se houver cabeçalho no bloco
-        section_matches = list(SECTION_RE.finditer(block_text))
-        if section_matches:
-            current_section = section_matches[-1].group("area").strip()
-            decision_body = block_text[section_matches[-1].end():].strip()
-        else:
+        # Atualiza seção de área: tenta cabeçalho normal, depois espaçado
+        # Cabeçalhos espaçados têm prioridade: o índice do boletim tem seções em
+        # texto normal que contaminariam SECTION_RE, mas os cabeçalhos reais são
+        # sempre no formato espaçado.
+        spaced_area = _area_from_spaced_header(block_text)
+        if spaced_area:
+            current_section = spaced_area
             decision_body = block_text
+        else:
+            section_matches = list(SECTION_RE.finditer(block_text))
+            if section_matches:
+                current_section = section_matches[-1].group("area").strip()
+                decision_body = block_text[section_matches[-1].end():].strip()
+            else:
+                decision_body = block_text
 
         body = clean_block(decision_body)
 
@@ -283,7 +317,6 @@ def extract_decisions(text: str, filename: str) -> list[dict]:
             "area": classify_area(body, current_section),
             "orgaoJulgador": turma,
             "url": f"https://www.trf5.jus.br/trf5/consultas-e-servicos/jurisprudencia",
-            "conteudoIntegral": (body + "\n" + citation_text)[:80_000],
         }
         decisions.append(doc)
         prev_end = match.end()

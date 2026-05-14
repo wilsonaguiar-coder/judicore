@@ -37,18 +37,19 @@ ES_INDEX = "jurisprudencia"
 
 # ── Regexes ───────────────────────────────────────────────────────────────────
 
-# Citação ao final de cada decisão:
-# (TRF4, AC 5001234-56.2020.4.04.7100, TERCEIRA TURMA, DESEMBARGADOR FEDERAL FULANO, POR UNANIMIDADE, JUNTADO AOS AUTOS EM 15.03.2023)
-CITATION_RE = re.compile(
-    r"\(TRF4,\s+"
-    r"(?P<tipo>[A-ZÁÀÃÂÉÊÍÓÔÕÚÇ][A-ZÁÀÃÂÉÊÍÓÔÕÚÇa-záàãâéêíóôõúç /]+?)\s+"
-    r"(?:Nº\s+)?"
-    r"(?P<processo>\d{7}-\d{2}\.\d{4}\.\d\.\d{2}\.\d{4}),\s+"
-    r"(?P<turma>[^,\n]+),\s+"
-    r"(?P<relator>[^,\n]+),\s+"
-    r"(?:POR\s+[^,\n]+,\s+)?"
-    r"JUNTADO\s+AOS\s+AUTOS\s+EM\s+"
-    r"(?P<data>\d{2}\.\d{2}\.\d{4})",
+# Localiza o fim de cada citação: JUNTADO AOS AUTOS EM DD.MM.YYYY)
+JUNTADO_CLOSE_RE = re.compile(
+    r"JUNTADO\s+AOS\s+AUTOS\s+EM\s+(?P<data>\d{2}\.\d{2}\.\d{4})\s*\)",
+    re.IGNORECASE,
+)
+
+# Extrai campos da citação (texto já normalizado, sem quebras de linha)
+# Texto de entrada: "TIPO N° PROCESSO, TURMA, RELATOR, ..., JUNTADO AOS AUTOS EM DATE)"
+# processo pode estar sem tipo ("5016176-33...") ou com tipo ("APELAÇÃO CÍVEL Nº 5001234...")
+CITE_FIELDS_RE = re.compile(
+    r"(?:(?P<tipo>[A-ZÁÀÃÂÉÊÍÓÔÕÚÇ][^,\d]*?)\s+(?:N[°º]\s+)?)?"
+    r"(?P<processo>\d{7}-\s*\d{2}\.\d{4}\.(?:\d\.\d{2}|\d{3})\.\d{4})"
+    r",\s*(?P<turma>[^,]+),\s*(?P<relator>[^,]+)",
     re.IGNORECASE,
 )
 
@@ -197,94 +198,94 @@ def extract_edition(filename: str) -> Optional[str]:
 
 # ── Parsing principal ─────────────────────────────────────────────────────────
 
+def _normalize(text: str) -> str:
+    """
+    Remove hifens de quebra de linha, cabeçalhos de página e colapsa whitespace.
+    """
+    # Hifens de quebra de linha
+    text = re.sub(r"-\s*\n\s*", "", text)
+    # Caixas de cabeçalho: | Boletim Jurídico nº NNN| ... | EMAGIS | NNN
+    text = re.sub(r"\|\s*[^\|]{1,80}\|\s*", " ", text)
+    # "Boletim Jurídico NNN" solto
+    text = re.sub(r"Boletim\s+Jur[íi]dico[^\n]*\n?", " ", text, flags=re.IGNORECASE)
+    # "mes/YYYY emagis | trf4 ..." (cabeçalho editorial)
+    text = re.sub(r"\w+/\d{4}\s+emagis[^\n]*\n?", " ", text, flags=re.IGNORECASE)
+    # Colapsa todo whitespace em espaço único
+    return re.sub(r"\s+", " ", text).strip()
+
+
 def extract_decisions(text: str, filename: str) -> list[dict]:
     """
-    Divide o texto do Boletim EMAGIS TRF4 em decisões individuais.
+    Divide o Boletim EMAGIS TRF4 em decisões individuais.
 
-    Cada decisão termina com a citação:
-    (TRF4, TIPO PROCESSO, TURMA, RELATOR, [POR UNANIMIDADE,] JUNTADO AOS AUTOS EM DD.MM.YYYY)
+    Abordagem: normaliza todo o texto (remove quebras) e separa por '(TRF4, '.
+    Cada segmento começa com os campos da citação e termina com o corpo da próxima decisão.
+    Tudo é ementa — não há conteúdoIntegral separado (igual ao TRF1).
     """
     edition = extract_edition(filename)
-    citations = list(CITATION_RE.finditer(text))
 
-    if not citations:
+    # Normaliza: remove hifens de quebra, colapsa whitespace
+    text = _normalize(text)
+
+    # Divide pelo delimitador de citação
+    chunks = text.split("(TRF4, ")
+
+    if len(chunks) < 2:
         log.warning(f"  Nenhuma citacao encontrada em {filename}")
         return []
 
-    # Regex para localizar início de decisão real (ALL CAPS após número-travessão)
-    _REAL_ENTRY_RE = re.compile(
-        r"(?m)^\s*\d{1,3}\s*[-–]\s+[A-Z\xc1\xc0\xc3\xc2\xc9\xca\xcd\xd3\xd4\xd5\xda\xc7]{3}",
-    )
-
     decisions = []
-    prev_end = 0
     current_section = ""
 
-    for match in citations:
-        block_text = text[prev_end:match.start()]
-        citation_text = match.group(0)
+    for i in range(1, len(chunks)):
+        chunk = chunks[i]
 
-        # Primeiro bloco: contém capa + editorial + sumário antes da 1ª decisão real.
-        # Localiza o último entry ALL CAPS (= ementa) para pular o material de capa.
-        if prev_end == 0:
-            real_entries = list(_REAL_ENTRY_RE.finditer(block_text))
-            if real_entries:
-                block_text = block_text[real_entries[-1].start():]
+        # Localiza o fim da citação: JUNTADO AOS AUTOS EM DD.MM.YYYY)
+        m_end = JUNTADO_CLOSE_RE.search(chunk)
+        if not m_end:
+            continue  # sem JUNTADO = referência interna incompleta, ignora
 
-        # Atualiza seção de área caso haja cabeçalho no bloco atual
-        section_matches = list(SECTION_RE.finditer(block_text))
-        if section_matches:
-            current_section = section_matches[-1].group(1).strip()
-            # Texto da decisão começa após o último cabeçalho de seção
-            decision_body = block_text[section_matches[-1].end():].strip()
+        data = parse_date(m_end.group("data"))
+        citation_text = chunk[: m_end.end()]
+
+        # Body desta decisão = restante do chunk anterior (após o ) da citação anterior)
+        prev_chunk = chunks[i - 1]
+        prev_juntado = JUNTADO_CLOSE_RE.search(prev_chunk)
+        if prev_juntado:
+            body_raw = prev_chunk[prev_juntado.end():]
         else:
-            decision_body = block_text
+            # Primeiro chunk = preamble do boletim + body da decisão 1.
+            # Descarta o preamble localizando a ÚLTIMA ocorrência de "NN – " (início de ementa).
+            _ENTRY_START = re.compile(r"\d{1,3}\s*[-–]\s+[A-Z\xc0-\xff]")
+            entries = list(_ENTRY_START.finditer(prev_chunk))
+            body_raw = prev_chunk[entries[-1].start():] if entries else prev_chunk
 
-        body = clean_block(decision_body)
+        body_raw = body_raw.strip()
 
-        # Ignora blocos muito curtos (ruído entre páginas)
-        if len(body.strip()) < 60:
-            prev_end = match.end()
+        # Ignora blocos muito curtos (ruído ou referências internas fragmentadas)
+        if len(body_raw) < 60:
             continue
 
-        processo = match.group("processo")
-        tipo = match.group("tipo").strip()
-        turma = match.group("turma").strip()
-        relator = clean_relator(match.group("relator").strip())
-        data = parse_date(match.group("data"))
+        # Extrai campos da citação
+        m_fields = CITE_FIELDS_RE.search(citation_text)
+        if not m_fields:
+            continue
 
-        # EMAGIS: blocos sempre começam com ")" do parêntese não capturado + espaço
-        # Formatos: (a) "NN – ALL CAPS KEYWORD.\n1. corpo" (bol200-204)
-        #           (b) "NN - ALL CAPS KEYWORD. Corpo em prosa." (bol205+, inline)
-        body_stripped = body.strip()
-        # Remove ")" residual do final da citação anterior
-        body_stripped = re.sub(r"^\s*\)\s*\n?", "", body_stripped).strip()
-        # Remove | residual de caixas de cabecalho (ex: "| Escola da Magistratura |" já removido mas deixa "|")
-        body_stripped = re.sub(r"^\s*\|[^\n]*\n", "", body_stripped).strip()
-        # Remove letra de índice alfabético solta ("H", "A", etc.)
-        body_stripped = re.sub(r"^[A-Z]\s*\n", "", body_stripped).strip()
+        # Remove espaço no meio do número de processo (quebra de linha normalizada)
+        processo = m_fields.group("processo").replace(" ", "")
+        turma = m_fields.group("turma").strip()
+        relator = clean_relator(m_fields.group("relator").strip())
 
-        # Ementa = sentenças ALL CAPS; corpo = primeira sentença com palavras minúsculas
-        # Divide nas quebras de sentenças (. ! ?) e acumula até encontrar prosa
-        _LOWER_PT = re.compile(r"[a-záàâãéêíóôõúüç]{3,}")
-        _BODY_NUM = re.compile(r"^\d+\.?$")  # marcador de parágrafo: "1.", "2.", etc.
-        sentences = re.split(r"(?<=[.!?])\s+", body_stripped)
-        ementa_parts: list[str] = []
-        for sent in sentences:
-            sent = sent.strip()
-            if not sent:
-                continue
-            # Para antes de marcadores de parágrafo do corpo ("1.", "2.") ou prosa
-            if _BODY_NUM.match(sent) or _LOWER_PT.search(sent):
-                break
-            ementa_parts.append(sent)
+        # Atualiza seção de área se houver cabeçalho no body
+        section_matches = list(SECTION_RE.finditer(body_raw))
+        if section_matches:
+            current_section = section_matches[-1].group(1).strip()
+            body_raw = body_raw[section_matches[-1].end():].strip()
 
-        if ementa_parts and len(" ".join(ementa_parts)) >= 15:
-            ementa_raw = " ".join(ementa_parts)
-        else:
-            ementa_raw = re.split(r"\n\s*\n", body_stripped, maxsplit=1)[0]
-        ementa = re.sub(r"-\s*\n\s*", "", re.sub(r"\s*\n\s*", " ", ementa_raw)).strip()
-        conteudo = (body + "\n" + citation_text)[:80_000]
+        # Ementa: remove número de página, prefixo "01 – " e eventual "– " inicial
+        ementa = re.sub(r"^\d{1,3}\s+", "", body_raw).strip()
+        ementa = re.sub(r"^\d{1,3}\s*[-–]\s*", "", ementa).strip()
+        ementa = re.sub(r"^[-–]\s*", "", ementa).strip()
 
         doc = {
             "_id": f"trf4-{processo}",
@@ -293,13 +294,11 @@ def extract_decisions(text: str, filename: str) -> list[dict]:
             "ementa": ementa,
             "relator": relator,
             "dataJulgamento": data,
-            "area": classify_area(body, current_section),
+            "area": classify_area(body_raw, current_section),
             "orgaoJulgador": turma,
             "url": f"https://www.trf4.jus.br/trf4/controlador.php?acao=jurisprudencia_pesquisar&processo={processo}",
-            "conteudoIntegral": conteudo,
         }
         decisions.append(doc)
-        prev_end = match.end()
 
     log.info(f"  {len(decisions)} decisoes extraidas de {filename} (ed. {edition})")
     return decisions

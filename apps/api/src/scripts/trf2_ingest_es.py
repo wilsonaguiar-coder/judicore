@@ -40,6 +40,7 @@ PROJECT_ROOT = SCRIPT_DIR.parent.parent.parent.parent  # e:/judicore
 DEFAULT_FOLDER = PROJECT_ROOT / "temp" / "trf2"
 CHECKPOINT_FILE = SCRIPT_DIR / "trf2_ingest_checkpoint.json"
 LOG_FILE = SCRIPT_DIR / "trf2_ingest_es.log"
+EMENTAS_FILE = PROJECT_ROOT / "trf2_ementas.json"
 ES_INDEX = "jurisprudencia"
 
 # ── Regexes ───────────────────────────────────────────────────────────────────
@@ -60,7 +61,18 @@ DATA_RE = re.compile(r"Decis[aã]o\s+em\s+(\d{2}/\d{2}/\d{4})", re.IGNORECASE)
 
 EDITION_RE = re.compile(r"informativo-de-jurisprudencia-(\d+)", re.IGNORECASE)
 
-# Classificação de área por palavras-chave
+# Classificação de área pelo cabeçalho da ementa (primeiros 200 chars)
+# As ementas do TRF2 quase sempre começam com o assunto em caps: "TRIBUTÁRIO.", "PENAL E PROCESSUAL PENAL.", etc.
+_EMENTA_HEAD_AREA: list[tuple[str, re.Pattern]] = [
+    ("CRIMINAL",       re.compile(r"\b(?:penal|criminal|processo\s+penal|habeas[\s\-]corpus)\b", re.IGNORECASE)),
+    ("PREVIDENCIARIO", re.compile(r"\bprevid[eê]nci[aá]ri[oa]\b", re.IGNORECASE)),
+    ("TRIBUTARIO",     re.compile(r"\btribut[aá]ri[oa]\b", re.IGNORECASE)),
+    ("ADMINISTRATIVO", re.compile(r"\b(?:administrativo|improbidade|militar)\b", re.IGNORECASE)),
+    ("AMBIENTAL",      re.compile(r"\bambiental\b", re.IGNORECASE)),
+    ("CIVIL",          re.compile(r"\bcivil\b", re.IGNORECASE)),
+]
+
+# Fallback: classificação por palavras-chave no texto completo
 AREA_RULES: list[tuple[str, re.Pattern]] = [
     ("PREVIDENCIARIO", re.compile(
         r"previd[eê]nci|aposen(?:tad|tor)|inss\b|pens[aã]o\s+por\s+morte|"
@@ -96,6 +108,8 @@ AREA_RULES: list[tuple[str, re.Pattern]] = [
         re.IGNORECASE,
     )),
 ]
+
+_VISTOS_RE = re.compile(r"^[Vv]istos\s+e\s+relatados", re.IGNORECASE)
 
 MESES_PT = {
     "janeiro": "01", "fevereiro": "02", "março": "03", "marco": "03",
@@ -134,6 +148,15 @@ def classify_area(text: str) -> str:
         if pattern.search(text):
             return area
     return "OUTRO"
+
+
+def classify_area_from_ementa(ementa: str) -> str:
+    """Classifica pela cabeçalho da ementa (primeiros 200 chars); fallback para texto completo."""
+    head = ementa[:200]
+    for area, pat in _EMENTA_HEAD_AREA:
+        if pat.search(head):
+            return area
+    return classify_area(ementa)
 
 
 def clean_title_prefix(content: str) -> str:
@@ -202,6 +225,23 @@ def pdf_to_text(path: str) -> str:
     return "\n".join(pages)
 
 
+def clean_block(text: str) -> str:
+    # Remove cabeçalhos INFOJUR e rodapés de página
+    text = re.sub(r"(?im)^INFOJUR\s+N[Oo°º]\s*\d+[^\n]*\n?", "", text)
+    text = re.sub(r"(?im)^Coordenadoria de Gest[aã]o Documental e Mem[oó]ria[^\n]*\n?", "", text)
+    # Remove números de página isolados
+    text = re.sub(r"(?m)^\s*\d{1,3}\s*$\n?", "", text)
+    # Remove contador "Documento N" do fim de cada decisão
+    text = re.sub(r"\s*\bDocumento\s+\d+\b\s*", " ", text)
+    text = re.sub(r"\n{3,}", "\n\n", text)
+    return text.strip()
+
+
+def _normalize(text: str) -> str:
+    """Remove quebras de linha e espaços duplos."""
+    return re.sub(r" {2,}", " ", re.sub(r"\s*\n\s*", " ", re.sub(r"-\s*\n\s*", "", text))).strip()
+
+
 def extract_edition(filename: str) -> Optional[str]:
     m = EDITION_RE.search(filename)
     return m.group(1) if m else None
@@ -209,7 +249,7 @@ def extract_edition(filename: str) -> Optional[str]:
 
 # ── Parsing principal ─────────────────────────────────────────────────────────
 
-def extract_decisions(text: str, filename: str) -> list[dict]:
+def extract_decisions(text: str, filename: str, ementas: dict | None = None) -> list[dict]:
     """
     Divide o texto do INFOJUR TRF2 em decisões individuais.
 
@@ -223,7 +263,7 @@ def extract_decisions(text: str, filename: str) -> list[dict]:
     for i, m in enumerate(matches):
         block_start = m.start()
         block_end = matches[i + 1].start() if i + 1 < len(matches) else len(text)
-        block = text[block_start:block_end]
+        block = clean_block(text[block_start:block_end])
 
         # Ignora citações de referência (não têm 'Decisão em' nem 'volta')
         header_chunk = block[:700]
@@ -241,26 +281,41 @@ def extract_decisions(text: str, filename: str) -> list[dict]:
         # Relator e turma
         relator, turma = extract_relator_turma(header_chunk)
 
-        # Ementa: primeira linha não-vazia após 'volta'
+        # Ementa: preferir lookup no JSON de ementas buscadas do eproc
+        ementa_from_json = (ementas or {}).get(processo, "")
+        if ementa_from_json and not ementa_from_json.startswith("[ERRO"):
+            ementa = ementa_from_json
+        else:
+            ementa_from_json = ""
+
+        # Texto do corpo: extraído após 'volta' para conteudoIntegral e ementa fallback
         volta_pos = block.lower().find("volta")
         if volta_pos >= 0:
             after_volta = block[volta_pos + 5:]
-            # Corpo inicia em "Cuida-se de", "Trata-se de" ou parágrafo longo
-            body_m = re.search(
-                r"(?m)^(?:[Cc]uida-se\s+de|[Tt]rata-se\s+de|[Nn]o\s+caso\s+dos\s+autos|"
-                r"[Ee]m\s+que\s+pese|[Vv]ersa\s+os\s+autos|[Aa]nalisando\s+os\s+autos)",
-                after_volta,
-            )
-            if body_m:
-                ementa_raw = after_volta[:body_m.start()].strip()
-            else:
-                # fallback: primeira linha não-vazia (título da ementa)
-                ementa_raw = after_volta.strip().split("\n")[0].strip()
-            ementa = re.sub(r"-\s*\n\s*", "", re.sub(r"\s*\n\s*", " ", ementa_raw)).strip()
-            decision_text = after_volta
+            if not ementa_from_json:
+                body_m = re.search(
+                    r"(?m)^(?:[Cc]uida-se\s+de|[Tt]rata-se\s+de|[Nn]o\s+caso\s+dos\s+autos|"
+                    r"[Ee]m\s+que\s+pese|[Vv]ersa\s+os\s+autos|[Aa]nalisando\s+os\s+autos)",
+                    after_volta,
+                )
+                if body_m:
+                    ementa_raw = after_volta[:body_m.start()].strip()
+                else:
+                    ementa_raw = after_volta.strip().split("\n")[0].strip()
+                ementa = _normalize(ementa_raw)
+            decision_text = _normalize(after_volta[:80_000])
         else:
-            ementa = ""
-            decision_text = block
+            if not ementa_from_json:
+                ementa = ""
+            decision_text = _normalize(block[:80_000])
+
+        # Descarta decisões muito curtas: editoriais, avisos processuais, resumos sem fundamentação
+        if len(decision_text) < 500:
+            continue
+
+        # Ementa = texto completo para todos os casos sem JSON (garante conteúdo para busca)
+        if not ementa_from_json:
+            ementa = decision_text
 
         doc = {
             "_id": f"trf2-{processo}",
@@ -269,10 +324,10 @@ def extract_decisions(text: str, filename: str) -> list[dict]:
             "ementa": ementa,
             "relator": relator,
             "dataJulgamento": data,
-            "area": classify_area(decision_text),
+            "area": classify_area_from_ementa(ementa),
             "orgaoJulgador": turma,
             "url": f"https://www.trf2.jus.br/trf2/consultas-e-servicos/infojur-informativos-de-jurisprudencia-do-trf2",
-            "conteudoIntegral": decision_text[:80_000],
+            "conteudoIntegral": decision_text,
         }
         decisions.append(doc)
 
@@ -347,6 +402,11 @@ def main() -> None:
         CHECKPOINT_FILE.unlink()
         log.info("🗑️  Checkpoint removido")
 
+    ementas: dict = {}
+    if EMENTAS_FILE.exists():
+        ementas = json.loads(EMENTAS_FILE.read_text(encoding="utf-8"))
+        log.info(f"Ementas carregadas: {sum(1 for v in ementas.values() if v and not v.startswith('[ERRO'))}/{len(ementas)}")
+
     done = load_checkpoint()
     es = None if args.dry_run else Elasticsearch(args.es_url)
 
@@ -372,7 +432,7 @@ def main() -> None:
         try:
             log.info(f"📄 {fname}")
             text = pdf_to_text(str(pdf_path))
-            decisions = extract_decisions(text, fname)
+            decisions = extract_decisions(text, fname, ementas)
             counters["decisions"] += len(decisions)
             log.info(f"  → {len(decisions)} decisões extraídas")
 

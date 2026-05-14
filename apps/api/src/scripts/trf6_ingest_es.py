@@ -17,6 +17,7 @@ Uso:
 """
 
 import argparse
+import hashlib
 import json
 import logging
 import os
@@ -45,9 +46,15 @@ ES_INDEX = "jurisprudencia"
 # múltiplos espaços (PDFs recentes), typo "julgao" em edições antigas.
 CITATION_RE = re.compile(
     r"\(TRF6,\s+"
-    r"(?P<tipo>[A-ZÁÀÃÂÉÊÍÓÔÕÚÇa-záàãâéêíóôõúç./° ]+?)\s+"
-    r"n[.°º]?\s*"
-    r"(?P<processo>\d{7}-\d{2}\.\d{4}\.\d\.\d{2}\.\d{4})(?:/[A-Z]{0,3})?,?\s*"
+    r"(?:"
+        # Com número de processo CNJ
+        r"(?:[A-ZÁÀÃÂÉÊÍÓÔÕÚÇa-záàãâéêíóôõúç./° ]+?)\s+"
+        r"n[.°º]?\s*"
+        r"(?P<processo>\d{7}-\d{2}\.\d{4}\.\d\.\d{2}\.\d{4})(?:/[A-Z]{0,3})?"
+    r"|"
+        # Segredo de justiça: sem número de processo
+        r"(?:[A-Za-záàãâéêíóôõúçÁÀÃÂÉÊÍÓÔÕÚÇ./° ]+,\s*)?processo\s+em\s+segredo\s+de\s+justi[çc]a"
+    r"),?\s*"
     r"Rel\.\s*(?P<relator>[^,]+),\s*"
     r"(?P<orgao>[^,\)]+),\s*"
     r"(?:julga(?:d[ao]|o)|publicad[ao])\s+em\s+"
@@ -57,7 +64,7 @@ CITATION_RE = re.compile(
 
 # Área explícita em "Assuntos:" (formato antigo) ou cabeçalho de seção (formato novo)
 ASSUNTO_RE = re.compile(
-    r"(?:Assuntos?:\s*|^)DIREITO\s+"
+    r"Assuntos?:\s*(?:DIREITO\s+)?"
     r"(?P<area>ADMINISTRATIVO|AMBIENTAL|CIVIL|CONSTITUCIONAL|PENAL|"
     r"PREVIDENCI[ÁA]RIO|PROCESSUAL(?:\s+(?:CIVIL|PENAL))?|TRIBUT[ÁA]RIO|"
     r"DO\s+CONSUMIDOR|TRABALHISTA)",
@@ -67,6 +74,20 @@ ASSUNTO_RE = re.compile(
 SECTION_AREA_RE = re.compile(
     r"^[ \t]*(?P<area>Previdenci[aá]rio|Administrativo|Tribut[aá]rio|Penal|Civil|"
     r"Ambiental|Constitucional|Processual|Trabalhista)\s*$",
+    re.IGNORECASE | re.MULTILINE,
+)
+
+# Detecta "1. TRIBUTÁRIO." / "2. E ADMINISTRATIVO." / "3. DIREITO PENAL." no início da ementa
+NUMBERED_AREA_RE = re.compile(
+    r"^\d+\.\s+(?:(?:E|DIREITO)\s+)?(?P<area>TRIBUTÁRI[OA]|PENAL|ADMINISTRATIVO|"
+    r"PREVIDENCI[ÁA]RI[OA]|CIVIL|AMBIENTAL|CONSTITUCIONAL)\b",
+    re.IGNORECASE | re.MULTILINE,
+)
+
+# Scan de alta especificidade: encontra área específica em qualquer posição do heading numerado
+# (cobre "1. CONSTITUCIONAL E TRIBUTÁRIO." → TRIBUTARIO, "1. DIREITO AMBIENTAL..." → AMBIENTAL)
+HEADING_SPECIFIC_RE = re.compile(
+    r"^\d+\.\s+[^\n]{0,80}?(?P<area>TRIBUTÁRI[OA]|PREVIDENCI[ÁA]RI[OA]|AMBIENTAL)\b",
     re.IGNORECASE | re.MULTILINE,
 )
 
@@ -81,6 +102,8 @@ SECTION_AREA_MAP = {
     "AMBIENTAL": "AMBIENTAL",
     "CONSTITUCIONAL": "ADMINISTRATIVO",
     "PROCESSUAL": "OUTRO",
+    "PROCESSUAL PENAL": "CRIMINAL",
+    "PROCESSUAL CIVIL": "CIVIL",
     "TRABALHISTA": "OUTRO",
     "CONSUMIDOR": "CIVIL",
 }
@@ -97,12 +120,12 @@ AREA_RULES: list[tuple[str, re.Pattern]] = [
         re.IGNORECASE,
     )),
     ("ADMINISTRATIVO", re.compile(
-        r"servidor\s+p[úu]blico|concurso\s+p[úu]blico|licita[çc][aã]o\b|"
+        r"administrat[ií]v[oa]\b|servidor\s+p[úu]blico|concurso\s+p[úu]blico|licita[çc][aã]o\b|"
         r"improbidade\b|ato\s+administrativo|cargo\s+p[úu]blico|desapropria[çc][aã]o\b",
         re.IGNORECASE,
     )),
     ("CRIMINAL", re.compile(
-        r"\bcrime\b|\bpenal\b|\bpena\s|\br[eé]u\b|den[úu]ncia\b|habeas.corpus|"
+        r"\bcrime\b|\bpenal\b|\bpena\s+(?!de\b)|\br[eé]u\b|den[úu]ncia\b|habeas.corpus|"
         r"contrabando\b|estelionato\b|homic[íi]dio\b|tr[aá]fico\b|corrup[çc][aã]o\b",
         re.IGNORECASE,
     )),
@@ -111,7 +134,7 @@ AREA_RULES: list[tuple[str, re.Pattern]] = [
         re.IGNORECASE,
     )),
     ("CIVIL", re.compile(
-        r"responsabilidade\s+civil|indeniza[çc][aã]o\s|usucapi[aã]o\b|loca[çc][aã]o\b",
+        r"\bcivil\b|responsabilidade\s+civil|indeniza[çc][aã]o\s|usucapi[aã]o\b|loca[çc][aã]o\b",
         re.IGNORECASE,
     )),
 ]
@@ -124,6 +147,8 @@ def parse_date(raw: str) -> Optional[str]:
     if m:
         d, mo, y = m.groups()
         y_full = f"20{y}" if len(y) == 2 and int(y) < 50 else (f"19{y}" if len(y) == 2 else y)
+        if not (1900 <= int(y_full) <= 2100):
+            return None
         return f"{y_full}-{mo}-{d}"
     return None
 
@@ -138,22 +163,35 @@ def clean_relator(raw: str) -> str:
     ).strip()
 
 
-def classify_area(block: str) -> str:
-    # 1. Procura "Assuntos: DIREITO XXX" explícito
+def _norm(s: str) -> str:
+    return (s.upper()
+            .replace("Á","A").replace("À","A").replace("Â","A").replace("Ã","A")
+            .replace("É","E").replace("Ê","E").replace("Í","I")
+            .replace("Ó","O").replace("Ô","O").replace("Õ","O").replace("Ú","U"))
+
+
+def classify_area(block: str) -> Optional[str]:
+    # 1. "Assuntos: [DIREITO] XXX" explícito
     m = ASSUNTO_RE.search(block)
     if m:
-        key = m.group("area").upper().replace("Á", "A").replace("Ã", "A").replace("É", "E")
-        return SECTION_AREA_MAP.get(key, "OUTRO")
-    # 2. Procura cabeçalho de seção standalone (formato novo dos BIJs)
+        return SECTION_AREA_MAP.get(_norm(m.group("area")), "OUTRO")
+    # 2. Cabeçalho de seção standalone ("Administrativo" sozinho na linha)
     m2 = SECTION_AREA_RE.search(block[:400])
     if m2:
-        key = m2.group("area").upper().replace("Á", "A").replace("Ã", "A").replace("É", "E")
-        return SECTION_AREA_MAP.get(key, "OUTRO")
-    # 3. Fallback por palavras-chave
+        return SECTION_AREA_MAP.get(_norm(m2.group("area")), "OUTRO")
+    # 3. Scan de alta especificidade no heading: "1. CONSTITUCIONAL E TRIBUTÁRIO." → TRIBUTARIO
+    m3 = HEADING_SPECIFIC_RE.search(block[:400])
+    if m3:
+        return SECTION_AREA_MAP.get(_norm(m3.group("area")), "OUTRO")
+    # 3b. Heading numerado imediato "1. TRIBUTÁRIO." / "2. E ADMINISTRATIVO." / "3. CIVIL."
+    m3b = NUMBERED_AREA_RE.search(block[:400])
+    if m3b:
+        return SECTION_AREA_MAP.get(_norm(m3b.group("area")), "OUTRO")
+    # 4. Palavras-chave no bloco
     for area, pattern in AREA_RULES:
         if pattern.search(block):
             return area
-    return "OUTRO"
+    return None
 
 
 def clean_block(text: str) -> str:
@@ -203,7 +241,7 @@ def extract_decisions(text: str, filename: str) -> list[dict]:
 
         body = clean_block(block_text)
 
-        if len(body.strip()) < 40:
+        if len(body.strip()) < 200:
             prev_end = match.end()
             continue
 
@@ -211,6 +249,11 @@ def extract_decisions(text: str, filename: str) -> list[dict]:
         relator = clean_relator(match.group("relator"))
         orgao = re.sub(r"\s+", " ", match.group("orgao").replace("\n", " ")).strip()
         data = parse_date(match.group("data"))
+
+        # Segredo de justiça: gera ID sintético pois não há número CNJ público
+        if not processo:
+            h = hashlib.md5(f"{relator}-{data}-{orgao}".encode()).hexdigest()[:10]
+            processo = f"segredo-{h}"
 
         # Normaliza body: remove artefato ")" ou ")." do parêntese não capturado
         body_stripped = body.strip()
@@ -228,29 +271,14 @@ def extract_decisions(text: str, filename: str) -> list[dict]:
         )
         body_stripped = re.sub(r"\n{3,}", "\n\n", body_stripped).strip()
 
-        # Formato antigo (BIJ1-BIJ21): ementa termina em "Decisão:"
-        decisao_m = re.search(r"Decis[aã]o\s*:", body_stripped, re.IGNORECASE)
-        if decisao_m and decisao_m.start() > 20:
-            ementa_raw = body_stripped[:decisao_m.start()].strip()
-        else:
-            # Formato novo (BIJ22+): ementa = sentenças ALL CAPS; corpo = primeira sentença com prosa
-            sentences = re.split(r"(?<=[.!?])\s+", body_stripped)
-            ementa_parts: list[str] = []
-            for sent in sentences:
-                sent = sent.strip()
-                if not sent:
-                    continue
-                if _LOWER_PT6.search(sent):
-                    break
-                ementa_parts.append(sent)
-
-            if ementa_parts and len(" ".join(ementa_parts)) >= 15:
-                ementa_raw = " ".join(ementa_parts)
-            else:
-                ementa_raw = re.split(r"\n\s*\n", body_stripped, maxsplit=1)[0]
-
-        ementa = re.sub(r"-\s*\n\s*", "", re.sub(r"\s*\n\s*", " ", ementa_raw)).strip()
+        # Ementa = texto completo (TRF6 não tem campo separado de ementa)
+        ementa = re.sub(r"-\s*\n\s*", "", re.sub(r"\s*\n\s*", " ", body_stripped)).strip()
         conteudo = (body + "\n" + citation_text)[:80_000]
+
+        # Área: classifica pelos primeiros 200 chars da ementa, que quase sempre começa
+        # com o assunto em caps ("TRIBUTÁRIO.", "PENAL.", "ADMINISTRATIVO.", etc.)
+        # Cai no classify_area(body) se não encontrar área no cabeçalho da ementa
+        area = classify_area(ementa[:200]) or classify_area(body) or "OUTRO"
 
         doc = {
             "_id": f"trf6-{processo}",
@@ -259,7 +287,7 @@ def extract_decisions(text: str, filename: str) -> list[dict]:
             "ementa": ementa,
             "relator": relator,
             "dataJulgamento": data,
-            "area": classify_area(body),
+            "area": area,
             "orgaoJulgador": orgao,
             "url": "https://www.trf6.jus.br/trf6/jurisprudencia/jurisprudencia",
             "conteudoIntegral": conteudo,

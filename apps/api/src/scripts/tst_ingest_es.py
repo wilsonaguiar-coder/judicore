@@ -268,7 +268,7 @@ def parse_html_file(path: Path) -> Optional[dict]:
         "dataJulgamento": _parse_date(data_str) if data_str else None,
         "area": "TRABALHISTA",
         "orgaoJulgador": orgao.strip(),
-        "url": "https://jurisprudencia.tst.jus.br/",
+        "url": f"https://jurisprudencia-backend2.tst.jus.br/rest/documentos/{path.stem}",
         "conteudoIntegral": conteudo,
     }
 
