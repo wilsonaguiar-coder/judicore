@@ -17,8 +17,6 @@ export function JurisprudenciaStats({ token, inline }: { token: string; inline?:
     api.get<Stats>("/search/stats", token).then(setStats).catch(() => {});
   }, [token]);
 
-  if (!stats) return null;
-
   const fmt = (n: number) => n.toLocaleString("pt-BR");
 
   const inner = (
@@ -27,13 +25,13 @@ export function JurisprudenciaStats({ token, inline }: { token: string; inline?:
         Nossos Números de Acórdãos Indexados
       </p>
       <div className="flex items-end gap-6 flex-wrap">
-        <StatItem label="STF e STJ" value={fmt(stats.stf_stj)} />
+        <StatItem label="STF e STJ" value={stats ? fmt(stats.stf_stj) : null} />
         <div className="w-px h-8 bg-border" />
-        <StatItem label="TST e TRFs" value={fmt(stats.tst_trfs)} />
+        <StatItem label="TST e TRFs" value={stats ? fmt(stats.tst_trfs) : null} />
         <div className="w-px h-8 bg-border" />
-        <StatItem label="TJs e TRTs" value={fmt(stats.tj_trts)} />
+        <StatItem label="TJs e TRTs" value={stats ? fmt(stats.tj_trts) : null} />
         <div className="w-px h-8 bg-border" />
-        <StatItem label="Total geral" value={fmt(stats.total)} highlight />
+        <StatItem label="Total geral" value={stats ? fmt(stats.total) : null} highlight />
       </div>
     </>
   );
@@ -53,19 +51,19 @@ function StatItem({
   highlight,
 }: {
   label: string;
-  value: string;
+  value: string | null;
   highlight?: boolean;
 }) {
   return (
     <div>
       <p className="text-[10px] text-muted-foreground leading-none mb-0.5">{label}</p>
-      <p
-        className={`text-lg font-bold leading-none tabular-nums ${
-          highlight ? "text-primary" : ""
-        }`}
-      >
-        {value}
-      </p>
+      {value === null ? (
+        <div className="h-5 w-16 rounded bg-muted animate-pulse mt-0.5" />
+      ) : (
+        <p className={`text-lg font-bold leading-none tabular-nums ${highlight ? "text-primary" : ""}`}>
+          {value}
+        </p>
+      )}
     </div>
   );
 }
