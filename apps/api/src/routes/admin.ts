@@ -1,5 +1,10 @@
 import type { FastifyInstance } from "fastify";
 import { z } from "zod";
+import { spawn } from "node:child_process";
+import { promises as fsp } from "node:fs";
+import { resolve, dirname } from "node:path";
+import { fileURLToPath } from "node:url";
+import { randomUUID } from "node:crypto";
 import { getIndexingQueue } from "../queues/queue.js";
 import { buildJobData, SCHEDULE_CONFIG } from "../queues/schedule-config.js";
 import { getElasticsearchClient, JURISPRUDENCIA_INDEX, ensureIndices } from "@judicore/search";
@@ -7,6 +12,52 @@ import type { LegalArea } from "@judicore/search";
 import { prisma } from "@judicore/db";
 
 const SEARCH_SERVICE_URL = process.env["SEARCH_SERVICE_URL"] ?? "http://127.0.0.1:7860";
+
+// ── TRF ingestion ─────────────────────────────────────────────────────────────
+
+const __routeDir = dirname(fileURLToPath(import.meta.url));
+const SCRIPTS_DIR = resolve(__routeDir, "../../src/scripts");
+const TRF_VENV = process.env["TRF_VENV_PATH"] ?? "/opt/judicore/trf_venv";
+const TRF_PYTHON = `${TRF_VENV}/bin/python3`;
+const ES_URL_DEFAULT = process.env["ELASTICSEARCH_URL"] ?? "http://localhost:9200";
+
+const VALID_TRFS = ["TRF1", "TRF2", "TRF3", "TRF4", "TRF5", "TRF6"] as const;
+
+interface TrfJob {
+  id: string;
+  tribunal: string;
+  status: "running" | "completed" | "failed";
+  lines: string[];
+  indexed: number;
+  startedAt: string;
+  finishedAt: string | null;
+}
+
+const trfJobs = new Map<string, TrfJob>();
+
+async function ensureTrfVenv(): Promise<void> {
+  try {
+    await fsp.access(TRF_PYTHON);
+    return;
+  } catch {
+    await fsp.mkdir("/opt/judicore", { recursive: true });
+    await spawnAsync("python3", ["-m", "venv", TRF_VENV]);
+    await spawnAsync(TRF_PYTHON, ["-m", "pip", "install", "--quiet", "elasticsearch>=8,<9", "pymupdf"]);
+  }
+}
+
+function spawnAsync(cmd: string, args: string[]): Promise<void> {
+  return new Promise((res, rej) => {
+    const p = spawn(cmd, args);
+    p.on("close", (code) => (code === 0 ? res() : rej(new Error(`${cmd} exited with code ${code}`))));
+    p.on("error", rej);
+  });
+}
+
+function getTrfScriptPath(tribunal: string): string {
+  const num = tribunal.replace("TRF", "").toLowerCase();
+  return resolve(SCRIPTS_DIR, `trf${num}_ingest_es.py`);
+}
 
 async function proxyToSearchService(path: string, options: RequestInit = {}) {
   const res = await fetch(`${SEARCH_SERVICE_URL}${path}`, {
@@ -347,6 +398,116 @@ export async function adminRoutes(app: FastifyInstance) {
     await prisma.usageLog.create({ data: body.data });
     return reply.status(201).send({ ok: true });
   });
+
+  // POST /admin/trf/upload — recebe PDF(s) de boletim TRF e indexa no ES
+  app.post(
+    "/trf/upload",
+    {
+      onRequest: [authenticate, requireAdmin],
+      config: { rawBody: true },
+    },
+    async (request, reply) => {
+      const tribunal = ((request.query as any).tribunal as string)?.toUpperCase();
+      if (!VALID_TRFS.includes(tribunal as any)) {
+        return reply.status(400).send({ error: `Tribunal inválido. Use: ${VALID_TRFS.join(", ")}` });
+      }
+
+      const scriptPath = getTrfScriptPath(tribunal);
+      try {
+        await fsp.access(scriptPath);
+      } catch {
+        return reply.status(400).send({ error: `Script de ingestão para ${tribunal} ainda não implementado` });
+      }
+
+      const jobId = randomUUID();
+      const tmpDir = `/tmp/trf_upload_${jobId}`;
+      await fsp.mkdir(tmpDir, { recursive: true });
+
+      const parts = (request as any).parts({ limits: { fileSize: 50 * 1024 * 1024, files: 20 } });
+      let fileCount = 0;
+
+      for await (const part of parts) {
+        if (part.type === "file" && part.filename?.toLowerCase().endsWith(".pdf")) {
+          const chunks: Buffer[] = [];
+          for await (const chunk of part.file) chunks.push(chunk);
+          await fsp.writeFile(resolve(tmpDir, part.filename), Buffer.concat(chunks));
+          fileCount++;
+        } else if (part.type === "file") {
+          for await (const _ of part.file) {} // drain
+        }
+      }
+
+      if (fileCount === 0) {
+        await fsp.rm(tmpDir, { recursive: true, force: true });
+        return reply.status(400).send({ error: "Nenhum PDF enviado" });
+      }
+
+      const job: TrfJob = {
+        id: jobId,
+        tribunal,
+        status: "running",
+        lines: [`Iniciando ingestão ${tribunal} — ${fileCount} PDF(s)…`],
+        indexed: 0,
+        startedAt: new Date().toISOString(),
+        finishedAt: null,
+      };
+      trfJobs.set(jobId, job);
+
+      // executa em background
+      (async () => {
+        try {
+          job.lines.push("Verificando ambiente Python…");
+          await ensureTrfVenv();
+          job.lines.push("Ambiente pronto. Processando PDFs…");
+
+          const proc = spawn(TRF_PYTHON, [
+            scriptPath, "--folder", tmpDir, "--es-url", ES_URL_DEFAULT, "--batch", "50",
+          ]);
+
+          proc.stdout.on("data", (data: Buffer) => {
+            const lines = data.toString("utf8").split("\n").filter(Boolean);
+            job.lines.push(...lines);
+            if (job.lines.length > 500) job.lines = job.lines.slice(-500);
+          });
+
+          proc.stderr.on("data", (data: Buffer) => {
+            const lines = data.toString("utf8").split("\n").filter(Boolean);
+            job.lines.push(...lines);
+          });
+
+          await new Promise<void>((res, rej) => {
+            proc.on("close", (code) => (code === 0 ? res() : rej(new Error(`Processo encerrou com código ${code}`))));
+            proc.on("error", rej);
+          });
+
+          const allOutput = job.lines.join("\n");
+          const m = allOutput.match(/Indexados\s*:\s*(\d+)/i);
+          job.indexed = m?.[1] ? parseInt(m[1]) : 0;
+          job.status = "completed";
+        } catch (e: any) {
+          job.lines.push(`❌ Erro: ${e.message}`);
+          job.status = "failed";
+        } finally {
+          job.finishedAt = new Date().toISOString();
+          await fsp.rm(tmpDir, { recursive: true, force: true });
+        }
+      })();
+
+      return reply.status(202).send({ jobId, tribunal, files: fileCount });
+    }
+  );
+
+  // GET /admin/trf/job/:id — status de um job de ingestão TRF
+  app.get(
+    "/trf/job/:id",
+    { onRequest: [authenticate, requireAdmin] },
+    async (request, reply) => {
+      const { id } = request.params as { id: string };
+      const job = trfJobs.get(id);
+      if (!job) return reply.status(404).send({ error: "Job não encontrado" });
+      return job;
+    }
+  );
 
   // DELETE /admin/jobs/:id — cancela job pendente
   app.delete(

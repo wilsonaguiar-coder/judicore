@@ -32,6 +32,7 @@ const indexMapping = {
       relator:         { type: "keyword" },
       dataJulgamento:  { type: "date", format: "yyyy-MM-dd" },
       area:            { type: "keyword" },
+      orgaoJulgador:   { type: "keyword" },
       url:             { type: "keyword", index: false },
       conteudoIntegral: { type: "text", analyzer: "portuguese_legal" },
     },

@@ -42,6 +42,16 @@ interface LanceDbInfo {
   stj_pdf_editions: number[];
 }
 
+interface TrfIngestJob {
+  id: string;
+  tribunal: string;
+  status: "running" | "completed" | "failed";
+  lines: string[];
+  indexed: number;
+  startedAt: string;
+  finishedAt: string | null;
+}
+
 interface LanceDbJob {
   id: string;
   sources: string[];
@@ -83,6 +93,12 @@ export default function AdminPage() {
   const [lanceTriggering, setLanceTriggering] = useState(false);
   const lancePollerRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const lancePrePopulatedRef = useRef(false);
+
+  // TRF ingestion state
+  const [trfTribunal, setTrfTribunal] = useState<string>("TRF1");
+  const [trfFiles, setTrfFiles] = useState<FileList | null>(null);
+  const [trfJob, setTrfJob] = useState<TrfIngestJob | null>(null);
+  const trfPollerRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   // STJ indexing state
   const [stjIndexing, setStjIndexing] = useState(false);
@@ -216,8 +232,48 @@ export default function AdminPage() {
     }
   }
 
+  async function handleTrfUpload() {
+    if (!token || !trfFiles || trfFiles.length === 0) return;
+    setTrfJob(null);
+    if (trfPollerRef.current) clearInterval(trfPollerRef.current);
+
+    try {
+      const form = new FormData();
+      for (const file of Array.from(trfFiles)) form.append("files", file);
+      const res = await fetch(`/api/admin/trf/upload?tribunal=${trfTribunal}`, {
+        method: "POST",
+        headers: { Authorization: `Bearer ${token}` },
+        body: form,
+      });
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        throw new Error((err as any).error ?? `HTTP ${res.status}`);
+      }
+      const data = await res.json() as { jobId: string };
+      setTrfJob({ id: data.jobId, tribunal: trfTribunal, status: "running", lines: ["Aguardando servidor…"], indexed: 0, startedAt: new Date().toISOString(), finishedAt: null });
+
+      trfPollerRef.current = setInterval(async () => {
+        try {
+          const job = await api.get<TrfIngestJob>(`/admin/trf/job/${data.jobId}`, token!);
+          setTrfJob(job);
+          if (job.status === "completed" || job.status === "failed") {
+            if (trfPollerRef.current) clearInterval(trfPollerRef.current);
+            trfPollerRef.current = null;
+            setTrfFiles(null);
+            api.get<IndexStats>("/admin/stats", token!).then(setStats).catch(() => {});
+          }
+        } catch {}
+      }, 3000);
+    } catch (e: any) {
+      alert(`Erro ao enviar PDFs: ${e.message}`);
+    }
+  }
+
   useEffect(() => {
-    return () => { if (lancePollerRef.current) clearInterval(lancePollerRef.current); };
+    return () => {
+      if (lancePollerRef.current) clearInterval(lancePollerRef.current);
+      if (trfPollerRef.current) clearInterval(trfPollerRef.current);
+    };
   }, []);
 
   useEffect(() => {
@@ -436,6 +492,94 @@ export default function AdminPage() {
                 {lanceJob.error && <p className="text-destructive">{lanceJob.error}</p>}
               </div>
             )}
+          </section>
+
+          {/* ── TRFs ── */}
+          <section className="rounded-lg border p-5 space-y-4">
+            <div className="flex items-center gap-2">
+              <Database size={14} className="text-muted-foreground" />
+              <h2 className="text-sm font-semibold">TRFs — Boletins de jurisprudência</h2>
+              <span className="text-xs text-muted-foreground">Elasticsearch · ingestão mensal por PDF</span>
+            </div>
+
+            {/* Contagem por TRF */}
+            {stats && (
+              <div className="grid grid-cols-6 gap-2">
+                {(["TRF1", "TRF2", "TRF3", "TRF4", "TRF5", "TRF6"] as const).map((trf) => {
+                  const count = stats.porTribunal.find((t) => t.tribunal === trf)?.count ?? 0;
+                  return (
+                    <div key={trf} className="rounded-md bg-muted/40 px-3 py-2">
+                      <p className="text-xs text-muted-foreground">{trf}</p>
+                      <p className="text-sm font-semibold mt-0.5">{count.toLocaleString("pt-BR")}</p>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+
+            {/* Upload */}
+            <div className="rounded-md border border-dashed px-3 py-3 space-y-3">
+              <div className="flex items-center gap-2 flex-wrap">
+                <select
+                  value={trfTribunal}
+                  onChange={(e) => { setTrfTribunal(e.target.value); setTrfJob(null); setTrfFiles(null); }}
+                  className="px-2 py-1.5 text-xs rounded border bg-background focus:outline-none focus:ring-1 focus:ring-ring"
+                >
+                  {["TRF1", "TRF2", "TRF3", "TRF4", "TRF5", "TRF6"].map((t) => (
+                    <option key={t} value={t}>{t}</option>
+                  ))}
+                </select>
+
+                <label className="cursor-pointer px-2.5 py-1.5 rounded border text-xs text-muted-foreground hover:text-foreground transition-colors">
+                  {trfFiles && trfFiles.length > 0 ? `${trfFiles.length} PDF(s) selecionado(s)` : "Selecionar boletim(ns)"}
+                  <input
+                    type="file"
+                    accept=".pdf"
+                    multiple
+                    className="hidden"
+                    onChange={(e) => { setTrfFiles(e.target.files); setTrfJob(null); }}
+                  />
+                </label>
+
+                {trfFiles && trfFiles.length > 0 && (
+                  <button
+                    onClick={handleTrfUpload}
+                    disabled={trfJob?.status === "running"}
+                    className="flex items-center gap-1 px-2.5 py-1.5 rounded border text-xs font-medium text-primary border-primary hover:bg-primary/10 disabled:opacity-50 transition-colors"
+                  >
+                    {trfJob?.status === "running"
+                      ? <Loader2 size={11} className="animate-spin" />
+                      : <Play size={11} />}
+                    Enviar ao servidor
+                  </button>
+                )}
+              </div>
+
+              {/* Status do job */}
+              {trfJob && (
+                <div className={`rounded-md border px-3 py-2.5 text-xs space-y-1.5 ${
+                  trfJob.status === "failed"    ? "border-destructive/40 bg-destructive/5" :
+                  trfJob.status === "completed" ? "border-green-500/30 bg-green-500/5" :
+                  "border-blue-500/30 bg-blue-500/5"
+                }`}>
+                  <div className="flex items-center gap-2">
+                    {trfJob.status === "completed" && <CheckCircle size={12} className="text-green-500" />}
+                    {trfJob.status === "failed"    && <XCircle size={12} className="text-destructive" />}
+                    {trfJob.status === "running"   && <Loader2 size={12} className="animate-spin text-blue-500" />}
+                    <span className="font-medium">
+                      {trfJob.status === "running"   && `Processando ${trfJob.tribunal}…`}
+                      {trfJob.status === "completed" && `Concluído — ${trfJob.indexed.toLocaleString("pt-BR")} decisões indexadas`}
+                      {trfJob.status === "failed"    && `Falha na ingestão ${trfJob.tribunal}`}
+                    </span>
+                  </div>
+                  <div className="rounded bg-muted/40 px-2 py-1.5 max-h-36 overflow-y-auto">
+                    {trfJob.lines.slice(-30).map((line, i) => (
+                      <p key={i} className="text-[10px] font-mono text-muted-foreground leading-relaxed">{line}</p>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
           </section>
 
           {/* ── INDEXAÇÃO ES ── */}
