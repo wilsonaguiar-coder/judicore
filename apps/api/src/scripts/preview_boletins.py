@@ -36,6 +36,41 @@ _TJBA_PROC_RE  = r'\d{7,9}(?:-\d{2})?\.\d{4}\.\d{1,2}\.\d{2}\.\d{4}'
 _TJCE_PROC_RE  = r'\d{7,8}-\d{2}\.\d{4}\.\d\.\d{2}\.\d{4}'
 _TJDFT_PROC_RE = r'(?:\d{7}-\d{2}\.\d{4}\.\d\.\d{2}\.\d{4}|\d{20})'
 _TJGO_PROC_RE  = r'(?:\d{7}[-. ]\s*\d{2}\.\d{4}\.\d\.\d{2}\.\d{4}|\d{15})'
+_TJES_PROC_RE  = r'(?:\d{7}-\d{2}\.\d{4}\.\d{1,2}\.\d{2}\.\d{4}|\d{10,13})'
+
+# TJES V1: citação no FIM (2020-2023) — (TJES, Classe: TYPE, PROC, Relator: ..., Data de Julgamento: DD/MM/YYYY[...])
+_TJES_V1_CIT_RE = re.compile(
+    r'\(TJES,\s*Classe:[^)]*Data\s+de\s+Julgamento:\s*\d{2}/\d{2}/\d{4}[^)]*\)',
+    re.IGNORECASE,
+)
+
+# TJES V1 detail: extrai campos da citação (para parse_fields_tjes)
+_TJES_V1_DETAIL_RE = re.compile(
+    r'\(TJES,\s*Classe:\s*(?P<tipo>[^,]+?),\s*'
+    r'(?P<numero>' + _TJES_PROC_RE + r'),\s*'
+    r'Relator(?:a)?:\s*(?P<relator>[^,]+?),\s*'
+    r'[Óo]rg[aã]o\s+julgador:\s*(?P<orgao>[^,]+?),\s*'
+    r'Data\s+de\s+Julgamento:\s*(?P<data>\d{2}/\d{2}/\d{4})[^)]*\)',
+    re.IGNORECASE | re.DOTALL,
+)
+
+# TJES V2: bloco de metadados no FIM (2024) — Data:/Órgão julgador:/Número:/Magistrado:/Classe:/Assunto:
+# Usado antes do flatten para split; o mesmo padrão funciona pós-flatten com \s+ em vez de \n
+_TJES_V2_META_RE = re.compile(
+    r'Data:\s+(?P<data>\d{1,2}/[A-Za-z]{3}/\d{4})\s*\n'
+    r'[Óo]rg[aã]o\s+julgador:\s*(?P<orgao>[^\n]+?)\s*\n'
+    r'N[uú]mero:\s*(?P<numero>' + _TJES_PROC_RE + r')[^\n]*\n'
+    r'Magistrado:\s*(?P<relator>[^\n]+?)\s*\n'
+    r'Classe:\s*(?P<tipo>[^\n]+?)\s*\n'
+    r'Assunto:\s*(?P<assunto>[^\n]+)',
+    re.IGNORECASE,
+)
+
+_MESES_EN_ABBR = {
+    'jan': '01', 'fev': '02', 'feb': '02', 'mar': '03', 'apr': '04', 'abr': '04',
+    'may': '05', 'mai': '05', 'jun': '06', 'jul': '07', 'aug': '08', 'ago': '08',
+    'sep': '09', 'set': '09', 'oct': '10', 'out': '10', 'nov': '11', 'dec': '12', 'dez': '12',
+}
 
 # TJGO Format 1: citação no FIM entre parênteses
 # (TYPE – PROC [– ORGAO] – [Relator|Decisão]: [Des.] NAME – Julgamento: YYYY)
@@ -265,6 +300,32 @@ TRIBUNAL_CFG: dict[str, dict] = {
         "file_patterns":  {"informativo": "informativo_*.pdf"},
         "parse_fn":       "tjgo",
         "min_ementa_len": 300,
+    },
+    "tjes": {
+        "use_pdfplumber": True,
+        "hyphen_rejoin": True,
+        "tribunal": "TJES",
+        "area_default": "ESTADUAL",
+        "file_patterns": {"ementario": "ementario_*.pdf"},
+        "parse_fn": "tjes",
+        "min_ementa_len": 80,
+        "header_re": [
+            # "REVISTA EMENTÁRIO DE JURISPRUDÊNCIA TRIMESTRAL\njaneiro • fevereiro • março • 2020"
+            re.compile(
+                r'REVISTA\s+EMENT[AÁ]RIO\s+DE\s+JURISPRUD[EÊ]NCIA\s+TRIMESTRAL[^\n]*\n[^\n]*\n',
+                re.IGNORECASE,
+            ),
+            # Rodapé: "~ 8 ~" ou ". 9 ." ou "TRIBUNAL DE JUSTIÇA DO ESPÍRITO SANTO"
+            re.compile(
+                r'(?:~\s*\d+\s*~|[•·\.\-]\s*\d+\s*[•·\.\-])\s*\n',
+                re.IGNORECASE,
+            ),
+            re.compile(
+                r'TRIBUNAL\s+DE\s+JUSTI[ÇC]A\s+DO\s+ESP[IÍ]RITO\s+SANTO\s*\n',
+                re.IGNORECASE,
+            ),
+        ],
+        "citation_re": _TJES_V1_CIT_RE,
     },
     "tjdft": {
         "use_pdfplumber": True,
@@ -802,6 +863,273 @@ def parse_fields_tjgo(chunk: str, filename: str, cfg: dict) -> Optional[dict]:
     }
 
 
+def _parse_date_tjes(raw: str) -> Optional[str]:
+    """Converte DD/MM/YYYY ou DD/Mon/YYYY para YYYY-MM-DD."""
+    m = re.match(r'(\d{1,2})/(\d{2})/(\d{4})', raw.strip())
+    if m:
+        d, mo, y = m.groups()
+        return f"{y}-{int(mo):02d}-{int(d):02d}"
+    m = re.match(r'(\d{1,2})/([A-Za-z]{3})/(\d{4})', raw.strip())
+    if m:
+        d, mon, y = m.groups()
+        mo = _MESES_EN_ABBR.get(mon.lower())
+        return f"{y}-{mo}-{int(d):02d}" if mo else f"{y}-01-01"
+    return None
+
+
+def _fix_doubled_text(text: str) -> str:
+    """Corrige artefato de extração PDF onde cada caractere aparece duplicado.
+
+    Ex: TTRRIIBBUUNNAALL DDEE JJUUSSTTIIÇÇAA → TRIBUNAL DE JUSTIÇA
+    """
+    def _undouble(m: re.Match) -> str:
+        s = m.group(0)
+        if len(s) % 2 == 0 and all(s[i] == s[i + 1] for i in range(0, len(s), 2)):
+            return s[::2]
+        return s
+    return re.sub(r'[A-Z\xc0-\xd6\xd8-\xde]{4,}', _undouble, text)
+
+
+_TJES_SUMARIO_RE = re.compile(
+    r'(?:'
+    r'\.{3,}\s*\d{1,3}'                                           # "......130"
+    r'|[A-Z\xc0-\xd6\xd8-\xde]{4,}[A-Z\xc0-\xd6\xd8-\xde\s–\-]{0,80}'
+    r'\s+\d{2,3}(?=\s+[A-Z\xc0-\xd6\xd8-\xde])'                 # "TRIBUTÁRIO 142 IMPOSTO"
+    r')',
+)
+
+
+def _tjes_trim_front_matter(text: str) -> str:
+    """Remove o sumário/índice/capa que precede as decisões no texto V1 TJES.
+
+    Localiza o último padrão de sumário (entrada com número de página) na
+    região ANTES da primeira citação e descarta tudo antes dele.
+    """
+    first_cit = _TJES_V1_CIT_RE.search(text)
+    if not first_cit:
+        return text
+    pre = text[:first_cit.start()]
+    last_end = 0
+    for m in _TJES_SUMARIO_RE.finditer(pre):
+        last_end = m.end()
+    if last_end > 0:
+        text = text[last_end:].lstrip()
+    return text
+
+
+def _tjes_trim_body_front_matter(body: str) -> str:
+    """Remove capa/composição/sumário do início de um body V2 (texto já flattened).
+
+    Usado no primeiro chunk V2, cujo body contém todo o front matter antes da
+    primeira decisão propriamente dita.
+    """
+    last_end = 0
+    for m in _TJES_SUMARIO_RE.finditer(body):
+        last_end = m.end()
+    if last_end > 0:
+        body = body[last_end:].lstrip()
+    return body
+
+
+_TJES_AREA_KW = (
+    r'(?:ADMINISTRATIVO|TRIBUT[AÁ]RIO|CRIMINAL|CIVIL|CONSUMIDOR|'
+    r'CONSTITUCIONAL|PREVIDENCI[AÁ]RIO|FAM[IÍ]LIA|TRABALHISTA|'
+    r'AMBIENTAL|COMERCIAL|ELEITORAL|PROCESSO|DIREITO)'
+)
+
+
+def _extract_ementa_tjes(body: str) -> str:
+    """Extrai ementa de um chunk TJES (V1 ou V2).
+
+    Após _process_file_tjes remover o bulk do front matter, ainda podem restar
+    fragmentos de sumário no início do body (cauda do último entry de índice).
+    Esta função remove esses resíduos antes de retornar a ementa.
+    """
+    body = _fix_doubled_text(body)
+
+    # Prefixo "EMENTA:" explícito → toma tudo depois da ÚLTIMA ocorrência
+    em_matches = list(re.finditer(r'\bEMENTA\s*:\s*', body, re.IGNORECASE))
+    if em_matches:
+        candidate = body[em_matches[-1].end():].strip()
+    else:
+        candidate = body.strip()
+
+        # 1. Remove entradas de sumário completas com número de página inline
+        #    Ex: "ATOS ADMINISTRATIVOS – AUTO DE INFRAÇÃO – LEI ANTERIOR. 96 "
+        #    Apenas se o trecho for todo maiúsculas (sem letras minúsculas).
+        for _ in range(8):
+            m = re.match(
+                r'^[A-Z\xc0-\xd6\xd8-\xde][A-Z\xc0-\xd6\xd8-\xde\s–\-]{3,500}'
+                r'(?:\.\s*)?\d{2,3}\s+',
+                candidate, re.DOTALL,
+            )
+            if not m or re.search(r'[a-z\xdf-\xf6\xf8-\xff]', m.group(0)):
+                break
+            candidate = candidate[m.end():].strip()
+
+        # 2. Remove fragmentos terminando com ". AREA_KW" (linhas de sumário residuais)
+        for _ in range(6):
+            m = re.match(
+                r'^\S.{1,300}?\.\s+(?=' + _TJES_AREA_KW + r'\b)',
+                candidate, re.DOTALL | re.IGNORECASE,
+            )
+            if not m:
+                break
+            candidate = candidate[m.end():].strip()
+
+        # 3. Remove cabeçalho de seção: "ADMINISTRATIVO" ou "ADMINISTRATIVO ATOS ADMINISTRATIVOS"
+        #    Apenas palavras totalmente maiúsculas — não inclui traços para não devorar a ementa.
+        candidate = re.sub(
+            r'^' + _TJES_AREA_KW +
+            r'(?:\s+[A-Z\xc0-\xd6\xd8-\xde]{4,}(?:\s+[A-Z\xc0-\xd6\xd8-\xde]{4,})*)?\s+',
+            '', candidate, flags=re.IGNORECASE,
+        ).strip()
+
+        # 4. Remove fragmento all-uppercase restante terminando com ponto
+        #    Ex: "NORMATIVOS – LEI E DECRETO ANTERIORES. "
+        m = re.match(
+            r'^[A-Z\xc0-\xd6\xd8-\xde][A-Z\xc0-\xd6\xd8-\xde\s–\-]{3,400}\.\s+',
+            candidate, re.DOTALL,
+        )
+        if m and not re.search(r'[a-z\xdf-\xf6\xf8-\xff]', m.group(0)):
+            candidate = candidate[m.end():].strip()
+
+        # 5. Remove fragmento iniciado por traço (continuação de entrada de sumário)
+        #    Ex: "– AUTO DE INFRAÇÃO – FUNDAMENTOS NORMATIVOS – LEI E DECRETO ANTERIORES. "
+        m = re.match(
+            r'^[–\-]\s*[A-Z\xc0-\xd6\xd8-\xde][A-Z\xc0-\xd6\xd8-\xde\s–\-]{0,400}\.\s+',
+            candidate, re.DOTALL,
+        )
+        if m and not re.search(r'[a-z\xdf-\xf6\xf8-\xff]', m.group(0)):
+            candidate = candidate[m.end():].strip()
+
+    # Remove artefatos de rodapé/cabeçalho de página ao final
+    candidate = re.sub(
+        r'\s+TRIBUNAL\s+DE\s+JUSTI[ÇC]A[^\n]{0,80}$', '', candidate,
+        flags=re.IGNORECASE,
+    ).strip()
+    candidate = re.sub(r'\s*[~•]\s*\d+\s*[~•]\s*$', '', candidate).strip()
+
+    return re.sub(r'\s+', ' ', candidate).strip()
+
+
+def parse_fields_tjes(chunk: str, filename: str, cfg: dict) -> Optional[dict]:
+    """Extrai campos ES de decisão TJES (suporta formato V1 2020-2023 e V2 2024)."""
+    # ── Tenta V1: citação no FIM (2020-2023) ─────────────────────────────────
+    m = _TJES_V1_DETAIL_RE.search(chunk)
+    if m:
+        tipo     = re.sub(r'\s+', ' ', m.group("tipo")).strip().title()
+        numero   = m.group("numero")
+        relator_raw = re.sub(r'\s+', ' ', m.group("relator")).strip()
+        # Remove prefixo honorífico e sufixo "– Desembargador Substituto: ..."
+        relator_raw = re.sub(r'\s*[–\-]\s*Desembargador\b.*', '', relator_raw, flags=re.IGNORECASE)
+        relator_raw = re.sub(r'\s*[–\-]\s*Relator\s+Substituto\s*:.*', '', relator_raw, flags=re.IGNORECASE)
+        relator_raw = re.sub(
+            r'^(?:Des(?:embargador[ao]?|[aª])?\s*\.?\s+)',
+            '', relator_raw, flags=re.IGNORECASE,
+        ).strip()
+        relator  = relator_raw.title()
+        orgao    = re.sub(r'\s+', ' ', m.group("orgao")).strip()
+        orgao    = re.sub(r'CÍVEIS(?=[A-Z])', 'CÍVEIS ', orgao)
+        data     = _parse_date_tjes(m.group("data"))
+        body     = chunk[:m.start()].strip()
+        ementa   = _extract_ementa_tjes(body)
+        area     = classify_area(ementa[:300])
+        min_len  = cfg.get("min_ementa_len", 0)
+        if min_len and len(ementa) < min_len:
+            return None
+        return {
+            "_id":            f"tjes-{numero}",
+            "tribunal":       "TJES",
+            "tipo":           tipo,
+            "numero":         numero,
+            "relator":        relator,
+            "orgaoJulgador":  orgao,
+            "dataJulgamento": data,
+            "area":           area,
+            "secao":          orgao[:40],
+            "fonte":          Path(filename).name,
+            "ementa":         ementa,
+        }
+
+    # ── Tenta V2: bloco de metadados no FIM (2024) ───────────────────────────
+    m = _TJES_V2_META_RE.search(chunk)
+    if m:
+        tipo    = re.sub(r'\s+', ' ', m.group("tipo")).strip().title()
+        numero  = m.group("numero")
+        relator = re.sub(r'\s+', ' ', m.group("relator")).strip().title()
+        orgao   = re.sub(r'\s+', ' ', m.group("orgao")).strip()
+        data    = _parse_date_tjes(m.group("data"))
+        body    = chunk[:m.start()].strip()
+        ementa  = _extract_ementa_tjes(body)
+        area    = classify_area(ementa[:300])
+        min_len = cfg.get("min_ementa_len", 0)
+        if min_len and len(ementa) < min_len:
+            return None
+        return {
+            "_id":            f"tjes-{numero}",
+            "tribunal":       "TJES",
+            "tipo":           tipo,
+            "numero":         numero,
+            "relator":        relator,
+            "orgaoJulgador":  orgao,
+            "dataJulgamento": data,
+            "area":           area,
+            "secao":          orgao[:40],
+            "fonte":          Path(filename).name,
+            "ementa":         ementa,
+        }
+
+    return None
+
+
+def _process_file_tjes(f: Path, cfg: dict) -> list[str]:
+    """Pipeline de extração TJES: suporta V1 (2020-2023) e V2 (2024)."""
+    raw = extract_text_pdf_plumber(f)
+
+    # Corrige artefato de texto duplicado antes de aplicar os header_re
+    raw = _fix_doubled_text(raw)
+    # Corrige artefato de layout de coluna: "A DMINIS TR ATIVO" → "ADMINISTRATIVO"
+    raw = re.sub(r'\bA\s+DMINIS\s+TR\s+ATIVO\b', 'ADMINISTRATIVO', raw, flags=re.IGNORECASE)
+
+    # Remove cabeçalhos e rodapés por página (antes do flatten)
+    for hre in cfg.get("header_re", []):
+        raw = hre.sub('\n', raw)
+
+    # Detecta formato V2 (2024): presença de bloco Magistrado:/Número:
+    is_v2 = bool(_TJES_V2_META_RE.search(raw))
+
+    if is_v2:
+        chunks: list[str] = []
+        seen: set[str] = set()
+        pos = 0
+        is_first = True
+        for mm in _TJES_V2_META_RE.finditer(raw):
+            body = raw[pos:mm.start()].strip()
+            meta = mm.group(0)
+            pos  = mm.end()
+            body = re.sub(r'\s+', ' ', body).strip()
+            if is_first:
+                # Primeiro chunk contém capa + composição + sumário antes da 1ª decisão
+                body = _tjes_trim_body_front_matter(body)
+                is_first = False
+            if len(body) < 100:
+                continue
+            key = mm.group("numero")
+            if key not in seen:
+                chunks.append(body + "\n" + meta)
+                seen.add(key)
+        return chunks
+
+    # V1: flatten → remove front matter → split por citação
+    text = raw.replace('\n', ' ')
+    text = re.sub(r'\s+', ' ', text)
+    if cfg.get("hyphen_rejoin"):
+        text = re.sub(r'([A-Za-z\xc0-\xff])- ([A-Za-z\xc0-\xff])', r'\1\2', text)
+    text = _tjes_trim_front_matter(text)
+    return split_decisions(text, _TJES_V1_CIT_RE, skip_trim=True)
+
+
 def parse_fields_tjdft(chunk: str, filename: str, cfg: dict) -> Optional[dict]:
     """Extrai campos ES de decisão TJDFT (citação no FIM do chunk)."""
     detail_re = cfg.get("detail_re")
@@ -1037,6 +1365,8 @@ def split_decisions_start(text: str, citation_re: re.Pattern) -> list[str]:
 
 
 def process_file(f: Path, cfg: dict) -> list[str]:
+    if cfg.get("parse_fn") == "tjes":
+        return _process_file_tjes(f, cfg)
     if f.suffix.lower() == ".pdf":
         if cfg.get("use_pdfplumber"):
             raw = extract_text_pdf_plumber(f)
@@ -1103,6 +1433,7 @@ def main():
             "tjce":  parse_fields_tjce,
             "tjdft": parse_fields_tjdft,
             "tjgo":  parse_fields_tjgo,
+            "tjes":  parse_fields_tjes,
         }.get(sigla, parse_fields_tjac)
 
         for label, files in groups.items():

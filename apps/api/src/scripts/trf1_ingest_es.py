@@ -220,11 +220,9 @@ def extract_decisions(text: str, filename: str) -> list[dict]:
         data_raw = match.group("data_raw").replace("\n", " ").strip()
         data = parse_date(data_raw) or (parse_date(session_date) if session_date else None)
 
-        # TRF1 BIJs: ementa = keywords antes do 1º parágrafo narrativo (começa com artigo + verbo)
-        body_m = re.search(r"\.\n([AO]s?\s+|[Tt]rata-se|[Cc]uida-se|[Nn]o\s+caso|[Ee]m\s+que\s+pese)", decision_text)
-        ementa_raw = decision_text[:body_m.start() + 1] if body_m else re.split(r"\n\s*\n", decision_text.strip(), maxsplit=1)[0]
-        ementa = re.sub(r"-\s*\n\s*", "", re.sub(r"\s*\n\s*", " ", ementa_raw)).strip()
-        conteudo = (decision_text + "\n" + citation_text)[:80000]
+        # TRF1: PDFs são boletins de ementa — todo o texto da decisão é a ementa
+        ementa_raw = (decision_text + " " + citation_text).strip()
+        ementa = re.sub(r" {2,}", " ", re.sub(r"\s*\n\s*", " ", re.sub(r"-\s*\n\s*", "", ementa_raw))).strip()
 
         doc = {
             "_id": f"trf1-{processo}",
@@ -236,7 +234,6 @@ def extract_decisions(text: str, filename: str) -> list[dict]:
             "area": classify_area(decision_text),
             "orgaoJulgador": current_orgao,
             "url": f"https://jurisprudencia.trf1.jus.br/paginador.php?paginador=1&processo={processo}",
-            "conteudoIntegral": conteudo,
         }
         decisions.append(doc)
         prev_end = match.end()
@@ -252,12 +249,11 @@ def _make_fallback_doc(text: str, filename: str, edition: Optional[str]) -> dict
         "_id": f"trf1-boleti-{edition or name}",
         "tribunal": "TRF1",
         "numero": edition or name,
-        "ementa": re.sub(r"\s*\n\s*", " ", re.split(r"\n\s*\n", body.strip(), maxsplit=1)[0]).strip(),
+        "ementa": re.sub(r" {2,}", " ", re.sub(r"\s*\n\s*", " ", re.sub(r"-\s*\n\s*", "", body[:80000]))).strip(),
         "relator": "Não informado",
         "dataJulgamento": None,
         "area": classify_area(body),
         "url": "",
-        "conteudoIntegral": body[:80000],
     }
 
 
