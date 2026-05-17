@@ -38,6 +38,39 @@ _TJDFT_PROC_RE = r'(?:\d{7}-\d{2}\.\d{4}\.\d\.\d{2}\.\d{4}|\d{20})'
 _TJGO_PROC_RE  = r'(?:\d{7}[-. ]\s*\d{2}\.\d{4}\.\d\.\d{2}\.\d{4}|\d{15})'
 _TJES_PROC_RE  = r'(?:\d{7}-\d{2}\.\d{4}\.\d{1,2}\.\d{2}\.\d{4}|\d{10,13})'
 
+# TJMG: número no formato 1.NNNN.NN.NNNNNN-N/NNN (pode ter espaço antes do traço)
+_TJMG_PROC_RE  = r'1\.\d{4}\.\d{2}\.\d{5,6}\s*[-]\s*\d/\d{3}'
+
+# TJMG: citação no FIM de cada decisão — (TJMG – Tipo Número, Rel. Des. NAME, Órgão, j. em DD/MM/YYYY...)
+_TJMG_CIT_RE = re.compile(
+    r'\(TJMG\s*[-–]\s*'
+    r'(?:\d+\s+)?'                                   # artefato de página: "6 "
+    r'[A-Za-záéíóúàâêôãõçÀ-ÿ][^)]{3,100}?'         # tipo (sem fechar paren)
+    r'(?:' + _TJMG_PROC_RE + r')'                   # número do processo
+    r'[^)]{10,280}?'                                 # nome, órgão etc (lazy)
+    r'j\.\s*em\s*\d{1,2}[/.]\d{1,2}[/.]\d{2,4}'   # j. em data
+    r'[^)]*\)',
+    re.IGNORECASE,
+)
+
+# TJMG: regex de campos para parse_fields_tjmg
+_TJMG_DETAIL_RE = re.compile(
+    r'\(TJMG\s*[-–]\s*'
+    r'(?:\d+\s+)?'                                             # artefato de página
+    r'(?P<tipo>[A-Za-záéíóúàâêôãõçÀ-ÿ][A-Za-záéíóúàâêôãõçÀ-ÿ°/.\s\-–]+?)'
+    r'\s*(?:n[°º]?\s*\d+\s+)?'                               # "n° 4" opcional
+    r'(?P<numero>' + _TJMG_PROC_RE + r')'
+    r'[^,]*,'                                                  # até a primeira vírgula
+    r'\s*Rel(?:ator[ae]?)?[.ª°]*\s*(?:\([aA]\)\s*)?:?\s*'   # Rel./Relator(a):
+    r'(?:Des(?:embargador[ao]?)?[.ª°]*\s+)?'                  # Des. opcional
+    r'(?P<relator>[A-ZÁÉÍÓÚÀÂÊÔÃÕÇÜ][^,]+?),'
+    r'\s*(?P<orgao>[^,]+?),'
+    r'\s*j\.\s*em\s*'
+    r'(?P<data>\d{1,2}[/.]\d{1,2}[/.]\d{2,4})'
+    r'[^)]*\)',
+    re.IGNORECASE,
+)
+
 # TJES V1: citação no FIM (2020-2023) — (TJES, Classe: TYPE, PROC, Relator: ..., Data de Julgamento: DD/MM/YYYY[...])
 _TJES_V1_CIT_RE = re.compile(
     r'\(TJES,\s*Classe:[^)]*Data\s+de\s+Julgamento:\s*\d{2}/\d{2}/\d{4}[^)]*\)',
@@ -326,6 +359,18 @@ TRIBUNAL_CFG: dict[str, dict] = {
             ),
         ],
         "citation_re": _TJES_V1_CIT_RE,
+    },
+    "tjmg": {
+        "use_pdfplumber": True,
+        "hyphen_rejoin": True,
+        "tribunal": "TJMG",
+        "area_default": "ESTADUAL",
+        "file_patterns": {"boletim": "boletim_*.pdf"},
+        "parse_fn": "tjmg",
+        "min_ementa_len": 80,
+        "header_re": [],
+        "citation_re": _TJMG_CIT_RE,
+        "detail_re": _TJMG_DETAIL_RE,
     },
     "tjdft": {
         "use_pdfplumber": True,
@@ -1130,6 +1175,108 @@ def _process_file_tjes(f: Path, cfg: dict) -> list[str]:
     return split_decisions(text, _TJES_V1_CIT_RE, skip_trim=True)
 
 
+def _process_file_tjmg(f: Path, cfg: dict) -> list[str]:
+    """Pipeline TJMG: pdfplumber → flatten → strip frente → split por citação."""
+    raw = extract_text_pdf_plumber(f)
+
+    # Remove linhas que contêm apenas o número de página (rodapé de cada página)
+    raw = re.sub(r'\n\d{1,3}\n', '\n', raw)
+
+    # Flatten completo
+    text = raw.replace('\n', ' ')
+    text = re.sub(r'\s+', ' ', text)
+    if cfg.get("hyphen_rejoin"):
+        text = re.sub(r'([A-Za-z\xc0-\xff])- ([A-Za-z\xc0-\xff])', r'\1\2', text)
+
+    # Remove tudo antes de "EMENTAS" (capa + sumário)
+    em_idx = text.upper().find("EMENTAS")
+    if em_idx >= 0:
+        text = text[em_idx:]
+
+    return split_decisions(text, _TJMG_CIT_RE, skip_trim=True)
+
+
+def parse_fields_tjmg(chunk: str, filename: str, cfg: dict) -> Optional[dict]:
+    """Extrai campos ES de decisão TJMG (citação no FIM do chunk)."""
+    detail_re = cfg.get("detail_re")
+    if not detail_re:
+        return None
+
+    m = detail_re.search(chunk)
+    if not m:
+        return None
+
+    # Tipo: limpa sufixos abreviados ("-Cv", "-Cr") e title-case
+    tipo = re.sub(r'\s+', ' ', m.group("tipo")).strip()
+    tipo = re.sub(r'\s*[-–]\s*[A-Z][a-z]?\s*$', '', tipo).strip()
+    tipo = tipo.title()
+
+    # Número: remove espaços internos (artefato de quebra de linha em PDF)
+    numero = re.sub(r'\s+', '', m.group("numero"))
+
+    # Relator: remove prefixo "Des." residual e aplica title-case
+    relator_raw = re.sub(r'\s+', ' ', m.group("relator")).strip()
+    relator_raw = re.sub(
+        r'^Des(?:embargador[ao]?)?[.ª°]*\s+', '', relator_raw, flags=re.IGNORECASE,
+    ).strip()
+    relator = relator_raw.title()
+
+    # Órgão julgador
+    orgao = re.sub(r'\s+', ' ', m.group("orgao")).strip()
+
+    # Data de julgamento
+    data = parse_date_tjac(m.group("data"))
+
+    # Ementa: corpo inteiro antes da citação (sem separar cabeçalho editorial)
+    body = chunk[:m.start()].strip()
+    ementa = re.sub(r'\s+', ' ', body).strip()
+    ementa = re.sub(r'^EMENTAS\s+', '', ementa, flags=re.IGNORECASE)
+
+    min_len = cfg.get("min_ementa_len", 0)
+    if min_len and len(ementa) < min_len:
+        return None
+
+    area = classify_area(ementa[:400])
+
+    # Campos editoriais extraídos do início do body (só para preview — não vão para o ES)
+    # Usa o ÚLTIMO "Processo" para descartar contaminação de citações sem traço embutidas
+    proc_all = list(re.finditer(r'\bProcesso\b', body, re.IGNORECASE))
+    proc_m2 = proc_all[-1] if proc_all else None
+    meta_str = body[proc_m2.start():] if proc_m2 else body
+    # Limita o meta_str ao trecho antes do primeiro "Ementa:" (se existir)
+    em_cut = re.search(r'\bEmenta\s*:', meta_str, re.IGNORECASE)
+    if em_cut:
+        meta_str = meta_str[:em_cut.start()]
+    parts = [p.strip() for p in re.split(r'\s*[-–]\s*', meta_str) if p.strip()]
+    processo_tipo = parts[0] if parts else ""
+    ramo_direito = ""
+    kw_parts: list[str] = []
+    for p in parts[1:]:
+        if re.match(r'^Direito\b', p, re.IGNORECASE) and not ramo_direito:
+            ramo_direito = p
+        else:
+            kw_parts.append(p)
+    palavras_chave = " – ".join(kw_parts)
+
+    return {
+        "_id":             f"tjmg-{numero}",
+        "tribunal":        "TJMG",
+        "tipo":            tipo,
+        "numero":          numero,
+        "relator":         relator,
+        "orgaoJulgador":   orgao,
+        "dataJulgamento":  data,
+        "area":            area,
+        "secao":           orgao[:40],
+        "fonte":           Path(filename).name,
+        "ementa":          ementa,
+        # Preview-only (filtrados no ingest):
+        "_processoTipo":   processo_tipo,
+        "_ramoDireito":    ramo_direito,
+        "_palavrasChave":  palavras_chave,
+    }
+
+
 def parse_fields_tjdft(chunk: str, filename: str, cfg: dict) -> Optional[dict]:
     """Extrai campos ES de decisão TJDFT (citação no FIM do chunk)."""
     detail_re = cfg.get("detail_re")
@@ -1365,6 +1512,8 @@ def split_decisions_start(text: str, citation_re: re.Pattern) -> list[str]:
 
 
 def process_file(f: Path, cfg: dict) -> list[str]:
+    if cfg.get("parse_fn") == "tjmg":
+        return _process_file_tjmg(f, cfg)
     if cfg.get("parse_fn") == "tjes":
         return _process_file_tjes(f, cfg)
     if f.suffix.lower() == ".pdf":
@@ -1433,6 +1582,7 @@ def main():
             "tjce":  parse_fields_tjce,
             "tjdft": parse_fields_tjdft,
             "tjgo":  parse_fields_tjgo,
+            "tjmg":  parse_fields_tjmg,
             "tjes":  parse_fields_tjes,
         }.get(sigla, parse_fields_tjac)
 
@@ -1471,6 +1621,12 @@ def main():
                 out.write(f"      area         : {fld['area']}\n")
                 out.write(f"      secao        : {fld['secao']}\n")
                 out.write(f"      fonte        : {fld['fonte']}\n")
+                if fld.get('_processoTipo'):
+                    out.write(f"      processoTipo : {fld['_processoTipo']}\n")
+                if fld.get('_ramoDireito'):
+                    out.write(f"      ramoDireito  : {fld['_ramoDireito']}\n")
+                if fld.get('_palavrasChave'):
+                    out.write(f"      palavrasChave: {fld['_palavrasChave']}\n")
                 ementa_out = fld['ementa'] if args.full else (fld['ementa'][:500] + ('...' if len(fld['ementa']) > 500 else ''))
                 out.write(f"      ementa       : {ementa_out}\n\n")
         print(f"\nGerado: {output_path}")
