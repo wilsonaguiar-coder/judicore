@@ -35,6 +35,34 @@ DEFAULT_INPUT = PROJECT_ROOT / "temp" / "boletins"
 _TJBA_PROC_RE  = r'\d{7,9}(?:-\d{2})?\.\d{4}\.\d{1,2}\.\d{2}\.\d{4}'
 _TJCE_PROC_RE  = r'\d{7,8}-\d{2}\.\d{4}\.\d\.\d{2}\.\d{4}'
 _TJDFT_PROC_RE = r'(?:\d{7}-\d{2}\.\d{4}\.\d\.\d{2}\.\d{4}|\d{20})'
+_TJGO_PROC_RE  = r'(?:\d{7}[-. ]\s*\d{2}\.\d{4}\.\d\.\d{2}\.\d{4}|\d{15})'
+
+# TJGO Format 1: citação no FIM entre parênteses
+# (TYPE – PROC [– ORGAO] – [Relator|Decisão]: [Des.] NAME – Julgamento: YYYY)
+_TJGO_V1_CIT_RE = re.compile(
+    r'\('
+    r'[A-Za-z\xc0-\xff][A-Za-z\xc0-\xff\s–\-]{2,120}?'
+    r'\s*[–\-]\s*'
+    r'(?:' + _TJGO_PROC_RE + r')'
+    r'[^)]{0,350}?'
+    r'[–\-]\s*[Jj]ulgamento\s*:\s*(?:19|20)\d{2}'
+    r'\)',
+    re.DOTALL,
+)
+
+# TJGO Format 2: cabeçalho no INÍCIO — [N. ]TYPE n[°º] PROC ... EMENTA:
+# A âncora em EMENTA: elimina citações internas de jurisprudência.
+# Negative lookahead impede match de "Relatora Apelação" (fim de assinatura).
+_TJGO_V2_CIT_RE = re.compile(
+    r'(?:\d{1,3}\.\s+)?'
+    r'(?!Relator[ae]?[\s,.\-])'
+    r'[A-Z\xc0-\xd6\xd8-\xde][A-Za-z\xc0-\xff][A-Za-z\xc0-\xff\s]{2,80}?'
+    r'\s+n[\xb0\xba]\s*'
+    r'(?:' + _TJGO_PROC_RE + r')'
+    r'.{0,900}?'
+    r'EMENTA\s*:',
+    re.IGNORECASE | re.DOTALL,
+)
 
 TRIBUNAL_CFG: dict[str, dict] = {
     "tjce": {
@@ -213,6 +241,30 @@ TRIBUNAL_CFG: dict[str, dict] = {
             "camaras": "camaras_*.pdf",
             "tj_pleno": "tj_*.pdf",
         },
+    },
+    "tjgo": {
+        "use_pdfplumber": True,
+        "hyphen_rejoin": True,
+        "dual_format": True,
+        "header_re": [
+            # Cobre todas as variações:
+            # "INFORMATIVO DE JURISPRUDÊNCIA 2022"
+            # "INFORMATIVO DE JURISPRUDÊNCIA 2 2022"  (nº de página inline)
+            # "2 INFORMATIVO DE JURISPRUDÊNCIA SETEMBRO.2025"
+            # "INFORMATIVO DE JURISPRUDÊNCIA SETEMBRO 2025"
+            re.compile(
+                r'(?:\d{1,3}\s+)?INFORMATIVO\s+DE\s+JURISPRUD[EÊ]NCIA'
+                r'(?:\s+\d{1,3})?\s+(?:[A-Z\xc0-\xff]+\.?\s*)?(?:19|20)\d{2}',
+                re.IGNORECASE,
+            ),
+        ],
+        "citation_re":    _TJGO_V1_CIT_RE,   # Format 1: citação no fim
+        "citation_re_v2": _TJGO_V2_CIT_RE,   # Format 2: cabeçalho no início
+        "tribunal":       "TJGO",
+        "area_default":   "ESTADUAL",
+        "file_patterns":  {"informativo": "informativo_*.pdf"},
+        "parse_fn":       "tjgo",
+        "min_ementa_len": 300,
     },
     "tjdft": {
         "use_pdfplumber": True,
@@ -575,6 +627,181 @@ def _tjdft_ementa_is_polluted(text: str) -> bool:
     return False
 
 
+# ── TJGO ──────────────────────────────────────────────────────────────────────
+
+# Detail regex for Format 1 field extraction
+_TJGO_V1_DETAIL_RE = re.compile(
+    r'\('
+    r'(?P<tipo>[A-Za-z\xc0-\xff][A-Za-z\xc0-\xff\s–\-]{2,120}?)'
+    r'\s*[–\-]\s*'
+    r'(?P<processo>' + _TJGO_PROC_RE + r')'
+    r'(?P<middle>[^)]{0,350}?)'
+    r'[–\-]\s*(?:[Rr]elator[ae]?(?:\s+em\s+substitui\xc3\xa7\xc3\xa3o)?|[Dd]ecis\xc3\xa3o)\s*:?\s*'
+    r'(?:Des(?:embargador[ao]?)?\s+)?'
+    r'(?P<relator>[A-Z\xc0-\xd6\xd8-\xde][^–\-)]{3,80}?)'
+    r'(?:\s*[–\-]\s*Redator\s*:?\s*[^–\-)]{3,80}?)?'
+    r'\s*[–\-]\s*[Jj]ulgamento\s*:\s*'
+    r'(?P<ano>(?:19|20)\d{2})'
+    r'\)',
+    re.DOTALL | re.IGNORECASE,
+)
+
+_MESES_PT = {
+    'janeiro': '01', 'fevereiro': '02', 'mar\xe7o': '03', 'abril': '04',
+    'maio': '05', 'junho': '06', 'julho': '07', 'agosto': '08',
+    'setembro': '09', 'outubro': '10', 'novembro': '11', 'dezembro': '12',
+}
+
+
+def _parse_date_tjgo_sig(chunk: str) -> Optional[str]:
+    """Extrai data da assinatura 'Goiânia, DD de MÊS de YYYY'."""
+    m = re.search(
+        r'Goi[â\xe2]nia(?:/GO)?,\s*(\d{1,2})\s+de\s+([a-z\xe0-\xff]+)\s+de\s+((?:19|20)\d{2})',
+        chunk, re.IGNORECASE,
+    )
+    if not m:
+        return None
+    d, mes, y = m.group(1), m.group(2).lower(), m.group(3)
+    mo = _MESES_PT.get(mes)
+    return f"{y}-{mo}-{int(d):02d}" if mo else f"{y}-01-01"
+
+
+def _normalize_proc_tjgo(proc: str) -> str:
+    """Normaliza número de processo TJGO: espaços internos e ponto→hífen."""
+    proc = re.sub(r'\s', '', proc)
+    m = re.match(r'^(\d{7})\.(\d{2}\.\d{4}\.\d\.\d{2}\.\d{4})$', proc)
+    return f"{m.group(1)}-{m.group(2)}" if m else proc
+
+
+def parse_fields_tjgo(chunk: str, filename: str, cfg: dict) -> Optional[dict]:
+    """Extrai campos ES de decisão TJGO (detecta formato V1/end-citation ou V2/start-citation)."""
+    # Tenta Format 1: citação no FIM entre parênteses
+    m1 = _TJGO_V1_DETAIL_RE.search(chunk)
+    if m1 and len(chunk) - m1.start() < 800:
+        tipo = re.sub(r'\s+', ' ', m1.group("tipo")).strip().title()
+        processo = _normalize_proc_tjgo(m1.group("processo"))
+        ano = m1.group("ano")
+        data = f"{ano}-01-01"
+        relator_raw = re.sub(r'[\s–\-]+', ' ', m1.group("relator")).strip()
+        relator_raw = re.sub(
+            r'^(?:em\s+substitui[çc][aã]o\s*:?\s*)?(?:des(?:embargador[ao]?)?\s+)?',
+            '', relator_raw, flags=re.IGNORECASE,
+        ).strip()
+        relator = relator_raw.title()
+        # Extrai órgão do trecho entre número e "Relator"
+        middle = re.sub(r'\s+', ' ', m1.group("middle")).strip(" –-")
+        # Remove processo e qualquer prefixo restante
+        orgao = re.sub(r'^[^A-Za-z\xc0-\xff]*', '', middle).strip()
+        orgao = re.sub(r'\s*[–\-]\s*$', '', orgao).strip()
+        ementa = chunk[:m1.start()].strip()
+        # Remove prefixo: residuo de cabeçalho e número de processo do início
+        ementa = re.sub(r'^.{0,80}?' + _TJGO_PROC_RE + r'\s*[-–]\s*', '', ementa, count=1).strip()
+        area = classify_area(ementa[:300])
+        min_len = cfg.get("min_ementa_len", 0)
+        if min_len and len(ementa) < min_len:
+            return None
+        return {
+            "_id":            f"tjgo-{processo}",
+            "tribunal":       "TJGO",
+            "tipo":           tipo,
+            "numero":         processo,
+            "relator":        relator,
+            "orgaoJulgador":  orgao,
+            "dataJulgamento": data,
+            "area":           area,
+            "secao":          orgao[:40],
+            "fonte":          Path(filename).name,
+            "ementa":         ementa,
+        }
+
+    # Format 2: citação no INÍCIO — TYPE nº PROC [header fields] EMENTA: ...
+    proc_m = re.search(_TJGO_PROC_RE, chunk)
+    if not proc_m:
+        return None
+    processo = _normalize_proc_tjgo(proc_m.group(0))
+
+    # Tipo: palavras antes de nº/n° PROC
+    tipo_m = re.match(
+        r'(?:\d{1,3}\.\s+)?(?P<tipo>[A-Za-z\xc0-\xff][A-Za-z\xc0-\xff\s]{2,80}?)\s+n[\xb0\xba]\s*' + _TJGO_PROC_RE,
+        chunk, re.IGNORECASE,
+    )
+    tipo = re.sub(r'\s+', ' ', tipo_m.group("tipo")).strip().title() if tipo_m else "Acórdão"
+    # Remove fragmento "Elator[a]" — resíduo de "Relator[a]" da decisão anterior
+    tipo = re.sub(r'^[Ee]lator[ae]?\s+', '', tipo).strip()
+    # Despachos administrativos (PROAD, etc.) não têm valor jurídico — descartar
+    if re.search(r'\bDespacho\b|\bPROAD\b', tipo, re.IGNORECASE):
+        return None
+
+    # Relator: "Relator[a]: [Des./Desª.] NAME"
+    _V2_STOP = r'EMENTA|Redator|Comarca|Reclamante|Reclamada|Apelante|Apelado|Agravante|Agravado|Impetrante|Paciente|Autora?|R\xe9u|Representa[dn]'
+    rel_m = re.search(
+        r'[Rr]elator[ae]?\s*:\s*(?:Des(?:embargador[ao]?|[a\xaa])?\s*\.?\s+)?'
+        r'(?P<rel>[A-Za-z\xc0-\xff][^,;\n]{3,70}?)'
+        r'(?=\s*(?:[,;]|\s+(?:' + _V2_STOP + r'))|\Z)',
+        chunk[:900],
+    )
+    relator = re.sub(r'\s+', ' ', rel_m.group("rel")).strip().title() if rel_m else ""
+    relator = re.sub(r'\s*[–\-]\s*Ju[ií]z\b.*', '', relator, flags=re.IGNORECASE).strip()
+
+    # Órgão julgador: busca apenas entre o processo e o início das partes
+    _party_m = re.search(
+        r'\b(?:Reclamante|Reclamada|Apelante|Apelado|Agravante|Agravado|'
+        r'Autora?|R[eé]us?|Impetrante|Paciente|Representa[nd]te|Representa[nd]o)\s*:',
+        chunk[:700], re.IGNORECASE,
+    )
+    _header_area = chunk[:_party_m.start()] if _party_m else chunk[:350]
+    orgao_m = re.search(
+        r'(?P<orgao>(?:\d+[ª\xba°]?\s+)?'
+        r'(?:C[aâ]mara|Turma)[^\n,;–\-]{0,80}?'
+        r'|[Óó]rg[aã]o\s+Especial[^\n,;–\-]{0,60}?)',
+        _header_area, re.IGNORECASE,
+    )
+    orgao = re.sub(r'\s+', ' ', orgao_m.group("orgao")).strip() if orgao_m else ""
+
+    # Ementa: texto entre "EMENTA:" e primeira seção estruturada ou corpo do acórdão
+    ementa_m = re.search(
+        r'EMENTA\s*:?\s*(.+?)(?=\s+(?:I{1,3}[VX]?|[1-9])\.\s+[A-Z\xc0-\xff]'
+        r'|\s+[Ii]\.?\s+(?:CASO|QUEST\xc3\x83O|RAZ\xc3\x95ES|DISPOSITIVO)'
+        r'|\s+RELAT[O\xd3]RIO\b|\s+Vistos[,\s]|\s+VOTO\b|\s+AC\xd3RD\xc3O\b'
+        r'|\Z)',
+        chunk, re.IGNORECASE | re.DOTALL,
+    )
+    if ementa_m:
+        ementa = re.sub(r'\s+', ' ', ementa_m.group(1)).strip()
+    else:
+        ementa = re.sub(r'\s+', ' ', chunk[proc_m.end():proc_m.end() + 1500]).strip()
+    # Remove cabeçalhos de página PDF embutidos (ex: "62 INFORMATIVO DE JURISPRUDÊNCIA MARÇO 2026")
+    for h_re in cfg.get("header_re", []):
+        ementa = h_re.sub(' ', ementa)
+    ementa = re.sub(r'\s+', ' ', ementa).strip()
+
+    # Data: assinatura "Goiânia, DD de MÊS de YYYY" ou ano do nome do arquivo
+    data = _parse_date_tjgo_sig(chunk)
+    if not data:
+        ym = re.search(r'((?:19|20)\d{2})', Path(filename).stem)
+        data = f"{ym.group(1)}-01-01" if ym else None
+
+    area = classify_area(ementa[:300])
+
+    min_len = cfg.get("min_ementa_len", 0)
+    if min_len and len(ementa) < min_len:
+        return None
+
+    return {
+        "_id":            f"tjgo-{processo}",
+        "tribunal":       "TJGO",
+        "tipo":           tipo,
+        "numero":         processo,
+        "relator":        relator,
+        "orgaoJulgador":  orgao,
+        "dataJulgamento": data,
+        "area":           area,
+        "secao":          orgao[:40],
+        "fonte":          Path(filename).name,
+        "ementa":         ementa,
+    }
+
+
 def parse_fields_tjdft(chunk: str, filename: str, cfg: dict) -> Optional[dict]:
     """Extrai campos ES de decisão TJDFT (citação no FIM do chunk)."""
     detail_re = cfg.get("detail_re")
@@ -750,7 +977,8 @@ def flatten(text: str, cfg: dict) -> str:
     text = text.replace("\n", " ")
     text = re.sub(r" {2,}", " ", text)
     if cfg.get("hyphen_rejoin"):
-        text = re.sub(r"(\w)- (\w)", r"\1\2", text)
+        # Letter-only: preserves digit-hyphen-digit sequences (e.g., process numbers)
+        text = re.sub(r"([A-Za-z\xc0-\xff])- ([A-Za-z\xc0-\xff])", r"\1\2", text)
     for hre in cfg.get("header_re", []):
         text = hre.sub(" ", text)
     text = re.sub(r" {2,}", " ", text)
@@ -819,6 +1047,10 @@ def process_file(f: Path, cfg: dict) -> list[str]:
     else:
         return []
     text = flatten(raw, cfg)
+    if cfg.get("dual_format"):
+        v1 = split_decisions(text, cfg["citation_re"], skip_trim=cfg.get("skip_trim", False))
+        v2 = split_decisions_start(text, cfg["citation_re_v2"])
+        return v1 if len(v1) >= len(v2) else v2
     if cfg.get("citation_at_start"):
         return split_decisions_start(text, cfg["citation_re"])
     return split_decisions(text, cfg["citation_re"], skip_trim=cfg.get("skip_trim", False))
@@ -870,6 +1102,7 @@ def main():
             "tjba":  parse_fields_tjba,
             "tjce":  parse_fields_tjce,
             "tjdft": parse_fields_tjdft,
+            "tjgo":  parse_fields_tjgo,
         }.get(sigla, parse_fields_tjac)
 
         for label, files in groups.items():
