@@ -38,6 +38,30 @@ _TJDFT_PROC_RE = r'(?:\d{7}-\d{2}\.\d{4}\.\d\.\d{2}\.\d{4}|\d{20})'
 _TJGO_PROC_RE  = r'(?:\d{7}[-. ]\s*\d{2}\.\d{4}\.\d\.\d{2}\.\d{4}|\d{15})'
 _TJES_PROC_RE  = r'(?:\d{7}-\d{2}\.\d{4}\.\d{1,2}\.\d{2}\.\d{4}|\d{10,13})'
 
+# TJPA: número de processo CNJ (novo e antigo formato)
+_TJPA_PROC_NUM = r'\d{4,10}-\d{2}\.\d{4}\.[\d.]{3,12}'
+
+# TJPA V2 (2022+): citação no FIM — (TJPA – TIPO – [Nº] PROCESSO – Relator(a): NOME – ÓRGÃO – Julgado/Documento em DD/MM/AAAA)
+_TJPA_CIT_RE = re.compile(
+    r'\(TJPA\s*[–\-]\s*'
+    r'(?P<tipo>[^–\-()\n]{3,80}?)\s*[–\-]\s*'
+    r'(?:N[°º]?\s*)?'
+    r'(?P<numero>' + _TJPA_PROC_NUM + r')'
+    r'\s*[–\-]\s*Relator\(a\)\s*:\s*'
+    r'(?P<relator>[^–\-()\n]{3,80}?)\s*[–\-]\s*'
+    r'(?P<orgao>[^–\-()\n]{3,60}?)\s*[–\-]\s*'
+    r'(?:Julgado|Documento|Publica[çc][ãa]o)\s*(?:em\s*)?'
+    r'(?P<data>\d{1,2}/\d{1,2}/\d{4})'
+    r'[^)]*\)',
+    re.IGNORECASE,
+)
+
+# TJPA V1 (2020): marcador de início de cada decisão
+_TJPA_V1_START_RE = re.compile(r'AC[ÓO]RD[ÃA]O\s+N[°º.]?\s*\d+', re.IGNORECASE)
+
+# TJPA V2: marcador de ID PJE (antes de cada ementa)
+_TJPA_PJE_ID_RE = re.compile(r'\d{7,8}\s*-\s*Ac[oó]rd[aã]o\s+PJE', re.IGNORECASE)
+
 # TJMG: número no formato 1.NNNN.NN.NNNNNN-N/NNN (pode ter espaço antes do traço)
 _TJMG_PROC_RE  = r'1\.\d{4}\.\d{2}\.\d{5,6}\s*[-]\s*\d/\d{3}'
 
@@ -371,6 +395,16 @@ TRIBUNAL_CFG: dict[str, dict] = {
         "header_re": [],
         "citation_re": _TJMG_CIT_RE,
         "detail_re": _TJMG_DETAIL_RE,
+    },
+    "tjpa": {
+        "use_pdfplumber": True,
+        "hyphen_rejoin": True,
+        "tribunal": "TJPA",
+        "area_default": "ESTADUAL",
+        "file_patterns": {"informativo": "informativo_*.pdf"},
+        "parse_fn": "tjpa",
+        "min_ementa_len": 300,
+        "citation_re": _TJPA_CIT_RE,
     },
     "tjdft": {
         "use_pdfplumber": True,
@@ -1511,7 +1545,120 @@ def split_decisions_start(text: str, citation_re: re.Pattern) -> list[str]:
     return chunks
 
 
+def _process_file_tjpa(f: Path, cfg: dict) -> list[str]:
+    """Pipeline TJPA: pdfplumber → flatten → split por V1 (ACÓRDÃO N.) ou V2 (citação fim)."""
+    raw = extract_text_pdf_plumber(f)
+    raw = re.sub(r'\n\d{1,3}\n', '\n', raw)
+    text = raw.replace('\n', ' ')
+    text = re.sub(r'\s+', ' ', text)
+    if cfg.get("hyphen_rejoin"):
+        text = re.sub(r'([A-Za-z\xc0-\xff])- ([A-Za-z\xc0-\xff])', r'\1\2', text)
+
+    if _TJPA_V1_START_RE.search(text):
+        return split_decisions_start(text, _TJPA_V1_START_RE)
+
+    # V2: strip front matter antes do primeiro ID PJE, depois split por citação
+    pje_m = _TJPA_PJE_ID_RE.search(text)
+    if pje_m:
+        text = text[pje_m.start():]
+    return split_decisions(text, cfg["citation_re"], skip_trim=True)
+
+
+def _parse_tjpa_v1(chunk: str, filename: str, cfg: dict) -> Optional[dict]:
+    """Extrai campos de decisão TJPA V1 (2020): campos inline PROCESSO/RELATOR/DATA."""
+    proc_m = re.search(r'PROCESSO\s*:\s*(' + _TJPA_PROC_NUM + r')', chunk, re.IGNORECASE)
+    if not proc_m:
+        return None
+    numero = proc_m.group(1).strip()
+
+    acord_m = _TJPA_V1_START_RE.search(chunk)
+    after_acord = chunk[acord_m.end():proc_m.start()].strip() if acord_m else ""
+
+    # Órgão: linha que contém TURMA / CÂMARA / SEÇÃO / TRIBUNAL PLENO
+    orgao_m = re.search(
+        r'\d[ªº°]?\s*(?:TURMA|CÂMARA|SEÇÃO)\s+\w[\w\s]+'
+        r'|(?:SEÇÃO|TRIBUNAL PLENO|CÂMARA|CONSELHO)\s+\w[\w\s]+',
+        chunk, re.IGNORECASE,
+    )
+    orgao = re.sub(r'\s+', ' ', orgao_m.group()).strip() if orgao_m else ""
+    # Tipo: texto entre ACÓRDÃO N. e PROCESSO: (descontando o órgão se detectado)
+    tipo_raw = re.sub(r'\s+', ' ', after_acord).strip()
+    if orgao and orgao in tipo_raw:
+        tipo_raw = tipo_raw.replace(orgao, '').strip()
+    tipo = tipo_raw.title() or "Acórdão"
+
+    rel_m = re.search(r'RELATOR[AE]?\s*:\s*(.+?)(?=\s+EMENTA|\s+DATA\s+DE|\s*$)', chunk, re.IGNORECASE)
+    relator = re.sub(r'\s+', ' ', rel_m.group(1)).strip().title() if rel_m else ""
+
+    data_m = re.search(r'DATA\s+DE\s+PUBLICA[ÇC][ÃA]O\s*:\s*(\d{1,2}/\d{1,2}/\d{4})', chunk, re.IGNORECASE)
+    data = parse_date_tjac(data_m.group(1)) if data_m else None
+
+    ementa = re.sub(r'\s+', ' ', chunk).strip()
+    ementa = re.sub(r'^AC[ÓO]RD[ÃA]O\s+N[°º.]?\s*\d+\s*', '', ementa, flags=re.IGNORECASE)
+    min_len = cfg.get("min_ementa_len", 0)
+    if min_len and len(ementa) < min_len:
+        return None
+
+    area = classify_area(ementa[:400])
+    return {
+        "_id":            f"tjpa-{numero}",
+        "tribunal":       "TJPA",
+        "tipo":           tipo,
+        "numero":         numero,
+        "relator":        relator,
+        "orgaoJulgador":  orgao,
+        "dataJulgamento": data,
+        "area":           area,
+        "secao":          orgao[:40],
+        "fonte":          Path(filename).name,
+        "ementa":         ementa,
+    }
+
+
+def parse_fields_tjpa(chunk: str, filename: str, cfg: dict) -> Optional[dict]:
+    """Extrai campos ES de decisão TJPA (V1 inline ou V2 citação no fim)."""
+    cit_re = cfg.get("citation_re")
+
+    # Tenta V2: encontra a ÚLTIMA citação (TJPA –...) no chunk
+    if cit_re:
+        last_m = None
+        for m in cit_re.finditer(chunk):
+            last_m = m
+        if last_m:
+            tipo = re.sub(r'\s+', ' ', last_m.group("tipo")).strip().title()
+            numero = last_m.group("numero").strip()
+            relator = re.sub(r'\s+', ' ', last_m.group("relator")).strip().title()
+            orgao = re.sub(r'\s+', ' ', last_m.group("orgao")).strip()
+            data = parse_date_tjac(last_m.group("data"))
+            ementa = re.sub(r'\s+', ' ', chunk[:last_m.start()]).strip()
+            min_len = cfg.get("min_ementa_len", 0)
+            if min_len and len(ementa) < min_len:
+                return None
+            area = classify_area(ementa[:400])
+            return {
+                "_id":            f"tjpa-{numero}",
+                "tribunal":       "TJPA",
+                "tipo":           tipo,
+                "numero":         numero,
+                "relator":        relator,
+                "orgaoJulgador":  orgao,
+                "dataJulgamento": data,
+                "area":           area,
+                "secao":          orgao[:40],
+                "fonte":          Path(filename).name,
+                "ementa":         ementa,
+            }
+
+    # Tenta V1: campos inline
+    if _TJPA_V1_START_RE.search(chunk):
+        return _parse_tjpa_v1(chunk, filename, cfg)
+
+    return None
+
+
 def process_file(f: Path, cfg: dict) -> list[str]:
+    if cfg.get("parse_fn") == "tjpa":
+        return _process_file_tjpa(f, cfg)
     if cfg.get("parse_fn") == "tjmg":
         return _process_file_tjmg(f, cfg)
     if cfg.get("parse_fn") == "tjes":
@@ -1584,6 +1731,7 @@ def main():
             "tjgo":  parse_fields_tjgo,
             "tjmg":  parse_fields_tjmg,
             "tjes":  parse_fields_tjes,
+            "tjpa":  parse_fields_tjpa,
         }.get(sigla, parse_fields_tjac)
 
         for label, files in groups.items():
