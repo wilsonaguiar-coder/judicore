@@ -62,6 +62,66 @@ _TJPA_V1_START_RE = re.compile(r'AC[ÓO]RD[ÃA]O\s+N[°º.]?\s*\d+', re.IGNORECA
 # TJPA V2: marcador de ID PJE (antes de cada ementa)
 _TJPA_PJE_ID_RE = re.compile(r'\d{7,8}\s*-\s*Ac[oó]rd[aã]o\s+PJE', re.IGNORECASE)
 
+# TJPI: número CNJ tolerante a artefatos PyMuPDF (espaços, ponto duplo, dígito extra)
+_TJPI_PROC_NUM = (
+    r'\d{5,9}'          # raiz (normalmente 7 dígitos; 8 por artefato de duplicação)
+    r'\s*[-–]\s*'       # traço (pode ter espaços)
+    r'\d{2}'            # dígitos verificadores
+    r'[.\s]{1,3}'       # separador: `.`, `..` ou `. ` (artefato de duplicação)
+    r'\d{4,5}'          # ano (pode ter 5 dígitos por artefato)
+    r'[.\s]{1,3}'       # separador
+    r'\d'               # segmento de justiça (8)
+    r'[.\s]{1,3}'       # separador
+    r'\d{2}'            # código do tribunal (18=PI)
+    r'[.\s]{1,3}'       # separador
+    r'\d{1,3}'          # início do código de origem
+    r'\s*\d{0,3}'       # possível continuação separada por espaço
+)
+
+# TJPI V1 (2021-2023, jun-2025): citação no FIM
+# (TIPO - NUMERO - ÓRGÃO - Relator: NAME - [Julgamento:] DD/MM/YYYY)
+_TJPI_V1_CIT_RE = re.compile(
+    r'\(?(?!TJPI\s*[-–])'
+    r'(?P<v1_tipo>[^-()]{3,80}?)'
+    r'\s*-\s*'
+    r'(?P<v1_num>' + _TJPI_PROC_NUM + r')'
+    r'\s*-\s*'
+    r'(?P<v1_orgao>[^-()]{3,80}?)'
+    r'\s*-\s*'
+    r'Rela{1,2}tor\s*:\s*'                 # aceita "Relaator" (artefato PyMuPDF)
+    r'(?P<v1_rel>[^-()]{3,80}?)'
+    r'\s*-{1,2}\s*'                         # aceita "--" (artefato PyMuPDF)
+    r'(?:Julgamento\s*:\s*)?'
+    r'(?P<v1_data>\d{1,2}/\d{1,2}/\d{2,6})'
+    r'[^)]{0,20}\)',
+    re.IGNORECASE,
+)
+
+# TJPI V2 (outnov-2024, outnov-2024-jun-2025): citação no FIM
+# (TJPI - TIPO NUMERO - Relator: NAME - ÓRGÃO - [Data] DD/MM/YYYY)
+_TJPI_V2_CIT_RE = re.compile(
+    r'\(*TJPI+\s*[-–]\s*'
+    r'(?P<v2_tipo>[A-ZÁÉÍÓÚÂÊÎÔÛÃÕÇÜ][^\d()]{2,70}?)'
+    r'\s+'
+    r'(?P<v2_num>' + _TJPI_PROC_NUM + r')'
+    r'\s*[-–]\s*'
+    r'Rela{1,2}tor\s*:\s*'                 # aceita "Relaator" (artefato PyMuPDF)
+    r'(?P<v2_rel>[^-()]{3,80}?)'
+    r'\s*[-–]\s*'
+    r'(?P<v2_orgao>[^-()]{3,80}?)'
+    r'\s*[-–]\s*'
+    r'(?:D{1,2}ata\s*)?'                   # aceita "DData" (artefato PyMuPDF)
+    r'(?P<v2_data>\d{1,2}/\d{1,2}/\d{2,6})'
+    r'[^)]{0,20}\)*',
+    re.IGNORECASE,
+)
+
+# Regex combinado para split_decisions (alternação V1|V2)
+_TJPI_SPLIT_RE = re.compile(
+    r'(?:' + _TJPI_V1_CIT_RE.pattern + r'|' + _TJPI_V2_CIT_RE.pattern + r')',
+    re.IGNORECASE,
+)
+
 # TJMG: número no formato 1.NNNN.NN.NNNNNN-N/NNN (pode ter espaço antes do traço)
 _TJMG_PROC_RE  = r'1\.\d{4}\.\d{2}\.\d{5,6}\s*[-]\s*\d/\d{3}'
 
@@ -405,6 +465,14 @@ TRIBUNAL_CFG: dict[str, dict] = {
         "parse_fn": "tjpa",
         "min_ementa_len": 300,
         "citation_re": _TJPA_CIT_RE,
+    },
+    "tjpi": {
+        "tribunal": "TJPI",
+        "area_default": "ESTADUAL",
+        "file_patterns": {"boletim": "*.pdf"},
+        "parse_fn": "tjpi",
+        "min_ementa_len": 300,
+        "citation_re": _TJPI_SPLIT_RE,
     },
     "tjdft": {
         "use_pdfplumber": True,
@@ -1656,7 +1724,105 @@ def parse_fields_tjpa(chunk: str, filename: str, cfg: dict) -> Optional[dict]:
     return None
 
 
+def _clean_tjpi_num(raw: str) -> str:
+    """Remove espaços e pontos duplos do número de processo TJPI capturado pelo regex."""
+    n = re.sub(r'\s+', '', raw)            # remove espaços
+    n = re.sub(r'\.{2,}', '.', n)         # normaliza ponto duplo
+    return n
+
+
+def _process_file_tjpi(f: Path, cfg: dict) -> list[str]:
+    """Pipeline TJPI: PyMuPDF (sort=True) → limpa sidebar → flatten → split V1|V2."""
+    import fitz  # PyMuPDF
+
+    doc = fitz.open(str(f))
+    page_texts: list[str] = []
+    for pg in doc:
+        raw = pg.get_text("text", sort=True)
+        # Remove palavras do sidebar vertical (aparecem após 10+ espaços no fim da linha)
+        raw = re.sub(r'[ \t]{10,}\S+(?:[ \t]+\S+){0,2}\s*$', ' ', raw, flags=re.MULTILINE)
+        # Remove números de página isolados
+        raw = re.sub(r'^\s*\d{1,3}\s*$', '', raw, flags=re.MULTILINE)
+        page_texts.append(raw)
+    doc.close()
+
+    text = '\n'.join(page_texts).replace('\n', ' ')
+    text = re.sub(r'\s+', ' ', text).strip()
+    # Rejunta palavras hifenizadas no fim de linha
+    text = re.sub(r'([A-Za-z\xc0-\xff])- ([A-Za-z\xc0-\xff])', r'\1\2', text)
+
+    return split_decisions(text, _TJPI_SPLIT_RE, skip_trim=True)
+
+
+def parse_fields_tjpi(chunk: str, filename: str, cfg: dict) -> Optional[dict]:
+    """Extrai campos ES de decisão TJPI (V1 citação-padrão ou V2 com prefixo TJPI)."""
+    last_v1 = None
+    for m in _TJPI_V1_CIT_RE.finditer(chunk):
+        last_v1 = m
+
+    last_v2 = None
+    for m in _TJPI_V2_CIT_RE.finditer(chunk):
+        last_v2 = m
+
+    # Usa a citação mais próxima do fim do chunk
+    if last_v2 and (not last_v1 or last_v2.start() >= last_v1.start()):
+        m = last_v2
+        tipo    = re.sub(r'\s+', ' ', m.group('v2_tipo')).strip().title()
+        numero  = _clean_tjpi_num(m.group('v2_num'))
+        relator = re.sub(r'\s+', ' ', m.group('v2_rel')).strip().title()
+        orgao   = re.sub(r'\s+', ' ', m.group('v2_orgao')).strip()
+        data    = parse_date_tjac(m.group('v2_data'))
+    elif last_v1:
+        m = last_v1
+        tipo    = re.sub(r'\s+', ' ', m.group('v1_tipo')).strip().title()
+        numero  = _clean_tjpi_num(m.group('v1_num'))
+        relator = re.sub(r'\s+', ' ', m.group('v1_rel')).strip().title()
+        orgao   = re.sub(r'\s+', ' ', m.group('v1_orgao')).strip()
+        data    = parse_date_tjac(m.group('v1_data'))
+    else:
+        return None
+
+    # Remove cabeçalho do boletim que entra na primeira decisão de cada PDF
+    body = chunk[:m.start()]
+    body = re.sub(
+        r'^.*?(?=\d{5,9}\s*[-–]\s*\d{2}[.\s]\d{4})',
+        '', body, count=1, flags=re.DOTALL,
+    )
+    ementa = re.sub(r'\s+', ' ', body).strip()
+    # Remove citação secundária da decisão anterior (ex: jun-2025 tem V1+V2 por decisão)
+    # Distingue de início normal de ementa: citação tem " - ORGAO" após número, ementa tem "."
+    ementa = re.sub(
+        r'^\d{5,9}[-–\s.]{1,4}\d{2}[.\s]{1,3}\d{4,5}[.\s]\d[.\s]\d{2}[.\s]\d{1,5}\s*[-–]\s*[^)]+\)\s*',
+        '', ementa,
+    )
+    # Remove número do processo do início da ementa (ex: "0000023-53.2016.8.18.0051. TEXTO...")
+    ementa = re.sub(
+        r'^\d{5,9}[-–\s.]{1,4}\d{2}[.\s]{1,3}\d{4,5}[.\s]\d[.\s]\d{2}[.\s]\d{1,5}[.\s]+',
+        '', ementa,
+    )
+    min_len = cfg.get("min_ementa_len", 0)
+    if min_len and len(ementa) < min_len:
+        return None
+
+    area = classify_area(ementa[:400])
+    return {
+        "_id":            f"tjpi-{numero}",
+        "tribunal":       "TJPI",
+        "tipo":           tipo,
+        "numero":         numero,
+        "relator":        relator,
+        "orgaoJulgador":  orgao,
+        "dataJulgamento": data,
+        "area":           area,
+        "secao":          orgao[:40],
+        "fonte":          Path(filename).name,
+        "ementa":         ementa,
+    }
+
+
 def process_file(f: Path, cfg: dict) -> list[str]:
+    if cfg.get("parse_fn") == "tjpi":
+        return _process_file_tjpi(f, cfg)
     if cfg.get("parse_fn") == "tjpa":
         return _process_file_tjpa(f, cfg)
     if cfg.get("parse_fn") == "tjmg":
@@ -1732,6 +1898,7 @@ def main():
             "tjmg":  parse_fields_tjmg,
             "tjes":  parse_fields_tjes,
             "tjpa":  parse_fields_tjpa,
+            "tjpi":  parse_fields_tjpi,
         }.get(sigla, parse_fields_tjac)
 
         for label, files in groups.items():
