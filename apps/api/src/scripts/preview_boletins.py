@@ -611,13 +611,15 @@ def parse_date_tjac(raw: str) -> Optional[str]:
     # D.M.YYYY ou DD.MM.YYYY
     m = re.search(r"(\d{1,2})\.(\d{1,2})\.(20\d{2})", raw)
     if m:
-        d, mo, y = m.groups()
-        return f"{y}-{int(mo):02d}-{int(d):02d}"
+        d, mo, y = int(m.group(1)), int(m.group(2)), m.group(3)
+        if 1 <= mo <= 12 and 1 <= d <= 31:
+            return f"{y}-{mo:02d}-{d:02d}"
     # DD/MM/YYYY ou D/M/YYYY (com ou sem ordinal: 1º/9/2020)
     m = re.search(r"(\d{1,2})[º°]?/(\d{1,2})/(20\d{2})", raw)
     if m:
-        d, mo, y = m.groups()
-        return f"{y}-{int(mo):02d}-{int(d):02d}"
+        d, mo, y = int(m.group(1)), int(m.group(2)), m.group(3)
+        if 1 <= mo <= 12 and 1 <= d <= 31:
+            return f"{y}-{mo:02d}-{d:02d}"
     m = re.search(r"(20\d{2})", raw)
     return f"{m.group(1)}-01-01" if m else None
 
