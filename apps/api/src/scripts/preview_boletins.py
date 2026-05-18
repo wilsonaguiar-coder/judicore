@@ -262,6 +262,28 @@ _TJSC_TIPO_RE = re.compile(
     re.IGNORECASE,
 )
 
+# ── TJSP ──────────────────────────────────────────────────────────────────────
+# Número CNJ do TJSP: 8.26 (ex: 1067311-87.2020.8.26.0002)
+_TJSP_CNJ = r'\d{7}-\s*\d{2}\.\d{4}\.8\.26\.\d{4}'
+_TJSP_CNJ_RE = re.compile(_TJSP_CNJ)
+
+# TJSP: citação no FIM entre parênteses, ancorada na aspa de fechamento da ementa.
+# O ” (aspa tipográfica de fechamento) logo antes de \( garante que só
+# capturamos referências reais, não citações internas dentro da ementa.
+_TJSP_SPLIT_RE = re.compile(
+    r'”\s*'
+    r'\('
+    r'(?P<tipo>[^()]{3,80}?)'
+    r'\s*n[°º]?\.?\s*'
+    r'(?P<numero>' + _TJSP_CNJ + r')'
+    r',\s*Rel\.\s*'
+    r'(?P<relator>[^,()]{3,80}?)'
+    r',\s*j\.\s*'
+    r'(?P<data>\d{1,2}/\d{1,2}/\d{2,4})'
+    r'[^)]*\)',
+    re.IGNORECASE,
+)
+
 # ─── TJRS ──────────────────────────────────────────────────────────────────────
 # Dois layouts HTML:
 #   OLD (ed. 229–290, 2020–jun/2023): divs col-xs-12 fundo; citação no FIM;
@@ -612,6 +634,13 @@ TRIBUNAL_CFG: dict[str, dict] = {
         "file_patterns": {"boletim": "*.pdf"},
         "parse_fn": "tjsc",
         "min_ementa_len": 100,
+    },
+    "tjsp": {
+        "tribunal": "TJSP",
+        "area_default": "ESTADUAL",
+        "file_patterns": {"boletim": "boletim_*.pdf"},
+        "parse_fn": "tjsp",
+        "min_ementa_len": 120,
     },
     "tjdft": {
         "use_pdfplumber": True,
@@ -2599,6 +2628,141 @@ def parse_fields_tjsc(chunk: str, filename: str, cfg: dict) -> Optional[dict]:
     }
 
 
+# ── TJSP ──────────────────────────────────────────────────────────────────────
+
+_TJSP_ORGAO_RE = re.compile(
+    r'\d+[ªº°]\s+CÂ?MARA\s+(?:RESERVADA\s+)?DE\s+DIREITO\s+(?:PRIVADO|EMPRESARIAL)'
+    r'|\d+[ªº°]\s+GRUPO\s+DE\s+DIREITO\s+PRIVADO',
+    re.IGNORECASE,
+)
+_TJSP_SECAO_RE = re.compile(
+    r'DIREITO\s+(?:PRIVADO\s+\d+|EMPRESARIAL)',
+    re.IGNORECASE,
+)
+
+
+def _parse_date_tjsp(raw: str) -> str:
+    m = re.search(r'(\d{1,2})/(\d{1,2})/(\d{2,4})', raw)
+    if not m:
+        return ''
+    d, mo, y = int(m.group(1)), int(m.group(2)), m.group(3)
+    if len(y) == 2:
+        y = '20' + y
+    if 1 <= mo <= 12 and 1 <= d <= 31:
+        return f"{y}-{mo:02d}-{d:02d}"
+    return y + '-01-01'
+
+
+def _process_file_tjsp(f: Path, cfg: dict) -> list[str]:
+    """Pipeline TJSP: PyMuPDF page-by-page, strip page headers, split on closing reference.
+
+    Decisões delimitadas por: "ementa" (aspas tipográficas) seguida de
+    (Tipo n° CNJ_8.26.XXXX, Rel. Nome, j. DD/MM/AA).
+    """
+    import fitz
+
+    doc = fitz.open(str(f))
+    pages = []
+    for pg in doc:
+        pages.append(pg.get_text("text"))
+    doc.close()
+
+    full = "\n".join(pages)
+
+    # Strip 2022 page header
+    full = re.sub(
+        r'Tribunal\s+de\s+Justi[çc]a\s+do\s+Estado\s+de\s+S[ãa]o\s+Paulo'
+        r'\s*[–\-]+\s*Se[çc][ãa]o\s+de\s+Direito\s+Privado\s*-\s*GAPRI\s*',
+        ' ', full, flags=re.IGNORECASE,
+    )
+    # Strip 2023+ page header ("Página | N  \nVOLTAR AO SUMÁRIO")
+    full = re.sub(
+        r'P[áa]gina\s*\|\s*\d+\s*\n\s*VOLTAR\s+AO\s+SUM[ÁA]RIO\s*',
+        ' ', full, flags=re.IGNORECASE,
+    )
+    # Strip TOC dot leaders
+    full = re.sub(r'\.{4,}\s*\d{1,3}', '', full)
+    # Normalize NBSP and similar
+    full = re.sub(r'[\xa0​  ]', ' ', full)
+
+    # Flatten
+    text = re.sub(r'\s+', ' ', full).strip()
+
+    # Index section and órgão headers for context tracking
+    section_headers = [(m.start(), m.group()) for m in _TJSP_SECAO_RE.finditer(text)]
+    orgao_headers = [(m.start(), m.group()) for m in _TJSP_ORGAO_RE.finditer(text)]
+
+    def _context_at(pos: int) -> tuple[str, str]:
+        sec = next((h[1] for h in reversed(section_headers) if h[0] < pos), '')
+        org = next((h[1] for h in reversed(orgao_headers) if h[0] < pos), '')
+        return sec, org
+
+    # Split on each closing reference; build one chunk per decision.
+    # Use find() (first occurrence after prev) to avoid landing inside inner sub-quotes.
+    chunks: list[str] = []
+    prev_end = 0
+    for m in _TJSP_SPLIT_RE.finditer(text):
+        first_quote = text.find('“', prev_end, m.start())
+        if first_quote == -1:
+            prev_end = m.end()
+            continue
+        sec, org = _context_at(first_quote)
+        prefix = f'[SECAO: {sec}] [ORGAO: {org}] '
+        chunk = prefix + text[first_quote:m.end()]
+        if _TJSP_CNJ_RE.search(chunk):
+            chunks.append(chunk)
+        prev_end = m.end()
+
+    return chunks
+
+
+def parse_fields_tjsp(chunk: str, filename: str, cfg: dict) -> Optional[dict]:
+    """Extrai campos ES de decisão TJSP."""
+    text = re.sub(r'\s+', ' ', chunk).strip()
+
+    ref_m = _TJSP_SPLIT_RE.search(text)
+    if not ref_m:
+        return None
+
+    tipo = re.sub(r'\s+', ' ', ref_m.group('tipo')).strip().title()
+    numero = re.sub(r'\s+', '', ref_m.group('numero'))
+    relator = re.sub(r'\s+', ' ', ref_m.group('relator')).strip().title()
+    data = _parse_date_tjsp(ref_m.group('data'))
+
+    # Ementa: da primeira “ (abertura) até ref_m.start() que é a “ de fechamento.
+    # _TJSP_SPLIT_RE inicia em “ (aspa tipográfica), então ref_m.start() = outer_close.
+    outer_open = text.find('“')
+    outer_close = ref_m.start()  # posição da “ de fechamento (início do match)
+    if outer_open == -1 or outer_open >= outer_close:
+        return None
+    ementa = re.sub(r'\s+', ' ', text[outer_open + 1:outer_close]).strip()
+
+    min_len = cfg.get("min_ementa_len", 0)
+    if min_len and len(ementa) < min_len:
+        return None
+
+    # Seção e órgão a partir dos prefixos injetados por _process_file_tjsp
+    secao_m = re.match(r'\[SECAO:\s*([^\]]*)\]', text)
+    orgao_m = re.search(r'\[ORGAO:\s*([^\]]*)\]', text)
+    secao = re.sub(r'\s+', ' ', secao_m.group(1)).strip().title() if secao_m else ''
+    orgao = re.sub(r'\s+', ' ', orgao_m.group(1)).strip().title() if orgao_m else ''
+
+    area = classify_area(ementa[:400])
+    return {
+        "_id":            f"tjsp-{re.sub(r'[^0-9]', '', numero)}",
+        "tribunal":       "TJSP",
+        "tipo":           tipo,
+        "numero":         numero,
+        "relator":        relator,
+        "orgaoJulgador":  orgao,
+        "dataJulgamento": data,
+        "area":           area,
+        "secao":          secao,
+        "fonte":          Path(filename).name,
+        "ementa":         ementa,
+    }
+
+
 def process_file(f: Path, cfg: dict) -> list[str]:
     if cfg.get("parse_fn") == "tjpi":
         return _process_file_tjpi(f, cfg)
@@ -2608,6 +2772,8 @@ def process_file(f: Path, cfg: dict) -> list[str]:
         return _process_file_tjrr(f, cfg)
     if cfg.get("parse_fn") == "tjsc":
         return _process_file_tjsc(f, cfg)
+    if cfg.get("parse_fn") == "tjsp":
+        return _process_file_tjsp(f, cfg)
     if cfg.get("parse_fn") == "tjpa":
         return _process_file_tjpa(f, cfg)
     if cfg.get("parse_fn") == "tjmg":
@@ -2688,6 +2854,7 @@ def main():
             "tjrr":  parse_fields_tjrr,
             "tjrs":  parse_fields_tjrs,
             "tjsc":  parse_fields_tjsc,
+            "tjsp":  parse_fields_tjsp,
         }.get(sigla, parse_fields_tjac)
 
         for label, files in groups.items():
