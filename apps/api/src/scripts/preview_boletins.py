@@ -122,6 +122,36 @@ _TJPI_SPLIT_RE = re.compile(
     re.IGNORECASE,
 )
 
+# ── TJRN ──────────────────────────────────────────────────────────────────────
+# Número CNJ do TJRN: 8.20 (ex: 0809990-81.2022.8.20.0000)
+_TJRN_PROC_NUM = r'\d{7}\s*[-–]\s*\d{2}\.?\s*\d{4}\.8\.20\.\d{4}'
+
+# TJRN: citação entre parênteses com número 8.20 e suporte a () aninhado nível 1
+# Usa (?:[^()]*\([^()]*\))*[^()]* para evitar backtracking catastrófico:
+# as alternativas [^()] e \([^()]*\) são mutuamente exclusivas, tornando o parse linear.
+_TJRN_SPLIT_RE = re.compile(
+    r'\('
+    r'(?:[^()]*\([^()]*\))*[^()]*'       # prefixo com () nível-1 opcionais
+    r'(?:' + _TJRN_PROC_NUM + r')'       # número CNJ 8.20
+    r'(?:[^()]*\([^()]*\))*[^()]*'       # sufixo com () nível-1 opcionais
+    r'\)',
+    re.IGNORECASE,
+)
+
+# ── TJRR ──────────────────────────────────────────────────────────────────────
+# Número CNJ do TJRR: 8.23 (ex: 9000312-06.2020.8.23.0000)
+_TJRR_PROC_NUM = r'\d{7}\s*-\s*\d{2}\.?\s*\d{4}\.8\.23\.\d{4}'
+_TJRR_PROC_NUM_RE = re.compile(_TJRR_PROC_NUM)
+
+# TJRR: tipo deve começar com uma palavra-chave processual (evita contaminação de cabeçalho)
+_TJRR_TIPO_RE = re.compile(
+    r'(?:A[çc][aã]o|Agravo|Mandado|Habeas|Recurso|Revis[aã]o|Incidente|'
+    r'Conflito|Diss[íi]dio|Pedido|Apela[çc][aã]o|Argui[çc][aã]o|'
+    r'Embargos?|Exce[çc][aã]o|Queixa|Reclama[çc][aã]o|Declarat[oó]rios?)'
+    r'(?:\s+[A-Za-záéíóúàâêôãõçÀ-ÿ]{2,}){0,6}',
+    re.IGNORECASE,
+)
+
 # TJMG: número no formato 1.NNNN.NN.NNNNNN-N/NNN (pode ter espaço antes do traço)
 _TJMG_PROC_RE  = r'1\.\d{4}\.\d{2}\.\d{5,6}\s*[-]\s*\d/\d{3}'
 
@@ -473,6 +503,56 @@ TRIBUNAL_CFG: dict[str, dict] = {
         "parse_fn": "tjpi",
         "min_ementa_len": 300,
         "citation_re": _TJPI_SPLIT_RE,
+    },
+    "tjrn": {
+        "tribunal": "TJRN",
+        "area_default": "ESTADUAL",
+        "file_patterns": {"informativo": "informativo_*.pdf"},
+        "parse_fn": "tjrn",
+        "min_ementa_len": 200,
+        "citation_re": _TJRN_SPLIT_RE,
+        "header_re": [
+            # "INFORMATIVO DE JURISPRUDÊNCIA DO TJRN • EDIÇÃO 001" — usa • (bullet), não traço
+            # Consome também número de página prefixado/sufixado: "6 INFORMATIVO..." / "...001 8"
+            re.compile(
+                r'(?:\d+\s+)?INFORMATIVO\s+DE\s+JURISPRUD[ÊE]NCIA\s+DO\s+TJRN'
+                r'\s*[•–\-]\s*EDI[ÇC][ÃA]O\s+\d{3}'
+                r'(?:\s+\d+)?',
+                re.IGNORECASE,
+            ),
+            # Itens do sumário (capa): "TRIBUNAL PLENO.....5", "SEÇÃO CÍVEL____29", "1a. CÂMARA CÍVEL___40"
+            re.compile(
+                r'(?:TRIBUNAL\s+PLENO|SE[ÇC][ÃA]O\s+C[ÍI]VEL'
+                r'|[123](?:ª|a)?\.?\s*C[ÂA]MARA\s+C[ÍI]VEL'
+                r'|C[ÂA]MARA\s+CRIMINAL|TURMAS?\s+RECURSAIS?)\s*[._]{2,}\s*\d+',
+                re.IGNORECASE,
+            ),
+            # Palavra "Sumário" / "SUMÁRIO" da capa
+            re.compile(r'\bSum[aá]rio\b', re.IGNORECASE),
+            # Data da capa: "Natal, 14 de junho de 2023" (ano pode ter sido consumido antes)
+            re.compile(
+                r'Natal,?\s+\d+\s+de\s+\w+\s+de\s*(?:20\d{2})?',
+                re.IGNORECASE,
+            ),
+            # Seção "DIRIGENTES" (diretoria do tribunal na capa)
+            re.compile(
+                r'DIRIGENTES\s+(?:Presidente|Vice|Corregedor|Ouvidor)'
+                r'(?:.(?!(?:[A-Z][a-záéíóúàâêôãõç]|\d{7})))*',
+                re.IGNORECASE | re.DOTALL,
+            ),
+            # Composição do colegiado (2+ "Des./Desª. Nome" consecutivos na capa)
+            re.compile(
+                r'(?:Desª?\.\s+[A-ZÁÉÍÓÚÂÊÎÔÛÃÕÇÜ][A-Za-záéíóúàâêôãõçÀ-ÿ]+'
+                r'(?:\s+[A-Za-záéíóúàâêôãõçÀ-ÿA-Z]+){1,4}\s*){2,}',
+            ),
+        ],
+    },
+    "tjrr": {
+        "tribunal": "TJRR",
+        "area_default": "ESTADUAL",
+        "file_patterns": {"informativo": "informativo_*.pdf"},
+        "parse_fn": "tjrr",
+        "min_ementa_len": 100,
     },
     "tjdft": {
         "use_pdfplumber": True,
@@ -1822,9 +1902,285 @@ def parse_fields_tjpi(chunk: str, filename: str, cfg: dict) -> Optional[dict]:
     }
 
 
+def parse_fields_tjrn(chunk: str, filename: str, cfg: dict) -> Optional[dict]:
+    """Extrai campos ES de decisão TJRN (citação no fim, número 8.20)."""
+    flat = re.sub(r'\s+', ' ', chunk).strip()
+
+    # Última citação com número TJRN (8.20)
+    last_m = None
+    for m in _TJRN_SPLIT_RE.finditer(flat):
+        last_m = m
+    if not last_m:
+        return None
+
+    cit_inner = last_m.group()[1:-1].strip()
+
+    # Número do processo
+    num_m = re.search(_TJRN_PROC_NUM, cit_inner, re.IGNORECASE)
+    if not num_m:
+        return None
+    numero = re.sub(r'\s+', '', num_m.group())
+
+    before_num = cit_inner[:num_m.start()].strip()
+    after_num  = cit_inner[num_m.end():].strip()
+
+    # Tipo: texto antes do número, remove prefixo "TJRN –" e sufixo "Nº/n."
+    before_num = re.sub(r'^TJRN\s*[-–]\s*', '', before_num, flags=re.IGNORECASE).strip()
+    tipo = re.sub(r'[,;]?\s*N[ºo°.]?\s*$', '', before_num, flags=re.IGNORECASE).strip().rstrip(',;')
+    if not tipo:
+        tipo = 'ACÓRDÃO'
+
+    # Data (âncora mais confiável)
+    data_m = (
+        re.search(r'(?:JULGADO|ASSINADO|julg\.?|j\.)\s+em\s+(\d{1,2}/\d{1,2}/\d{2,4})',
+                  cit_inner, re.IGNORECASE)
+        or re.search(r'sess[aã]o\s+\S+\s+de\s+(\d{1,2}/\d{1,2}/\d{2,4})', cit_inner, re.IGNORECASE)
+        or re.search(r'(\d{1,2}/\d{1,2}/\d{2,4})', cit_inner)
+    )
+    data_raw = data_m.group(1) if data_m else ''
+    # Expande ano de 2 dígitos (ex: 25/01/23 → 25/01/2023)
+    data_raw = re.sub(r'/(\d{2})$', lambda m: f'/20{m.group(1)}', data_raw)
+    data = parse_date_tjac(data_raw)
+
+    # Região entre número e data — contém relator e órgão
+    region = cit_inner[num_m.end(): data_m.start()] if data_m else after_num[:300]
+
+    # Órgão julgador (nome institucional conhecido)
+    orgao_m = re.search(
+        r'(Tribunal\s+Pleno|Se[çc][aã]o\s+C[íi]vel|Se[çc][aã]o\s+Criminal|'
+        r'Câmara\s+Criminal|[123][ªa]\s+Câmara\s+C[íi]vel|[123][ªa]\s+Câmara\s+Criminal|'
+        r'[123ºo]?[ªa]?\s*Turma\s+Recursal)',
+        region, re.IGNORECASE,
+    )
+    orgao = orgao_m.group(1).strip() if orgao_m else ''
+
+    # Relator
+    rel_region = region[:orgao_m.start()] if orgao_m else region
+    rel_m = re.search(
+        r'(?:Rel(?:ator[ae]?)?\.?\s+)?'
+        r'(?:Des(?:embargador[ao]?)?[aª]?\.?\s*|Des[aª]?\.?\s*|Dr\.?\s*|'
+        r'Ju[íi]z[ao]?(?:\s+Convocad[ao]?)?\s+)?'
+        r'([A-ZÁÉÍÓÚÂÊÎÔÛÃÕÇÜ][A-Za-záéíóúàâêôãõçÀ-ÿ]+(?:\s+[A-Za-záéíóúàâêôãõçÀ-ÿA-Z.]+){1,6}?)'
+        r'(?:\s+substituindo\b.+)?'
+        r'\s*[,\-–]',
+        rel_region, re.IGNORECASE,
+    )
+    if not rel_m:
+        # fallback: primeiro nome capitalizado
+        rel_m = re.search(
+            r'[,\s]*([A-ZÁÉÍÓÚÂÊÎÔÛÃÕÇÜ][A-Za-záéíóúàâêôãõçÀ-ÿ]+(?:\s+[A-Za-záéíóúàâêôãõçÀ-ÿA-Z]+){1,4})',
+            rel_region,
+        )
+    relator = re.sub(r'\s+', ' ', rel_m.group(1)).strip() if rel_m else ''
+
+    # Ementa = tudo antes da citação
+    ementa = re.sub(r'\s+', ' ', flat[:last_m.start()]).strip()
+
+    # Primeira decisão de cada PDF pode ter preamble (capa, sumário, lista de desembargadores).
+    # Detecta início real do conteúdo pelo primeiro ramo jurídico + separador.
+    area_m = re.search(
+        r'(?:Penal|Processual|Constitucional|Administrativo|Civil|Criminal|Tributár)\b',
+        ementa, re.IGNORECASE,
+    )
+    if area_m and area_m.start() > 80:
+        ementa = ementa[area_m.start():]
+
+    min_len = cfg.get("min_ementa_len", 0)
+    if min_len and len(ementa) < min_len:
+        return None
+
+    area = classify_area(ementa[:500])
+    return {
+        "_id":            f"tjrn-{re.sub(r'[^0-9]', '', numero)}",
+        "tribunal":       "TJRN",
+        "tipo":           re.sub(r'\s+', ' ', tipo).strip().title(),
+        "numero":         numero,
+        "relator":        relator.title() if relator else '',
+        "orgaoJulgador":  orgao,
+        "dataJulgamento": data,
+        "area":           area,
+        "secao":          orgao[:40],
+        "fonte":          Path(filename).name,
+        "ementa":         ementa,
+    }
+
+
+def _process_file_tjrr(f: Path, cfg: dict) -> list[str]:
+    """Pipeline TJRR: PyMuPDF words-extraction por página, split no marcador PROCESSO.
+
+    Usa get_text("words") em vez de get_text("text") para evitar artefatos de
+    character-tracking nos PDFs do TJRR (espaços inseridos dentro de palavras).
+    """
+    import fitz
+
+    doc = fitz.open(str(f))
+    pages = []
+    for pg in doc:
+        text = pg.get_text("text", sort=True)
+        tokens = text.split()
+        # Detecta artefato de character-tracking largo: >20% dos tokens têm 1-2 letras isoladas.
+        # Quando detectado, usa get_text("words") que extrai palavras como unidades e evita o artefato.
+        short_ratio = (
+            sum(1 for t in tokens if 1 <= len(t) <= 2 and t.isalpha()) / len(tokens)
+            if tokens else 0
+        )
+        if short_ratio > 0.20:
+            words = pg.get_text("words", sort=True)
+            pages.append(' '.join(w[4] for w in words) if words else text)
+        else:
+            pages.append(text)
+    doc.close()
+
+    full = '\n'.join(pages)
+
+    # sort=True cola texto de colunas adjacentes: garante espaços em torno de PROCESSO
+    full = re.sub(r'(\S)PROCESSO', r'\1 PROCESSO', full)
+    full = re.sub(r'PROCESSO(\S)', r'PROCESSO \1', full)
+
+    # sort=True nas edições trimestrais/inaugurais parte o número CNJ ao meio:
+    # "9000312- PROCESSO 06.2020.8.23.0000" → "9000312-06.2020.8.23.0000 PROCESSO"
+    full = re.sub(
+        r'(\d{7})\s*[-–]\s*PROCESSO\s+(\d{2}\.?\s*\d{4}\.8\.23\.\d{4})',
+        r'\1-\2 PROCESSO',
+        full,
+    )
+
+    # Remove cabeçalhos de página recorrentes em três etapas distintas.
+    # Não usa [^\n]* para não consumir conteúdo útil em páginas words-mode (sem newlines).
+    # "Informativo de Jurisprudência [Edição X] [Boa Vista, DD de mês de YYYY]"
+    full = re.sub(
+        r'Informativo\s+de\s*\n?\s*Jurisprud[êe]ncia\b',
+        ' ', full, flags=re.IGNORECASE,
+    )
+    full = re.sub(
+        r'Edi[çc][aã]o\s+(?:n\.\s*\d+|Inaugural)\b',
+        ' ', full, flags=re.IGNORECASE,
+    )
+    full = re.sub(
+        r'Boa\s+Vista[/,]?\s*RR?,?\s*\d+\s+de\s+\w+\s+de\s+20\d{2}',
+        ' ', full, flags=re.IGNORECASE,
+    )
+
+    # Flatten
+    text = re.sub(r'\s+', ' ', full).strip()
+
+    # Divide no marcador PROCESSO
+    parts = re.split(r'\bPROCESSO\b', text)
+
+    chunks = []
+    for i in range(1, len(parts)):
+        # tail do chunk anterior pode conter tipo+número+relator (edições mensais)
+        prev_tail = parts[i - 1][-600:] if len(parts[i - 1]) > 600 else parts[i - 1]
+        curr = parts[i].strip()
+        # Não reintroduz PROCESSO no chunk — evita contaminação no campo relator
+        chunk = re.sub(r'\s+', ' ', prev_tail + ' ' + curr).strip()
+        if _TJRR_PROC_NUM_RE.search(chunk):
+            chunks.append(chunk)
+
+    return chunks
+
+
+def parse_fields_tjrr(chunk: str, filename: str, cfg: dict) -> Optional[dict]:
+    """Extrai campos ES de decisão TJRR (marcador PROCESSO + DESTAQUE como ementa)."""
+    text = re.sub(r'\s+', ' ', chunk).strip()
+
+    # Número TJRR (8.23)
+    num_m = _TJRR_PROC_NUM_RE.search(text)
+    if not num_m:
+        return None
+    numero = re.sub(r'\s+', '', num_m.group())
+
+    # Tipo: último candidato válido (palavra-chave processual) nos últimos 250 chars antes do número
+    # Restringe a janela ao fim de before_clean para não capturar palavras da decisão anterior
+    before_num = text[:num_m.start()]
+    before_clean = re.sub(r'\s*n[°º.]\s*$', '', before_num, flags=re.IGNORECASE).rstrip()
+    before_tail = before_clean[-250:] if len(before_clean) > 250 else before_clean
+    tipo_candidates = list(_TJRR_TIPO_RE.finditer(before_tail))
+    tipo = tipo_candidates[-1].group().strip() if tipo_candidates else 'ACÓRDÃO'
+
+    # Região pós-número (relator, órgão, data)
+    after = text[num_m.end(): num_m.end() + 600].strip().lstrip('.,')
+
+    data_m = re.search(r'julgado\s+em\s+(\d{1,2}/\d{1,2}/\d{4})', after, re.IGNORECASE)
+    data_raw = data_m.group(1) if data_m else ''
+    data = parse_date_tjac(data_raw)
+
+    region = after[:data_m.start()] if data_m else after[:300]
+
+    orgao_m = re.search(
+        r'(Tribunal\s+Pleno|Câmaras?\s+Reunidas|'
+        r'(?:Câmara|Turma)\s+(?:C[íi]vel|Criminal|Recursal)|'
+        r'(?:Primeira|Segunda|1[ªa]|2[ªa])\s+Turma\s+C[íi]vel)',
+        region, re.IGNORECASE,
+    )
+    orgao = orgao_m.group(1).strip() if orgao_m else ''
+
+    rel_region = region[:orgao_m.start()] if orgao_m else region
+    rel_m = re.search(
+        r'(?:[,.]?\s*)?(?:Rel\.\s+)?'
+        r'(?:Des(?:embargador[ao]?)?[aª]?\.?\s*|Des[aª]?\.?\s*|Ju[íi]z[ao]?(?:\s+de\s+Direito)?\s*)?'
+        r'([A-ZÁÉÍÓÚÂÊÎÔÛÃÕÇÜ][A-Za-záéíóúàâêôãõçÀ-ÿ]+(?:\s+[A-Za-záéíóúàâêôãõçÀ-ÿA-Z]+){1,5})',
+        rel_region, re.IGNORECASE,
+    )
+    relator = re.sub(r'\s+', ' ', rel_m.group(1)).strip() if rel_m else ''
+
+    # Área: RAMO DO DIREITO
+    ramo_m = re.search(
+        r'RAMO\s+DO\s+DIREITO\s+([^T]+?)(?=\s+TEMA\b|\s+DESTAQUE\b|\s+INFORMA)',
+        text, re.IGNORECASE,
+    )
+    ramo_text = re.sub(r'\s+', ' ', ramo_m.group(1)).strip() if ramo_m else ''
+
+    # Ementa: DESTAQUE + INFORMAÇÕES DO INTEIRO TEOR (texto completo da decisão)
+    destaque_m = re.search(r'\bDESTAQUE\s+', text, re.IGNORECASE)
+    inteiro_m  = re.search(r'\bINFORMA[ÇC][ÕO]ES\s+DO\s+INTEIRO\s+TEOR\s+', text, re.IGNORECASE)
+
+    if destaque_m and inteiro_m and inteiro_m.start() > destaque_m.start():
+        # Destaque: do marcador até INFORMAÇÕES DO INTEIRO TEOR
+        destaque_text = re.sub(r'\s+', ' ', text[destaque_m.end(): inteiro_m.start()]).strip()
+        # Inteiro teor: do marcador até o próximo marcador ou fim
+        inteiro_end = len(text)
+        for end_m in re.finditer(r'\bINFORMA[ÇC][ÕO]ES\s+CORRELATAS\b', text, re.IGNORECASE):
+            if end_m.start() > inteiro_m.start():
+                inteiro_end = end_m.start()
+                break
+        inteiro_text = re.sub(r'\s+', ' ', text[inteiro_m.end(): inteiro_end]).strip()
+        ementa = (destaque_text + ' ' + inteiro_text).strip()
+    elif destaque_m:
+        ementa = re.sub(r'\s+', ' ', text[destaque_m.end():]).strip()
+    else:
+        # Fallback: texto entre TEMA e INFORMAÇÕES
+        tema_m = re.search(r'\bTEMA\s+\d*\s+(.+?)(?=\s+INFORMA[ÇC][ÕO]ES|\Z)', text, re.IGNORECASE | re.DOTALL)
+        ementa = re.sub(r'\s+', ' ', tema_m.group(1)).strip() if tema_m else ''
+
+    # Remove artefato de cabeçalho de página que escapa do cleanup
+    ementa = re.sub(r'^\s*Informativo(?:\s+de\s+Jurisprud[êe]ncia)?\s*', '', ementa, flags=re.IGNORECASE).strip()
+
+    min_len = cfg.get("min_ementa_len", 0)
+    if min_len and len(ementa) < min_len:
+        return None
+
+    area = classify_area(ramo_text + ' ' + ementa[:300])
+    return {
+        "_id":            f"tjrr-{re.sub(r'[^0-9]', '', numero)}",
+        "tribunal":       "TJRR",
+        "tipo":           tipo.title(),
+        "numero":         numero,
+        "relator":        relator.title() if relator else '',
+        "orgaoJulgador":  orgao,
+        "dataJulgamento": data,
+        "area":           area,
+        "secao":          ramo_text[:40] or orgao[:40],
+        "fonte":          Path(filename).name,
+        "ementa":         ementa,
+    }
+
+
 def process_file(f: Path, cfg: dict) -> list[str]:
     if cfg.get("parse_fn") == "tjpi":
         return _process_file_tjpi(f, cfg)
+    if cfg.get("parse_fn") == "tjrr":
+        return _process_file_tjrr(f, cfg)
     if cfg.get("parse_fn") == "tjpa":
         return _process_file_tjpa(f, cfg)
     if cfg.get("parse_fn") == "tjmg":
@@ -1901,6 +2257,8 @@ def main():
             "tjes":  parse_fields_tjes,
             "tjpa":  parse_fields_tjpa,
             "tjpi":  parse_fields_tjpi,
+            "tjrn":  parse_fields_tjrn,
+            "tjrr":  parse_fields_tjrr,
         }.get(sigla, parse_fields_tjac)
 
         for label, files in groups.items():
