@@ -14,9 +14,14 @@ interface Props {
   onResults: (results: Jurisprudencia[]) => void;
 }
 
+const TRTs = ["TRT1","TRT2","TRT3","TRT4","TRT5","TRT6","TRT7","TRT8","TRT9","TRT10","TRT11","TRT12","TRT13","TRT14","TRT15","TRT16","TRT17","TRT18","TRT19","TRT20","TRT21","TRT22","TRT23","TRT24"];
+const TJs = ["TJSP","TJRJ","TJMG","TJRS","TJPR","TJSC","TJBA","TJPE","TJCE","TJGO","TJDFT","TJMA","TJPA","TJES","TJMT","TJMS","TJAL","TJSE","TJRN","TJPB","TJPI","TJAM","TJAC","TJRO","TJRR","TJAP","TJTO"];
+
 const TRIBUNAL_GROUPS = [
-  { label: "Superiores", tribunais: ["STF","STJ","TST"] },
-  { label: "Federais",   tribunais: ["TRF1","TRF2","TRF3","TRF4","TRF5","TRF6"] },
+  { label: "Superiores",   tribunais: ["STF","STJ","TST"] },
+  { label: "Federais",     tribunais: ["TRF1","TRF2","TRF3","TRF4","TRF5","TRF6"] },
+  { label: "Trabalhistas", tribunais: TRTs },
+  { label: "Estaduais",    tribunais: TJs },
 ];
 
 export function SearchPanel({ caseId, token, defaultArea, defaultQuery, onResults }: Props) {
