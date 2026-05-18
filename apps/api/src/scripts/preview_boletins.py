@@ -246,6 +246,35 @@ _TJGO_V2_CIT_RE = re.compile(
     re.IGNORECASE | re.DOTALL,
 )
 
+# ─── TJRS ──────────────────────────────────────────────────────────────────────
+# Dois layouts HTML:
+#   OLD (ed. 229–290, 2020–jun/2023): divs col-xs-12 fundo; citação no FIM;
+#       números 70XXXXXXXXX (11 d.) ou CNJ 20 d.
+#   NEW (ed. 291–318, jul/2023+):     sections general-wrapper; citação no INÍCIO
+#       ("Processo TYPE, nº NUM"); números CNJ 20 d.
+
+_TJRS_META_RE = re.compile(
+    r'(?P<tipo>[A-ZÁÉÍÓÚÀÂÊÔÃÕÇÜ][A-Za-záéíóúàâêôãõçÀ-ÿ\s]{2,79}?)'
+    r',\s*n[°º]?\s*'
+    r'(?P<numero>\d{20}|7\d{10})'         # CNJ 20 d. ou antigo TJRS 11 d.
+    r'\s*,\s*'
+    r'(?P<orgao>[^,\n]{5,80}),\s*'
+    r'Tribunal\s+de\s+Justi[çc]a\s+do\s+RS,?\s*'
+    r'Relator:\s*(?P<relator>[^,\n]{3,80}?)'
+    # Campos opcionais entre Relator e Julgado (ex.: "Redator: NOME")
+    r'(?:,\s*[A-Za-záéíóúàâêôãõçÀ-ÿ]+:\s*[^,\n]{3,80}?)*'
+    r'\s*,?\s*Julgado\s+em\s+(?P<data>\d{1,2}/\d{1,2}/\d{4})',
+    re.IGNORECASE,
+)
+
+# Marcador de início de cada processo no novo layout (ed. 291+)
+_TJRS_NEW_PROC_RE = re.compile(
+    r'Processo\s+'
+    r'[A-ZÁÉÍÓÚÀÂÊÔÃÕÇÜ][A-Za-záéíóúàâêôãõçÀ-ÿ\s]{2,79}?'
+    r',\s*n[°º]?\s*\d{20}\s*,',
+    re.IGNORECASE,
+)
+
 TRIBUNAL_CFG: dict[str, dict] = {
     "tjce": {
         "use_pdfplumber": True,
@@ -553,6 +582,13 @@ TRIBUNAL_CFG: dict[str, dict] = {
         "file_patterns": {"informativo": "informativo_*.pdf"},
         "parse_fn": "tjrr",
         "min_ementa_len": 100,
+    },
+    "tjrs": {
+        "tribunal": "TJRS",
+        "area_default": "ESTADUAL",
+        "file_patterns": {"boletim": "boletim_*.html"},
+        "parse_fn": "tjrs",
+        "min_ementa_len": 50,
     },
     "tjdft": {
         "use_pdfplumber": True,
@@ -2005,6 +2041,172 @@ def parse_fields_tjrn(chunk: str, filename: str, cfg: dict) -> Optional[dict]:
     }
 
 
+def _normalize_num_tjrs(raw: str) -> str:
+    """Formata nº TJRS: CNJ 20 d. → NNNNNNN-DD.AAAA.J.TT.OOOO; antigo 11 d. → inalterado."""
+    num = re.sub(r'\D', '', raw)
+    if len(num) == 20:
+        return f"{num[:7]}-{num[7:9]}.{num[9:13]}.{num[13]}.{num[14:16]}.{num[16:]}"
+    return num
+
+
+def _area_from_tjrs_caderno(caderno: str) -> str:
+    """Mapeia caderno TJRS → área ES."""
+    t = caderno.upper()
+    if 'CRIMINAL' in t or 'PENAL' in t:
+        return 'CRIMINAL'
+    if 'TRIBUTAR' in t:
+        return 'TRIBUTARIO'
+    if any(k in t for k in ('PÚBLICO', 'PUBLICO', 'ADMINISTRAT', 'CONSTITUCIONAL')):
+        return 'ADMINISTRATIVO'
+    if 'FAMÍLIA' in t or 'FAMILIA' in t:
+        return 'FAMILIA'
+    if 'TRABALH' in t or 'PREVIDÊNC' in t or 'PREVIDENC' in t:
+        return 'TRABALHISTA'
+    if 'PRIVADO' in t or 'CONTRAT' in t or 'CIVIL' in t or 'CONSUM' in t:
+        return 'CIVIL'
+    return 'OUTRO'
+
+
+def _process_file_tjrs(f: Path, cfg: dict) -> list[str]:
+    """Extrai decisões dos HTMLs do TJRS (dois layouts: old col-xs-12 e new general-wrapper)."""
+    from html.parser import HTMLParser
+
+    class _P(HTMLParser):
+        def __init__(self):
+            super().__init__()
+            self.parts: list[str] = []
+            self._skip = False
+
+        def handle_starttag(self, tag, attrs):
+            if tag in ('script', 'style'):
+                self._skip = True
+            if tag in ('div', 'p', 'br', 'h3', 'h4', 'strong', 'li'):
+                self.parts.append(' ')
+
+        def handle_endtag(self, tag):
+            if tag in ('script', 'style'):
+                self._skip = False
+
+        def handle_data(self, data):
+            if not self._skip:
+                self.parts.append(data)
+
+    raw = f.read_bytes().decode('latin-1')
+    is_new = 'general-wrapper' in raw
+
+    p = _P()
+    p.feed(raw)
+    text = ' '.join(p.parts)
+    text = re.sub(r'\s+', ' ', text).strip()
+
+    if not is_new:
+        # OLD FORMAT (ed. 229–290): citação no FIM do chunk
+        return split_decisions(text, _TJRS_META_RE, skip_trim=False)
+    else:
+        # NEW FORMAT (ed. 291+): cada chunk começa com "Processo TYPE, nº NUM..."
+        return split_decisions_start(text, _TJRS_NEW_PROC_RE)
+
+
+def parse_fields_tjrs(chunk: str, filename: str, cfg: dict) -> Optional[dict]:
+    """Extrai campos ES de decisão TJRS (old: citação no fim; new: começa com 'Processo ...')."""
+    is_new = bool(re.match(r'Processo\s+[A-Z]', chunk, re.IGNORECASE))
+
+    # No formato antigo a citação está no FIM do chunk; usa o ÚLTIMO match para evitar
+    # falsos positivos com referências internas que copiam o padrão de metadados.
+    # No formato novo a citação está no INÍCIO, então o primeiro match já é correto.
+    all_matches = list(_TJRS_META_RE.finditer(chunk))
+    m = all_matches[-1] if (all_matches and not is_new) else (all_matches[0] if all_matches else None)
+    if not m:
+        return None
+
+    tipo_raw = re.sub(r'\s+', ' ', m.group('tipo')).strip()
+    # Novo formato embute "Processo " como prefixo capturado — remove
+    tipo_raw = re.sub(r'^Processo\s+', '', tipo_raw, flags=re.IGNORECASE).strip()
+    # Remove lixo de veredicto que vaza do final da ementa para o início do tipo:
+    #   all-caps (ex.: "APELAÇÃO PROVIDA", "ORDEM DENEGADA") e palavras isoladas ("Unânime")
+    tipo_raw = re.sub(
+        r'^(?:Un[âa]nime|[A-ZÁÉÍÓÚÀÂÊÔÃÕÇÜ]{2,}(?:\s+[A-ZÁÉÍÓÚÀÂÊÔÃÕÇÜ]{2,})*)\s+',
+        '', tipo_raw,
+    ).strip()
+    # Expande abreviações que o site TJRS usa no metadado
+    tipo_raw = re.sub(r'^Direta\s+de\s+Inconstitucionalidade\b', 'Ação Direta de Inconstitucionalidade', tipo_raw, flags=re.IGNORECASE)
+
+    numero_raw = re.sub(r'\D', '', m.group('numero'))
+    numero = _normalize_num_tjrs(numero_raw)
+
+    orgao = re.sub(r'\s+', ' ', m.group('orgao')).strip()
+
+    relator_raw = re.sub(r'\s+', ' ', m.group('relator')).strip()
+    relator_raw = re.sub(
+        r'^(?:Des(?:embargador[ao]?)?[aª]?\.?\s+|Ju[íi]z[ao]?\s+(?:de\s+Direito\s+)?)',
+        '', relator_raw, flags=re.IGNORECASE,
+    ).strip()
+    relator = relator_raw.title()
+
+    data = parse_date_tjac(m.group('data'))
+
+    if not is_new:
+        # OLD: ementa = body antes da citação
+        body = chunk[:m.start()].strip()
+
+        # Localiza início da linha de palavras-chave (ex.: "1. Direito Privado. ...")
+        kw_m = re.search(
+            r'\d+\.\s+Direito\s+(?:Privado|P[úu]blico|Criminal)',
+            body, re.IGNORECASE,
+        )
+        if kw_m:
+            content = body[kw_m.start():]
+            content = re.sub(r'^\d+\.\s+', '', content)  # remove "N. "
+        else:
+            content = body
+
+        caderno_m = re.search(
+            r'\bDireito\s+(?:Privado|P[úu]blico|Criminal)\b', content, re.IGNORECASE,
+        )
+        caderno = caderno_m.group(0) if caderno_m else ''
+        area = _area_from_tjrs_caderno(caderno) if caderno else classify_area(content[:400])
+        ementa = re.sub(r'\s+', ' ', content).strip()
+    else:
+        # NEW: Destaque + Indexação como ementa; caderno para área
+        caderno_m = re.search(
+            r'Caderno\s+e\s+t[oó]pico[^A-Za-z\xc0-\xff]+(.+?)(?=\s+Destaque\b)',
+            chunk, re.IGNORECASE,
+        )
+        caderno = re.sub(r'\s+', ' ', caderno_m.group(1)).strip() if caderno_m else ''
+        area = _area_from_tjrs_caderno(caderno) if caderno else 'OUTRO'
+
+        destaque_m = re.search(
+            r'\bDestaque\b\s+(.+?)(?=\s+Indexa[çc][aã]o\b)',
+            chunk, re.IGNORECASE | re.DOTALL,
+        )
+        destaque = re.sub(r'\s+', ' ', destaque_m.group(1)).strip() if destaque_m else ''
+
+        index_m = re.search(
+            r'\bIndexa[çc][aã]o\b\s+(.+?)(?=\s+Acesse\b|\Z)',
+            chunk, re.IGNORECASE | re.DOTALL,
+        )
+        index_text = re.sub(r'\s+', ' ', index_m.group(1)).strip() if index_m else ''
+        ementa = (destaque + ' ' + index_text).strip()
+
+    min_len = cfg.get('min_ementa_len', 0)
+    if min_len and len(ementa) < min_len:
+        return None
+
+    return {
+        '_id':            f'tjrs-{numero_raw}',
+        'tribunal':       'TJRS',
+        'tipo':           tipo_raw.title(),
+        'numero':         numero,
+        'relator':        relator,
+        'orgaoJulgador':  orgao,
+        'dataJulgamento': data,
+        'area':           area,
+        'secao':          orgao,
+        'fonte':          Path(filename).name,
+        'ementa':         ementa,
+    }
+
+
 def _process_file_tjrr(f: Path, cfg: dict) -> list[str]:
     """Pipeline TJRR: PyMuPDF words-extraction por página, split no marcador PROCESSO.
 
@@ -2179,6 +2381,8 @@ def parse_fields_tjrr(chunk: str, filename: str, cfg: dict) -> Optional[dict]:
 def process_file(f: Path, cfg: dict) -> list[str]:
     if cfg.get("parse_fn") == "tjpi":
         return _process_file_tjpi(f, cfg)
+    if cfg.get("parse_fn") == "tjrs":
+        return _process_file_tjrs(f, cfg)
     if cfg.get("parse_fn") == "tjrr":
         return _process_file_tjrr(f, cfg)
     if cfg.get("parse_fn") == "tjpa":
@@ -2259,6 +2463,7 @@ def main():
             "tjpi":  parse_fields_tjpi,
             "tjrn":  parse_fields_tjrn,
             "tjrr":  parse_fields_tjrr,
+            "tjrs":  parse_fields_tjrs,
         }.get(sigla, parse_fields_tjac)
 
         for label, files in groups.items():
