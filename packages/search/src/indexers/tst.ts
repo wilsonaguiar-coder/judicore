@@ -123,8 +123,7 @@ export const tstAdapter: JurisprudenciaAdapter = {
             relator: r.nomRelator ?? "Não informado",
             dataJulgamento: r.dtaPublicacao?.slice(0, 10) ?? "",
             area: "TRABALHISTA",
-            url: `https://jurisprudencia.tst.jus.br/#!/resultado?id=${r.id}`,
-            urlPdf: `https://jurisprudencia-backend2.tst.jus.br/rest/documentos/${r.id}`,
+            url: `https://jurisprudencia-backend2.tst.jus.br/rest/documentos/${r.id}`,
           };
           if (texto.length > 0) item.conteudoIntegral = texto;
           items.push(item);

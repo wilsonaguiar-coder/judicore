@@ -58,7 +58,7 @@ function TextoIntegralModal({ j, onClose }: { j: Jurisprudencia; onClose: () => 
             {j.textoIntegral || j.ementa}
           </p>
         </div>
-        {j.url && (
+        {j.url && !j.tribunal.startsWith("TRF") && (
           <div className="p-3 border-t flex-shrink-0">
             <a
               href={j.url}
@@ -148,7 +148,7 @@ export function ResultsPanel({ results, selected, onToggle }: Props) {
                           <FileText size={10} /> Ler
                         </button>
                       )}
-                      {j.url ? (
+                      {j.url && !j.tribunal.startsWith("TRF") ? (
                         <a
                           href={j.url}
                           target="_blank"
@@ -158,9 +158,9 @@ export function ResultsPanel({ results, selected, onToggle }: Props) {
                         >
                           Ver original <ExternalLink size={10} />
                         </a>
-                      ) : (
+                      ) : !j.tribunal.startsWith("TRF") ? (
                         <span className="text-xs text-muted-foreground/40">sem link</span>
-                      )}
+                      ) : null}
                     </div>
                   </div>
                 </div>
