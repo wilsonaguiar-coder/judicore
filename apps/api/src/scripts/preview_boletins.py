@@ -246,6 +246,22 @@ _TJGO_V2_CIT_RE = re.compile(
     re.IGNORECASE | re.DOTALL,
 )
 
+# ── TJSC ──────────────────────────────────────────────────────────────────────
+# Número CNJ do TJSC: 8.24 (ex: 0306653-37.2017.8.24.0023)
+_TJSC_CNJ = r'\d{7}-\d{2}\.\d{4}\.8\.24\.\d{4}'
+_TJSC_CNJ_RE = re.compile(_TJSC_CNJ)
+
+# TJSC: tipo deve começar com uma palavra-chave processual
+_TJSC_TIPO_RE = re.compile(
+    r'(?:A[çc][aã]o|Agravo|Mandado|Habeas|Recurso|Revis[aã]o|Incidente|'
+    r'Conflito|Apela[çc][aã]o|Argui[çc][aã]o|Embargos?|Exce[çc][aã]o|'
+    r'Reclama[çc][aã]o|Declarat[oó]rios?|Inqu[eé]rito|Cautelar|'
+    r'Execu[çc][aã]o|Nulidade|Reintegra[çc][aã]o|Restaura[çc][aã]o|'
+    r'Dissolu[çc][aã]o|Homologa[çc][aã]o)'
+    r'(?:\s+(?!N[°º.]|n\.)[A-Za-záéíóúàâêôãõçÀ-ÿ().-]{2,}){0,8}',
+    re.IGNORECASE,
+)
+
 # ─── TJRS ──────────────────────────────────────────────────────────────────────
 # Dois layouts HTML:
 #   OLD (ed. 229–290, 2020–jun/2023): divs col-xs-12 fundo; citação no FIM;
@@ -589,6 +605,13 @@ TRIBUNAL_CFG: dict[str, dict] = {
         "file_patterns": {"boletim": "boletim_*.html"},
         "parse_fn": "tjrs",
         "min_ementa_len": 50,
+    },
+    "tjsc": {
+        "tribunal": "TJSC",
+        "area_default": "ESTADUAL",
+        "file_patterns": {"boletim": "*.pdf"},
+        "parse_fn": "tjsc",
+        "min_ementa_len": 100,
     },
     "tjdft": {
         "use_pdfplumber": True,
@@ -984,6 +1007,19 @@ def _parse_date_tjgo_sig(chunk: str) -> Optional[str]:
     m = re.search(
         r'Goi[â\xe2]nia(?:/GO)?,\s*(\d{1,2})\s+de\s+([a-z\xe0-\xff]+)\s+de\s+((?:19|20)\d{2})',
         chunk, re.IGNORECASE,
+    )
+    if not m:
+        return None
+    d, mes, y = m.group(1), m.group(2).lower(), m.group(3)
+    mo = _MESES_PT.get(mes)
+    return f"{y}-{mo}-{int(d):02d}" if mo else f"{y}-01-01"
+
+
+def _parse_date_tjsc(text: str) -> Optional[str]:
+    """Extrai data de 'Florianópolis, DD de MÊS de YYYY'."""
+    m = re.search(
+        r'Florian[oó]polis,?\s+(\d{1,2})\s+de\s+([a-záéíóúàâêôãõç]+)\s+de\s+((?:19|20)\d{2})',
+        text, re.IGNORECASE,
     )
     if not m:
         return None
@@ -2378,6 +2414,191 @@ def parse_fields_tjrr(chunk: str, filename: str, cfg: dict) -> Optional[dict]:
     }
 
 
+def _process_file_tjsc(f: Path, cfg: dict) -> list[str]:
+    """Pipeline TJSC: PyMuPDF page-by-page, strip page headers, split on Relator:.
+
+    Dois layouts PDF:
+      OLD (ed.140-147, ~2020-2023): 'Tipo n. NUMERO, comarca\nRelator: Des. NOME'
+      NEW (ed.148+, 2024+):         'TIPO Nº NUMERO/SC\nRELATOR: DESEMBARGADOR NOME\n...EMENTA\n...ACÓRDÃO'
+    """
+    import fitz
+
+    doc = fitz.open(str(f))
+    pages = []
+    for pg in doc:
+        pages.append(pg.get_text("text"))
+    doc.close()
+
+    full = "\n".join(pages)
+
+    # Strip page headers: "NÚMERO NN\nNN\nJurisprudência Catarinense\n[tJsc|TJSC]\n"
+    full = re.sub(
+        r'N[ÚU]MERO\s+\d+\s+\d+\s+Jurisprud[êe]ncia\s+Catarinense\s*(?:[Tt][Jj][Ss][Cc]\s*)?',
+        ' ', full, flags=re.IGNORECASE,
+    )
+
+    # Normaliza espaços não-separadores (U+00A0, U+200B etc.)
+    full = re.sub(r'[\xa0​  ]', ' ', full)
+
+    # Flatten
+    text = re.sub(r'\s+', ' ', full).strip()
+
+    # Divide no marcador "Relator:" (cobre OLD "Relator: Des." e NEW "RELATOR: DESEMBARGADOR")
+    parts = re.split(r'\bRelator\s*:', text, flags=re.IGNORECASE)
+
+    chunks = []
+    for i in range(1, len(parts)):
+        prev_tail = parts[i - 1][-500:] if len(parts[i - 1]) > 500 else parts[i - 1]
+        curr = parts[i].strip()
+        chunk = re.sub(r'\s+', ' ', prev_tail + ' Relator: ' + curr).strip()
+        # Filtra apenas decisões TJSC (número com .8.24.)
+        if _TJSC_CNJ_RE.search(chunk):
+            chunks.append(chunk)
+
+    return chunks
+
+
+def parse_fields_tjsc(chunk: str, filename: str, cfg: dict) -> Optional[dict]:
+    """Extrai campos ES de decisão TJSC.
+
+    Três layouts:
+      OLD (ed.140-141):   'Tipo n. CNJ, comarca\nRelator: Des. Nome'  → ementa em CAPS após relator
+      INTER (ed.142-147): 'TIPO Nº CNJ/SC\nRELATOR: DESEMBARGADOR NOME\nAGRAVANTE: ...'
+                          → sem rótulo EMENTA; ementa em CAPS após partes
+      NEW (ed.148+):      igual INTER mas com rótulo explícito 'EMENTA' e 'ACÓRDÃO'
+    """
+    text = re.sub(r'\s+', ' ', chunk).strip()
+
+    # "Relator:" — marcador do cabeçalho desta decisão
+    rel_m = re.search(r'\bRelator\s*:\s*', text, re.IGNORECASE)
+    if not rel_m:
+        return None
+
+    before_rel = text[:rel_m.start()]
+
+    # Número TJSC (.8.24.): última ocorrência antes de "Relator:" (mais próxima ao cabeçalho)
+    num_matches = list(_TJSC_CNJ_RE.finditer(before_rel))
+    if not num_matches:
+        return None
+    num_m = num_matches[-1]
+    numero = num_m.group()
+
+    # Tipo: última palavra-chave processual nos 300 chars antes do número
+    before_num = before_rel[:num_m.start()]
+    before_short = before_num[-300:] if len(before_num) > 300 else before_num
+    before_short = re.sub(r'\s*[Nn][.°º]?\s*$', '', before_short.rstrip())
+    tipo_candidates = list(_TJSC_TIPO_RE.finditer(before_short))
+    tipo_raw = tipo_candidates[-1].group().strip() if tipo_candidates else 'Acórdão'
+    tipo = re.sub(r'\s+', ' ', tipo_raw).strip().title()
+
+    # ── Relator ───────────────────────────────────────────────────────────────
+    after_rel = text[rel_m.end():]
+    rel_section = after_rel[:300].strip()
+    # Strip prefix (Des., DESEMBARGADOR, Min.)
+    rel_section = re.sub(
+        r'^(?:DES(?:EMBARGADOR[AO]?[AÂ]?)?\s*\.?\s*|Des(?:embargador[ao]?)?\.?\s*|'
+        r'Min(?:istro?|istra)?\s*\.?\s*)',
+        '', rel_section, flags=re.IGNORECASE,
+    ).strip()
+
+    first_word = rel_section.split()[0] if rel_section.split() else ''
+    if first_word and first_word[0].isupper() and any(c.islower() for c in first_word[1:]):
+        # OLD format: nome em Title Case — para no primeiro token ALL_CAPS (ementa)
+        name_m = re.match(
+            r'([A-ZÁÉÍÓÚÂÊÎÔÛÃÕÇÜ][a-záéíóúàâêôãõç]+'
+            r'(?:\s+(?:d[ao]s?|de|e)\s+[A-ZÁÉÍÓÚÂÊÎÔÛÃÕÇÜ][a-záéíóúàâêôãõç]+'
+            r'|\s+[A-ZÁÉÍÓÚÂÊÎÔÛÃÕÇÜ][a-záéíóúàâêôãõç]+){0,7})',
+            rel_section,
+        )
+        relator = re.sub(r'\s+', ' ', name_m.group(1)).strip().title() if name_m else ''
+        rel_name_end = name_m.end() if name_m else 0
+    else:
+        # NEW/INTER format: nome em ALL CAPS — para no primeiro rótulo de parte ou EMENTA
+        stop_m = re.search(
+            r'\b(?:EMENTA|SUSCITANTE|SUSCITADO|AGRAVANTE|AGRAVADO|APELANTE|APELADO|'
+            r'RECORRENTE|RECORRIDO|EMBARGANTE|EMBARGADO|INTERESSADO)\b',
+            rel_section, re.IGNORECASE,
+        )
+        name_raw = rel_section[:stop_m.start()].strip() if stop_m else rel_section[:80].strip()
+        relator = re.sub(r'\s+', ' ', name_raw).strip().title()
+        rel_name_end = stop_m.start() if stop_m else len(name_raw)
+
+    # ── Ementa ────────────────────────────────────────────────────────────────
+    # Detecta "Vistos" (em qualquer forma) para limitar janela de busca
+    vistos_any_m = re.search(r'\bVistos\b', after_rel, re.IGNORECASE)
+    em_new_window = after_rel[:vistos_any_m.start()] if vistos_any_m else after_rel[:3000]
+    # Caso NEW (ed.148+): rótulo explícito EMENTA … ACÓRDÃO (antes de Vistos)
+    em_new_m = re.search(r'\bEMENTA\s+(.+?)\s+AC[ÓO]RD[ÃA]O\b', em_new_window, re.IGNORECASE | re.DOTALL)
+    if em_new_m:
+        ementa = re.sub(r'\s+', ' ', em_new_m.group(1)).strip()
+    else:
+        # OLD / INTER: texto entre cabeçalho e "Vistos[,./e]" / "ACÓRDÃO"
+        vistos_m  = re.search(r'\bVistos(?:[,.]|\s+e\s)', after_rel, re.IGNORECASE)
+        acordao_m = re.search(r'\bAC[ÓO]RD[ÃA]O\b', after_rel, re.IGNORECASE)
+        end_pos = min(
+            vistos_m.start()  if vistos_m  else len(after_rel),
+            acordao_m.start() if acordao_m else len(after_rel),
+        )
+        raw = after_rel[:end_pos]
+
+        # Busca primeira palavra-chave processual no raw (início real da ementa)
+        em_start_m = re.search(
+            r'\b(?:APELA[ÇC][ÃA]O|AGRAVO|CONFLITO|A[ÇC][ÃA]O|MANDADO|HABEAS|'
+            r'RECURSO|EMBARGOS?|INCIDENTE|RECLAMA[ÇC][ÃA]O|NULIDADE|CAUTELAR|'
+            r'EXECU[ÇC][ÃA]O|DISS[ÍI]DIO|INQU[EÉ]RITO|ARGUI[ÇC][ÃA]O)\b',
+            raw, re.IGNORECASE,
+        )
+        if em_start_m:
+            ementa = re.sub(r'\s+', ' ', raw[em_start_m.start():]).strip()
+        else:
+            # Fallback: strip nome do relator / rótulos de parte do início
+            ementa = re.sub(r'\s+', ' ', raw).strip()
+            ementa = re.sub(
+                r'^(?:DES(?:EMBARGADOR[AO]?)?\.?\s*|Des(?:embargador[ao]?)?\.?\s*)?'
+                r'[A-ZÁÉÍÓÚÂÊÎÔÛÃÕÇÜ][a-záéíóúàâêôãõç]+'
+                r'(?:\s+[A-ZÁÉÍÓÚÂÊÎÔÛÃÕÇÜ][a-záéíóúàâêôãõç]+){0,7}',
+                '', ementa, count=1,
+            ).strip()
+
+    # Data: "Florianópolis, DD de MÊS de YYYY."
+    data = _parse_date_tjsc(text)
+
+    # Órgão julgador
+    orgao = ''
+    orgao_egr_m = re.search(
+        r'Egr[eé]gia\s+(.{5,80}?)\s+do\s+Tribunal',
+        text, re.IGNORECASE,
+    )
+    if orgao_egr_m:
+        orgao = re.sub(r'\s+', ' ', orgao_egr_m.group(1)).strip()
+    if not orgao:
+        orgao_dec_m = re.search(
+            r'\bA\s+([A-ZÁÉÍÓÚ][A-Za-záéíóúàâêôãõçÀ-ÿ0-9ª°\s.]{5,80}?)\s+decidiu\b',
+            text, re.IGNORECASE,
+        )
+        if orgao_dec_m:
+            orgao = re.sub(r'\s+', ' ', orgao_dec_m.group(1)).strip()
+
+    min_len = cfg.get("min_ementa_len", 0)
+    if min_len and len(ementa) < min_len:
+        return None
+
+    area = classify_area(ementa[:400])
+    return {
+        "_id":            f"tjsc-{re.sub(r'[^0-9]', '', numero)}",
+        "tribunal":       "TJSC",
+        "tipo":           tipo,
+        "numero":         numero,
+        "relator":        relator,
+        "orgaoJulgador":  orgao,
+        "dataJulgamento": data,
+        "area":           area,
+        "secao":          orgao[:40],
+        "fonte":          Path(filename).name,
+        "ementa":         ementa,
+    }
+
+
 def process_file(f: Path, cfg: dict) -> list[str]:
     if cfg.get("parse_fn") == "tjpi":
         return _process_file_tjpi(f, cfg)
@@ -2385,6 +2606,8 @@ def process_file(f: Path, cfg: dict) -> list[str]:
         return _process_file_tjrs(f, cfg)
     if cfg.get("parse_fn") == "tjrr":
         return _process_file_tjrr(f, cfg)
+    if cfg.get("parse_fn") == "tjsc":
+        return _process_file_tjsc(f, cfg)
     if cfg.get("parse_fn") == "tjpa":
         return _process_file_tjpa(f, cfg)
     if cfg.get("parse_fn") == "tjmg":
@@ -2464,6 +2687,7 @@ def main():
             "tjrn":  parse_fields_tjrn,
             "tjrr":  parse_fields_tjrr,
             "tjrs":  parse_fields_tjrs,
+            "tjsc":  parse_fields_tjsc,
         }.get(sigla, parse_fields_tjac)
 
         for label, files in groups.items():
