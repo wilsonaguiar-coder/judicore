@@ -9,8 +9,8 @@ import { Loader2, Cpu } from "lucide-react";
 
 interface UsageData {
   period: number;
-  totals: { groqInput: number; groqOutput: number; geminiInput: number };
-  byDay: { date: string; groqInput: number; groqOutput: number; geminiInput: number }[];
+  totals: { openaiInput: number; openaiOutput: number; geminiInput: number };
+  byDay: { date: string; openaiInput: number; openaiOutput: number; geminiInput: number }[];
   byDocType: Record<string, { input: number; output: number; count: number }>;
 }
 
@@ -64,14 +64,17 @@ export default function UsagePage() {
     );
   }
 
-  const totals = usage?.totals ?? { groqInput: 0, groqOutput: 0, geminiInput: 0 };
+  const totals = usage?.totals ?? { openaiInput: 0, openaiOutput: 0, geminiInput: 0 };
   const byDay = usage?.byDay ?? [];
   const byDocType = usage?.byDocType ?? {};
 
-  const groqCostInput  = (totals.groqInput  / 1_000_000) * 0.15;
-  const groqCostOutput = (totals.groqOutput / 1_000_000) * 0.60;
-  const totalCost      = groqCostInput + groqCostOutput;
-  const geminiCost     = (totals.geminiInput / 1_000_000) * 0.025;
+  // GPT-4o pricing: $2.50/M input, $10.00/M output
+  const openaiCostInput  = (totals.openaiInput  / 1_000_000) * 2.50;
+  const openaiCostOutput = (totals.openaiOutput / 1_000_000) * 10.00;
+  const totalOpenaiCost  = openaiCostInput + openaiCostOutput;
+
+  // Gemini text-embedding-004: $0.025/M tokens (≤128k), free tier for small usage
+  const geminiCost = (totals.geminiInput / 1_000_000) * 0.025;
 
   return (
     <div className="flex h-screen bg-background">
@@ -86,24 +89,27 @@ export default function UsagePage() {
             </p>
           </div>
 
-          {/* Card Groq */}
+          {/* Card OpenAI */}
           <div className="rounded-lg border p-5 space-y-3">
             <div className="flex items-center gap-2 text-sm font-medium">
               <Cpu size={14} className="text-muted-foreground" />
-              Groq — Geração de documentos
+              OpenAI — Geração de documentos (GPT-4o)
             </div>
             <div className="grid grid-cols-3 gap-3">
               <div>
                 <p className="text-xs text-muted-foreground">Input</p>
-                <p className="text-2xl font-semibold">{fmt(totals.groqInput)}</p>
+                <p className="text-2xl font-semibold">{fmt(totals.openaiInput)}</p>
+                <p className="text-xs text-muted-foreground mt-0.5">US$ {openaiCostInput.toFixed(4)}</p>
               </div>
               <div>
                 <p className="text-xs text-muted-foreground">Output</p>
-                <p className="text-2xl font-semibold">{fmt(totals.groqOutput)}</p>
+                <p className="text-2xl font-semibold">{fmt(totals.openaiOutput)}</p>
+                <p className="text-xs text-muted-foreground mt-0.5">US$ {openaiCostOutput.toFixed(4)}</p>
               </div>
               <div>
-                <p className="text-xs text-muted-foreground">Custo estimado</p>
-                <p className="text-2xl font-semibold">US$ {totalCost.toFixed(4)}</p>
+                <p className="text-xs text-muted-foreground">Custo estimado total</p>
+                <p className="text-2xl font-semibold">US$ {totalOpenaiCost.toFixed(4)}</p>
+                <p className="text-xs text-muted-foreground mt-0.5">$2.50/M in · $10.00/M out</p>
               </div>
             </div>
           </div>
@@ -112,18 +118,24 @@ export default function UsagePage() {
           <div className="rounded-lg border p-5 space-y-3">
             <div className="flex items-center gap-2 text-sm font-medium">
               <Cpu size={14} className="text-muted-foreground" />
-              Gemini — Embeddings de busca
+              Gemini — Embeddings de busca (text-embedding-004)
             </div>
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <p className="text-xs text-muted-foreground">Input</p>
+                <p className="text-xs text-muted-foreground">Input (tokens estimados)</p>
                 <p className="text-2xl font-semibold">{fmt(totals.geminiInput)}</p>
               </div>
               <div>
                 <p className="text-xs text-muted-foreground">Custo estimado</p>
                 <p className="text-2xl font-semibold">US$ {geminiCost.toFixed(4)}</p>
+                <p className="text-xs text-muted-foreground mt-0.5">$0.025/M tokens</p>
               </div>
             </div>
+            {totals.geminiInput === 0 && (
+              <p className="text-xs text-amber-500">
+                ⚠ Nenhum uso registrado. O serviço de busca pode não estar enviando logs para a API — verifique INTERNAL_SECRET e API_URL no servidor.
+              </p>
+            )}
           </div>
 
           {/* Por tipo de peça */}
@@ -138,17 +150,22 @@ export default function UsagePage() {
                       <th className="px-4 py-2.5 text-right font-medium">Gerações</th>
                       <th className="px-4 py-2.5 text-right font-medium">Input</th>
                       <th className="px-4 py-2.5 text-right font-medium">Output</th>
+                      <th className="px-4 py-2.5 text-right font-medium">Custo est.</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y">
-                    {Object.entries(byDocType).map(([type, d]) => (
-                      <tr key={type} className="hover:bg-muted/20">
-                        <td className="px-4 py-2.5 font-medium">{DOC_LABELS[type] ?? type}</td>
-                        <td className="px-4 py-2.5 text-right text-muted-foreground">{d.count}</td>
-                        <td className="px-4 py-2.5 text-right">{fmt(d.input)}</td>
-                        <td className="px-4 py-2.5 text-right">{fmt(d.output)}</td>
-                      </tr>
-                    ))}
+                    {Object.entries(byDocType).map(([type, d]) => {
+                      const cost = (d.input / 1_000_000) * 2.50 + (d.output / 1_000_000) * 10.00;
+                      return (
+                        <tr key={type} className="hover:bg-muted/20">
+                          <td className="px-4 py-2.5 font-medium">{DOC_LABELS[type] ?? type}</td>
+                          <td className="px-4 py-2.5 text-right text-muted-foreground">{d.count}</td>
+                          <td className="px-4 py-2.5 text-right">{fmt(d.input)}</td>
+                          <td className="px-4 py-2.5 text-right">{fmt(d.output)}</td>
+                          <td className="px-4 py-2.5 text-right">US$ {cost.toFixed(4)}</td>
+                        </tr>
+                      );
+                    })}
                   </tbody>
                 </table>
               </div>
@@ -164,22 +181,27 @@ export default function UsagePage() {
                   <thead className="bg-muted/50 text-muted-foreground">
                     <tr>
                       <th className="px-4 py-2.5 text-left font-medium">Data</th>
-                      <th className="px-4 py-2.5 text-right font-medium">Groq Input</th>
-                      <th className="px-4 py-2.5 text-right font-medium">Groq Output</th>
+                      <th className="px-4 py-2.5 text-right font-medium">OpenAI Input</th>
+                      <th className="px-4 py-2.5 text-right font-medium">OpenAI Output</th>
                       <th className="px-4 py-2.5 text-right font-medium">Gemini Input</th>
+                      <th className="px-4 py-2.5 text-right font-medium">Custo OpenAI</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y">
-                    {[...byDay].reverse().map((d) => (
-                      <tr key={d.date} className="hover:bg-muted/20">
-                        <td className="px-4 py-2.5 text-muted-foreground">
-                          {new Date(d.date + "T12:00:00").toLocaleDateString("pt-BR")}
-                        </td>
-                        <td className="px-4 py-2.5 text-right">{fmt(d.groqInput)}</td>
-                        <td className="px-4 py-2.5 text-right">{fmt(d.groqOutput)}</td>
-                        <td className="px-4 py-2.5 text-right">{fmt(d.geminiInput)}</td>
-                      </tr>
-                    ))}
+                    {[...byDay].reverse().map((d) => {
+                      const cost = (d.openaiInput / 1_000_000) * 2.50 + (d.openaiOutput / 1_000_000) * 10.00;
+                      return (
+                        <tr key={d.date} className="hover:bg-muted/20">
+                          <td className="px-4 py-2.5 text-muted-foreground">
+                            {new Date(d.date + "T12:00:00").toLocaleDateString("pt-BR")}
+                          </td>
+                          <td className="px-4 py-2.5 text-right">{fmt(d.openaiInput)}</td>
+                          <td className="px-4 py-2.5 text-right">{fmt(d.openaiOutput)}</td>
+                          <td className="px-4 py-2.5 text-right">{fmt(d.geminiInput)}</td>
+                          <td className="px-4 py-2.5 text-right">US$ {cost.toFixed(4)}</td>
+                        </tr>
+                      );
+                    })}
                   </tbody>
                 </table>
               </div>

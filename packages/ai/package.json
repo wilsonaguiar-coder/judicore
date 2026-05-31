@@ -16,10 +16,10 @@
     "dev": "tsc --watch"
   },
   "dependencies": {
-    "groq-sdk": "^0.9.0"
+    "openai": "^6.39.1"
   },
   "devDependencies": {
-    "typescript": "^5.4.0",
-    "@types/node": "^20.0.0"
+    "@types/node": "^20.0.0",
+    "typescript": "^5.4.0"
   }
 }

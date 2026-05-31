@@ -1,14 +1,14 @@
-import Groq from "groq-sdk";
+import OpenAI from "openai";
 
-let _client: Groq | null = null;
+let _client: OpenAI | null = null;
 
-export function getGroqClient(): Groq {
+export function getOpenAIClient(): OpenAI {
   if (!_client) {
-    const apiKey = process.env["GROQ_API_KEY"];
-    if (!apiKey) throw new Error("GROQ_API_KEY não definida");
-    _client = new Groq({ apiKey });
+    const apiKey = process.env["OPENAI_API_KEY"];
+    if (!apiKey) throw new Error("OPENAI_API_KEY não definida");
+    _client = new OpenAI({ apiKey });
   }
   return _client;
 }
 
-export const MODEL = "openai/gpt-oss-120b";
+export const MODEL = "gpt-4o";

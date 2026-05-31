@@ -81,7 +81,7 @@ export async function streamRoutes(app: FastifyInstance) {
       }
 
       prisma.usageLog.create({ data: {
-        userId: sub, service: "groq", model: "deepseek-r1-distill-llama-70b",
+        userId: sub, service: "openai", model: "gpt-4o",
         operation: "generate", inputTokens: usageInput, outputTokens: usageOutput,
         docType: body.data.type,
       }}).catch(() => {});
@@ -94,7 +94,7 @@ export async function streamRoutes(app: FastifyInstance) {
             content: fullContent,
             instruction: body.data.instruction ?? null,
             sourcesJson: body.data.jurisprudencias as any,
-            modelUsed: "openai/gpt-oss-120b",
+            modelUsed: "openai/gpt-4o",
           },
         });
         reply.raw.write(`data: ${JSON.stringify({ done: true, documentId: doc.id })}\n\n`);
@@ -196,7 +196,7 @@ export async function streamRoutes(app: FastifyInstance) {
       }
 
       prisma.usageLog.create({ data: {
-        userId: sub, service: "groq", model: "deepseek-r1-distill-llama-70b",
+        userId: sub, service: "openai", model: "gpt-4o",
         operation: "generate", inputTokens: usageInput, outputTokens: usageOutput,
         docType,
       }}).catch(() => {});
@@ -209,7 +209,7 @@ export async function streamRoutes(app: FastifyInstance) {
             content: fullContent,
             instruction: instruction || null,
             sourcesJson: jurisprudencias as any,
-            modelUsed: "openai/gpt-oss-120b",
+            modelUsed: "openai/gpt-4o",
           },
         });
         reply.raw.write(`data: ${JSON.stringify({ done: true, documentId: doc.id })}\n\n`);

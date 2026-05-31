@@ -95,14 +95,14 @@ def _search_merged(req: "SearchRequest", query_vector: list) -> list:
 _API_URL = os.getenv("API_URL", "http://127.0.0.1:3001")
 _INTERNAL_SECRET = os.getenv("INTERNAL_SECRET", os.getenv("JWT_SECRET", ""))
 
-def _log_usage_async(input_tokens: int):
+def _log_usage_async(input_tokens: int, model: str = "text-embedding-004", operation: str = "embed"):
     """Registra uso do Gemini na API Node em thread separada (fire-and-forget)."""
     def _post():
         try:
             payload = _json.dumps({
                 "service": "gemini",
-                "model": "text-embedding-004",
-                "operation": "embed",
+                "model": model,
+                "operation": operation,
                 "inputTokens": input_tokens,
                 "outputTokens": 0,
             }).encode()
@@ -112,9 +112,11 @@ def _log_usage_async(input_tokens: int):
                 headers={"Content-Type": "application/json", "x-internal-secret": _INTERNAL_SECRET},
                 method="POST",
             )
-            urllib.request.urlopen(req, timeout=2)
-        except Exception:
-            pass
+            resp = urllib.request.urlopen(req, timeout=3)
+            if resp.status not in (200, 201):
+                print(f"[usage] aviso: status inesperado {resp.status} ao registrar uso Gemini")
+        except Exception as exc:
+            print(f"[usage] erro ao registrar uso Gemini (API_URL={_API_URL}): {exc}")
     threading.Thread(target=_post, daemon=True).start()
 
 
@@ -475,7 +477,9 @@ def search(req: SearchRequest):
 
     try:
         query_vector = rag.embed_query(req.query)
-        _log_usage_async(max(1, len(req.query.split())))
+        # Estimativa de tokens: ~4 chars por token (aprox GPT/Gemini)
+        estimated_tokens = max(1, len(req.query) // 4)
+        _log_usage_async(estimated_tokens)
         candidates = _search_merged(req, query_vector)
         if req.date_from:
             cutoff = _parse_date_flexible(req.date_from)

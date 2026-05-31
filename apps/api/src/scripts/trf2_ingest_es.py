@@ -37,7 +37,7 @@ from elasticsearch import Elasticsearch, helpers
 
 SCRIPT_DIR = Path(__file__).parent
 PROJECT_ROOT = SCRIPT_DIR.parent.parent.parent.parent  # e:/judicore
-DEFAULT_FOLDER = PROJECT_ROOT / "temp" / "trf2"
+DEFAULT_FOLDER = PROJECT_ROOT / "temp" / "trfs" / "trf2"
 CHECKPOINT_FILE = SCRIPT_DIR / "trf2_ingest_checkpoint.json"
 LOG_FILE = SCRIPT_DIR / "trf2_ingest_es.log"
 EMENTAS_FILE = PROJECT_ROOT / "trf2_ementas.json"

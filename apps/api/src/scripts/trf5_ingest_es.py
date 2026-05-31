@@ -37,7 +37,7 @@ from elasticsearch import Elasticsearch, helpers
 
 SCRIPT_DIR = Path(__file__).parent
 PROJECT_ROOT = SCRIPT_DIR.parent.parent.parent.parent  # e:/judicore
-DEFAULT_FOLDER = PROJECT_ROOT / "temp" / "trf5"
+DEFAULT_FOLDER = PROJECT_ROOT / "temp" / "trfs" / "trf5"
 CHECKPOINT_FILE = SCRIPT_DIR / "trf5_ingest_checkpoint.json"
 LOG_FILE = SCRIPT_DIR / "trf5_ingest_es.log"
 ES_INDEX = "jurisprudencia"

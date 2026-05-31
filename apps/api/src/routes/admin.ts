@@ -344,17 +344,17 @@ export async function adminRoutes(app: FastifyInstance) {
       });
 
       // Agrega por dia + serviço
-      const byDay: Record<string, { date: string; groqInput: number; groqOutput: number; geminiInput: number }> = {};
-      let totalGroqInput = 0, totalGroqOutput = 0, totalGeminiInput = 0;
+      const byDay: Record<string, { date: string; openaiInput: number; openaiOutput: number; geminiInput: number }> = {};
+      let totalOpenaiInput = 0, totalOpenaiOutput = 0, totalGeminiInput = 0;
 
       for (const log of logs) {
         const date = log.createdAt.toISOString().slice(0, 10);
-        if (!byDay[date]) byDay[date] = { date, groqInput: 0, groqOutput: 0, geminiInput: 0 };
-        if (log.service === "groq") {
-          byDay[date].groqInput  += log.inputTokens;
-          byDay[date].groqOutput += log.outputTokens;
-          totalGroqInput  += log.inputTokens;
-          totalGroqOutput += log.outputTokens;
+        if (!byDay[date]) byDay[date] = { date, openaiInput: 0, openaiOutput: 0, geminiInput: 0 };
+        if (log.service === "groq" || log.service === "openai") {
+          byDay[date].openaiInput  += log.inputTokens;
+          byDay[date].openaiOutput += log.outputTokens;
+          totalOpenaiInput  += log.inputTokens;
+          totalOpenaiOutput += log.outputTokens;
         } else {
           byDay[date].geminiInput += log.inputTokens;
           totalGeminiInput += log.inputTokens;
@@ -363,7 +363,7 @@ export async function adminRoutes(app: FastifyInstance) {
 
       // Agrega por tipo de documento
       const byDocType: Record<string, { input: number; output: number; count: number }> = {};
-      for (const log of logs.filter((l: (typeof logs)[0]) => l.service === "groq" && l.docType)) {
+      for (const log of logs.filter((l: (typeof logs)[0]) => (l.service === "groq" || l.service === "openai") && l.docType)) {
         const k = log.docType!;
         if (!byDocType[k]) byDocType[k] = { input: 0, output: 0, count: 0 };
         byDocType[k].input  += log.inputTokens;
@@ -373,8 +373,8 @@ export async function adminRoutes(app: FastifyInstance) {
 
       return {
         period,
-        totals: { groqInput: totalGroqInput, groqOutput: totalGroqOutput, geminiInput: totalGeminiInput },
-        byDay: Object.values(byDay),
+        totals: { openaiInput: totalOpenaiInput, openaiOutput: totalOpenaiOutput, geminiInput: totalGeminiInput },
+        byDay: Object.values(byDay).sort((a, b) => a.date.localeCompare(b.date)),
         byDocType,
       };
     }

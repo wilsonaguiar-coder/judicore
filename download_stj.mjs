@@ -1,8 +1,8 @@
 import { writeFileSync, existsSync, mkdirSync } from "fs";
 import { join } from "path";
 
-const START = 780;
-const END = 900;
+const START = 888;
+const END = 888;
 const OUT_DIR = "stj_pdfs";
 const BASE_URL = "https://processo.stj.jus.br/SCON/GetPDFINFJ?edicao=";
 
