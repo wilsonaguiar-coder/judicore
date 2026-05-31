@@ -73,9 +73,9 @@ export default function UsagePage() {
   const groqCostOutput = (totals.groqOutput / 1_000_000) * 0.60;
   const totalGroqCost  = groqCostInput + groqCostOutput;
 
-  // GPT-4o: $2.50/M input, $10.00/M output
-  const openaiCostInput  = (totals.openaiInput  / 1_000_000) * 2.50;
-  const openaiCostOutput = (totals.openaiOutput / 1_000_000) * 10.00;
+  // GPT-4.1: $2.00/M input, $8.00/M output
+  const openaiCostInput  = (totals.openaiInput  / 1_000_000) * 2.00;
+  const openaiCostOutput = (totals.openaiOutput / 1_000_000) * 8.00;
   const totalOpenaiCost  = openaiCostInput + openaiCostOutput;
 
   // Gemini text-embedding-004: $0.025/M tokens
@@ -126,7 +126,7 @@ export default function UsagePage() {
           <div className="rounded-lg border p-5 space-y-3">
             <div className="flex items-center gap-2 text-sm font-medium">
               <Cpu size={14} className="text-muted-foreground" />
-              OpenAI — Geração de documentos (GPT-4o)
+              OpenAI — Geração de documentos (GPT-4.1)
             </div>
             <div className="grid grid-cols-3 gap-3">
               <div>
@@ -142,11 +142,11 @@ export default function UsagePage() {
               <div>
                 <p className="text-xs text-muted-foreground">Custo estimado total</p>
                 <p className="text-2xl font-semibold">US$ {totalOpenaiCost.toFixed(4)}</p>
-                <p className="text-xs text-muted-foreground mt-0.5">$2.50/M in · $10.00/M out</p>
+                <p className="text-xs text-muted-foreground mt-0.5">$2.00/M in · $8.00/M out</p>
               </div>
             </div>
             {totals.openaiInput === 0 && (
-              <p className="text-xs text-muted-foreground">Nenhum uso ainda — aparecerá após a primeira geração com GPT-4o.</p>
+              <p className="text-xs text-muted-foreground">Nenhum uso ainda — aparecerá após a primeira geração com GPT-4.1.</p>
             )}
           </div>
 
@@ -193,7 +193,7 @@ export default function UsagePage() {
                   <tbody className="divide-y">
                     {Object.entries(byDocType).map(([type, d]) => {
                       const groqCost   = (d.groqInput   / 1_000_000) * 0.15 + (d.groqOutput   / 1_000_000) * 0.60;
-                      const openaiCost = (d.openaiInput / 1_000_000) * 2.50 + (d.openaiOutput / 1_000_000) * 10.00;
+                      const openaiCost = (d.openaiInput / 1_000_000) * 2.00 + (d.openaiOutput / 1_000_000) * 8.00;
                       const totalInput  = d.groqInput  + d.openaiInput;
                       const totalOutput = d.groqOutput + d.openaiOutput;
                       return (
@@ -234,7 +234,7 @@ export default function UsagePage() {
                     {[...byDay].reverse().map((d) => {
                       const cost =
                         (d.groqInput   / 1_000_000) * 0.15  + (d.groqOutput   / 1_000_000) * 0.60 +
-                        (d.openaiInput / 1_000_000) * 2.50  + (d.openaiOutput / 1_000_000) * 10.00;
+                        (d.openaiInput / 1_000_000) * 2.00  + (d.openaiOutput / 1_000_000) * 8.00;
                       return (
                         <tr key={d.date} className="hover:bg-muted/20">
                           <td className="px-4 py-2.5 text-muted-foreground">

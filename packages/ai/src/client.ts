@@ -11,4 +11,4 @@ export function getOpenAIClient(): OpenAI {
   return _client;
 }
 
-export const MODEL = "gpt-4o";
+export const MODEL = "gpt-4.1";
