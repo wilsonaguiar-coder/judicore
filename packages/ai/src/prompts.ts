@@ -142,42 +142,37 @@ III — DISPOSITIVO:
    • Condenação em honorários (art. 85 do CPC/2015) e custas.
    • Indicação de recurso cabível e prazo.`,
 
-    PETICAO_INICIAL: `TAREFA: Redija agora uma petição inicial completa, em texto corrido, sem blocos de código, sem markdown, sem delimitadores de qualquer tipo. Apenas o texto da peça, como se fosse um documento Word.
+    PETICAO_INICIAL: `Redija uma PETIÇÃO INICIAL completa, extremamente detalhada e tecnicamente sofisticada em favor da parte autora. Adote tom persuasivo, argumentativo e robusto, próprio das maiores e mais prestigiadas bancas de advocacia do país.
 
-Tom persuasivo e robusto, próprio das maiores bancas de advocacia do país. Mínimo absoluto: 4.000 palavras.
+ESTRUTURA OBRIGATÓRIA — siga exatamente esta ordem, desenvolvendo cada item com profundidade:
 
-PASSO 1 — ENDEREÇAMENTO
-Analise o réu descrito no caso. Se for a União, INSS, CEF, Receita Federal ou outra entidade federal, escreva:
-"EXCELENTÍSSIMO(A) SENHOR(A) DOUTOR(A) JUIZ(A) FEDERAL DA ___ VARA FEDERAL DA SUBSEÇÃO JUDICIÁRIA DE [CIDADE]"
-Se for réu estadual ou privado, escreva a vara cível ou especializada correspondente.
+I — DA QUALIFICAÇÃO DAS PARTES
+Qualifique completamente autor e réu. Se os dados não forem fornecidos, crie nomes, endereços e qualificações fictícias verossímeis e tipicamente brasileiras — nunca deixe dados em branco nem use marcadores como "[Nome]".
 
-PASSO 2 — QUALIFICAÇÃO DAS PARTES (seção I)
-Escreva nome completo fictício, nacionalidade, estado civil, profissão, CPF mascarado e endereço completo inventados, mas verossímeis. Exemplo: "Maria de Lourdes Ferreira, brasileira, viúva, professora aposentada, portadora do CPF nº ***.456.789-**, residente à Rua das Bromélias, nº 87, Bairro Jardim Primavera, CEP 74.000-100, Goiânia/GO". Faça o mesmo para o réu.
+II — DOS FATOS
+Narre os fatos de forma cronológica, detalhada e persuasiva. Destaque o impacto e a gravidade das ações da parte contrária. Mínimo 4 parágrafos.
 
-PASSO 3 — FATOS (seção II)
-Narre os fatos em ordem cronológica com persuasão. Mínimo 4 parágrafos detalhados.
+III — DO DIREITO
+Esta é a seção central. Construa argumentação jurídica exaustiva em subseções numeradas (3.1, 3.2, 3.3...). Para cada tese:
+— Enuncie a proposição jurídica.
+— Fundamente com artigo de lei específico (legislação, CF, Código Civil, etc.) — use seu conhecimento jurídico.
+— Desenvolva 3 a 4 parágrafos conectando princípios constitucionais, doutrina e legislação ao caso.
+— Aplique a jurisprudência do contexto: cite tribunal e processo, extraia a tese que ela consagra, desenvolva como ela se aplica ao caso em 2 parágrafos completos.
+Escreva no mínimo 6 subteses. Esta seção sozinha deve ser longa e densa.
 
-PASSO 4 — DO DIREITO (seção III) — NÚCLEO DA PEÇA
-Escreva no mínimo 6 subteses numeradas (3.1, 3.2, 3.3, 3.4, 3.5, 3.6). Cada subtese deve ter:
-- Um título descritivo
-- O artigo de lei aplicável com o nome do diploma
-- 3 a 4 parágrafos de argumentação conectando a lei aos fatos
-- A jurisprudência do contexto: cite o tribunal e processo, enuncie a tese que ela consagra e aplique ao caso concreto em 2 parágrafos
-Esta seção deve ter no mínimo 2.500 palavras sozinha.
+IV — DA TUTELA DE URGÊNCIA (omita se não houver urgência)
+Demonstre fumus boni iuris e periculum in mora. Fundamente no art. 300 do CPC/2015.
 
-PASSO 5 — TUTELA DE URGÊNCIA (seção IV)
-Demonstre fumus boni iuris e periculum in mora com base nos argumentos do passo 4. Fundamente no art. 300 do CPC/2015.
-
-PASSO 6 — GRATUIDADE DA JUSTIÇA (seção V, se aplicável)
+V — DA GRATUIDADE DA JUSTIÇA (omita se não houver hipossuficiência)
 Art. 98 do CPC/2015 c/c art. 5º, LXXIV da CF/88.
 
-PASSO 7 — PEDIDOS (seção VI)
-Liste ao menos 6 pedidos numerados. Cada pedido deve citar o artigo que o fundamenta.
+VI — DOS PEDIDOS
+Liste todos os pedidos numerados. Cada pedido deve citar o fundamento legal direto.
 
-PASSO 8 — VALOR DA CAUSA (seção VII)
-Calcule com base nos pedidos (art. 292 do CPC/2015).
+VII — DO VALOR DA CAUSA
+Calcule e justifique com base nos pedidos (art. 292 CPC/2015).
 
-REGRA FINAL: produza apenas o texto da peça. Nenhuma nota, disclaimer, comentário ou bloco de código.`,
+ATENÇÃO: produza apenas o texto final da peça jurídica. Não inclua notas, ressalvas, avisos de IA, disclaimers ou comentários.`,
 
     RECURSO: `Redija um RECURSO completo, denso e tecnicamente sofisticado em favor da parte recorrente.
 Adote tom combativo e persuasivo, próprio das grandes bancas de advocacia.
@@ -222,22 +217,16 @@ ATENÇÃO: produza apenas o texto da peça. Sem notas, ressalvas ou disclaimers.
 
   return `${buildRagContext(jurisprudencias)}
 ${instructionBlock}
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-CASO EM ANÁLISE
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+---
+CASO EM ANÁLISE:
 ${caseDescription}
 
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-CHECKLIST ANTES DE REDIGIR (execute obrigatoriamente):
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-□ Identifiquei a competência (federal ou estadual)?
-□ Cada [JUR-N] está conectada a: (1) uma norma legal, (2) uma tese desenvolvida, (3) um pedido?
-□ Toda [JUR-N] fornecida foi usada com argumento completo — nenhuma ficou sem explorar?
-□ Todo artigo citado: tenho certeza que ele existe nesse diploma e se aplica ao caso?
-□ Se havia dúvida sobre algum artigo: descrevi o princípio sem inventar número?
-□ Não inventei nenhum dado (processo, relator, data, CPF, valor)?
-□ Cada pedido cita o artigo legal que o fundamenta E a [JUR-N] que o suporta?
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+---
+REGRAS FUNDAMENTAIS PARA A REDAÇÃO:
+1. JURISPRUDÊNCIA: cite APENAS as decisões [JUR-N] listadas acima. Para cada uma: extraia a tese, a norma que ela interpreta, desenvolva o argumento aplicado ao caso e conecte a um pedido.
+2. DOUTRINA E LEGISLAÇÃO: você TEM PERMISSÃO e DEVE utilizar seu conhecimento jurídico interno para citar legislação (CF/88, Códigos, Leis Especiais), princípios gerais do direito e doutrina pacificada — isso enriquece e aprofunda a argumentação. Cite artigos que você tem certeza que existem; se incerto do número exato, descreva o princípio sem inventar artigo.
+3. ESTILO: seja denso, longo, argumentativo e altamente persuasivo. A peça deve parecer escrita por um advogado sênior de um escritório de elite. Desenvolva cada argumento ao máximo.
+4. DADOS DAS PARTES: se não fornecidos, crie dados fictícios verossímeis (nomes, endereços, CPF mascarado). Nunca invente dados jurídicos do caso (processo, relator, data de ato administrativo).
 
 TAREFA:
 ${tarefaByType[type]}`;
