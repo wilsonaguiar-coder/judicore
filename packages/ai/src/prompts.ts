@@ -142,61 +142,42 @@ III — DISPOSITIVO:
    • Condenação em honorários (art. 85 do CPC/2015) e custas.
    • Indicação de recurso cabível e prazo.`,
 
-    PETICAO_INICIAL: `Redija uma PETIÇÃO INICIAL completa, densa e tecnicamente sofisticada em favor da parte autora.
-Adote tom persuasivo, argumentativo e robusto, próprio das maiores bancas de advocacia do país.
+    PETICAO_INICIAL: `TAREFA: Redija agora uma petição inicial completa, em texto corrido, sem blocos de código, sem markdown, sem delimitadores de qualquer tipo. Apenas o texto da peça, como se fosse um documento Word.
 
-⚠ COMPRIMENTO OBRIGATÓRIO: Esta peça deve ter no MÍNIMO 4.000 palavras. A seção III (Do Direito) deve ter ao menos 6 subteses, cada uma desenvolvida em 3 ou mais parágrafos. Não resuma — aprofunde cada argumento ao máximo.
+Tom persuasivo e robusto, próprio das maiores bancas de advocacia do país. Mínimo absoluto: 4.000 palavras.
 
-ESTRUTURA OBRIGATÓRIA — desenvolva cada seção com profundidade:
+PASSO 1 — ENDEREÇAMENTO
+Analise o réu descrito no caso. Se for a União, INSS, CEF, Receita Federal ou outra entidade federal, escreva:
+"EXCELENTÍSSIMO(A) SENHOR(A) DOUTOR(A) JUIZ(A) FEDERAL DA ___ VARA FEDERAL DA SUBSEÇÃO JUDICIÁRIA DE [CIDADE]"
+Se for réu estadual ou privado, escreva a vara cível ou especializada correspondente.
 
-[ENDEREÇAMENTO CONFORME COMPETÊNCIA]
+PASSO 2 — QUALIFICAÇÃO DAS PARTES (seção I)
+Escreva nome completo fictício, nacionalidade, estado civil, profissão, CPF mascarado e endereço completo inventados, mas verossímeis. Exemplo: "Maria de Lourdes Ferreira, brasileira, viúva, professora aposentada, portadora do CPF nº ***.456.789-**, residente à Rua das Bromélias, nº 87, Bairro Jardim Primavera, CEP 74.000-100, Goiânia/GO". Faça o mesmo para o réu.
 
-I — DA QUALIFICAÇÃO DAS PARTES
-Crie qualificação completa com dados fictícios verossímeis para os dados não fornecidos.
-OBRIGATÓRIO: use nomes brasileiros completos (ex: "Maria de Lourdes da Silva"), endereço fictício completo, CPF mascarado (ex: "***.***.123-**"), profissão e estado civil coerentes com o caso.
-NUNCA deixe colchetes como [Nome do Autor] ou [endereço] — substitua sempre por dados fictícios plausíveis.
+PASSO 3 — FATOS (seção II)
+Narre os fatos em ordem cronológica com persuasão. Mínimo 4 parágrafos detalhados.
 
-II — DOS FATOS
-Narre cronologicamente, com detalhes e persuasão. Destaque o impacto das condutas da parte contrária e a situação de vulnerabilidade ou prejuízo do autor.
+PASSO 4 — DO DIREITO (seção III) — NÚCLEO DA PEÇA
+Escreva no mínimo 6 subteses numeradas (3.1, 3.2, 3.3, 3.4, 3.5, 3.6). Cada subtese deve ter:
+- Um título descritivo
+- O artigo de lei aplicável com o nome do diploma
+- 3 a 4 parágrafos de argumentação conectando a lei aos fatos
+- A jurisprudência do contexto: cite o tribunal e processo, enuncie a tese que ela consagra e aplique ao caso concreto em 2 parágrafos
+Esta seção deve ter no mínimo 2.500 palavras sozinha.
 
-III — DO DIREITO
-Construa a argumentação jurídica tese por tese. Para cada tese, siga OBRIGATORIAMENTE:
+PASSO 5 — TUTELA DE URGÊNCIA (seção IV)
+Demonstre fumus boni iuris e periculum in mora com base nos argumentos do passo 4. Fundamente no art. 300 do CPC/2015.
 
-   ► TESE [número]: [enunciado claro da proposição jurídica]
+PASSO 6 — GRATUIDADE DA JUSTIÇA (seção V, se aplicável)
+Art. 98 do CPC/2015 c/c art. 5º, LXXIV da CF/88.
 
-   FUNDAMENTO LEGAL: cite o artigo específico e o diploma (ex: "art. 186 do CC/2002").
-   Só cite artigo que você tem certeza que existe e se aplica ao caso.
-   Se incerto sobre o número exato, cite o princípio sem inventar: "princípio da boa-fé objetiva (CC/2002)".
+PASSO 7 — PEDIDOS (seção VI)
+Liste ao menos 6 pedidos numerados. Cada pedido deve citar o artigo que o fundamenta.
 
-   ARGUMENTO: 3-4 parágrafos desenvolvendo a tese — conecte o artigo, os fatos do caso e as consequências jurídicas.
+PASSO 8 — VALOR DA CAUSA (seção VII)
+Calcule com base nos pedidos (art. 292 do CPC/2015).
 
-   JURISPRUDÊNCIA [JUR-N]: Cite pelo rótulo exato.
-   • Norma interpretada: qual artigo/princípio essa decisão aplica.
-   • Tese consagrada: o que o tribunal decidiu e por quê.
-   • Aplicação ao caso: como essa tese se aplica diretamente aos fatos narrados no item II.
-   • Conexão com pedido: qual pedido do item VI essa jurisprudência fundamenta.
-
-   REGRA: uma tese por jurisprudência fornecida, no mínimo. Toda [JUR-N] deve aparecer aqui com argumento completo.
-
-IV — DA TUTELA DE URGÊNCIA (omita se não houver urgência no caso)
-   Fumus boni iuris: demonstre com os argumentos do item III.
-   Periculum in mora: demonstre o risco concreto de dano irreparável.
-   Fundamento: art. 300 do CPC/2015.
-
-V — DA GRATUIDADE DA JUSTIÇA (omita se não houver hipossuficiência)
-   Art. 98 do CPC/2015 c/c art. 5º, LXXIV da CF/88.
-
-VI — DOS PEDIDOS
-Liste numerados. Cada pedido DEVE conter:
-   [N]. [Descrição do pedido], com fundamento no [artigo X do diploma Y] e conforme consagrado em [JUR-N].
-
-Inclua pedido de condenação em honorários advocatícios (art. 85 do CPC/2015).
-Inclua pedido de inversão/condenação em custas processuais.
-
-VII — DO VALOR DA CAUSA
-Calcule e justifique com base nos pedidos (art. 292 do CPC/2015).
-
-ATENÇÃO: produza apenas o texto final da peça. Sem notas, ressalvas, disclaimers ou comentários de IA.`,
+REGRA FINAL: produza apenas o texto da peça. Nenhuma nota, disclaimer, comentário ou bloco de código.`,
 
     RECURSO: `Redija um RECURSO completo, denso e tecnicamente sofisticado em favor da parte recorrente.
 Adote tom combativo e persuasivo, próprio das grandes bancas de advocacia.
