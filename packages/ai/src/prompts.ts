@@ -59,9 +59,10 @@ Pedido sem fundamento legal explícito = pedido fraco.
 ENDEREÇAMENTO E DIPLOMAS
 ══════════════════════════════════════════════════════
 
-ENDEREÇAMENTO:
+ENDEREÇAMENTO — aplicável EXCLUSIVAMENTE a PETIÇÃO INICIAL:
 • Réu = União, autarquia federal (INSS, ANATEL, IBAMA, Receita Federal...), empresa pública federal (CEF, ECT, BNDES...) → JUSTIÇA FEDERAL: "EXCELENTÍSSIMO(A) SENHOR(A) DOUTOR(A) JUIZ(A) FEDERAL DA ___ VARA FEDERAL DA SUBSEÇÃO JUDICIÁRIA DE [CIDADE]"
 • Demais casos → JUSTIÇA ESTADUAL: "EXCELENTÍSSIMO(A) SENHOR(A) DOUTOR(A) JUIZ(A) DE DIREITO DA ___ VARA [ESPECIALIDADE] DA COMARCA DE [CIDADE]"
+⚠ PROIBIDO em RECURSO, SENTENÇA, DECISÃO e DESPACHO: essas peças têm endereçamento próprio definido na tarefa — NUNCA aplique este formato de juiz de primeiro grau a elas.
 
 DIPLOMAS — nunca confunda numeração:
 • CC/2002: arts. 186, 187, 206, 421, 422, 927, 944...
@@ -102,7 +103,7 @@ Para peças de juiz (sentença, decisão, despacho): use todas as [JUR-N] normal
 
 REGRAS PARA AS [JUR-N] QUE FOREM USADAS:
 • Para usar uma [JUR-N]: (1) citar a norma que ela interpreta, (2) enunciar a tese, (3) aplicar ao caso em 2-3 parágrafos, (4) vincular a um pedido.
-• Referência à [JUR-N] no texto deve usar exatamente esse rótulo para rastreabilidade.
+• Ao citar a decisão no corpo da peça, use os dados reais: tribunal + número do processo + relator (ex: "TRF1, AI 1014483-13.2024.4.01.0000, Rel. Des. Federal Rui Gonçalves"). NUNCA escreva "[JUR-1]", "[JUR-2]" ou qualquer "[JUR-N]" literalmente no texto final — esses marcadores são referência interna de seleção, nunca parte do documento.
 • PROIBIDO: mencionar a decisão apenas pelo número sem extrair e desenvolver o argumento.
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ${items.join("\n")}`;
@@ -203,6 +204,13 @@ ATENÇÃO: produza apenas o texto final da peça jurídica. Não inclua notas, r
     RECURSO: `Redija um RECURSO completo, denso e tecnicamente sofisticado em favor da parte recorrente.
 Adote tom combativo e persuasivo, próprio das grandes bancas de advocacia.
 
+ENDEREÇAMENTO DO RECURSO (coloque no início, antes da identificação das partes):
+• Apelação → Justiça Federal: "EGRÉGIO TRIBUNAL REGIONAL FEDERAL DA ___ REGIÃO"
+• Apelação → Justiça Estadual: "EGRÉGIO TRIBUNAL DE JUSTIÇA DO ESTADO DE [UF]"
+• Agravo de instrumento → mesmo tribunal da apelação correspondente
+• Embargos de declaração / agravo interno/regimental → mesmo órgão julgador da decisão (use "EXCELENTÍSSIMO(A) SENHOR(A) RELATOR(A)...")
+Se o tipo de recurso não for especificado, use o endereçamento de apelação ao Tribunal.
+
 ESTRUTURA OBRIGATÓRIA:
 
 I — DA TEMPESTIVIDADE
@@ -254,7 +262,7 @@ REGRAS FUNDAMENTAIS PARA A REDAÇÃO:
 1. JURISPRUDÊNCIA: cite APENAS as decisões [JUR-N] listadas acima. Para cada uma: extraia a tese, a norma que ela interpreta, desenvolva o argumento aplicado ao caso e conecte a um pedido.
 2. DOUTRINA E LEGISLAÇÃO: você TEM PERMISSÃO e DEVE utilizar seu conhecimento jurídico interno para citar legislação (CF/88, Códigos, Leis Especiais), princípios gerais do direito e doutrina pacificada — isso enriquece e aprofunda a argumentação. Cite artigos que você tem certeza que existem; se incerto do número exato, descreva o princípio sem inventar artigo.
 3. ESTILO: seja denso, longo, argumentativo e altamente persuasivo. A peça deve parecer escrita por um advogado sênior de um escritório de elite. Desenvolva cada argumento ao máximo.
-4. DADOS DAS PARTES: se não fornecidos, crie dados fictícios verossímeis (nomes, endereços, CPF mascarado). Nunca invente dados jurídicos do caso (processo, relator, data de ato administrativo).
+4. DADOS DAS PARTES: se não fornecidos, use marcadores estruturados: [NOME COMPLETO DO AUTOR], [CPF], [ENDEREÇO COMPLETO], [NOME/RAZÃO SOCIAL DO RÉU], etc. NUNCA invente dados fictícios de partes nem dados jurídicos do caso.
 
 TAREFA:
 ${tarefaByType[type]}`;
@@ -452,7 +460,7 @@ REGRAS ABSOLUTAS — INVIOLÁVEIS
 ${regraLeg}
 3. FATOS: JAMAIS invente dados (processos, nomes, CPF, datas, valores) não presentes nos documentos.
 4. COMPLETUDE: a peça deve ser extensa e tecnicamente densa. Não resuma onde cabe fundamentar.
-5. CHECKLIST antes de entregar: □ toda [JUR-N] tem norma + tese + argumento + pedido vinculado? □ todo artigo citado existe nesse diploma e se aplica ao caso? □ onde havia dúvida no artigo, usei o princípio em vez de inventar? □ cada pedido cita artigo e [JUR-N]?
+5. CHECKLIST antes de entregar: □ toda decisão citada tem norma + tese + argumento + pedido vinculado? □ todo artigo citado existe nesse diploma e se aplica ao caso? □ onde havia dúvida no artigo, usei o princípio em vez de inventar? □ cada pedido cita artigo e a decisão aplicável? □ NÃO há nenhum marcador "[JUR-N]" escrito literalmente no texto final?
 
 TAREFA:
 ${tarefaByType[type]}`;

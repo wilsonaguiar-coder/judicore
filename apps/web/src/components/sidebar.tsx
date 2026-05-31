@@ -17,7 +17,7 @@ export function Sidebar({ user }: { user: User | null }) {
   }
 
   function navItem(label: string, icon: React.ReactNode, path: string) {
-    const active = pathname === path || (path !== "/dashboard" && pathname.startsWith(path));
+    const active = pathname === path;
     return (
       <button
         onClick={() => router.push(path)}
