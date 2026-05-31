@@ -151,7 +151,7 @@ I — DA QUALIFICAÇÃO DAS PARTES
 Use marcadores estruturados para todos os dados não fornecidos: [NOME COMPLETO DO AUTOR], [NACIONALIDADE], [ESTADO CIVIL], [PROFISSÃO], portador(a) do CPF nº [CPF], inscrito(a) no RG nº [RG], residente e domiciliado(a) na [ENDEREÇO, BAIRRO, CEP, CIDADE/UF], vem, por seu advogado infra-assinado (procuração em anexo), propor a presente ação em face de [NOME/RAZÃO SOCIAL DO RÉU], [qualificação completa do réu: CNPJ/CPF, endereço].
 
 II — DOS FATOS
-Organize os fatos do caso em análise em linguagem jurídica cronológica e persuasiva. Use APENAS as informações fornecidas no caso — não invente fatos, datas, valores ou circunstâncias não mencionados. Destaque o impacto e a gravidade das ações da parte contrária.
+Use o caso fornecido como base e desenvolva uma narrativa jurídica cronológica, fluente e persuasiva. Elabore, enriqueça e dê peso jurídico ao relato — como faria um advogado sênior. Não invente fatos essenciais que mudem a essência do caso, mas pode e deve expandir o contexto, as consequências e o impacto sobre a parte autora. Mínimo 4 parágrafos.
 
 III — DO DIREITO
 Esta é a seção central. Construa argumentação jurídica exaustiva em subseções numeradas (3.1, 3.2, 3.3...). Para cada tese:

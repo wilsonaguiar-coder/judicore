@@ -65,11 +65,11 @@ Você está redigindo uma PETIÇÃO INICIAL genérica. Escreva SOMENTE as seguin
    — Detecte o tipo de réu pelo caso (União, autarquia federal, empresa, pessoa física) e adapte a qualificação do réu.
 
 3. A seção "II — DOS FATOS"
-   — Use EXCLUSIVAMENTE as informações do caso fornecido pelo advogado acima.
-   — Organize essas informações em linguagem jurídica, cronológica e persuasiva.
-   — Estruture em parágrafos bem desenvolvidos. Destaque o impacto e a gravidade sobre a parte autora.
-   — NÃO invente fatos, datas, valores ou circunstâncias que não estejam no caso fornecido.
-   — Se o caso tiver poucas informações, use o que há sem inventar complementos.
+   — Use o caso fornecido como BASE dos fatos — não como texto a copiar.
+   — Desenvolva os fatos em narrativa jurídica cronológica, fluente e persuasiva, enriquecendo a descrição com contexto, consequências e impacto sobre a parte autora.
+   — Você PODE e DEVE elaborar, organizar e dar peso jurídico ao relato — é isso que um advogado sênior faz.
+   — NÃO invente fatos essenciais que mudem a essência do caso (novas partes, novos eventos, valores não mencionados).
+   — Estruture em mínimo 4 parágrafos bem desenvolvidos.
 
 Entregue apenas essas partes. Não escreva "Do Direito", pedidos nem encerramento.`;
 
