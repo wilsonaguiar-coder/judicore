@@ -52,21 +52,24 @@ async function* generatePeticaoBySection(
   }
 
   // ── SEÇÃO 1: Endereçamento + Qualificação + Fatos ──────────────────────────
-  const prompt1 = `CASO: ${caseDescription}
+  const prompt1 = `CASO FORNECIDO PELO ADVOGADO:
+${caseDescription}
 ${instrBlock}
-Você está redigindo uma PETIÇÃO INICIAL. Escreva SOMENTE as seguintes partes — nada além:
+Você está redigindo uma PETIÇÃO INICIAL genérica. Escreva SOMENTE as seguintes partes — nada além:
 
 1. O endereçamento: "${enderecamento}"
 
 2. A seção "I — DA QUALIFICAÇÃO DAS PARTES"
-   — Qualifique o AUTOR com dados fictícios verossímeis e completos: nome completo, nacionalidade, estado civil, profissão, CPF mascarado (ex: ***.456.789-**), RG, endereço com rua, número, bairro, CEP e cidade.
-   — Qualifique o RÉU (pessoa jurídica ou física conforme o caso) com dados completos.
-   — NUNCA use marcadores como [Nome do Autor] ou [endereço] — crie os dados.
+   — Use marcadores estruturados entre colchetes para TODOS os dados das partes — NÃO invente nomes, endereços ou documentos:
+     Exemplo: [NOME COMPLETO DO AUTOR], [NACIONALIDADE], [ESTADO CIVIL], [PROFISSÃO], portador(a) do CPF nº [CPF], inscrito(a) no RG nº [RG], residente e domiciliado(a) na [ENDEREÇO COMPLETO, BAIRRO, CEP, CIDADE/UF], vem, por seu advogado infra-assinado (procuração em anexo), propor a presente ação em face de [NOME/RAZÃO SOCIAL DO RÉU], [CNPJ/CPF do réu], com sede na [ENDEREÇO DO RÉU].
+   — Detecte o tipo de réu pelo caso (União, autarquia federal, empresa, pessoa física) e adapte a qualificação do réu.
 
 3. A seção "II — DOS FATOS"
-   — Narre os fatos cronologicamente em MÍNIMO 6 parágrafos densos.
-   — Seja específico, detalhado e persuasivo. Destaque o impacto sobre o autor.
-   — Inclua datas aproximadas, valores e circunstâncias relevantes ao caso.
+   — Use EXCLUSIVAMENTE as informações do caso fornecido pelo advogado acima.
+   — Organize essas informações em linguagem jurídica, cronológica e persuasiva.
+   — Estruture em parágrafos bem desenvolvidos. Destaque o impacto e a gravidade sobre a parte autora.
+   — NÃO invente fatos, datas, valores ou circunstâncias que não estejam no caso fornecido.
+   — Se o caso tiver poucas informações, use o que há sem inventar complementos.
 
 Entregue apenas essas partes. Não escreva "Do Direito", pedidos nem encerramento.`;
 
@@ -133,15 +136,17 @@ V — DA GRATUIDADE DA JUSTIÇA (INCLUA se a parte autora for hipossuficiente)
 VI — DOS PEDIDOS
    — Liste TODOS os pedidos numerados (mínimo 6)
    — Cada pedido DEVE citar seu fundamento legal: "[N]. Requerer [resultado] com fundamento no art. X do Diploma Y."
+   — Use [ESPECIFICAR] para valores ou datas que dependem dos dados reais do caso
    — Inclua pedido de honorários advocatícios (art. 85 CPC/2015), custas e demais verbas de sucumbência
 
 VII — DO VALOR DA CAUSA
-   — Calcule e justifique o valor com base nos pedidos (art. 292 CPC/2015)
+   — Use o marcador: "Dá-se à causa o valor de R$ [VALOR DA CAUSA], nos termos do art. 292 do CPC/2015."
+   — NÃO invente valor — o advogado calculará com base nos dados reais
 
 ENCERRAMENTO FORMAL:
    — "Nestes termos, pede e espera deferimento."
-   — Cidade/data fictícios (ex: "São Paulo, [data].")
-   — "Advogado(a)" + OAB fictício`;
+   — "[Cidade/UF], [data]."
+   — "[NOME DO ADVOGADO]" + "OAB/[UF] nº [NÚMERO]"`;
 
   for await (const chunk of streamSection(prompt3, 2048)) {
     yield chunk;
