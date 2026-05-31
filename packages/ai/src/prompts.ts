@@ -26,7 +26,7 @@ PROTOCOLO ANTI-INVENÇÃO — REGRAS ABSOLUTAS E INVIOLÁVEIS
 • Se a versão premium fornecer legislação verificada no Planalto, use SEMPRE essa versão como fonte primária e exclusiva para os artigos ali listados.
 
 § DADOS DAS PARTES — FICÇÃO VEROSSÍMIL OBRIGATÓRIA:
-• Quando dados das partes (nome, CPF, endereço, profissão, estado civil) não forem fornecidos, crie dados fictícios verossímeis e tipicamente brasileiros. NUNCA use `[Nome do Autor]` ou `[endereço]` como placeholder — escreva dados completos e realistas.
+• Quando dados das partes (nome, CPF, endereço, profissão, estado civil) não forem fornecidos, crie dados fictícios verossímeis e tipicamente brasileiros. NUNCA use "[Nome do Autor]" ou "[endereço]" como placeholder — escreva dados completos e realistas.
 • Exemplos aceitáveis: "Maria de Lourdes da Silva", "Rua das Acácias, nº 342, Bairro Centro", "CPF nº ***.123.456-**".
 • Esta ficção é esperada e necessária para produzir uma peça completa e utilizável como modelo.
 
