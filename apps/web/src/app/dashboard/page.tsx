@@ -46,7 +46,7 @@ export default function DashboardPage() {
               className="flex flex-col items-start gap-3 p-6 rounded-xl border bg-card hover:border-primary/50 hover:bg-primary/5 transition-colors text-left group"
             >
               <div className="w-10 h-10 rounded-lg bg-violet-600/15 border border-violet-500/20 flex items-center justify-center">
-                <Search size={18} className="text-violet-400" />
+                <Search size={18} className="text-violet-600" />
               </div>
               <div>
                 <p className="text-sm font-semibold">Busca livre</p>
@@ -62,7 +62,7 @@ export default function DashboardPage() {
               trigger={
                 <div className="flex flex-col items-start gap-3 p-6 rounded-xl border bg-card hover:border-primary/50 hover:bg-primary/5 transition-colors text-left cursor-pointer group">
                   <div className="w-10 h-10 rounded-lg bg-violet-600/15 border border-violet-500/20 flex items-center justify-center">
-                    <FolderPlus size={18} className="text-violet-400" />
+                    <FolderPlus size={18} className="text-violet-600" />
                   </div>
                   <div>
                     <p className="text-sm font-semibold">Novo caso</p>

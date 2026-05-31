@@ -23,8 +23,8 @@ export function Sidebar({ user }: { user: User | null }) {
         onClick={() => router.push(path)}
         className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm transition-colors ${
           active
-            ? "bg-violet-600/15 text-violet-300 border border-violet-500/20"
-            : "text-white/40 hover:text-white/80 hover:bg-white/5 border border-transparent"
+            ? "bg-primary/10 text-primary font-medium"
+            : "text-slate-500 hover:text-slate-800 hover:bg-slate-100"
         }`}
       >
         {icon}
@@ -34,12 +34,10 @@ export function Sidebar({ user }: { user: User | null }) {
   }
 
   return (
-    <aside className="w-56 border-r border-white/[0.06] flex flex-col bg-[#08080f]">
+    <aside className="w-56 border-r border-slate-200 flex flex-col bg-white shrink-0">
       {/* Logo */}
-      <div className="px-4 py-5 border-b border-white/[0.06]">
-        <div className="flex items-center">
-          <Image src="/logo.png" alt="Judicore" width={112} height={112} className="rounded-lg flex-shrink-0" />
-        </div>
+      <div className="px-4 py-5 border-b border-slate-100">
+        <Image src="/logo.png" alt="Judicore" width={112} height={112} className="rounded-lg flex-shrink-0" />
       </div>
 
       {/* Nav */}
@@ -52,14 +50,14 @@ export function Sidebar({ user }: { user: User | null }) {
       </nav>
 
       {/* User / Logout */}
-      <div className="px-3 py-4 border-t border-white/[0.06]">
+      <div className="px-3 py-4 border-t border-slate-100">
         <div className="px-2 mb-3">
-          <p className="text-xs font-medium text-white/70 truncate">{user?.name}</p>
-          <p className="text-[11px] text-white/30 truncate mt-0.5">{user?.email}</p>
+          <p className="text-xs font-medium text-slate-700 truncate">{user?.name}</p>
+          <p className="text-[11px] text-slate-400 truncate mt-0.5">{user?.email}</p>
         </div>
         <button
           onClick={handleLogout}
-          className="w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-xs text-white/35 hover:text-white/70 hover:bg-white/5 transition-colors border border-transparent"
+          className="w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-xs text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition-colors"
         >
           <LogOut size={13} />
           Sair

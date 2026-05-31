@@ -15,8 +15,8 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
   if (!_hasHydrated || !token) {
     return (
-      <div className="flex h-screen items-center justify-center bg-[#07070f]">
-        <div className="w-5 h-5 rounded-full border-2 border-violet-500 border-t-transparent animate-spin" />
+      <div className="flex h-screen items-center justify-center bg-background">
+        <div className="w-5 h-5 rounded-full border-2 border-primary border-t-transparent animate-spin" />
       </div>
     );
   }

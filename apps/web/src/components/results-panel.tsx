@@ -123,7 +123,7 @@ export function ResultsPanel({ results, selected, onToggle }: Props) {
                       </span>
                     )}
                     {j.autoridade && (
-                      <span className="text-[10px] px-1.5 py-0.5 rounded bg-violet-500/15 text-violet-400 font-medium">
+                      <span className="text-[10px] px-1.5 py-0.5 rounded bg-violet-100 text-violet-700 font-medium">
                         {j.autoridade}
                       </span>
                     )}

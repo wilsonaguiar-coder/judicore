@@ -21,50 +21,48 @@ export default function SearchPage() {
     <div className="flex h-screen bg-background">
       <Sidebar user={user} />
 
-      <main className="flex-1 flex flex-col overflow-hidden">
-        <header className="border-b px-6 py-4 flex-shrink-0">
-          <h1 className="text-sm font-semibold">Busca livre</h1>
-          <p className="text-xs text-muted-foreground">Pesquise jurisprudência sem criar um caso</p>
-        </header>
+      <main className="flex-1 flex overflow-hidden min-w-0">
 
-        <div className="flex-1 flex overflow-hidden">
-          <div className="w-72 border-r flex flex-col overflow-auto">
-            <SearchPanel
-              caseId=""
-              token={token!}
-              onResults={setResults}
-            />
-          </div>
+        {/* Painel de filtros */}
+        <aside className="w-68 shrink-0 border-r border-slate-200 overflow-y-auto bg-slate-50">
+          <SearchPanel
+            caseId=""
+            token={token!}
+            onResults={setResults}
+          />
+        </aside>
 
-          <div className="flex-1 border-r overflow-auto">
-            <ResultsPanel
-              results={results}
-              selected={selected}
-              onToggle={(jid) =>
-                setSelected((prev) => {
-                  const next = new Set(prev);
-                  next.has(jid) ? next.delete(jid) : next.add(jid);
-                  return next;
-                })
-              }
-            />
-          </div>
+        {/* Resultados */}
+        <section className="flex-1 min-w-0 overflow-y-auto border-r border-slate-200 bg-white">
+          <ResultsPanel
+            results={results}
+            selected={selected}
+            onToggle={(jid) =>
+              setSelected((prev) => {
+                const next = new Set(prev);
+                next.has(jid) ? next.delete(jid) : next.add(jid);
+                return next;
+              })
+            }
+          />
+        </section>
 
-          <div className="w-96 overflow-auto">
-            <DocumentPanel
-              caseId=""
-              token={token!}
-              userRole={user?.role ?? "COMUM"}
-              jurisprudencias={selectedJurisprudencias}
-              activeDoc={activeDoc}
-              activeDocId={activeDocId}
-              onDocGenerated={(content, docId) => {
-                setActiveDoc(content);
-                if (docId) setActiveDocId(docId);
-              }}
-            />
-          </div>
-        </div>
+        {/* Geração de documento */}
+        <aside className="w-[27rem] shrink-0 overflow-y-auto bg-white">
+          <DocumentPanel
+            caseId=""
+            token={token!}
+            userRole={user?.role ?? "COMUM"}
+            jurisprudencias={selectedJurisprudencias}
+            activeDoc={activeDoc}
+            activeDocId={activeDocId}
+            onDocGenerated={(content, docId) => {
+              setActiveDoc(content);
+              if (docId) setActiveDocId(docId);
+            }}
+          />
+        </aside>
+
       </main>
     </div>
   );
