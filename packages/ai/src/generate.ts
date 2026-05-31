@@ -12,6 +12,7 @@ export async function* generateDocumentStream(
   const stream = await client.chat.completions.create({
     model: MODEL,
     max_tokens: 16384,
+    temperature: 0.7,
     messages: [
       { role: "system", content: buildSystemPrompt() },
       { role: "user", content: buildDocumentPrompt(type, caseDescription, jurisprudencias, instruction) },
@@ -63,6 +64,7 @@ export async function* generatePremiumDocumentStream(
   const stream = await client.chat.completions.create({
     model: MODEL,
     max_tokens: maxTokens,
+    temperature: 0.7,
     messages: [
       { role: "system", content: buildSystemPrompt() },
       {
