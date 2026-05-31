@@ -46,24 +46,29 @@ export default function LoginPage() {
       </div>
 
       {/* Card */}
-      <div className="w-full max-w-sm bg-white rounded-2xl border border-slate-200 shadow-lg shadow-slate-200/60 p-8">
+      <div className="w-full max-w-sm bg-white rounded-2xl border border-slate-200 shadow-lg shadow-slate-200/60 overflow-hidden">
 
-        {/* Logo + título dentro do card */}
-        <div className="flex flex-col items-center mb-7">
+        {/* Faixa escura com logo */}
+        <div className="bg-[#1a2035] flex flex-col items-center justify-center py-8 px-8">
           <Image
             src="/logo.png"
             alt="Judicore"
-            width={72}
-            height={72}
-            className="rounded-xl mb-4"
+            width={96}
+            height={96}
+            className="rounded-xl"
           />
-          <h1 className="text-xl font-semibold text-slate-800 leading-tight">
-            Bem-vindo de volta
-          </h1>
-          <p className="text-sm text-slate-400 mt-1">
-            Acesse sua conta para continuar
-          </p>
         </div>
+
+        {/* Título + formulário */}
+        <div className="p-8">
+          <div className="text-center mb-7">
+            <h1 className="text-xl font-semibold text-slate-800 leading-tight">
+              Bem-vindo de volta
+            </h1>
+            <p className="text-sm text-slate-400 mt-1">
+              Acesse sua conta para continuar
+            </p>
+          </div>
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-1.5">
@@ -125,6 +130,7 @@ export default function LoginPage() {
             )}
           </button>
         </form>
+        </div>
       </div>
 
       <p className="text-center text-[11px] text-slate-400 mt-6">
