@@ -131,28 +131,40 @@ ESTILO: impessoal, técnico, conciso. Despacho não é sentença — evite proli
 
     DECISAO: `Redija uma MINUTA DE DECISÃO INTERLOCUTÓRIA completa e fundamentada.
 
+SENTIDO DA DECISÃO — leia a instrução do usuário:
+• "defiro" / "deferido" → fundamente acolhendo o requerimento; use [JUR-N] favoráveis ao deferimento; omita as contrárias.
+• "indefiro" / "indeferido" → fundamente rejeitando o requerimento; use [JUR-N] favoráveis ao indeferimento; omita as contrárias.
+• Sem indicação de sentido → adote o resultado mais coerente com os fatos e o direito, justificando.
+
 ESTRUTURA:
 I — RELATÓRIO: síntese dos fatos processuais relevantes à decisão.
 II — FUNDAMENTAÇÃO JURÍDICA:
-   • Identifique o pressuposto legal da questão decidida (artigo específico do CPC/2015 ou legislação material).
-   • Para cada jurisprudência fornecida: enuncie a tese que ela consagra, desenvolva o argumento e aplique ao caso.
-   • Construa a cadeia lógica: premissa legal → tese jurisprudencial → subsunção ao fato concreto.
-III — DISPOSITIVO: decisão expressa com seus efeitos.`,
+   • Dispositivo legal que rege a questão (artigo específico do CPC/2015 ou legislação material).
+   • Para cada [JUR-N] favorável ao sentido adotado: enuncie a tese, desenvolva o argumento e aplique ao caso.
+   • Cadeia lógica: premissa legal → tese jurisprudencial → subsunção → conclusão.
+III — DISPOSITIVO: decisão expressa, clara e com seus efeitos imediatos.`,
 
     SENTENCA: `Redija uma MINUTA DE SENTENÇA completa, exaustiva e tecnicamente impecável.
 
+SENTIDO DO JULGAMENTO — leia a instrução do usuário:
+• "procedente" → julgue procedente; fundamente acolhendo os pedidos do autor; use [JUR-N] favoráveis ao autor; omita as contrárias.
+• "improcedente" → julgue improcedente; fundamente rejeitando os pedidos; use [JUR-N] favoráveis ao réu; omita as contrárias.
+• "procedente em parte" + especificação dos pedidos → acolha apenas os pedidos indicados; rejeite os demais com fundamento; use [JUR-N] adequada para cada resultado parcial.
+• Sem indicação de sentido → adote o resultado mais coerente com os fatos e a jurisprudência disponível, justificando.
+Em todos os casos: use apenas as [JUR-N] que apoiem o resultado adotado para cada pedido — omita completamente as contrárias ao sentido escolhido.
+
 ESTRUTURA:
-I — RELATÓRIO: síntese cronológica dos fatos e do processado.
+I — RELATÓRIO: síntese cronológica dos fatos, qualificação das partes, pedidos do autor e defesa do réu.
 II — FUNDAMENTAÇÃO JURÍDICA (seção central — desenvolva com máxima profundidade):
-   2.1 QUESTÕES PRELIMINARES (se houver): prescrição, decadência, legitimidade, etc. — cada uma com artigo específico.
+   2.1 QUESTÕES PRELIMINARES (se houver): prescrição, decadência, legitimidade — cada uma com artigo específico; acolha ou rejeite explicitamente com fundamento.
    2.2 MÉRITO:
-      • Para cada tese relevante: enuncie, fundamente em artigo específico, cite e elabore a jurisprudência correspondente do contexto, aplique ao caso.
-      • Estruture como: Tese → Lei → Jurisprudência (com raciocínio desenvolvido) → Aplicação ao caso.
-      • Aborde todas as alegações das partes, acolhendo ou rejeitando com fundamento.
+      • Para cada tese relevante ao resultado: Tese → artigo específico → [JUR-N] favorável ao sentido adotado (raciocínio desenvolvido) → aplicação ao caso → conclusão parcial.
+      • Aborde todas as alegações das partes, acolhendo ou rejeitando com fundamento legal.
+      • Construa fundamentação coesa que conduza logicamente ao dispositivo.
 III — DISPOSITIVO:
-   • Julgamento expresso (procedente/improcedente/parcialmente procedente).
-   • Condenação em honorários (art. 85 do CPC/2015) e custas.
-   • Indicação de recurso cabível e prazo.`,
+   • Julgamento expresso conforme o sentido indicado (procedente / improcedente / parcialmente procedente).
+   • Condenação em honorários advocatícios (art. 85 do CPC/2015) e custas processuais — indique quem paga.
+   • Indicação do recurso cabível e prazo.`,
 
     PETICAO_INICIAL: `Redija uma PETIÇÃO INICIAL completa, extremamente detalhada e tecnicamente sofisticada em favor da parte autora. Adote tom persuasivo, argumentativo e robusto, próprio das maiores e mais prestigiadas bancas de advocacia do país.
 
@@ -301,23 +313,36 @@ III — DISPOSITIVO: determinação clara e sem ambiguidade.`,
 
     DECISAO: `Redija uma MINUTA DE DECISÃO INTERLOCUTÓRIA completa, com base nos documentos do processo.
 
+SENTIDO DA DECISÃO — leia a instrução do usuário:
+• "defiro" / "deferido" → fundamente acolhendo o requerimento; use [JUR-N] favoráveis ao deferimento; omita as contrárias.
+• "indefiro" / "indeferido" → fundamente rejeitando; use [JUR-N] favoráveis ao indeferimento; omita as contrárias.
+• Sem indicação → adote o resultado mais coerente com os documentos e o direito.
+
 ESTRUTURA:
 I — RELATÓRIO: síntese processual com base nos documentos.
 II — FUNDAMENTAÇÃO JURÍDICA:
    • Dispositivo legal da legislação verificada que rege a questão.
-   • Para cada jurisprudência: tese consagrada + desenvolvimento + aplicação ao caso.
+   • Para cada [JUR-N] favorável ao sentido adotado: tese consagrada + desenvolvimento + aplicação ao caso.
    • Cadeia lógica: premissa legal → tese jurisprudencial → subsunção.
-III — DISPOSITIVO: decisão expressa com efeitos.`,
+III — DISPOSITIVO: decisão expressa com efeitos imediatos.`,
 
     SENTENCA: `Redija uma MINUTA DE SENTENÇA completa e exaustiva, com base nos documentos do processo.
 
+SENTIDO DO JULGAMENTO — leia a instrução do usuário:
+• "procedente" → julgue procedente; fundamente acolhendo os pedidos do autor; use [JUR-N] favoráveis ao autor; omita as contrárias.
+• "improcedente" → julgue improcedente; fundamente rejeitando os pedidos; use [JUR-N] favoráveis ao réu; omita as contrárias.
+• "procedente em parte" + especificação → acolha os pedidos indicados; rejeite os demais; use [JUR-N] adequada para cada resultado parcial.
+• Sem indicação → adote o resultado mais coerente com os documentos e a jurisprudência disponível.
+Em todos os casos: use apenas as [JUR-N] que apoiem o resultado adotado para cada pedido — omita as contrárias.
+
 ESTRUTURA:
-I — RELATÓRIO: cronologia processual extraída dos documentos.
+I — RELATÓRIO: cronologia processual extraída dos documentos, pedidos do autor e defesa do réu.
 II — FUNDAMENTAÇÃO JURÍDICA:
-   2.1 Questões preliminares (art. 337 do CPC/2015, se houver).
-   2.2 Mérito — para cada tese:
-      Tese → artigo da legislação verificada → jurisprudência do contexto (tese + aplicação ao caso) → conclusão.
-III — DISPOSITIVO: julgamento + honorários (art. 85 CPC/2015) + custas + recurso cabível.`,
+   2.1 Questões preliminares (art. 337 do CPC/2015, se houver) — acolha ou rejeite com fundamento.
+   2.2 Mérito — para cada tese relevante ao resultado:
+      Tese → artigo da legislação verificada → [JUR-N] favorável ao sentido adotado (tese + aplicação ao caso) → conclusão parcial.
+      Aborde todas as alegações das partes, acolhendo ou rejeitando com fundamento.
+III — DISPOSITIVO: julgamento conforme o sentido indicado + honorários (art. 85 CPC/2015) + custas + recurso cabível.`,
 
     PETICAO_INICIAL: `Redija uma PETIÇÃO INICIAL completa, densa e sofisticada, com base nos documentos fornecidos.
 Tom persuasivo e robusto, próprio das maiores bancas de advocacia.
