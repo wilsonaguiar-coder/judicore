@@ -9,9 +9,9 @@ import { Loader2, Cpu } from "lucide-react";
 
 interface UsageData {
   period: number;
-  totals: { openaiInput: number; openaiOutput: number; geminiInput: number };
-  byDay: { date: string; openaiInput: number; openaiOutput: number; geminiInput: number }[];
-  byDocType: Record<string, { input: number; output: number; count: number }>;
+  totals: { groqInput: number; groqOutput: number; openaiInput: number; openaiOutput: number; geminiInput: number };
+  byDay: { date: string; groqInput: number; groqOutput: number; openaiInput: number; openaiOutput: number; geminiInput: number }[];
+  byDocType: Record<string, { groqInput: number; groqOutput: number; openaiInput: number; openaiOutput: number; count: number }>;
 }
 
 
@@ -64,16 +64,21 @@ export default function UsagePage() {
     );
   }
 
-  const totals = usage?.totals ?? { openaiInput: 0, openaiOutput: 0, geminiInput: 0 };
+  const totals = usage?.totals ?? { groqInput: 0, groqOutput: 0, openaiInput: 0, openaiOutput: 0, geminiInput: 0 };
   const byDay = usage?.byDay ?? [];
   const byDocType = usage?.byDocType ?? {};
 
-  // GPT-4o pricing: $2.50/M input, $10.00/M output
+  // Groq deepseek-r1-distill-llama-70b: $0.15/M input, $0.60/M output
+  const groqCostInput  = (totals.groqInput  / 1_000_000) * 0.15;
+  const groqCostOutput = (totals.groqOutput / 1_000_000) * 0.60;
+  const totalGroqCost  = groqCostInput + groqCostOutput;
+
+  // GPT-4o: $2.50/M input, $10.00/M output
   const openaiCostInput  = (totals.openaiInput  / 1_000_000) * 2.50;
   const openaiCostOutput = (totals.openaiOutput / 1_000_000) * 10.00;
   const totalOpenaiCost  = openaiCostInput + openaiCostOutput;
 
-  // Gemini text-embedding-004: $0.025/M tokens (≤128k), free tier for small usage
+  // Gemini text-embedding-004: $0.025/M tokens
   const geminiCost = (totals.geminiInput / 1_000_000) * 0.025;
 
   return (
@@ -88,6 +93,34 @@ export default function UsagePage() {
               Consumo de tokens nos últimos {usage?.period ?? 30} dias
             </p>
           </div>
+
+          {/* Card Groq — histórico */}
+          {totals.groqInput > 0 && (
+            <div className="rounded-lg border p-5 space-y-3">
+              <div className="flex items-center gap-2 text-sm font-medium">
+                <Cpu size={14} className="text-muted-foreground" />
+                Groq — Histórico (deepseek-r1-distill-llama-70b)
+                <span className="ml-auto text-xs text-muted-foreground font-normal">migrado para OpenAI</span>
+              </div>
+              <div className="grid grid-cols-3 gap-3">
+                <div>
+                  <p className="text-xs text-muted-foreground">Input</p>
+                  <p className="text-2xl font-semibold">{fmt(totals.groqInput)}</p>
+                  <p className="text-xs text-muted-foreground mt-0.5">US$ {groqCostInput.toFixed(4)}</p>
+                </div>
+                <div>
+                  <p className="text-xs text-muted-foreground">Output</p>
+                  <p className="text-2xl font-semibold">{fmt(totals.groqOutput)}</p>
+                  <p className="text-xs text-muted-foreground mt-0.5">US$ {groqCostOutput.toFixed(4)}</p>
+                </div>
+                <div>
+                  <p className="text-xs text-muted-foreground">Custo estimado total</p>
+                  <p className="text-2xl font-semibold">US$ {totalGroqCost.toFixed(4)}</p>
+                  <p className="text-xs text-muted-foreground mt-0.5">$0.15/M in · $0.60/M out</p>
+                </div>
+              </div>
+            </div>
+          )}
 
           {/* Card OpenAI */}
           <div className="rounded-lg border p-5 space-y-3">
@@ -112,6 +145,9 @@ export default function UsagePage() {
                 <p className="text-xs text-muted-foreground mt-0.5">$2.50/M in · $10.00/M out</p>
               </div>
             </div>
+            {totals.openaiInput === 0 && (
+              <p className="text-xs text-muted-foreground">Nenhum uso ainda — aparecerá após a primeira geração com GPT-4o.</p>
+            )}
           </div>
 
           {/* Card Gemini */}
@@ -150,19 +186,24 @@ export default function UsagePage() {
                       <th className="px-4 py-2.5 text-right font-medium">Gerações</th>
                       <th className="px-4 py-2.5 text-right font-medium">Input</th>
                       <th className="px-4 py-2.5 text-right font-medium">Output</th>
-                      <th className="px-4 py-2.5 text-right font-medium">Custo est.</th>
+                      <th className="px-4 py-2.5 text-right font-medium">Custo Groq est.</th>
+                      <th className="px-4 py-2.5 text-right font-medium">Custo OpenAI est.</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y">
                     {Object.entries(byDocType).map(([type, d]) => {
-                      const cost = (d.input / 1_000_000) * 2.50 + (d.output / 1_000_000) * 10.00;
+                      const groqCost   = (d.groqInput   / 1_000_000) * 0.15 + (d.groqOutput   / 1_000_000) * 0.60;
+                      const openaiCost = (d.openaiInput / 1_000_000) * 2.50 + (d.openaiOutput / 1_000_000) * 10.00;
+                      const totalInput  = d.groqInput  + d.openaiInput;
+                      const totalOutput = d.groqOutput + d.openaiOutput;
                       return (
                         <tr key={type} className="hover:bg-muted/20">
                           <td className="px-4 py-2.5 font-medium">{DOC_LABELS[type] ?? type}</td>
                           <td className="px-4 py-2.5 text-right text-muted-foreground">{d.count}</td>
-                          <td className="px-4 py-2.5 text-right">{fmt(d.input)}</td>
-                          <td className="px-4 py-2.5 text-right">{fmt(d.output)}</td>
-                          <td className="px-4 py-2.5 text-right">US$ {cost.toFixed(4)}</td>
+                          <td className="px-4 py-2.5 text-right">{fmt(totalInput)}</td>
+                          <td className="px-4 py-2.5 text-right">{fmt(totalOutput)}</td>
+                          <td className="px-4 py-2.5 text-right">{groqCost > 0 ? `US$ ${groqCost.toFixed(4)}` : "—"}</td>
+                          <td className="px-4 py-2.5 text-right">{openaiCost > 0 ? `US$ ${openaiCost.toFixed(4)}` : "—"}</td>
                         </tr>
                       );
                     })}
@@ -181,20 +222,26 @@ export default function UsagePage() {
                   <thead className="bg-muted/50 text-muted-foreground">
                     <tr>
                       <th className="px-4 py-2.5 text-left font-medium">Data</th>
-                      <th className="px-4 py-2.5 text-right font-medium">OpenAI Input</th>
-                      <th className="px-4 py-2.5 text-right font-medium">OpenAI Output</th>
-                      <th className="px-4 py-2.5 text-right font-medium">Gemini Input</th>
-                      <th className="px-4 py-2.5 text-right font-medium">Custo OpenAI</th>
+                      <th className="px-4 py-2.5 text-right font-medium">Groq In</th>
+                      <th className="px-4 py-2.5 text-right font-medium">Groq Out</th>
+                      <th className="px-4 py-2.5 text-right font-medium">OpenAI In</th>
+                      <th className="px-4 py-2.5 text-right font-medium">OpenAI Out</th>
+                      <th className="px-4 py-2.5 text-right font-medium">Gemini In</th>
+                      <th className="px-4 py-2.5 text-right font-medium">Custo est.</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y">
                     {[...byDay].reverse().map((d) => {
-                      const cost = (d.openaiInput / 1_000_000) * 2.50 + (d.openaiOutput / 1_000_000) * 10.00;
+                      const cost =
+                        (d.groqInput   / 1_000_000) * 0.15  + (d.groqOutput   / 1_000_000) * 0.60 +
+                        (d.openaiInput / 1_000_000) * 2.50  + (d.openaiOutput / 1_000_000) * 10.00;
                       return (
                         <tr key={d.date} className="hover:bg-muted/20">
                           <td className="px-4 py-2.5 text-muted-foreground">
                             {new Date(d.date + "T12:00:00").toLocaleDateString("pt-BR")}
                           </td>
+                          <td className="px-4 py-2.5 text-right">{fmt(d.groqInput)}</td>
+                          <td className="px-4 py-2.5 text-right">{fmt(d.groqOutput)}</td>
                           <td className="px-4 py-2.5 text-right">{fmt(d.openaiInput)}</td>
                           <td className="px-4 py-2.5 text-right">{fmt(d.openaiOutput)}</td>
                           <td className="px-4 py-2.5 text-right">{fmt(d.geminiInput)}</td>

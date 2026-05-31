@@ -343,14 +343,19 @@ export async function adminRoutes(app: FastifyInstance) {
         orderBy: { createdAt: "asc" },
       });
 
-      // Agrega por dia + serviço
-      const byDay: Record<string, { date: string; openaiInput: number; openaiOutput: number; geminiInput: number }> = {};
-      let totalOpenaiInput = 0, totalOpenaiOutput = 0, totalGeminiInput = 0;
+      // Agrega por dia + serviço (groq e openai separados)
+      const byDay: Record<string, { date: string; groqInput: number; groqOutput: number; openaiInput: number; openaiOutput: number; geminiInput: number }> = {};
+      let totalGroqInput = 0, totalGroqOutput = 0, totalOpenaiInput = 0, totalOpenaiOutput = 0, totalGeminiInput = 0;
 
       for (const log of logs) {
         const date = log.createdAt.toISOString().slice(0, 10);
-        if (!byDay[date]) byDay[date] = { date, openaiInput: 0, openaiOutput: 0, geminiInput: 0 };
-        if (log.service === "groq" || log.service === "openai") {
+        if (!byDay[date]) byDay[date] = { date, groqInput: 0, groqOutput: 0, openaiInput: 0, openaiOutput: 0, geminiInput: 0 };
+        if (log.service === "groq") {
+          byDay[date].groqInput  += log.inputTokens;
+          byDay[date].groqOutput += log.outputTokens;
+          totalGroqInput  += log.inputTokens;
+          totalGroqOutput += log.outputTokens;
+        } else if (log.service === "openai") {
           byDay[date].openaiInput  += log.inputTokens;
           byDay[date].openaiOutput += log.outputTokens;
           totalOpenaiInput  += log.inputTokens;
@@ -361,19 +366,24 @@ export async function adminRoutes(app: FastifyInstance) {
         }
       }
 
-      // Agrega por tipo de documento
-      const byDocType: Record<string, { input: number; output: number; count: number }> = {};
+      // Agrega por tipo de documento (separado por serviço)
+      const byDocType: Record<string, { groqInput: number; groqOutput: number; openaiInput: number; openaiOutput: number; count: number }> = {};
       for (const log of logs.filter((l: (typeof logs)[0]) => (l.service === "groq" || l.service === "openai") && l.docType)) {
         const k = log.docType!;
-        if (!byDocType[k]) byDocType[k] = { input: 0, output: 0, count: 0 };
-        byDocType[k].input  += log.inputTokens;
-        byDocType[k].output += log.outputTokens;
-        byDocType[k].count  += 1;
+        if (!byDocType[k]) byDocType[k] = { groqInput: 0, groqOutput: 0, openaiInput: 0, openaiOutput: 0, count: 0 };
+        if (log.service === "groq") {
+          byDocType[k].groqInput  += log.inputTokens;
+          byDocType[k].groqOutput += log.outputTokens;
+        } else {
+          byDocType[k].openaiInput  += log.inputTokens;
+          byDocType[k].openaiOutput += log.outputTokens;
+        }
+        byDocType[k].count += 1;
       }
 
       return {
         period,
-        totals: { openaiInput: totalOpenaiInput, openaiOutput: totalOpenaiOutput, geminiInput: totalGeminiInput },
+        totals: { groqInput: totalGroqInput, groqOutput: totalGroqOutput, openaiInput: totalOpenaiInput, openaiOutput: totalOpenaiOutput, geminiInput: totalGeminiInput },
         byDay: Object.values(byDay).sort((a, b) => a.date.localeCompare(b.date)),
         byDocType,
       };
