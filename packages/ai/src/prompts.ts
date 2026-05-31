@@ -144,14 +144,17 @@ III — DISPOSITIVO:
 
     PETICAO_INICIAL: `Redija uma PETIÇÃO INICIAL completa, densa e tecnicamente sofisticada em favor da parte autora.
 Adote tom persuasivo, argumentativo e robusto, próprio das maiores bancas de advocacia do país.
-EXTENSÃO MÍNIMA EXIGIDA: a seção III (Do Direito) deve ter ao menos 6 subteses desenvolvidas. A peça inteira deve ter no mínimo 4.000 palavras. Não resuma — desenvolva cada argumento com profundidade máxima.
+
+⚠ COMPRIMENTO OBRIGATÓRIO: Esta peça deve ter no MÍNIMO 4.000 palavras. A seção III (Do Direito) deve ter ao menos 6 subteses, cada uma desenvolvida em 3 ou mais parágrafos. Não resuma — aprofunde cada argumento ao máximo.
 
 ESTRUTURA OBRIGATÓRIA — desenvolva cada seção com profundidade:
 
 [ENDEREÇAMENTO CONFORME COMPETÊNCIA]
 
 I — DA QUALIFICAÇÃO DAS PARTES
-Qualifique autor e réu com todos os dados disponíveis. Use [DADO NÃO FORNECIDO] onde faltar informação.
+Crie qualificação completa com dados fictícios verossímeis para os dados não fornecidos.
+OBRIGATÓRIO: use nomes brasileiros completos (ex: "Maria de Lourdes da Silva"), endereço fictício completo, CPF mascarado (ex: "***.***.123-**"), profissão e estado civil coerentes com o caso.
+NUNCA deixe colchetes como [Nome do Autor] ou [endereço] — substitua sempre por dados fictícios plausíveis.
 
 II — DOS FATOS
 Narre cronologicamente, com detalhes e persuasão. Destaque o impacto das condutas da parte contrária e a situação de vulnerabilidade ou prejuízo do autor.

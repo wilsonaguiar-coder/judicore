@@ -9,10 +9,12 @@ export async function* generateDocumentStream(
   const { type, caseDescription, jurisprudencias, instruction } = params;
   const client = getOpenAIClient();
 
+  const isPostulatorio = type === "PETICAO_INICIAL" || type === "RECURSO";
+
   const stream = await client.chat.completions.create({
     model: MODEL,
     max_tokens: 16384,
-    temperature: 0.7,
+    temperature: isPostulatorio ? 0.9 : 0.7,
     messages: [
       { role: "system", content: buildSystemPrompt() },
       { role: "user", content: buildDocumentPrompt(type, caseDescription, jurisprudencias, instruction) },
