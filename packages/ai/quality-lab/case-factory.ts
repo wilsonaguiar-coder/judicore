@@ -1,43 +1,98 @@
 // Gerador de casos sintéticos do Quality Lab.
 //
-// generateSyntheticCases(count, areaFilter?)
-//   Distribui o total proporcionalmente pelas 5 áreas. Dentro de cada área,
-//   itera ciclicamente pelos templates definidos em case-templates.ts.
+// Distribuição obrigatória:
+//   20 temas × 4 fases (PETICAO_INICIAL, RECURSO, DECISAO, SENTENCA) = 80 casos
+//   + 20 despachos (ciclando entre 5 templates de despacho)
+//   = 100 casos totais.
 //
-// Quando count=100 (default):
-//   - 20 RPPS, 20 RGPS, 20 TRABALHISTA, 20 CRIMINAL, 20 CIVEL.
+// 30% dos casos (30) recebem armadilhas jurídicas (traps) distribuídas
+// deterministicamente por índice. As traps são compatíveis com a área/fase
+// — armadilhas inaplicáveis viram no-ops.
 //
-// Quando areaFilter está presente, todos os casos vêm da área especificada.
+// Argumentos opcionais:
+//   --count=N    limita aos N primeiros casos do plano
+//   --area=X     filtra para uma área específica (afeta apenas os 80 com tema;
+//                despachos não respondem à área)
+//   --dry-run    grava cases.json sem chamar OpenAI
 
 import { writeFile, mkdir } from "node:fs/promises";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
-import type { LegalArea, SyntheticCase } from "./case-types.js";
-import { TEMPLATES_BY_AREA } from "./case-templates.js";
+import type { SyntheticCase, LegalArea, TrapKind } from "./case-types.js";
+import { THEMES, PHASE_BUILDERS, buildDespacho } from "./case-templates.js";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
-export function generateSyntheticCases(count = 100, areaFilter?: LegalArea): SyntheticCase[] {
-  const cases: SyntheticCase[] = [];
-  const areas: LegalArea[] = areaFilter
-    ? [areaFilter]
-    : ["RPPS", "RGPS", "TRABALHISTA", "CRIMINAL", "CIVEL"];
-  const perArea = Math.floor(count / areas.length);
-  const remainder = count - perArea * areas.length;
+const PHASES = ["PETICAO_INICIAL", "RECURSO", "DECISAO", "SENTENCA"] as const;
+type Phase = typeof PHASES[number];
 
-  for (let a = 0; a < areas.length; a++) {
-    const area = areas[a]!;
-    const templates = TEMPLATES_BY_AREA[area];
-    const areaCount = perArea + (a < remainder ? 1 : 0);
-    for (let i = 0; i < areaCount; i++) {
-      const template = templates[i % templates.length]!;
-      cases.push(template(i));
-    }
+// Distribuição determinística de traps. ~30% dos casos.
+// Cada slot (theme×phase ou despacho idx) recebe uma trap se atender ao critério.
+function decideTrap(slotIndex: number, area: LegalArea, phase: Phase | "DESPACHO"): TrapKind | undefined {
+  // Critério: roda traps em índices específicos (cobrindo ~30%)
+  const trapEvery3 = slotIndex % 3 === 0;
+  if (!trapEvery3) return undefined;
+
+  const cycleIdx = Math.floor(slotIndex / 3);
+  const trapTable: TrapKind[] = [
+    "JURISPRUDENCIA_CONTRARIA",
+    "ARTIGO_INCOMPATIVEL",
+    "RECURSO_INADEQUADO",
+    "COMPETENCIA_INCORRETA",
+    "TESE_EQUIVOCADA",
+    "PRECEDENTE_SUPERADO",
+    "FATO_INCOMPLETO",
+    "LINGUAGEM_DECISORIA",
+  ];
+
+  let kind = trapTable[cycleIdx % trapTable.length]!;
+
+  // Compatibilidade trap×fase×área (degrada para algo aplicável)
+  if (kind === "RECURSO_INADEQUADO" && phase !== "RECURSO") kind = "ARTIGO_INCOMPATIVEL";
+  if (kind === "COMPETENCIA_INCORRETA" && phase !== "RECURSO") kind = "JURISPRUDENCIA_CONTRARIA";
+  if (kind === "LINGUAGEM_DECISORIA" && phase !== "DESPACHO") kind = "ARTIGO_INCOMPATIVEL";
+  if (kind === "ARTIGO_INCOMPATIVEL" && !["RPPS", "RGPS", "CRIMINAL"].includes(area)) {
+    kind = "JURISPRUDENCIA_CONTRARIA";
   }
-  return cases;
+  // RECURSO_INADEQUADO só faz sentido em TRABALHISTA / JEF (não temos JEF aqui)
+  if (kind === "RECURSO_INADEQUADO" && area !== "TRABALHISTA") kind = "JURISPRUDENCIA_CONTRARIA";
+  if (kind === "COMPETENCIA_INCORRETA" && area !== "TRABALHISTA") kind = "JURISPRUDENCIA_CONTRARIA";
+
+  return kind;
 }
 
-// ── CLI: salva os casos em output/cases.json (apenas para inspeção) ──────────
+export function generateSyntheticCases(count = 100, areaFilter?: LegalArea): SyntheticCase[] {
+  const cases: SyntheticCase[] = [];
+
+  // 80 casos: 20 temas × 4 fases
+  const themesToUse = areaFilter
+    ? THEMES.filter((t) => t.build(0).area === areaFilter)
+    : THEMES;
+
+  let slot = 0;
+  for (const theme of themesToUse) {
+    const narrative = theme.build(slot);
+    for (const phase of PHASES) {
+      const trap = decideTrap(slot, narrative.area, phase);
+      const builder = PHASE_BUILDERS[phase];
+      cases.push(builder(narrative, slot, trap));
+      slot++;
+    }
+  }
+
+  // 20 despachos (só geramos quando não há filtro de área OU quando o filtro
+  // é compatível com algum template — atualmente despachos cobrem várias áreas)
+  if (!areaFilter) {
+    for (let i = 0; i < 20; i++) {
+      const trap = i % 4 === 0 ? "LINGUAGEM_DECISORIA" : undefined;
+      cases.push(buildDespacho(slot + i, trap));
+    }
+  }
+
+  return cases.slice(0, count);
+}
+
+// ── CLI ───────────────────────────────────────────────────────────────────────
 
 async function main(): Promise<void> {
   const args = process.argv.slice(2);
@@ -49,16 +104,29 @@ async function main(): Promise<void> {
 
   const outDir = join(__dirname, "output");
   await mkdir(outDir, { recursive: true });
-  const outPath = join(outDir, "cases.json");
-  await writeFile(outPath, JSON.stringify(cases, null, 2), "utf8");
+  await writeFile(join(outDir, "cases.json"), JSON.stringify(cases, null, 2), "utf8");
+
+  // Sumário
+  const byArea = new Map<string, number>();
+  const byType = new Map<string, number>();
+  const byTrap = new Map<string, number>();
+  let withTrap = 0;
+  for (const c of cases) {
+    byArea.set(c.area, (byArea.get(c.area) ?? 0) + 1);
+    byType.set(c.documentType, (byType.get(c.documentType) ?? 0) + 1);
+    if (c.trap) {
+      withTrap++;
+      byTrap.set(c.trap, (byTrap.get(c.trap) ?? 0) + 1);
+    }
+  }
 
   console.log(`[case-factory] Geração concluída`);
-  console.log(`  total:  ${cases.length}`);
-  console.log(`  por área:`);
-  const byArea = new Map<string, number>();
-  for (const c of cases) byArea.set(c.area, (byArea.get(c.area) ?? 0) + 1);
-  for (const [a, n] of byArea) console.log(`    ${a}: ${n}`);
-  console.log(`  arquivo: ${outPath}`);
+  console.log(`  total:           ${cases.length}`);
+  console.log(`  por área:        ${[...byArea].map(([k, v]) => `${k}=${v}`).join(", ")}`);
+  console.log(`  por documento:   ${[...byType].map(([k, v]) => `${k}=${v}`).join(", ")}`);
+  console.log(`  com traps:       ${withTrap} (${Math.round((withTrap / cases.length) * 100)}%)`);
+  console.log(`  por tipo trap:   ${[...byTrap].map(([k, v]) => `${k}=${v}`).join(", ")}`);
+  console.log(`  arquivo:         ${join(outDir, "cases.json")}`);
 }
 
 const isMain = import.meta.url === `file://${process.argv[1]?.replace(/\\/g, "/")}` ||

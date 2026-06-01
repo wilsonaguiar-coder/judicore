@@ -9,27 +9,87 @@ import type {
 
 export type LegalArea = "RPPS" | "RGPS" | "TRABALHISTA" | "CRIMINAL" | "CIVEL";
 
+// Tipos de armadilhas jurídicas inseridas em ~30% dos casos
+export type TrapKind =
+  | "JURISPRUDENCIA_CONTRARIA"   // precedente contrário não distinguido
+  | "ARTIGO_INCOMPATIVEL"        // ex: RPPS com art. 201 CF, criminal com art. 85 CPC
+  | "RECURSO_INADEQUADO"         // ex: trabalhista com apelação, JEF com apelação
+  | "COMPETENCIA_INCORRETA"      // ex: STJ em matéria trabalhista
+  | "TESE_EQUIVOCADA"            // tese juridicamente errada
+  | "PRECEDENTE_SUPERADO"        // súmula/precedente já revogado
+  | "FATO_INCOMPLETO"            // descrição faltando elementos essenciais
+  | "LINGUAGEM_DECISORIA";       // despacho com "defiro/julgo"
+
 export interface SyntheticCase {
   id: string;
   area: LegalArea;
   documentType: TipoPeca;
+  theme: string;                 // chave do tema (ex: "rpps_paridade")
+  themeLabel: string;            // rótulo legível
   title: string;
   caseDescription: string;
   instruction?: string;
   jurisprudencias?: JurisprudenciaInput[];
-  expectedBehavior?: {
-    expectedMode?: GenerationMode;
-    mustContain?: string[];
-    mustNotContain?: string[];
-    shouldUseDistinguishing?: boolean;
-  };
+  trap?: TrapKind;               // armadilha inserida (se houver)
+  expectedRulesIfTrap?: string[]; // regras esperadas como crítica quando há trap
+}
+
+export type ValidatorComponent =
+  | "EvidenceAnalyzer"
+  | "LegalValidator"
+  | "AppealValidator"
+  | "StructuralValidator"
+  | "FinalValidator"
+  | "JurisprudenceValidator"
+  | "GenericityValidator"
+  | "MatrixQualityValidator"
+  | "RichnessValidator"
+  | "Other";
+
+/** Mapeia uma rule de ValidationError para o validator que a emitiu. */
+export function mapRuleToValidator(rule: string): ValidatorComponent {
+  if (rule.startsWith("EVIDENCE_")) return "EvidenceAnalyzer";
+  if (rule.startsWith("MATRIX_")) return "MatrixQualityValidator";
+  if (rule.startsWith("RICHNESS_") || rule === "FINAL_DRAFT_GENERIC_LANGUAGE") return "RichnessValidator";
+  if (
+    rule === "JUR_MARKER_IN_DRAFT" ||
+    rule === "GENERIC_JURISPRUDENCE" ||
+    rule === "TRIBUNAL_MISMATCH"
+  ) return "JurisprudenceValidator";
+  if (
+    rule === "INCOMPATIBLE_APPEAL" ||
+    rule === "WRONG_SUPERIOR_COURT" ||
+    rule === "JEF_JEC_WRONG_APPEAL" ||
+    rule === "CRIMINAL_WRONG_APPEAL"
+  ) return "AppealValidator";
+  if (
+    rule === "MISSING_STRUCTURE" ||
+    rule === "DESPACHO_WITH_DECISION_LANGUAGE" ||
+    rule === "FORBIDDEN_STRUCTURE"
+  ) return "StructuralValidator";
+  if (
+    rule === "RPPS_WRONG_ARTICLE" ||
+    rule === "RGPS_WRONG_ARTICLE" ||
+    rule === "WRONG_HONORARIOS" ||
+    rule === "WRONG_HONORARIOS_CRIMINAL" ||
+    rule === "BLOCKED_ARTICLE" ||
+    rule === "PROHIBITED_TERM" ||
+    rule === "CRIMINAL_WRONG_TERM" ||
+    rule === "REQUIRED_FIELD" ||
+    rule === "LOW_CONFIDENCE"
+  ) return "LegalValidator";
+  return "Other";
 }
 
 export interface CaseResult {
   caseId: string;
   area: LegalArea;
   documentType: TipoPeca;
+  theme: string;
+  themeLabel: string;
   title: string;
+  trap?: TrapKind;
+  trapDetected?: boolean;        // true se ao menos uma regra esperada foi emitida
   status: "success" | "error";
   errorMessage?: string;
   mode?: GenerationMode;
@@ -46,24 +106,7 @@ export interface CaseResult {
   durationMs: number;
 }
 
-export interface RunSummary {
-  generatedAt: string;
-  totalCases: number;
-  succeeded: number;
-  failed: number;
-  approved: number;             // MINUTA APROVADA
-  approvedWithCaveats: number;  // APROVADA COM RESSALVAS
-  rejected: number;             // REPROVADA
-  avgScore: number;
-  totalInputTokens: number;
-  totalOutputTokens: number;
-  totalCostUsd: number;
-  avgDurationMs: number;
-  byArea: Record<LegalArea, AreaStats>;
-  byDocumentType: Record<string, AreaStats>;
-  topCriticalRules: { rule: string; count: number }[];
-  results: CaseResult[];
-}
+// ── Estatísticas ─────────────────────────────────────────────────────────────
 
 export interface AreaStats {
   total: number;
@@ -73,7 +116,48 @@ export interface AreaStats {
   avgScore: number;
 }
 
-// Pricing aproximado do gpt-4.1 (USD/1M tokens)
+export interface ThemeStats extends AreaStats {
+  themeLabel: string;
+  area: LegalArea;
+  trapTotal: number;
+  trapDetected: number;
+  topCriticalRules: { rule: string; count: number }[];
+}
+
+export interface ValidatorStats {
+  fatal: number;
+  nonFatal: number;
+  topRules: { rule: string; count: number }[];
+}
+
+export interface RunSummary {
+  generatedAt: string;
+  totalCases: number;
+  succeeded: number;
+  failed: number;
+  approved: number;
+  approvedWithCaveats: number;
+  rejected: number;
+  avgScore: number;
+  totalInputTokens: number;
+  totalOutputTokens: number;
+  totalCostUsd: number;
+  avgDurationMs: number;
+  byArea: Record<LegalArea, AreaStats>;
+  byDocumentType: Record<string, AreaStats>;
+  byTheme: Record<string, ThemeStats>;
+  byValidator: Record<ValidatorComponent, ValidatorStats>;
+  trapStats: {
+    totalWithTraps: number;
+    detected: number;
+    missed: number;
+    byKind: Record<string, { total: number; detected: number }>;
+  };
+  topCriticalRules: { rule: string; count: number }[];
+  results: CaseResult[];
+}
+
+// ── Pricing aproximado do gpt-4.1 ────────────────────────────────────────────
 export const GPT41_INPUT_USD_PER_1M = 2.0;
 export const GPT41_OUTPUT_USD_PER_1M = 8.0;
 

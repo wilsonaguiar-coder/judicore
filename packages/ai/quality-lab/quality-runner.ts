@@ -115,10 +115,17 @@ async function runOneCase(fx: SyntheticCase): Promise<CaseResult> {
   const durationMs = Date.now() - start;
   const cost = estimateCost(inputTokens, outputTokens);
 
+  const emittedRules = validationErrors.map((e) => e.rule);
+  const trapDetected = fx.trap && fx.expectedRulesIfTrap && fx.expectedRulesIfTrap.length > 0
+    ? fx.expectedRulesIfTrap.some((rule) => emittedRules.includes(rule))
+    : undefined;
+
   const result: CaseResult = {
     caseId: fx.id,
     area: fx.area,
     documentType: fx.documentType,
+    theme: fx.theme,
+    themeLabel: fx.themeLabel,
     title: fx.title,
     status: errorMessage ? "error" : "success",
     validationErrors: validationErrors.map((e) => ({
@@ -137,6 +144,8 @@ async function runOneCase(fx: SyntheticCase): Promise<CaseResult> {
   if (documentStatus) result.documentStatus = documentStatus;
   if (audit) result.score = audit.score;
   if (safeMessage) result.safeMessage = safeMessage;
+  if (fx.trap) result.trap = fx.trap;
+  if (trapDetected !== undefined) result.trapDetected = trapDetected;
   if (draft) {
     result.draft = draft;
     result.draftExcerpt = draft.slice(0, 600);
@@ -175,7 +184,8 @@ async function main(): Promise<void> {
 
   for (let i = 0; i < cases.length; i++) {
     const fx = cases[i]!;
-    process.stdout.write(`[quality-runner] (${i + 1}/${cases.length}) ${fx.id} [${fx.area}/${fx.documentType}] ... `);
+    const trapTag = fx.trap ? ` [trap:${fx.trap}]` : "";
+    process.stdout.write(`[quality-runner] (${i + 1}/${cases.length}) ${fx.id} [${fx.documentType}/${fx.area}]${trapTag} ... `);
     try {
       const r = await runOneCase(fx);
       results.push(r);

@@ -1,132 +1,206 @@
-// Gera relatório agregado (HTML + JSON sumarizado) a partir de results.json.
+// Gera relatório agregado (HTML + JSON) a partir de results.json.
 //
-// Mostra:
-//   - totais e taxas
-//   - score médio global, por área e por tipo de peça
-//   - top regras críticas
-//   - lista de casos com status, score, erros e trecho
+// Seções:
+//   - Resumo geral
+//   - Por tipo de documento (score médio, taxas)
+//   - Por tema (score médio, erros críticos, trap detection)
+//   - Por validator (Evidence, Legal, Appeal, Structural, Final etc.)
+//   - Por área (compatibilidade)
+//   - Lista de casos
 
 import { readFile, writeFile, mkdir } from "node:fs/promises";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
-import type {
-  CaseResult,
-  RunSummary,
-  AreaStats,
-  LegalArea,
+import {
+  mapRuleToValidator,
+  type CaseResult,
+  type RunSummary,
+  type AreaStats,
+  type ThemeStats,
+  type ValidatorStats,
+  type ValidatorComponent,
+  type LegalArea,
 } from "./case-types.js";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const OUTPUT_DIR = join(__dirname, "output");
 
-function emptyAreaStats(): AreaStats {
+function emptyArea(): AreaStats {
   return { total: 0, approved: 0, withCaveats: 0, rejected: 0, avgScore: 0 };
 }
 
 function emptyByArea(): Record<LegalArea, AreaStats> {
   return {
-    RPPS: emptyAreaStats(),
-    RGPS: emptyAreaStats(),
-    TRABALHISTA: emptyAreaStats(),
-    CRIMINAL: emptyAreaStats(),
-    CIVEL: emptyAreaStats(),
+    RPPS: emptyArea(), RGPS: emptyArea(), TRABALHISTA: emptyArea(),
+    CRIMINAL: emptyArea(), CIVEL: emptyArea(),
   };
+}
+
+function emptyValidator(): ValidatorStats {
+  return { fatal: 0, nonFatal: 0, topRules: [] };
+}
+
+function emptyByValidator(): Record<ValidatorComponent, ValidatorStats> {
+  return {
+    EvidenceAnalyzer: emptyValidator(),
+    LegalValidator: emptyValidator(),
+    AppealValidator: emptyValidator(),
+    StructuralValidator: emptyValidator(),
+    FinalValidator: emptyValidator(),
+    JurisprudenceValidator: emptyValidator(),
+    GenericityValidator: emptyValidator(),
+    MatrixQualityValidator: emptyValidator(),
+    RichnessValidator: emptyValidator(),
+    Other: emptyValidator(),
+  };
+}
+
+function topN(map: Map<string, number>, n: number): { rule: string; count: number }[] {
+  return [...map.entries()].sort((a, b) => b[1] - a[1]).slice(0, n).map(([rule, count]) => ({ rule, count }));
+}
+
+function applyStatus(stats: AreaStats, status: string | undefined): void {
+  if (status === "MINUTA APROVADA") stats.approved++;
+  else if (status === "APROVADA COM RESSALVAS") stats.withCaveats++;
+  else if (status === "REPROVADA") stats.rejected++;
 }
 
 function summarize(results: CaseResult[]): RunSummary {
   const byArea = emptyByArea();
   const byDocumentType: Record<string, AreaStats> = {};
+  const byTheme: Record<string, ThemeStats> = {};
+  const byValidator = emptyByValidator();
   const ruleCounts = new Map<string, number>();
+  const themeRuleCounts = new Map<string, Map<string, number>>();
+  const validatorRuleCounts: Record<ValidatorComponent, Map<string, number>> = {
+    EvidenceAnalyzer: new Map(), LegalValidator: new Map(), AppealValidator: new Map(),
+    StructuralValidator: new Map(), FinalValidator: new Map(),
+    JurisprudenceValidator: new Map(), GenericityValidator: new Map(),
+    MatrixQualityValidator: new Map(), RichnessValidator: new Map(), Other: new Map(),
+  };
 
-  let approved = 0;
-  let approvedWithCaveats = 0;
-  let rejected = 0;
-  let succeeded = 0;
-  let failed = 0;
-  let scoreSum = 0;
-  let scoreN = 0;
-  let inputTokens = 0;
-  let outputTokens = 0;
-  let costUsd = 0;
-  let durationSum = 0;
-
-  // Per-area score accumulators
   const areaScoreSum: Record<LegalArea, number> = { RPPS: 0, RGPS: 0, TRABALHISTA: 0, CRIMINAL: 0, CIVEL: 0 };
   const areaScoreN: Record<LegalArea, number> = { RPPS: 0, RGPS: 0, TRABALHISTA: 0, CRIMINAL: 0, CIVEL: 0 };
   const docScoreSum: Record<string, number> = {};
   const docScoreN: Record<string, number> = {};
+  const themeScoreSum: Record<string, number> = {};
+  const themeScoreN: Record<string, number> = {};
+
+  let succeeded = 0, failed = 0;
+  let approved = 0, withCaveats = 0, rejected = 0;
+  let scoreSum = 0, scoreN = 0;
+  let inputTokens = 0, outputTokens = 0, costUsd = 0, durationSum = 0;
+
+  let totalWithTraps = 0, trapsDetected = 0;
+  const trapByKind = new Map<string, { total: number; detected: number }>();
 
   for (const r of results) {
-    if (r.status === "success") succeeded++;
-    else failed++;
-
+    if (r.status === "success") succeeded++; else failed++;
     if (r.documentStatus === "MINUTA APROVADA") approved++;
-    else if (r.documentStatus === "APROVADA COM RESSALVAS") approvedWithCaveats++;
+    else if (r.documentStatus === "APROVADA COM RESSALVAS") withCaveats++;
     else if (r.documentStatus === "REPROVADA") rejected++;
 
     if (typeof r.score === "number") {
-      scoreSum += r.score;
-      scoreN++;
-      areaScoreSum[r.area] += r.score;
-      areaScoreN[r.area]++;
+      scoreSum += r.score; scoreN++;
+      areaScoreSum[r.area] += r.score; areaScoreN[r.area]++;
       docScoreSum[r.documentType] = (docScoreSum[r.documentType] ?? 0) + r.score;
       docScoreN[r.documentType] = (docScoreN[r.documentType] ?? 0) + 1;
+      themeScoreSum[r.themeLabel] = (themeScoreSum[r.themeLabel] ?? 0) + r.score;
+      themeScoreN[r.themeLabel] = (themeScoreN[r.themeLabel] ?? 0) + 1;
     }
 
-    inputTokens += r.inputTokens;
-    outputTokens += r.outputTokens;
-    costUsd += r.estimatedCostUsd;
-    durationSum += r.durationMs;
+    inputTokens += r.inputTokens; outputTokens += r.outputTokens;
+    costUsd += r.estimatedCostUsd; durationSum += r.durationMs;
 
-    // Por área
+    // By area
     const a = byArea[r.area];
-    a.total++;
-    if (r.documentStatus === "MINUTA APROVADA") a.approved++;
-    else if (r.documentStatus === "APROVADA COM RESSALVAS") a.withCaveats++;
-    else if (r.documentStatus === "REPROVADA") a.rejected++;
+    a.total++; applyStatus(a, r.documentStatus);
 
-    // Por tipo de peça
-    if (!byDocumentType[r.documentType]) byDocumentType[r.documentType] = emptyAreaStats();
+    // By documentType
+    if (!byDocumentType[r.documentType]) byDocumentType[r.documentType] = emptyArea();
     const d = byDocumentType[r.documentType]!;
-    d.total++;
-    if (r.documentStatus === "MINUTA APROVADA") d.approved++;
-    else if (r.documentStatus === "APROVADA COM RESSALVAS") d.withCaveats++;
-    else if (r.documentStatus === "REPROVADA") d.rejected++;
+    d.total++; applyStatus(d, r.documentStatus);
 
-    // Regras críticas (fatal)
+    // By theme
+    if (!byTheme[r.themeLabel]) {
+      byTheme[r.themeLabel] = {
+        ...emptyArea(),
+        themeLabel: r.themeLabel,
+        area: r.area,
+        trapTotal: 0,
+        trapDetected: 0,
+        topCriticalRules: [],
+      };
+      themeRuleCounts.set(r.themeLabel, new Map());
+    }
+    const t = byTheme[r.themeLabel]!;
+    t.total++; applyStatus(t, r.documentStatus);
+
+    // Traps
+    if (r.trap) {
+      totalWithTraps++;
+      t.trapTotal++;
+      const bk = trapByKind.get(r.trap) ?? { total: 0, detected: 0 };
+      bk.total++;
+      if (r.trapDetected) {
+        trapsDetected++;
+        t.trapDetected++;
+        bk.detected++;
+      }
+      trapByKind.set(r.trap, bk);
+    }
+
+    // Validation errors
     for (const err of r.validationErrors) {
-      if (err.fatal) ruleCounts.set(err.rule, (ruleCounts.get(err.rule) ?? 0) + 1);
+      const validator = mapRuleToValidator(err.rule);
+      if (err.fatal) {
+        byValidator[validator].fatal++;
+        ruleCounts.set(err.rule, (ruleCounts.get(err.rule) ?? 0) + 1);
+        themeRuleCounts.get(r.themeLabel)!.set(
+          err.rule, (themeRuleCounts.get(r.themeLabel)!.get(err.rule) ?? 0) + 1,
+        );
+      } else {
+        byValidator[validator].nonFatal++;
+      }
+      const vMap = validatorRuleCounts[validator];
+      vMap.set(err.rule, (vMap.get(err.rule) ?? 0) + 1);
     }
   }
 
+  // Compute averages
   for (const area of Object.keys(byArea) as LegalArea[]) {
     byArea[area].avgScore = areaScoreN[area] > 0 ? areaScoreSum[area] / areaScoreN[area] : 0;
   }
   for (const dt of Object.keys(byDocumentType)) {
     byDocumentType[dt]!.avgScore = docScoreN[dt]! > 0 ? docScoreSum[dt]! / docScoreN[dt]! : 0;
   }
-
-  const topCriticalRules = [...ruleCounts.entries()]
-    .sort((a, b) => b[1] - a[1])
-    .slice(0, 10)
-    .map(([rule, count]) => ({ rule, count }));
+  for (const label of Object.keys(byTheme)) {
+    const t = byTheme[label]!;
+    t.avgScore = themeScoreN[label]! > 0 ? themeScoreSum[label]! / themeScoreN[label]! : 0;
+    t.topCriticalRules = topN(themeRuleCounts.get(label) ?? new Map(), 5);
+  }
+  for (const v of Object.keys(byValidator) as ValidatorComponent[]) {
+    byValidator[v].topRules = topN(validatorRuleCounts[v], 5);
+  }
 
   return {
     generatedAt: new Date().toISOString(),
     totalCases: results.length,
-    succeeded,
-    failed,
-    approved,
-    approvedWithCaveats,
-    rejected,
+    succeeded, failed,
+    approved, approvedWithCaveats: withCaveats, rejected,
     avgScore: scoreN > 0 ? scoreSum / scoreN : 0,
     totalInputTokens: inputTokens,
     totalOutputTokens: outputTokens,
     totalCostUsd: costUsd,
     avgDurationMs: results.length > 0 ? durationSum / results.length : 0,
-    byArea,
-    byDocumentType,
-    topCriticalRules,
+    byArea, byDocumentType, byTheme, byValidator,
+    trapStats: {
+      totalWithTraps,
+      detected: trapsDetected,
+      missed: totalWithTraps - trapsDetected,
+      byKind: Object.fromEntries(trapByKind),
+    },
+    topCriticalRules: topN(ruleCounts, 10),
     results,
   };
 }
@@ -137,62 +211,91 @@ function escapeHtml(s: string): string {
 
 function renderHtml(s: RunSummary): string {
   const passRate = s.totalCases > 0 ? Math.round(((s.approved + s.approvedWithCaveats) / s.totalCases) * 100) : 0;
+  const trapDetRate = s.trapStats.totalWithTraps > 0
+    ? Math.round((s.trapStats.detected / s.trapStats.totalWithTraps) * 100)
+    : 0;
 
-  const areaRows = (Object.entries(s.byArea) as [LegalArea, AreaStats][])
-    .map(([area, st]) => `
-      <tr>
-        <td><strong>${area}</strong></td>
-        <td>${st.total}</td>
-        <td class="ok">${st.approved}</td>
-        <td class="warn">${st.withCaveats}</td>
-        <td class="bad">${st.rejected}</td>
-        <td>${st.avgScore.toFixed(1)}</td>
-      </tr>
-    `).join("");
+  const areaRows = (Object.entries(s.byArea) as [LegalArea, AreaStats][]).map(([area, st]) => `
+    <tr>
+      <td><strong>${area}</strong></td>
+      <td>${st.total}</td>
+      <td class="ok">${st.approved}</td>
+      <td class="warn">${st.withCaveats}</td>
+      <td class="bad">${st.rejected}</td>
+      <td>${st.avgScore.toFixed(1)}</td>
+    </tr>`).join("");
 
-  const docRows = Object.entries(s.byDocumentType)
-    .map(([dt, st]) => `
-      <tr>
-        <td><strong>${dt}</strong></td>
-        <td>${st.total}</td>
-        <td class="ok">${st.approved}</td>
-        <td class="warn">${st.withCaveats}</td>
-        <td class="bad">${st.rejected}</td>
-        <td>${st.avgScore.toFixed(1)}</td>
-      </tr>
-    `).join("");
+  const docRows = Object.entries(s.byDocumentType).map(([dt, st]) => `
+    <tr>
+      <td><strong>${dt}</strong></td>
+      <td>${st.total}</td>
+      <td class="ok">${st.approved} <small>(${Math.round((st.approved / Math.max(st.total, 1)) * 100)}%)</small></td>
+      <td class="warn">${st.withCaveats} <small>(${Math.round((st.withCaveats / Math.max(st.total, 1)) * 100)}%)</small></td>
+      <td class="bad">${st.rejected} <small>(${Math.round((st.rejected / Math.max(st.total, 1)) * 100)}%)</small></td>
+      <td><strong>${st.avgScore.toFixed(1)}</strong></td>
+    </tr>`).join("");
 
-  const ruleRows = s.topCriticalRules
-    .map((r) => `<tr><td><code>${escapeHtml(r.rule)}</code></td><td>${r.count}</td></tr>`)
-    .join("");
+  const themeRows = Object.values(s.byTheme).map((t) => `
+    <tr>
+      <td><strong>${escapeHtml(t.themeLabel)}</strong><br><small class="muted">${escapeHtml(t.area)}</small></td>
+      <td>${t.total}</td>
+      <td><strong>${t.avgScore.toFixed(1)}</strong></td>
+      <td class="ok">${t.approved}</td>
+      <td class="warn">${t.withCaveats}</td>
+      <td class="bad">${t.rejected}</td>
+      <td>${t.trapTotal > 0 ? `${t.trapDetected}/${t.trapTotal}` : `<span class="muted">—</span>`}</td>
+      <td>${t.topCriticalRules.length > 0
+        ? t.topCriticalRules.map((r) => `<code>${escapeHtml(r.rule)}</code>×${r.count}`).join("<br>")
+        : `<span class="muted">—</span>`}</td>
+    </tr>`).join("");
 
-  const caseRows = s.results
-    .map((r) => {
-      const statusClass =
-        r.documentStatus === "MINUTA APROVADA" ? "ok" :
-        r.documentStatus === "APROVADA COM RESSALVAS" ? "warn" :
-        r.documentStatus === "REPROVADA" ? "bad" : "muted";
-      const errors = r.validationErrors.length
-        ? `<ul class="errors">${r.validationErrors.map((e) =>
-            `<li class="${e.fatal ? 'fatal' : 'nonfatal'}"><code>${escapeHtml(e.rule)}</code> — ${escapeHtml(e.message)}</li>`,
-          ).join("")}</ul>`
-        : `<span class="muted">—</span>`;
-      const excerpt = r.draftExcerpt
-        ? `<details><summary>Trecho</summary><pre>${escapeHtml(r.draftExcerpt)}</pre></details>`
-        : "";
-      return `
-        <tr class="row-${statusClass}">
-          <td><span class="badge ${statusClass}">${escapeHtml(r.documentStatus ?? r.status)}</span></td>
-          <td><strong>${escapeHtml(r.caseId)}</strong><br><small>${escapeHtml(r.title)}</small></td>
-          <td>${escapeHtml(r.area)}</td>
-          <td>${escapeHtml(r.documentType)}</td>
-          <td>${escapeHtml(r.mode ?? "—")}</td>
-          <td>${r.score ?? "—"}</td>
-          <td>${errors}${excerpt}</td>
-          <td><small>${r.inputTokens + r.outputTokens}tok<br>$${r.estimatedCostUsd.toFixed(4)}<br>${r.durationMs}ms</small></td>
-        </tr>
-      `;
-    }).join("");
+  const validatorRows = Object.entries(s.byValidator).map(([name, vs]) => `
+    <tr>
+      <td><strong>${escapeHtml(name)}</strong></td>
+      <td class="bad">${vs.fatal}</td>
+      <td class="warn">${vs.nonFatal}</td>
+      <td>${vs.topRules.length > 0
+        ? vs.topRules.map((r) => `<code>${escapeHtml(r.rule)}</code>×${r.count}`).join(", ")
+        : `<span class="muted">—</span>`}</td>
+    </tr>`).join("");
+
+  const trapRows = Object.entries(s.trapStats.byKind).map(([kind, stats]) => `
+    <tr>
+      <td><code>${escapeHtml(kind)}</code></td>
+      <td>${stats.total}</td>
+      <td class="ok">${stats.detected}</td>
+      <td class="bad">${stats.total - stats.detected}</td>
+      <td>${Math.round((stats.detected / Math.max(stats.total, 1)) * 100)}%</td>
+    </tr>`).join("");
+
+  const caseRows = s.results.map((r) => {
+    const statusClass =
+      r.documentStatus === "MINUTA APROVADA" ? "ok" :
+      r.documentStatus === "APROVADA COM RESSALVAS" ? "warn" :
+      r.documentStatus === "REPROVADA" ? "bad" : "muted";
+    const errors = r.validationErrors.length
+      ? `<ul class="errors">${r.validationErrors.map((e) =>
+          `<li class="${e.fatal ? 'fatal' : 'nonfatal'}"><code>${escapeHtml(e.rule)}</code> — ${escapeHtml(e.message)}</li>`,
+        ).join("")}</ul>`
+      : `<span class="muted">—</span>`;
+    const excerpt = r.draftExcerpt
+      ? `<details><summary>Trecho</summary><pre>${escapeHtml(r.draftExcerpt)}</pre></details>`
+      : "";
+    const trapInfo = r.trap
+      ? `<br><span class="badge ${r.trapDetected ? "ok" : "bad"}" title="${r.trapDetected ? "Trap detectada" : "Trap NÃO detectada"}">${escapeHtml(r.trap)}</span>`
+      : "";
+    return `
+      <tr class="row-${statusClass}">
+        <td><span class="badge ${statusClass}">${escapeHtml(r.documentStatus ?? r.status)}</span>${trapInfo}</td>
+        <td><strong>${escapeHtml(r.caseId)}</strong><br><small>${escapeHtml(r.title)}</small></td>
+        <td>${escapeHtml(r.area)}</td>
+        <td>${escapeHtml(r.documentType)}</td>
+        <td>${escapeHtml(r.mode ?? "—")}</td>
+        <td>${r.score ?? "—"}</td>
+        <td>${errors}${excerpt}</td>
+        <td><small>${r.inputTokens + r.outputTokens}tok<br>$${r.estimatedCostUsd.toFixed(4)}<br>${r.durationMs}ms</small></td>
+      </tr>`;
+  }).join("");
 
   return `<!doctype html>
 <html lang="pt-BR">
@@ -242,9 +345,9 @@ function renderHtml(s: RunSummary): string {
   <div class="summary">
     <div class="card total"><div class="v">${s.totalCases}</div><div>Casos</div></div>
     <div class="card ok"><div class="v">${s.approved}</div><div>MINUTA APROVADA</div></div>
-    <div class="card warn"><div class="v">${s.approvedWithCaveats}</div><div>APROVADA COM RESSALVAS</div></div>
+    <div class="card warn"><div class="v">${s.approvedWithCaveats}</div><div>COM RESSALVAS</div></div>
     <div class="card bad"><div class="v">${s.rejected}</div><div>REPROVADA</div></div>
-    <div class="card"><div class="v">${passRate}%</div><div>Aprovação (com ou sem ressalvas)</div></div>
+    <div class="card"><div class="v">${passRate}%</div><div>Aprovação</div></div>
     <div class="card"><div class="v">${s.avgScore.toFixed(1)}</div><div>Score médio</div></div>
   </div>
 
@@ -253,22 +356,37 @@ function renderHtml(s: RunSummary): string {
     <div class="card"><div class="v">$${s.totalCostUsd.toFixed(2)}</div><div>Custo estimado</div></div>
     <div class="card"><div class="v">${Math.round(s.avgDurationMs)}ms</div><div>Tempo médio</div></div>
     <div class="card bad"><div class="v">${s.failed}</div><div>Erros de execução</div></div>
+    <div class="card"><div class="v">${trapDetRate}%</div><div>Traps detectadas</div></div>
   </div>
 
-  <h2>Por área</h2>
-  <table>
-    <thead><tr><th>Área</th><th>Total</th><th>Aprovados</th><th>C/ ressalvas</th><th>Reprovados</th><th>Score médio</th></tr></thead>
-    <tbody>${areaRows}</tbody>
-  </table>
-
-  <h2>Por tipo de peça</h2>
+  <h2>Por tipo de documento</h2>
   <table>
     <thead><tr><th>Tipo</th><th>Total</th><th>Aprovados</th><th>C/ ressalvas</th><th>Reprovados</th><th>Score médio</th></tr></thead>
     <tbody>${docRows}</tbody>
   </table>
 
-  <h2>Top regras críticas (fatal)</h2>
-  ${ruleRows ? `<table><thead><tr><th>Regra</th><th>Ocorrências</th></tr></thead><tbody>${ruleRows}</tbody></table>` : `<p class="muted">Nenhuma regra crítica emitida.</p>`}
+  <h2>Por tema</h2>
+  <table>
+    <thead><tr><th>Tema</th><th>Total</th><th>Score médio</th><th>Aprov</th><th>C/ress</th><th>Reprov</th><th>Traps detect.</th><th>Top erros críticos</th></tr></thead>
+    <tbody>${themeRows}</tbody>
+  </table>
+
+  <h2>Por componente (validator)</h2>
+  <table>
+    <thead><tr><th>Componente</th><th>Erros fatais</th><th>Avisos</th><th>Top regras</th></tr></thead>
+    <tbody>${validatorRows}</tbody>
+  </table>
+
+  <h2>Detecção de armadilhas (traps)</h2>
+  ${trapRows
+    ? `<table><thead><tr><th>Trap</th><th>Total</th><th>Detectadas</th><th>Não detectadas</th><th>Taxa</th></tr></thead><tbody>${trapRows}</tbody></table>`
+    : `<p class="muted">Nenhuma armadilha aplicada.</p>`}
+
+  <h2>Por área jurídica</h2>
+  <table>
+    <thead><tr><th>Área</th><th>Total</th><th>Aprov</th><th>C/ress</th><th>Reprov</th><th>Score médio</th></tr></thead>
+    <tbody>${areaRows}</tbody>
+  </table>
 
   <h2>Casos</h2>
   <table>
@@ -302,6 +420,7 @@ async function main(): Promise<void> {
   console.log(`  reprov:   ${summary.rejected}`);
   console.log(`  erros:    ${summary.failed}`);
   console.log(`  score:    ${summary.avgScore.toFixed(1)}`);
+  console.log(`  traps:    ${summary.trapStats.detected}/${summary.trapStats.totalWithTraps} detectadas`);
   console.log(`  tokens:   ${summary.totalInputTokens + summary.totalOutputTokens}`);
   console.log(`  custo:    $${summary.totalCostUsd.toFixed(2)}`);
   console.log(`  JSON:     ${join(OUTPUT_DIR, "report.json")}`);
