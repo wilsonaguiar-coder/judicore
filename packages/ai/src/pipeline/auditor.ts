@@ -23,7 +23,7 @@ CONTEXTO DA PEÇA:
 REGRAS APLICÁVEIS:
 - Honorários: ${rules.honorarios_artigo}
 - Artigos BLOQUEADOS: ${rules.artigos_bloqueados.join(", ") || "nenhum"}
-- Proibições da peça: ${(template as {proibicoes?: string[]}).proibicoes?.join(", ") ?? "nenhuma"}
+- Proibições da peça: ${(template as unknown as {proibicoes?: readonly string[]}).proibicoes?.join(", ") ?? "nenhuma"}
 
 TESES OBRIGATÓRIAS (verificar cobertura):
 ${matrix.teses.map((t, i) => `${i + 1}. ${t.pedido} → norma: ${t.norma}`).join("\n")}

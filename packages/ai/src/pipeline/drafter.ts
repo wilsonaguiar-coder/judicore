@@ -55,8 +55,8 @@ ${jurBlock}
 ${appealInfo}
 ${correctionsBlock}
 
-ESTRUTURA OBRIGATÓRIA: ${(template as {estrutura?: string[]}).estrutura?.join(" → ") ?? "ver template"}
-TOM: ${(template as {tom?: string}).tom ?? "técnico"}
+ESTRUTURA OBRIGATÓRIA: ${(template as unknown as {estrutura?: readonly string[]}).estrutura?.join(" → ") ?? "ver template"}
+TOM: ${(template as unknown as {tom?: string}).tom ?? "técnico"}
 PROIBIÇÕES ABSOLUTAS: ${prohibitions.join(" | ")}
 HONORÁRIOS (se aplicável): ${rules.honorarios_artigo}
 

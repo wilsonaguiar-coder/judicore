@@ -75,7 +75,7 @@ export class LegalClassifierService {
       throw new Error(`Classificador retornou JSON inválido: ${raw.slice(0, 200)}`);
     }
 
-    const classification = parsed as LegalClassification;
+    const classification = parsed as unknown as LegalClassification;
 
     if (!classification.tipo_justica || !classification.tipo_peca) {
       throw new Error("Classificação incompleta: tipo_justica e tipo_peca são obrigatórios");
