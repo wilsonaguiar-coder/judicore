@@ -6,14 +6,14 @@ import type {
   GenerationMode,
   JurisprudenciaInput,
   ValidationError,
-  ValidationResult,
-  TipoPeca,
 } from "../pipeline/types.js";
 import { StructuralValidator } from "./structural.validator.js";
 import { LegalRulesValidator } from "./legal.validator.js";
 import { AppealValidator } from "./appeal.validator.js";
 import { JurisprudenceValidator } from "./jurisprudence.validator.js";
 import { GenericityValidator } from "./genericity.validator.js";
+import { MatrixQualityValidator } from "./matrix-quality.validator.js";
+import { RichnessValidator } from "./richness.validator.js";
 
 export interface FinalValidationResult {
   valid: boolean;
@@ -30,6 +30,8 @@ export class FinalValidator {
   private appeal = new AppealValidator();
   private jurisprudence = new JurisprudenceValidator();
   private genericity = new GenericityValidator();
+  private matrixQuality = new MatrixQualityValidator();
+  private richness = new RichnessValidator();
 
   validate(
     draft: string,
@@ -62,35 +64,40 @@ export class FinalValidator {
     const genericErrors = this.genericity.detect(draft);
     allErrors.push(...genericErrors);
 
+    // 6. Qualidade da matriz (emite avisos sem bloquear)
+    const matrixResult = this.matrixQuality.validate(matrix, extraction);
+    allErrors.push(...matrixResult.errors);
+
     const hasFatalErrors = allErrors.some((e) => e.fatal);
     const genericityScore = this.genericity.calculateScore(draft, extraction);
 
-    // FINAL_DRAFT com conteúdo excessivamente genérico → rebaixar para REVISÃO
-    if (mode === "FINAL_DRAFT" && genericityScore >= 4) {
+    // 7. FINAL_DRAFT: genericidade >= 3 → rebaixar para revisão
+    if (mode === "FINAL_DRAFT" && genericityScore >= 3) {
       allErrors.push({
-        rule: "FINAL_DRAFT_TOO_GENERIC",
-        message: "A peça foi classificada como FINAL_DRAFT, mas contém conteúdo excessivamente genérico.",
+        rule: "FINAL_DRAFT_GENERIC_LANGUAGE",
+        message: "A peça FINAL_DRAFT contém linguagem genérica demais — revise a fundamentação.",
         fatal: false,
       });
+    }
+
+    // 8. FINAL_DRAFT: validação de riqueza argumentativa
+    if (mode === "FINAL_DRAFT") {
+      allErrors.push(...this.richness.validate(draft));
     }
 
     // Calcular document_confidence
     // Para SAFE_SKELETON e TEMPLATE_MODEL os valores são fixos (0.20 / 0.50) e não sofrem capping.
     let confidence = this.calculateConfidence(classification, extraction, matrix, audit, mode, genericityScore);
 
-    // Capping de confidence — só se aplica a FINAL_DRAFT (modos fixos já são conservadores por natureza)
+    // Capping de confidence — só se aplica a FINAL_DRAFT
     if (mode === "FINAL_DRAFT") {
-      if (hasFatalErrors) {
-        confidence = Math.min(confidence, 0.49);
-      }
-      if (genericityScore >= 4) {
-        confidence = Math.min(confidence, 0.69);
-      }
+      if (hasFatalErrors) confidence = Math.min(confidence, 0.49);
+      if (genericityScore >= 3) confidence = Math.min(confidence, 0.69);
     }
 
-    const isTooGenericFinalDraft = mode === "FINAL_DRAFT" && genericityScore >= 4;
+    const isWeakFinalDraft = mode === "FINAL_DRAFT" && genericityScore >= 3;
     const status_minuta: "MINUTA APROVADA" | "MINUTA PARA REVISÃO" =
-      confidence >= 0.80 && !hasFatalErrors && !isTooGenericFinalDraft
+      confidence >= 0.80 && !hasFatalErrors && !isWeakFinalDraft
         ? "MINUTA APROVADA"
         : "MINUTA PARA REVISÃO";
 
@@ -99,8 +106,8 @@ export class FinalValidator {
       safe_message = "A minuta contém erros jurídicos graves e exige revisão antes de qualquer uso.";
     } else if (mode !== "FINAL_DRAFT") {
       safe_message = "A minuta é um modelo estruturado. Preencha os campos entre colchetes com os dados reais do caso antes de usar.";
-    } else if (isTooGenericFinalDraft) {
-      safe_message = "A minuta contém conteúdo genérico demais para um FINAL_DRAFT — revise os fatos e pedidos antes de usar.";
+    } else if (isWeakFinalDraft) {
+      safe_message = "A minuta contém linguagem genérica — revise a fundamentação antes de usar.";
     } else if (status_minuta === "MINUTA PARA REVISÃO") {
       safe_message = "A minuta exige revisão jurídica antes de uso.";
     }

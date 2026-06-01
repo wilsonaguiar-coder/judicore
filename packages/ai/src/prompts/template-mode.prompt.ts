@@ -35,5 +35,23 @@ REGRAS ABSOLUTAS PARA ESTE MODO:
 `;
   }
 
-  return "";
+  return `
+⚡ MODO FINAL_DRAFT — PEÇA JURIDICAMENTE DENSA
+Você está gerando uma peça final. A fundamentação deve ser técnica, densa e específica.
+
+CADA TESE deve ser desenvolvida em 3 a 5 parágrafos seguindo esta estrutura:
+1. Enunciado claro da proposição jurídica
+2. Norma aplicável (artigo + diploma — obrigatório)
+3. Aplicação minuciosa ao fato concreto do caso
+4. Enfrentamento da principal objeção possível
+5. Conclusão diretamente vinculada ao pedido
+
+PROIBIÇÕES ABSOLUTAS NESTE MODO (nunca escreva estas expressões):
+— "direito alegado" | "matéria cível" | "pretensão da parte"
+— "caso concreto" | "legislação aplicável" | "normas pertinentes"
+— "reconhecimento do direito" | "direito material postulado"
+
+Se algum dado específico faltar (nome, data, valor), use marcador SOMENTE naquele ponto — mas NÃO empobreça a fundamentação jurídica das teses disponíveis.
+
+`;
 }

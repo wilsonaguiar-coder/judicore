@@ -21,7 +21,20 @@ export function buildDraftPrompt(
     ? `\nJURISPRUDÊNCIAS APROVADAS PARA USO (use SOMENTE estas, pelos dados reais abaixo):\n${relevantJurs.map((j) => `[${j.id}] ${j.tribunal} — ${j.numero} — Relator: ${j.relator ?? "N/I"} — Data: ${j.dataJulgamento ?? "N/I"}\nTese: ${j.tese}\nEmenta (resumo): ${j.ementa.slice(0, 300)}...`).join("\n\n")}`
     : "\nNenhuma jurisprudência aprovada para uso. NÃO mencione nenhuma decisão judicial.";
 
-  const matrixBlock = `\nMATRIZ DE ARGUMENTAÇÃO (use como estrutura obrigatória):\n${matrix.teses.map((t, i) => `Tese ${i + 1}: ${t.pedido}\n  Fato: ${t.fato}\n  Norma: ${t.norma}\n  Jurisprudência: ${t.jurisprudencia_id ?? "nenhuma"}\n  Conclusão: ${t.conclusao}`).join("\n\n")}`;
+  const matrixBlock = `\nMATRIZ DE ARGUMENTAÇÃO (use como estrutura obrigatória — desenvolva cada tese em 3 a 5 parágrafos):\n${matrix.teses.map((t, i) => {
+    const lines = [
+      `Tese ${i + 1}: ${t.tese ?? t.pedido}`,
+      `  Pedido: ${t.pedido}`,
+      `  Fato: ${t.fato}`,
+      `  Norma: ${t.norma}`,
+      `  Ratio: ${t.ratio ?? ""}`,
+      t.contraponto ? `  Contraponto: ${t.contraponto}` : null,
+      t.resposta_contraponto ? `  Resposta: ${t.resposta_contraponto}` : null,
+      `  Jurisprudência: ${t.jurisprudencia_id ?? "nenhuma"}`,
+      `  Conclusão: ${t.conclusao}`,
+    ].filter(Boolean);
+    return lines.join("\n");
+  }).join("\n\n")}`;
 
   const appealInfo = classification.tipo_peca === "SENTENCA" && classification.tipo_justica in (APPEAL_RULES.SENTENCA as Record<string, unknown>)
     ? `\nRECURSO CABÍVEL: ${(APPEAL_RULES.SENTENCA as Record<string, { recurso: string }>)[classification.tipo_justica]?.recurso ?? "ver legislação"}`

@@ -66,8 +66,12 @@ export interface LegalExtraction {
 export interface ArgumentacaoTese {
   id: string;
   pedido: string;
+  tese: string;
   fato: string;
   norma: string;
+  ratio: string;
+  contraponto?: string | undefined;
+  resposta_contraponto?: string | undefined;
   jurisprudencia_id: string | null;
   conclusao: string;
 }

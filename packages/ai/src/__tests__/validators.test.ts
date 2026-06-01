@@ -40,7 +40,7 @@ function makeExtraction(overrides: Partial<LegalExtraction> = {}): LegalExtracti
 function makeMatrix(overrides: Partial<ArgumentationMatrix> = {}): ArgumentationMatrix {
   return {
     teses: [
-      { id: "tese_001", pedido: "Indenização por danos morais", fato: "Fato 1", norma: "art. 186 CC/2002", jurisprudencia_id: null, conclusao: "Deve ser acolhido" },
+      { id: "tese_001", pedido: "Indenização por danos morais", tese: "É devida indenização por danos morais", fato: "Fato 1", norma: "art. 186 CC/2002", ratio: "Nexo causal comprovado", jurisprudencia_id: null, conclusao: "Deve ser acolhido" },
     ],
     ...overrides,
   };
@@ -352,8 +352,8 @@ describe("Teste 16: FINAL_DRAFT com conteúdo genérico vira MINUTA PARA REVISÃ
     assert.equal(result.status_minuta, "MINUTA PARA REVISÃO", "FINAL_DRAFT genérico deve ser MINUTA PARA REVISÃO");
     assert.ok(result.document_confidence <= 0.69, `confidence deve ser <= 0.69, foi ${result.document_confidence}`);
     assert.ok(
-      result.errors.some((e) => e.rule === "FINAL_DRAFT_TOO_GENERIC"),
-      "Deve haver erro FINAL_DRAFT_TOO_GENERIC",
+      result.errors.some((e) => e.rule === "FINAL_DRAFT_GENERIC_LANGUAGE"),
+      "Deve haver erro FINAL_DRAFT_GENERIC_LANGUAGE",
     );
   });
 });

@@ -4,7 +4,7 @@ import { LegalMatrixService } from "./matrix.js";
 import { LegalDraftService } from "./drafter.js";
 import { LegalAuditService } from "./auditor.js";
 import { LegalValidator } from "./validator.js";
-import { FinalValidator } from "../validators/index.js";
+import { FinalValidator, MatrixQualityValidator } from "../validators/index.js";
 import type {
   PipelineInput,
   PipelineContext,
@@ -45,54 +45,63 @@ function checkInputBlocked(desc: string): string | null {
   return null;
 }
 
-// ── Determinação do modo de geração ──────────────────────────────────────────
+// ── Determinação do modo de geração — Fase 1 (após extração) ─────────────────
 
-function determineGenerationMode(
+type PreliminaryMode = GenerationMode | "POSSIBLE_FINAL_DRAFT";
+
+function determinePreliminaryMode(
   caseDescription: string,
   classification: LegalClassification,
   extraction: LegalExtraction,
-): { mode: GenerationMode; reason: string } {
-  // Descrição muito curta → SAFE_SKELETON (sem bloquear o pipeline)
+): { mode: PreliminaryMode; reason: string } {
   if (caseDescription.trim().length < 20) {
-    return {
-      mode: "SAFE_SKELETON",
-      reason: "Descrição curta/incompleta — gerando esqueleto seguro",
-    };
+    return { mode: "SAFE_SKELETON", reason: "Descrição curta/incompleta — gerando esqueleto seguro" };
   }
-
-  // Classificação incerta → SAFE_SKELETON
   if (classification.confianca < 0.75 || classification.tipo_justica === "INDETERMINADA") {
     return {
       mode: "SAFE_SKELETON",
       reason: `Confiança na classificação insuficiente (${classification.confianca.toFixed(2)}) — gerando esqueleto seguro`,
     };
   }
-
-  // Input com padrões genéricos → TEMPLATE_MODEL
   if (GENERIC_INPUT_PATTERNS.some((p) => p.test(caseDescription.trim()))) {
-    return {
-      mode: "TEMPLATE_MODEL",
-      reason: "Descrição do caso é genérica — gerando modelo estruturado com placeholders",
-    };
+    return { mode: "TEMPLATE_MODEL", reason: "Descrição do caso é genérica — gerando modelo estruturado" };
   }
-
-  // Extração insuficiente → SAFE_SKELETON
   if (extraction.qualidade_extracao === "INSUFICIENTE") {
-    return {
-      mode: "SAFE_SKELETON",
-      reason: extraction.motivo_qualidade ?? "Qualidade de extração insuficiente para peça final",
-    };
+    return { mode: "SAFE_SKELETON", reason: extraction.motivo_qualidade ?? "Qualidade de extração insuficiente" };
   }
-
-  // Sem nenhum fato E sem nenhum pedido → TEMPLATE_MODEL
-  if (extraction.fatos.length < 1 && extraction.pedidos.length < 1) {
-    return {
-      mode: "TEMPLATE_MODEL",
-      reason: "Nenhum fato ou pedido identificado — gerando modelo estruturado",
-    };
+  if (extraction.qualidade_extracao === "PARCIAL") {
+    return { mode: "TEMPLATE_MODEL", reason: extraction.motivo_qualidade ?? "Fatos parcialmente identificados — gerando modelo estruturado" };
   }
+  if (
+    extraction.fatos.length >= 3 &&
+    extraction.pedidos.length >= 2 &&
+    extraction.questoes_juridicas.length >= 2
+  ) {
+    return { mode: "POSSIBLE_FINAL_DRAFT", reason: "Extração suficiente — aguardando avaliação da matriz" };
+  }
+  return { mode: "TEMPLATE_MODEL", reason: `Informações insuficientes: ${extraction.fatos.length} fato(s), ${extraction.pedidos.length} pedido(s)` };
+}
 
-  return { mode: "FINAL_DRAFT", reason: "Informações suficientes para geração de peça final" };
+// ── Determinação do modo de geração — Fase 2 (após matriz) ───────────────────
+
+function confirmGenerationMode(
+  preliminary: PreliminaryMode,
+  extraction: LegalExtraction,
+  matrix: ArgumentationMatrix,
+): { mode: GenerationMode; reason: string } {
+  if (preliminary !== "POSSIBLE_FINAL_DRAFT") {
+    return { mode: preliminary as GenerationMode, reason: "" };
+  }
+  const matrixValidator = new MatrixQualityValidator();
+  const matrixResult = matrixValidator.validate(matrix, extraction);
+  const hasEnoughTeses = matrix.teses.length >= extraction.pedidos.length;
+  if (hasEnoughTeses && matrixResult.valid) {
+    return { mode: "FINAL_DRAFT", reason: "Extração suficiente e matriz de qualidade — gerando peça final" };
+  }
+  return {
+    mode: "TEMPLATE_MODEL",
+    reason: `Matriz insuficiente para FINAL_DRAFT: ${matrixResult.errors[0]?.message ?? "qualidade baixa"}`,
+  };
 }
 
 // ── Cálculo do score de confiança do documento ────────────────────────────────
@@ -201,14 +210,12 @@ export class LegalPipeline {
       return;
     }
 
-    // ── Determinação do modo de geração ───────────────────────────────────────
-    const { mode, reason } = determineGenerationMode(
+    // ── Determinação preliminar do modo (fase 1) ─────────────────────────────
+    const { mode: preliminaryMode } = determinePreliminaryMode(
       ctx.caseDescription,
       ctx.classification!,
       ctx.extraction!,
     );
-    ctx.generationMode = mode;
-    yield { event: "mode", data: { mode, reason } };
 
     // Emite avisos de extração insuficiente sem bloquear
     const extractionValidation = this.validator.validateExtractionSufficiency(ctx.extraction!);
@@ -231,6 +238,11 @@ export class LegalPipeline {
       yield { event: "error", data: { message: String(err), phase: "building_matrix", fatal: true } };
       return;
     }
+
+    // ── Confirmação do modo de geração (fase 2, após matriz) ─────────────────
+    const { mode, reason } = confirmGenerationMode(preliminaryMode, ctx.extraction!, ctx.matrix!);
+    ctx.generationMode = mode;
+    yield { event: "mode", data: { mode, reason } };
 
     // ── Fase 4: Geração da peça ────────────────────────────────────────────────
     yield { event: "phase", data: { phase: "drafting", generationId } };
