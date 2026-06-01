@@ -1,5 +1,6 @@
 import type { LegalClassification, ValidationError, ValidationResult } from "../pipeline/types.js";
 import { FORBIDDEN_COMBINATIONS, CRIMINAL_BLOCKED_TERMS, getJurisdicaoRules } from "../rules/legal_rules.js";
+import { detectArticleContext } from "./article-context.js";
 
 export class LegalRulesValidator {
   validateClassification(classification: LegalClassification): ValidationResult {
@@ -72,22 +73,43 @@ export class LegalRulesValidator {
       });
     }
 
-    // Alertar art. 201 CF em regime RPPS (não fatal — pode aparecer para contraste/distinção legítima)
-    if (classification.regime_juridico === "RPPS" && /art\.\s*201\s*(da\s*)?(CF|Constitui[cç][aã]o\s+Federal)/i.test(draft)) {
-      errors.push({
-        rule: "RPPS_WRONG_ARTICLE",
-        message: "Regime RPPS usa art. 40 CF/88 — verifique se art. 201 CF está sendo citado corretamente (RGPS/INSS)",
-        fatal: false,
-      });
+    // Validação contextual de artigos previdenciários:
+    //   DIRECT_FOUNDATION → fatal (uso direto errado, ex: RPPS com fundamento no art. 201)
+    //   DISTINCTION       → sem erro (uso para contrastar RPPS vs RGPS é legítimo)
+    //   AMBIGUOUS         → aviso não fatal (revisar manualmente)
+    if (classification.regime_juridico === "RPPS") {
+      const ctx = detectArticleContext(draft, "201");
+      if (ctx === "DIRECT_FOUNDATION") {
+        errors.push({
+          rule: "RPPS_WRONG_ARTICLE",
+          message: "Art. 201 CF está sendo usado como fundamento direto, mas o caso é RPPS — use art. 40 CF/88",
+          fatal: true,
+        });
+      } else if (ctx === "AMBIGUOUS") {
+        errors.push({
+          rule: "RPPS_WRONG_ARTICLE",
+          message: "Art. 201 CF citado em caso RPPS — confirme se é uso distintivo (RGPS) ou erro de fundamentação",
+          fatal: false,
+        });
+      }
+      // DISTINCTION ou NOT_PRESENT → silencioso
     }
 
-    // Alertar art. 40 CF em regime RGPS (não fatal — pode aparecer para contraste/distinção legítima)
-    if (classification.regime_juridico === "RGPS" && /art\.\s*40\s*(da\s*)?(CF|Constitui[cç][aã]o\s+Federal)/i.test(draft)) {
-      errors.push({
-        rule: "RGPS_WRONG_ARTICLE",
-        message: "Regime RGPS usa art. 201 CF/88 — verifique se art. 40 CF está sendo citado corretamente (RPPS/servidor público)",
-        fatal: false,
-      });
+    if (classification.regime_juridico === "RGPS") {
+      const ctx = detectArticleContext(draft, "40");
+      if (ctx === "DIRECT_FOUNDATION") {
+        errors.push({
+          rule: "RGPS_WRONG_ARTICLE",
+          message: "Art. 40 CF está sendo usado como fundamento direto, mas o caso é RGPS — use art. 201 CF/88",
+          fatal: true,
+        });
+      } else if (ctx === "AMBIGUOUS") {
+        errors.push({
+          rule: "RGPS_WRONG_ARTICLE",
+          message: "Art. 40 CF citado em caso RGPS — confirme se é uso distintivo (RPPS) ou erro de fundamentação",
+          fatal: false,
+        });
+      }
     }
 
     // Bloquear termos cíveis em matéria criminal (julgo procedente/improcedente são erros graves em processo penal)

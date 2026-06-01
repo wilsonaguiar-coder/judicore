@@ -14,13 +14,17 @@
   "scripts": {
     "build": "tsc",
     "dev": "tsc --watch",
-    "test": "tsc && node --test dist/__tests__/validators.test.js"
+    "test": "npm run test:legal",
+    "test:legal": "tsx tests/run.ts legal",
+    "test:legal-ai": "tsx tests/run.ts legal-ai",
+    "test:legal-report": "tsx tests/report/generate-report.ts"
   },
   "dependencies": {
     "openai": "^6.39.1"
   },
   "devDependencies": {
     "@types/node": "^20.0.0",
+    "tsx": "^4.19.0",
     "typescript": "^5.4.0"
   }
 }
