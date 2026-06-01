@@ -60,7 +60,8 @@ ENDEREÇAMENTO E DIPLOMAS
 ══════════════════════════════════════════════════════
 
 ENDEREÇAMENTO — aplicável EXCLUSIVAMENTE a PETIÇÃO INICIAL:
-• Réu = União, autarquia federal (INSS, ANATEL, IBAMA, Receita Federal...), empresa pública federal (CEF, ECT, BNDES...) → JUSTIÇA FEDERAL: "EXCELENTÍSSIMO(A) SENHOR(A) DOUTOR(A) JUIZ(A) FEDERAL DA ___ VARA FEDERAL DA SUBSEÇÃO JUDICIÁRIA DE [CIDADE]"
+• Réu = União, autarquia federal, empresa pública federal → JUSTIÇA FEDERAL: "EXCELENTÍSSIMO(A) SENHOR(A) DOUTOR(A) JUIZ(A) FEDERAL DA ___ VARA FEDERAL DA SUBSEÇÃO JUDICIÁRIA DE [CIDADE]"
+• Caso trabalhista (CLT, vínculo empregatício, reclamação trabalhista) → JUSTIÇA DO TRABALHO: "EXCELENTÍSSIMO(A) SENHOR(A) DOUTOR(A) JUIZ(A) DO TRABALHO DA ___ VARA DO TRABALHO DE [CIDADE]"
 • Demais casos → JUSTIÇA ESTADUAL: "EXCELENTÍSSIMO(A) SENHOR(A) DOUTOR(A) JUIZ(A) DE DIREITO DA ___ VARA [ESPECIALIDADE] DA COMARCA DE [CIDADE]"
 ⚠ PROIBIDO em RECURSO, SENTENÇA, DECISÃO e DESPACHO: essas peças têm endereçamento próprio definido na tarefa — NUNCA aplique este formato de juiz de primeiro grau a elas.
 
@@ -68,7 +69,11 @@ DIPLOMAS — nunca confunda numeração:
 • CC/2002: arts. 186, 187, 206, 421, 422, 927, 944...
 • CPC/2015: arts. 300, 303, 319, 330, 485, 487, 537...
 • CF/88: arts. 5º, 37, 109, 127, 196, 205...
-• Sempre indique: "art. X do CC/2002", "art. X do CPC/2015", "art. X da CF/88".
+• CLT: art. 391-A (estabilidade gestante), art. 482 (justa causa), art. 791-A (honorários trabalhistas — pós-Reforma 2017), art. 895 (recurso ordinário — 8 dias), art. 789 (custas trabalhistas), art. 20 Lei 8.906/94 (jornada advogado empregado).
+• Sempre indique: "art. X do CC/2002", "art. X do CPC/2015", "art. X da CF/88", "art. X da CLT".
+
+⚠ HONORÁRIOS TRABALHISTAS: em processos regidos pela CLT (pós-Reforma Trabalhista — Lei 13.467/2017), os honorários advocatícios são regidos pelo art. 791-A da CLT, NÃO pelo art. 85 do CPC/2015. Nunca usar art. 85 CPC em sentença ou decisão trabalhista.
+⚠ RECURSO NA JUSTIÇA DO TRABALHO: o recurso contra sentença de 1ª instância trabalhista é o RECURSO ORDINÁRIO (art. 895 CLT), não "apelação". O endereçamento vai ao TRIBUNAL REGIONAL DO TRABALHO (TRT), não ao Tribunal de Justiça (TJ).
 
 ⚠ DISTINÇÃO CRÍTICA — REGIMES PREVIDENCIÁRIOS (confusão aqui é erro grave visível):
 • Art. 40 da CF/88 → RPPS: regime próprio dos SERVIDORES PÚBLICOS (aposentadoria, pensão, irredutibilidade de benefício). Use este para ações envolvendo servidores estatutários e seus dependentes.
@@ -92,11 +97,11 @@ export function buildRagContext(jurisprudencias: Jurisprudencia[]): string {
 │ Ementa   : ${j.ementa}
 │ Link     : ${j.url}
 └─────────────────────────────────────────────────────
-│ USO OBRIGATÓRIO DE [JUR-${i + 1}]:
-│  → Identifique qual NORMA LEGAL esta decisão interpreta.
-│  → Enuncie a TESE JURÍDICA central que ela consagra.
-│  → Construa um argumento de 2-3 parágrafos aplicando essa tese ao caso.
-│  → Vincule explicitamente a um PEDIDO da peça.
+│ AVALIE ANTES DE USAR [JUR-${i + 1}]:
+│  → A tese que esta decisão consagra é DIRETAMENTE RELEVANTE para o caso em análise?
+│  → Se SIM: identifique a norma interpretada, enuncie a tese, construa argumento de 2-3 parágrafos e vincule a um pedido.
+│  → Se NÃO (decisão sobre tema diferente do caso): OMITA completamente — não force conexão artificial.
+│  → NUNCA aplique jurisprudência sobre tema X para argumentar sobre tema Y apenas para citar algo.
 └─────────────────────────────────────────────────────`);
 
   return `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -217,11 +222,14 @@ ATENÇÃO: produza apenas o texto final da peça jurídica. Não inclua notas, r
 Adote tom combativo e persuasivo, próprio das grandes bancas de advocacia.
 
 ENDEREÇAMENTO DO RECURSO (coloque no início, antes da identificação das partes):
+• Recurso Ordinário trabalhista (CLT, art. 895) → "EGRÉGIO TRIBUNAL REGIONAL DO TRABALHO DA ___ REGIÃO"
+• Recurso de Revista → "EGRÉGIO TRIBUNAL SUPERIOR DO TRABALHO"
 • Apelação → Justiça Federal: "EGRÉGIO TRIBUNAL REGIONAL FEDERAL DA ___ REGIÃO"
 • Apelação → Justiça Estadual: "EGRÉGIO TRIBUNAL DE JUSTIÇA DO ESTADO DE [UF]"
-• Agravo de instrumento → mesmo tribunal da apelação correspondente
-• Embargos de declaração / agravo interno/regimental → mesmo órgão julgador da decisão (use "EXCELENTÍSSIMO(A) SENHOR(A) RELATOR(A)...")
-Se o tipo de recurso não for especificado, use o endereçamento de apelação ao Tribunal.
+• Agravo de instrumento → mesmo tribunal da apelação/RO correspondente
+• Embargos de declaração / agravo interno → mesmo órgão julgador da decisão (use "EXCELENTÍSSIMO(A) SENHOR(A) RELATOR(A)...")
+⚠ NUNCA endereçar recurso trabalhista ao "Tribunal de Justiça" — a Justiça do Trabalho tem tribunal próprio (TRT).
+Se o tipo de recurso não for especificado, identifique pelo contexto (trabalhista → RO ao TRT; cível/federal → apelação ao TJ/TRF).
 
 ESTRUTURA OBRIGATÓRIA:
 
