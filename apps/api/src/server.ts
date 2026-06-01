@@ -11,6 +11,7 @@ import { documentsRoutes } from "./routes/documents.js";
 import { streamRoutes } from "./routes/stream.js";
 import { adminRoutes } from "./routes/admin.js";
 import { exportRoutes } from "./routes/export.js";
+import { pipelineRoutes } from "./routes/pipeline.js";
 import { ensureIndices } from "@judicore/search";
 import { startIndexingWorker } from "./queues/worker.js";
 import { registerScheduledJobs } from "./queues/scheduler.js";
@@ -50,6 +51,7 @@ await app.register(documentsRoutes, { prefix: "/documents" });
 await app.register(streamRoutes,  { prefix: "/stream" });
 await app.register(adminRoutes,   { prefix: "/admin" });
 await app.register(exportRoutes,  { prefix: "/export" });
+await app.register(pipelineRoutes, { prefix: "/pipeline" });
 
 app.get("/health", async () => ({ status: "ok", timestamp: new Date().toISOString() }));
 

@@ -106,3 +106,137 @@ model UsageLog {
 
   @@map("usage_logs")
 }
+
+enum LegalGenerationStatus {
+  PENDING
+  CLASSIFYING
+  EXTRACTING
+  BUILDING_MATRIX
+  DRAFTING
+  AUDITING
+  APPROVED
+  REJECTED
+  FAILED
+}
+
+enum TipoJustica {
+  TRABALHO
+  FEDERAL
+  ESTADUAL
+}
+
+enum TipoPecaEnum {
+  PETICAO_INICIAL
+  RECURSO
+  SENTENCA
+  DECISAO
+  DESPACHO
+}
+
+enum RegimeJuridicoEnum {
+  CLT
+  RPPS
+  RGPS
+  ESTATUTARIO
+  CIVIL
+}
+
+model LegalGeneration {
+  id         String                @id @default(cuid())
+  documentId String?               @map("document_id")
+  caseId     String?               @map("case_id")
+  userId     String                @map("user_id")
+  status     LegalGenerationStatus @default(PENDING)
+  retryOf    String?               @map("retry_of")
+  createdAt  DateTime              @default(now()) @map("created_at")
+  updatedAt  DateTime              @updatedAt @map("updated_at")
+
+  classification LegalClassificationRecord?
+  extraction     LegalExtractionRecord?
+  matrix         LegalMatrixRecord?
+  draft          LegalDraftRecord?
+  audit          LegalAuditRecord?
+
+  @@map("legal_generations")
+}
+
+model LegalClassificationRecord {
+  id             String              @id @default(cuid())
+  generationId   String              @unique @map("generation_id")
+  tipoJustica    TipoJustica         @map("tipo_justica")
+  tipoPeca       TipoPecaEnum        @map("tipo_peca")
+  regimeJuridico RegimeJuridicoEnum? @map("regime_juridico")
+  grau           String
+  tribunal       String
+  assunto        String              @db.Text
+  confianca      Float               @default(0)
+  dataJson       Json                @map("data_json")
+  modelUsed      String              @map("model_used")
+  inputTokens    Int                 @default(0) @map("input_tokens")
+  outputTokens   Int                 @default(0) @map("output_tokens")
+  createdAt      DateTime            @default(now()) @map("created_at")
+
+  generation LegalGeneration @relation(fields: [generationId], references: [id], onDelete: Cascade)
+
+  @@map("legal_classifications")
+}
+
+model LegalExtractionRecord {
+  id           String   @id @default(cuid())
+  generationId String   @unique @map("generation_id")
+  dataJson     Json     @map("data_json")
+  modelUsed    String   @map("model_used")
+  inputTokens  Int      @default(0) @map("input_tokens")
+  outputTokens Int      @default(0) @map("output_tokens")
+  createdAt    DateTime @default(now()) @map("created_at")
+
+  generation LegalGeneration @relation(fields: [generationId], references: [id], onDelete: Cascade)
+
+  @@map("legal_extractions")
+}
+
+model LegalMatrixRecord {
+  id           String   @id @default(cuid())
+  generationId String   @unique @map("generation_id")
+  teseCount    Int      @map("tese_count")
+  dataJson     Json     @map("data_json")
+  modelUsed    String   @map("model_used")
+  inputTokens  Int      @default(0) @map("input_tokens")
+  outputTokens Int      @default(0) @map("output_tokens")
+  createdAt    DateTime @default(now()) @map("created_at")
+
+  generation LegalGeneration @relation(fields: [generationId], references: [id], onDelete: Cascade)
+
+  @@map("legal_matrices")
+}
+
+model LegalDraftRecord {
+  id           String   @id @default(cuid())
+  generationId String   @unique @map("generation_id")
+  content      String   @db.Text
+  modelUsed    String   @map("model_used")
+  inputTokens  Int      @default(0) @map("input_tokens")
+  outputTokens Int      @default(0) @map("output_tokens")
+  createdAt    DateTime @default(now()) @map("created_at")
+
+  generation LegalGeneration @relation(fields: [generationId], references: [id], onDelete: Cascade)
+
+  @@map("legal_drafts")
+}
+
+model LegalAuditRecord {
+  id           String   @id @default(cuid())
+  generationId String   @unique @map("generation_id")
+  aprovada     Boolean
+  score        Int
+  erroCount    Int      @map("erro_count")
+  dataJson     Json     @map("data_json")
+  modelUsed    String   @map("model_used")
+  inputTokens  Int      @default(0) @map("input_tokens")
+  outputTokens Int      @default(0) @map("output_tokens")
+  createdAt    DateTime @default(now()) @map("created_at")
+
+  generation LegalGeneration @relation(fields: [generationId], references: [id], onDelete: Cascade)
+
+  @@map("legal_audits")
+}
