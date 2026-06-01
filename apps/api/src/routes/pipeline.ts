@@ -100,7 +100,7 @@ export async function pipelineRoutes(app: FastifyInstance) {
               tribunal: String(c["tribunal_competente"] ?? ""),
               assunto: String(c["assunto_principal"] ?? ""),
               confianca: Number(c["confianca"] ?? 0),
-              dataJson: c,
+              dataJson: c as any,
               modelUsed: String((u as Record<string, unknown>)["model"] ?? "gpt-4.1"),
               inputTokens: Number((u as Record<string, unknown>)["inputTokens"] ?? 0),
               outputTokens: Number((u as Record<string, unknown>)["outputTokens"] ?? 0),
@@ -112,7 +112,7 @@ export async function pipelineRoutes(app: FastifyInstance) {
           await prisma.legalExtractionRecord.create({
             data: {
               generationId: generation.id,
-              dataJson: d["extraction"] as Record<string, unknown>,
+              dataJson: d["extraction"] as any,
               modelUsed: String(u["model"] ?? "gpt-4.1"),
               inputTokens: Number(u["inputTokens"] ?? 0),
               outputTokens: Number(u["outputTokens"] ?? 0),
@@ -127,7 +127,7 @@ export async function pipelineRoutes(app: FastifyInstance) {
             data: {
               generationId: generation.id,
               teseCount: teses.length,
-              dataJson: m,
+              dataJson: m as any,
               modelUsed: String(u["model"] ?? "gpt-4.1"),
               inputTokens: Number(u["inputTokens"] ?? 0),
               outputTokens: Number(u["outputTokens"] ?? 0),
@@ -152,7 +152,7 @@ export async function pipelineRoutes(app: FastifyInstance) {
                 type: body.data.type,
                 content: fullDraft,
                 instruction: body.data.instruction ?? null,
-                sourcesJson: body.data.jurisprudencias as unknown[],
+                sourcesJson: body.data.jurisprudencias as any,
                 modelUsed: "openai/gpt-4.1",
               },
             });
@@ -174,7 +174,7 @@ export async function pipelineRoutes(app: FastifyInstance) {
               aprovada,
               score: Number(a["score"] ?? 0),
               erroCount: erros.length,
-              dataJson: a,
+              dataJson: a as any,
               modelUsed: String(u["model"] ?? "gpt-4.1"),
               inputTokens: Number(u["inputTokens"] ?? 0),
               outputTokens: Number(u["outputTokens"] ?? 0),
@@ -311,7 +311,7 @@ export async function pipelineRoutes(app: FastifyInstance) {
           aprovada: audit.aprovada,
           score: audit.score,
           erroCount: audit.erros.length,
-          dataJson: audit as unknown as Record<string, unknown>,
+          dataJson: audit as any,
           modelUsed: auditUsage.model,
           inputTokens: auditUsage.inputTokens,
           outputTokens: auditUsage.outputTokens,
