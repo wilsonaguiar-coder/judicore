@@ -17,7 +17,10 @@
     "test": "npm run test:legal",
     "test:legal": "tsx tests/run.ts legal",
     "test:legal-ai": "tsx tests/run.ts legal-ai",
-    "test:legal-report": "tsx tests/report/generate-report.ts"
+    "test:legal-report": "tsx tests/report/generate-report.ts",
+    "quality:cases": "tsx quality-lab/case-factory.ts",
+    "quality:run": "tsx quality-lab/quality-runner.ts",
+    "quality:report": "tsx quality-lab/quality-report.ts"
   },
   "dependencies": {
     "openai": "^6.39.1"
