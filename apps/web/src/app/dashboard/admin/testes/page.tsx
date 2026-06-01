@@ -54,6 +54,7 @@ export default function TestesPage() {
   const [count, setCount] = useState(10);
   const [maxCostUsd, setMaxCostUsd] = useState(5);
   const [area, setArea] = useState<string>("");
+  const [documentType, setDocumentType] = useState<string>("");
 
   // Auth gate
   useEffect(() => {
@@ -157,6 +158,7 @@ export default function TestesPage() {
     setQualityRunning(true);
     const body: Record<string, unknown> = { count, maxCostUsd };
     if (area) body.area = area;
+    if (documentType) body.documentType = documentType;
     await runSSE(
       "/admin/testes/run-quality",
       body,
@@ -305,7 +307,7 @@ export default function TestesPage() {
           </div>
 
           {/* Form */}
-          <div className="grid grid-cols-3 gap-4 mb-4">
+          <div className="grid grid-cols-4 gap-4 mb-4">
             <div>
               <label className="block text-xs font-medium text-slate-700 mb-1">
                 Nº de casos (1–100)
@@ -357,6 +359,24 @@ export default function TestesPage() {
                 <option value="TRABALHISTA">Trabalhista</option>
                 <option value="CRIMINAL">Criminal</option>
                 <option value="CIVEL">Cível</option>
+              </select>
+            </div>
+            <div>
+              <label className="block text-xs font-medium text-slate-700 mb-1">
+                Peça (opcional)
+              </label>
+              <select
+                value={documentType}
+                onChange={(e) => setDocumentType(e.target.value)}
+                disabled={qualityRunning}
+                className="w-full px-3 py-2 text-sm border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-amber-500"
+              >
+                <option value="">Todas as peças</option>
+                <option value="SENTENCA">Sentença</option>
+                <option value="DECISAO">Decisão</option>
+                <option value="RECURSO">Recurso</option>
+                <option value="PETICAO_INICIAL">Petição Inicial</option>
+                <option value="DESPACHO">Despacho</option>
               </select>
             </div>
           </div>

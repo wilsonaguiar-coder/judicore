@@ -31,6 +31,7 @@ import type {
   ValidationError,
   GenerationMode,
   DocumentStatus,
+  TipoPeca,
 } from "../src/pipeline/types.js";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
@@ -39,6 +40,7 @@ const OUTPUT_DIR = join(__dirname, "output");
 interface CliArgs {
   count: number;
   area?: LegalArea;
+  documentType?: TipoPeca;
   dryRun: boolean;
 }
 
@@ -46,11 +48,13 @@ function parseArgs(): CliArgs {
   const args = process.argv.slice(2);
   const countArg = args.find((a) => a.startsWith("--count="));
   const areaArg = args.find((a) => a.startsWith("--area="));
+  const typeArg = args.find((a) => a.startsWith("--type="));
   const result: CliArgs = {
     count: countArg ? Number.parseInt(countArg.slice("--count=".length), 10) : 100,
     dryRun: args.includes("--dry-run"),
   };
   if (areaArg) result.area = areaArg.slice("--area=".length) as LegalArea;
+  if (typeArg) result.documentType = typeArg.slice("--type=".length) as TipoPeca;
   return result;
 }
 
@@ -157,12 +161,13 @@ async function runOneCase(fx: SyntheticCase): Promise<CaseResult> {
 async function main(): Promise<void> {
   const args = parseArgs();
   const limits = loadLimits();
-  const cases = generateSyntheticCases(args.count, args.area).slice(0, limits.maxCases);
+  const cases = generateSyntheticCases(args.count, args.area, args.documentType).slice(0, limits.maxCases);
 
   console.log(`[quality-runner] Configuração:`);
   console.log(`  modo:        ${args.dryRun ? "DRY-RUN (sem OpenAI)" : "REAL (OpenAI)"}`);
   console.log(`  casos:       ${cases.length}`);
   console.log(`  área filtro: ${args.area ?? "todas"}`);
+  console.log(`  tipo filtro: ${args.documentType ?? "todos"}`);
   console.log(`  limites:     ${limits.maxCases} casos / ${limits.maxTokens} tokens / $${limits.maxCostUsd}`);
 
   if (args.dryRun) {

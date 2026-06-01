@@ -2,12 +2,13 @@
 //
 // Verifica:
 //   - Presença de RELATÓRIO, FUNDAMENTAÇÃO e DISPOSITIVO
-//   - Linguagem dispositiva adequada
+//   - Linguagem dispositiva adequada (verbo correto por área)
 //   - Indicação do recurso cabível
-//   - Comprimento mínimo das seções
+//   - Comprimento mínimo das seções (mais rigoroso)
+//   - Dispositivo não genérico (deve nomear pedido ou ben. específico)
 //
 // Roda apenas quando tipo_peca === "SENTENCA". Complementa o StructuralValidator
-// existente (que já checa "Excelentíssimo", "julgo", etc.).
+// existente e o CriminalSentenceValidator (que cobre criminal especificamente).
 
 import type { LegalClassification, ValidationError, ValidationResult } from "../pipeline/types.js";
 
@@ -16,6 +17,14 @@ const FUNDAMENTACAO_RE = /fundamenta[cç][aã]o/i;
 const DISPOSITIVO_RE = /(dispositivo|ante\s+o\s+exposto|isso\s+posto|isto\s+posto|pelo\s+exposto)/i;
 const DECISION_VERB_RE = /julgo\s+(procedente|improcedente|extinto|parcialmente)|absolvo|condeno|concedo\s+(a\s+)?(parcial(mente)?\s+)?ordem|denego\s+(a\s+)?ordem/i;
 const RECURSO_RE = /(recurso\s+(ord[ií]n[aá]rio|cab[ií]vel|inominado|de\s+revista|em\s+sentido\s+estrito|especial|extraordin[aá]rio)|apela[cç][aã]o(\s+criminal)?|RO\b|RR\b|REsp\b|RE\b|APL\b|art\.\s*(593|895|1\.?009|1009|42)\s+(CPP|CLT|CPC|Lei\s*9\.?099))/i;
+
+// Dispositivo genérico sem detalhamento de pedido ou benefício
+const DISPOSITIVO_VAGUE_RE = /julgo\s+(procedente|improcedente|parcialmente\s+procedente)\s+o\s+pedido[.\s]*$/i;
+
+// Comprimentos mínimos das seções (mais rigorosos que antes)
+const MIN_RELATORIO = 350;
+const MIN_FUNDAMENTACAO = 600;
+const MIN_DISPOSITIVO = 80;
 
 export class SentencaValidator {
   validate(draft: string, classification: LegalClassification): ValidationResult {
@@ -63,19 +72,35 @@ export class SentencaValidator {
       });
     }
 
-    // Tamanho mínimo das seções — apenas se as marcas existem
+    // Dispositivo genérico sem identificar pedido ou benefício específico
     const sections = splitSections(draft);
-    if (sections.relatorio && sections.relatorio.length < 200) {
+    if (sections.dispositivo && DISPOSITIVO_VAGUE_RE.test(sections.dispositivo.trim())) {
       errors.push({
-        rule: "SENTENCA_RELATORIO_TOO_SHORT",
-        message: "Relatório muito curto — deve conter síntese dos fatos e alegações (mínimo ~200 chars)",
+        rule: "SENTENCA_DISPOSITIVO_VAGUE",
+        message: "Dispositivo genérico — deve identificar o pedido ou benefício específico (ex: concessão de auxílio-doença, reconhecimento do vínculo, etc.)",
         fatal: false,
       });
     }
-    if (sections.fundamentacao && sections.fundamentacao.length < 400) {
+
+    // Comprimento mínimo das seções — apenas se as marcas existem
+    if (sections.relatorio && sections.relatorio.length < MIN_RELATORIO) {
+      errors.push({
+        rule: "SENTENCA_RELATORIO_TOO_SHORT",
+        message: `Relatório muito curto (${sections.relatorio.length} chars) — deve conter síntese completa dos fatos e alegações (mínimo ~${MIN_RELATORIO} chars)`,
+        fatal: false,
+      });
+    }
+    if (sections.fundamentacao && sections.fundamentacao.length < MIN_FUNDAMENTACAO) {
       errors.push({
         rule: "SENTENCA_FUNDAMENTACAO_TOO_SHORT",
-        message: "Fundamentação muito curta — deve analisar cada tese (mínimo ~400 chars)",
+        message: `Fundamentação muito curta (${sections.fundamentacao.length} chars) — deve analisar cada tese com profundidade (mínimo ~${MIN_FUNDAMENTACAO} chars)`,
+        fatal: false,
+      });
+    }
+    if (sections.dispositivo && sections.dispositivo.length < MIN_DISPOSITIVO) {
+      errors.push({
+        rule: "SENTENCA_DISPOSITIVO_TOO_SHORT",
+        message: "Dispositivo muito curto — deve resolver todos os pedidos com clareza",
         fatal: false,
       });
     }

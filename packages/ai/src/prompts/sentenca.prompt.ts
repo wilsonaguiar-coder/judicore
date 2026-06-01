@@ -53,27 +53,34 @@ REGRAS GERAIS:
     return `${baseRules}
 ⚠ SENTENÇA EM HABEAS CORPUS — LINGUAGEM PROCESSUAL PENAL OBRIGATÓRIA:
 
-DISPOSITIVO obrigatório usa expressões da técnica do mandamus:
-  ✓ "CONCEDO A ORDEM" — para HC concessivo (liberta o paciente, tranca a ação, etc.)
-  ✓ "DENEGO A ORDEM" — para HC denegado (mantém a constrição)
-  ✓ "CONCEDO PARCIALMENTE A ORDEM" — para HC parcialmente provido
+ESTA É UMA SENTENÇA CRIMINAL EM HABEAS CORPUS — não é petição nem despacho.
+Use APENAS os termos técnicos do mandamus abaixo.
 
-PROIBIDO em HC:
+DISPOSITIVO obrigatório usa expressões da técnica do mandamus:
+  ✓ "CONCEDO A ORDEM" — para HC concessivo (liberta o paciente, tranca a ação penal, etc.)
+  ✓ "DENEGO A ORDEM" — para HC denegado (mantém a constrição, indefere o pedido)
+  ✓ "CONCEDO PARCIALMENTE A ORDEM" — para HC parcialmente provido
+  O dispositivo deve indicar CLARAMENTE o efeito prático (ex: "determino a imediata expedição de alvará de soltura").
+
+PROIBIDO em HC (uso causa REPROVAÇÃO automática):
   ✗ "julgo procedente" / "julgo improcedente" / "julgo parcialmente procedente"
-  ✗ "ante o exposto, condeno" / "absolvo o réu"
+  ✗ "ante o exposto, condeno" / "absolvo o réu" / "absolvo o paciente"
   ✗ tratar o paciente como "autor" ou "réu" (use "PACIENTE")
   ✗ tratar o impetrante como "autor" ou "requerente" (use "IMPETRANTE")
-  ✗ citar art. 85 CPC (não há honorários em HC)
+  ✗ tratar a autoridade impetrada como "réu" (use "AUTORIDADE COATORA")
+  ✗ citar art. 85 CPC (não há honorários em HC nem em ação penal)
 
 FUNDAMENTOS LEGAIS principais a citar:
   - art. 5º, LXVIII, CF/88 (cabimento do HC)
-  - arts. 647 a 667 CPP (procedimento)
-  - art. 312 CPP se houver prisão preventiva discutida
-  - Súmulas STF/STJ pertinentes
+  - arts. 647 a 667 CPP (procedimento do habeas corpus)
+  - art. 312 CPP se houver prisão preventiva discutida (fundamentos da preventiva)
+  - art. 316 CPP se discutir reavaliação periódica da preventiva
+  - Súmulas STF/STJ pertinentes ao caso concreto
 
-RECURSO CABÍVEL:
-  - Recurso em sentido estrito (art. 581 CPP) se denegada em primeira instância
-  - Recurso Ordinário Constitucional (art. 102, II, "a", CF) se denegada por TJ/TRF em HC originário
+RECURSO CABÍVEL (indicar obrigatoriamente):
+  - Recurso em sentido estrito — art. 581, X, CPP — se HC denegado em primeira instância
+  - Recurso Ordinário Constitucional — art. 102, II, "a", CF — se denegado por TJ/TRF em HC originário
+  ✗ NUNCA "Apelação cível" ou "Recurso Ordinário Trabalhista"
 `;
   }
 
@@ -82,36 +89,49 @@ RECURSO CABÍVEL:
 ⚠ SENTENÇA CRIMINAL CONDENATÓRIA OU ABSOLUTÓRIA — LINGUAGEM PROCESSUAL PENAL OBRIGATÓRIA:
 
 DISPOSITIVO obrigatório usa termos do processo penal:
-  ✓ "ABSOLVO" — quando reconhecer hipótese do art. 386 CPP
-  ✓ "CONDENO" — quando provada a autoria e materialidade
-  ✓ Em caso de absolvição, citar o INCISO específico do art. 386 CPP
+  ✓ "ABSOLVO o réu [NOME], qualificado nos autos, da imputação do art. [X], com fundamento no art. 386, [INCISO], do CPP"
+  ✓ "CONDENO o réu [NOME] pela prática do art. [X] à pena de [X] anos e [Y] meses de reclusão/detenção"
+  — O INCISO do art. 386 CPP é OBRIGATÓRIO na absolvição (I a VII)
 
-PROIBIDO em sentença criminal:
+PROIBIDO em sentença criminal (causa REPROVAÇÃO automática):
   ✗ "julgo procedente / improcedente o pedido" — usar ABSOLVO/CONDENO
   ✗ tratar o acusado como "réu civil" — usar "RÉU/ACUSADO" no processo penal
-  ✗ citar art. 85 CPC (não há honorários em processo penal)
+  ✗ citar art. 85 CPC (não há honorários em processo penal — causa vício grave)
   ✗ aplicar regras civis de sucumbência
+  ✗ mencionar STJ como instância recursal criminal (é STF para questão constitucional)
 
-ESTRUTURA DA CONDENAÇÃO (se condenatória):
+ESTRUTURA DA ABSOLVIÇÃO:
+  1. Relatório dos fatos imputados
+  2. Análise da prova: materialidade e autoria
+  3. Dispositivo: ABSOLVO + inciso do art. 386 CPP (ex: VI — insuficiência de provas)
+  4. Custas: conforme art. 804 CPP (isenção se réu pobre)
+  5. Recurso: Apelação Criminal (art. 593, I, CPP) — prazo 5 dias
+
+ESTRUTURA DA CONDENAÇÃO:
   1. Materialidade e autoria — análise das provas
   2. Tipicidade — enquadramento no tipo penal
   3. Ilicitude / culpabilidade
-  4. DOSIMETRIA em 3 fases (art. 68 CP):
-     - 1ª fase: pena-base (art. 59 CP — 8 circunstâncias)
-     - 2ª fase: atenuantes (art. 65 CP) / agravantes (arts. 61-62 CP)
-     - 3ª fase: causas de diminuição (-) / aumento (+)
-     - Pena definitiva com regime inicial e detração (art. 387, §2º CPP)
-  5. Substituição (art. 44 CP) ou sursis (art. 77 CP) se cabível
-  6. Custas processuais
+  4. DOSIMETRIA EM 3 FASES OBRIGATÓRIAS (art. 68 CP):
+     - 1ª fase: pena-base (art. 59 CP — fixar com análise das 8 circunstâncias judiciais)
+     - 2ª fase: atenuantes (art. 65 CP) / agravantes (arts. 61-62 CP) — se houver
+     - 3ª fase: causas de diminuição (-) / aumento (+) — se houver
+     - Resultado: "Pena definitiva: X anos e Y meses de reclusão/detenção"
+  5. REGIME INICIAL DE CUMPRIMENTO (art. 33 CP) — OBRIGATÓRIO:
+     - Regime fechado / semiaberto / aberto (conforme pena e reincidência)
+     - Citar fundamento: "art. 33, §2º, [a/b/c], do CP"
+  6. Substituição (art. 44 CP) ou sursis (art. 77 CP) se cabível
+  7. Detração: art. 387, §2º, CPP se houver prisão anterior
+  8. Custas processuais
 
-FUNDAMENTOS LEGAIS principais:
+FUNDAMENTOS LEGAIS obrigatórios:
   - Tipo penal aplicado (CP ou lei extravagante)
   - art. 386 CPP (absolvição) ou art. 387 CPP (condenação)
-  - arts. 59, 68 e seguintes CP (dosimetria)
+  - arts. 59 e 68 CP (dosimetria — citar explicitamente)
+  - art. 33 CP (regime inicial — citar explicitamente)
 
-RECURSO CABÍVEL:
-  ✓ APELAÇÃO CRIMINAL (art. 593 CPP) — prazo de 5 dias para interposição e 8 dias para razões
-  ✗ NUNCA "Apelação cível" ou "Recurso Ordinário"
+RECURSO CABÍVEL (indicar obrigatoriamente):
+  ✓ APELAÇÃO CRIMINAL (art. 593, I, CPP) — prazo de 5 dias para interposição e 8 dias para razões
+  ✗ NUNCA "Apelação cível", "Recurso Ordinário Trabalhista" ou "Recurso Inominado"
 `;
   }
 

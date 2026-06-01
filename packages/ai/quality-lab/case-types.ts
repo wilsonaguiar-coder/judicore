@@ -60,12 +60,24 @@ export function mapRuleToValidator(rule: string): ValidatorComponent {
     rule === "INCOMPATIBLE_APPEAL" ||
     rule === "WRONG_SUPERIOR_COURT" ||
     rule === "JEF_JEC_WRONG_APPEAL" ||
-    rule === "CRIMINAL_WRONG_APPEAL"
+    rule === "CRIMINAL_WRONG_APPEAL" ||
+    rule === "CRIMINAL_MISSING_APPEAL_REF"
   ) return "AppealValidator";
   if (
     rule === "MISSING_STRUCTURE" ||
     rule === "DESPACHO_WITH_DECISION_LANGUAGE" ||
-    rule === "FORBIDDEN_STRUCTURE"
+    rule === "FORBIDDEN_STRUCTURE" ||
+    rule === "SENTENCA_MISSING_RELATORIO" ||
+    rule === "SENTENCA_MISSING_FUNDAMENTACAO" ||
+    rule === "SENTENCA_MISSING_DISPOSITIVO" ||
+    rule === "SENTENCA_MISSING_DECISION_VERB" ||
+    rule === "SENTENCA_MISSING_APPEAL_REF" ||
+    rule === "SENTENCA_RELATORIO_TOO_SHORT" ||
+    rule === "SENTENCA_FUNDAMENTACAO_TOO_SHORT" ||
+    rule === "SENTENCA_DISPOSITIVO_TOO_SHORT" ||
+    rule === "SENTENCA_DISPOSITIVO_VAGUE" ||
+    rule === "HC_MISSING_ORDER_VERB" ||
+    rule === "HC_WRONG_DISPOSITIVO"
   ) return "StructuralValidator";
   if (
     rule === "RPPS_WRONG_ARTICLE" ||
@@ -76,7 +88,13 @@ export function mapRuleToValidator(rule: string): ValidatorComponent {
     rule === "PROHIBITED_TERM" ||
     rule === "CRIMINAL_WRONG_TERM" ||
     rule === "REQUIRED_FIELD" ||
-    rule === "LOW_CONFIDENCE"
+    rule === "LOW_CONFIDENCE" ||
+    rule === "CRIMINAL_ARTICLE_85_CPC" ||
+    rule === "CRIMINAL_MISSING_DISPOSITIVO" ||
+    rule === "CRIMINAL_WRONG_CIVIL_VERB" ||
+    rule === "CRIMINAL_MISSING_DOSIMETRIA" ||
+    rule === "CRIMINAL_MISSING_REGIME" ||
+    rule === "CRIMINAL_ABSOLVICAO_MISSING_ART386"
   ) return "LegalValidator";
   return "Other";
 }

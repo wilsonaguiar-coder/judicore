@@ -7,6 +7,7 @@
 // Distingue subcategorias:
 //   - HC (habeas corpus): exige "concedo a ordem" ou "denego a ordem"
 //   - Sentença comum: exige ABSOLVO ou CONDENO + dosimetria se condenatória
+//     + regime inicial de cumprimento + art. 386 CPP em absolvição
 
 import type { LegalClassification, ValidationError, ValidationResult } from "../pipeline/types.js";
 
@@ -20,7 +21,15 @@ const APELACAO_CIVEL_RE = /apela[cç][aã]o\s+c[ií]vel|recurso\s+ordin[aá]rio\
 const ABSOLVICAO_RE = /absolvo/i;
 const CONDENACAO_RE = /condeno/i;
 const DOSIMETRIA_RE = /(art\.\s*59\s*(do\s+)?cp|pena[\s-]*base|primeira\s+fase|2[ªa]\s+fase|3[ªa]\s+fase|atenuante|agravante|dosimetri|art\.\s*68\s*(do\s+)?cp)/i;
-const HC_KEYWORDS_RE = /habeas\s+corpus|\bhc\b|paciente|impetrante/i;
+
+// Regime inicial de cumprimento da pena (art. 33 CP)
+const REGIME_CUMPRIMENTO_RE = /(regime\s+(inicial\s+)?(fechado|semiaberto|aberto)|art\.?\s*33\s*(do\s+)?cp|regime\s+de\s+cumprimento)/i;
+
+// Inciso do art. 386 CPP em absolvição
+const ART_386_RE = /art\.?\s*386\s*(do\s+)?cpp/i;
+
+// HC detection — ampliado para cobrir mais indicadores
+const HC_KEYWORDS_RE = /habeas\s+corpus|\bhc\b|paciente|impetrante|coator|constrangimento\s+ilegal|\bwrit\b/i;
 
 export class CriminalSentenceValidator {
   validate(draft: string, classification: LegalClassification): ValidationResult {
@@ -30,7 +39,9 @@ export class CriminalSentenceValidator {
     if (!isCriminal) return { valid: true, errors: [] };
 
     const errors: ValidationError[] = [];
-    const isHC = HC_KEYWORDS_RE.test(classification.assunto_principal) || HC_KEYWORDS_RE.test(draft);
+    const isHC =
+      HC_KEYWORDS_RE.test(classification.assunto_principal) ||
+      HC_KEYWORDS_RE.test(draft.slice(0, 800)); // só verifica início do draft
 
     if (isHC) {
       // Sentença em HC
@@ -64,17 +75,36 @@ export class CriminalSentenceValidator {
           fatal: true,
         });
       }
-      // Se condenatória, deve ter dosimetria
-      if (CONDENACAO_RE.test(draft) && !DOSIMETRIA_RE.test(draft)) {
+
+      // Absolvição deve citar o inciso do art. 386 CPP
+      if (ABSOLVICAO_RE.test(draft) && !ART_386_RE.test(draft)) {
         errors.push({
-          rule: "CRIMINAL_MISSING_DOSIMETRIA",
-          message: "Sentença condenatória deve conter dosimetria em 3 fases (art. 59/68 CP)",
+          rule: "CRIMINAL_ABSOLVICAO_MISSING_ART386",
+          message: "Sentença absolutória deve indicar o inciso específico do art. 386 CPP (ex: art. 386, VI, CPP — insuficiência de provas)",
           fatal: false,
         });
       }
+
+      // Condenatória: exige dosimetria e regime de cumprimento
+      if (CONDENACAO_RE.test(draft)) {
+        if (!DOSIMETRIA_RE.test(draft)) {
+          errors.push({
+            rule: "CRIMINAL_MISSING_DOSIMETRIA",
+            message: "Sentença condenatória deve conter dosimetria em 3 fases (art. 59/68 CP)",
+            fatal: false,
+          });
+        }
+        if (!REGIME_CUMPRIMENTO_RE.test(draft)) {
+          errors.push({
+            rule: "CRIMINAL_MISSING_REGIME",
+            message: "Sentença condenatória deve fixar o regime inicial de cumprimento da pena (art. 33 CP — fechado, semiaberto ou aberto)",
+            fatal: false,
+          });
+        }
+      }
     }
 
-    // Honorários — proibido em criminal
+    // Honorários — proibido em criminal (tanto HC quanto comum)
     if (ART_85_CPC_RE.test(draft)) {
       errors.push({
         rule: "CRIMINAL_ARTICLE_85_CPC",

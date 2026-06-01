@@ -19,6 +19,7 @@ import { writeFile, mkdir } from "node:fs/promises";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import type { SyntheticCase, LegalArea, TrapKind } from "./case-types.js";
+import type { TipoPeca } from "../src/pipeline/types.js";
 import { THEMES, PHASE_BUILDERS, buildDespacho } from "./case-templates.js";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
@@ -61,7 +62,11 @@ function decideTrap(slotIndex: number, area: LegalArea, phase: Phase | "DESPACHO
   return kind;
 }
 
-export function generateSyntheticCases(count = 100, areaFilter?: LegalArea): SyntheticCase[] {
+export function generateSyntheticCases(
+  count = 100,
+  areaFilter?: LegalArea,
+  typeFilter?: TipoPeca,
+): SyntheticCase[] {
   const cases: SyntheticCase[] = [];
 
   // 80 casos: 20 temas × 4 fases
@@ -89,7 +94,10 @@ export function generateSyntheticCases(count = 100, areaFilter?: LegalArea): Syn
     }
   }
 
-  return cases.slice(0, count);
+  // Filtro por tipo de peça — aplicado após gerar todos os casos da área
+  const filtered = typeFilter ? cases.filter((c) => c.documentType === typeFilter) : cases;
+
+  return filtered.slice(0, count);
 }
 
 // ── CLI ───────────────────────────────────────────────────────────────────────
@@ -98,9 +106,11 @@ async function main(): Promise<void> {
   const args = process.argv.slice(2);
   const countArg = args.find((a) => a.startsWith("--count="));
   const areaArg = args.find((a) => a.startsWith("--area="));
+  const typeArg = args.find((a) => a.startsWith("--type="));
   const count = countArg ? Number.parseInt(countArg.slice("--count=".length), 10) : 100;
   const area = areaArg ? (areaArg.slice("--area=".length) as LegalArea) : undefined;
-  const cases = generateSyntheticCases(count, area);
+  const documentType = typeArg ? (typeArg.slice("--type=".length) as TipoPeca) : undefined;
+  const cases = generateSyntheticCases(count, area, documentType);
 
   const outDir = join(__dirname, "output");
   await mkdir(outDir, { recursive: true });
