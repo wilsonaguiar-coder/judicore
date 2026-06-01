@@ -329,12 +329,10 @@ export function DocumentPanel({ caseId, token, userRole, jurisprudencias, caseDe
           const prevPhase = pipelinePhase;
           if (prevPhase) setCompletedPhases((prev) => new Set([...prev, prevPhase]));
           setPipelinePhase(data.phase);
-          if (data.phase === "drafting") setModalOpen(true);
           if (!isRetry) setPipelineGenerationId(data.generationId);
         } else if (evt === "chunk") {
           accumulated += parsed["data"] as string;
           onDocGenerated(accumulated);
-          setModalOpen(true);
         } else if (evt === "audit") {
           const data = parsed["data"] as AuditResult;
           setAudit(data);
@@ -376,7 +374,6 @@ export function DocumentPanel({ caseId, token, userRole, jurisprudencias, caseDe
         if (parsed.chunk) {
           accumulated += parsed.chunk;
           onDocGenerated(accumulated);
-          setModalOpen(true);
         }
         if (parsed.done) onDocGenerated(accumulated, parsed.documentId);
       }
@@ -460,7 +457,6 @@ export function DocumentPanel({ caseId, token, userRole, jurisprudencias, caseDe
     });
     setError("");
     onDocGenerated("");
-    setModalOpen(true);
 
     try {
       const res = await fetch(`/api/pipeline/${pipelineGenerationId}/retry`, {
