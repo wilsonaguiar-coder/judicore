@@ -14,6 +14,7 @@ interface Props {
   token: string;
   userRole: UserRole;
   jurisprudencias: Jurisprudencia[];
+  caseDescription?: string | undefined;
   activeDoc: string | null;
   activeDocId: string | null;
   onDocGenerated: (content: string, docId?: string) => void;
@@ -131,10 +132,11 @@ function AuditErrors({ erros }: { erros: AuditError[] }) {
   );
 }
 
-export function DocumentPanel({ caseId, token, userRole, jurisprudencias, activeDoc, activeDocId, onDocGenerated }: Props) {
+export function DocumentPanel({ caseId, token, userRole, jurisprudencias, caseDescription, activeDoc, activeDocId, onDocGenerated }: Props) {
   const allowedTypes = DOC_TYPES_BY_ROLE[userRole] ?? DOC_TYPES_BY_ROLE["COMUM"];
   const [mode, setMode]           = useState<"pipeline" | "padrao" | "premium">("pipeline");
   const [docType, setDocType]     = useState<DocumentType>(allowedTypes[0]!);
+  const [caseDescEdit, setCaseDescEdit] = useState(caseDescription ?? "");
   const [instruction, setInstruction] = useState("");
   const [pdfFiles, setPdfFiles]   = useState<File[]>([]);
   const [streaming, setStreaming] = useState(false);
@@ -262,6 +264,7 @@ export function DocumentPanel({ caseId, token, userRole, jurisprudencias, active
           headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
           body: JSON.stringify({
             caseId: caseId || undefined,
+            caseDescription: caseDescEdit.trim() || undefined,
             type: docType,
             jurisprudencias: jurisprudencias.map(toJurPipeline),
             instruction: instruction.trim() || undefined,
@@ -368,7 +371,11 @@ export function DocumentPanel({ caseId, token, userRole, jurisprudencias, active
   }
 
   const isGenerating = streaming || retrying;
-  const canGenerate  = mode === "premium" ? pdfFiles.length > 0 : jurisprudencias.length > 0;
+  const canGenerate  = mode === "pipeline"
+    ? jurisprudencias.length > 0 && caseDescEdit.trim().length > 0
+    : mode === "premium"
+      ? pdfFiles.length > 0
+      : jurisprudencias.length > 0;
   const showPipeline = mode === "pipeline";
 
   return (
@@ -419,6 +426,20 @@ export function DocumentPanel({ caseId, token, userRole, jurisprudencias, active
               </button>
             ))}
           </div>
+
+          {/* Descrição do caso (pipeline only) */}
+          {mode === "pipeline" && (
+            <textarea
+              value={caseDescEdit}
+              onChange={(e) => setCaseDescEdit(e.target.value)}
+              disabled={isGenerating}
+              placeholder="Descreva o caso: partes, fatos relevantes, pedido pretendido..."
+              rows={3}
+              className={`w-full text-xs rounded-lg border px-3 py-2 resize-none placeholder:text-muted-foreground/50 focus:outline-none focus:ring-1 focus:ring-primary disabled:opacity-50 ${
+                caseDescEdit.trim().length === 0 ? "bg-destructive/5 border-destructive/40" : "bg-muted/30"
+              }`}
+            />
+          )}
 
           {/* Instrução */}
           <textarea

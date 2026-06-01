@@ -92,6 +92,7 @@ export default function CasePage() {
               token={token!}
               userRole={user?.role ?? "COMUM"}
               jurisprudencias={selectedJurisprudencias}
+              caseDescription={caseData?.description}
               activeDoc={activeDoc}
               activeDocId={activeDocId}
               onDocGenerated={(content, docId) => {

@@ -26,6 +26,7 @@ const DOC_TYPES_BY_ROLE: Record<string, readonly string[]> = {
 
 const pipelineSchema = z.object({
   caseId: z.string().optional(),
+  caseDescription: z.string().optional(),
   type: z.enum(ALL_DOC_TYPES),
   jurisprudencias: z.array(jurisprudenciaInputSchema),
   instruction: z.string().optional(),
@@ -54,11 +55,11 @@ export async function pipelineRoutes(app: FastifyInstance) {
       return reply.status(403).send({ error: `Perfil não permite gerar ${body.data.type}` });
     }
 
-    let caseDescription = "";
+    let caseDescription = body.data.caseDescription ?? "";
     if (body.data.caseId) {
       const caseData = await prisma.case.findFirst({ where: { id: body.data.caseId, userId: sub } });
       if (!caseData) return reply.status(404).send({ error: "Caso não encontrado" });
-      caseDescription = caseData.description;
+      if (!caseDescription) caseDescription = caseData.description;
     }
 
     const generation = await prisma.legalGeneration.create({
