@@ -2,6 +2,17 @@ import type { LegalClassification, LegalExtraction, ArgumentationMatrix, Jurispr
 import { PIECE_TEMPLATES, APPEAL_RULES, getJurisdicaoRules } from "../rules/legal_rules.js";
 import { buildModeBlock } from "./template-mode.prompt.js";
 
+const TUTELA_KEYWORDS_RE = /previdenci|pensão\s+por\s+morte|benefício|servidor\s+públic|alimentar|saúde|remuneratório|salarial|vencimentos|proventos|aposentadori|paridade|reajuste/i;
+
+function requiresTutelaUrgencia(classification: LegalClassification, extraction: LegalExtraction): boolean {
+  if (classification.tipo_peca !== "PETICAO_INICIAL") return false;
+  return (
+    TUTELA_KEYWORDS_RE.test(classification.assunto_principal) ||
+    ["RPPS", "RGPS"].includes(classification.regime_juridico ?? "") ||
+    extraction.pedidos.some((p) => TUTELA_KEYWORDS_RE.test(p))
+  );
+}
+
 export function buildDraftPrompt(
   classification: LegalClassification,
   extraction: LegalExtraction,
@@ -53,7 +64,17 @@ export function buildDraftPrompt(
 
   const modeBlock = buildModeBlock(mode);
 
-  return `${modeBlock}Redija a peça jurídica com base na classificação, extração e matriz de argumentação abaixo.
+  const peticaoInicialBlock = (() => {
+    if (mode !== "FINAL_DRAFT" || classification.tipo_peca !== "PETICAO_INICIAL") return "";
+    const hasTutela = requiresTutelaUrgencia(classification, extraction);
+    const tutelaInstrucao = hasTutela
+      ? `\n⚖ TUTELA DE URGÊNCIA OBRIGATÓRIA (natureza ${classification.regime_juridico ?? "alimentar/previdenciária"} identificada — art. 300 CPC/2015):\nInclua a seção "DA TUTELA DE URGÊNCIA" com:\n  1. Probabilidade do direito (fumus boni iuris) — cite a norma específica;\n  2. Perigo de dano ou risco ao resultado útil do processo (periculum in mora) — aplique ao caso;\n  3. Reversibilidade da medida;\n  4. Pedido liminar específico com o que deve ser deferido imediatamente.\nAdicione o pedido liminar individualizado na seção DOS PEDIDOS.\n`
+      : "";
+    return `\n📋 PETICAO_INICIAL FINAL_DRAFT — EXIGÊNCIAS MÍNIMAS:\nA seção DO DIREITO DEVE conter no mínimo 6 subtópicos com numeração romana (I, II, III, IV, V, VI...):\n  I — Competência e fundamento jurisdicional\n  II — Regime jurídico aplicável\n  III — Norma principal do direito pleiteado\n  IV — Requisitos legais e aplicação ao caso concreto\n  V — Resistência administrativa ou lesão ao direito${hasTutela ? "\n  VI — Efeitos financeiros e/ou prescrição\n  VII — Da Tutela de Urgência (obrigatório)" : "\n  VI — Efeitos financeiros e/ou prescrição"}\nCada subtópico: 2-4 parágrafos. Tese → norma → aplicação → objeção → resposta → conclusão.${tutelaInstrucao}`;
+  })();
+
+  return `${modeBlock}${peticaoInicialBlock}
+Redija a peça jurídica com base na classificação, extração e matriz de argumentação abaixo.
 
 CLASSIFICAÇÃO:
 - Tipo: ${classification.tipo_peca}

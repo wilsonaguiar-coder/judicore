@@ -82,7 +82,12 @@ export class FinalValidator {
 
     // 8. FINAL_DRAFT: validação de riqueza argumentativa
     if (mode === "FINAL_DRAFT") {
-      allErrors.push(...this.richness.validate(draft));
+      allErrors.push(...this.richness.validate(draft, {
+        tipo_peca: classification.tipo_peca,
+        regime_juridico: classification.regime_juridico,
+        assunto_principal: classification.assunto_principal,
+        pedidos: extraction.pedidos,
+      }));
     }
 
     // Calcular document_confidence

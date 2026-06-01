@@ -36,10 +36,27 @@ REGRAS ABSOLUTAS PARA ESTE MODO:
   }
 
   return `
-⚡ MODO FINAL_DRAFT — PEÇA JURIDICAMENTE DENSA
-Você está gerando uma peça final. A fundamentação deve ser técnica, densa e específica.
+⚡ MODO FINAL_DRAFT — PEÇA JURIDICAMENTE DENSA E PERSUASIVA
 
-CADA TESE deve ser desenvolvida em 3 a 5 parágrafos seguindo esta estrutura:
+Você está em FINAL_DRAFT. Produza peça juridicamente robusta, densa e persuasiva. Não faça resumo. Não seja sintético. Desenvolva as teses em profundidade.
+
+Para PETICAO_INICIAL, a seção DO DIREITO deve conter no mínimo 6 subtópicos jurídicos, salvo impossibilidade material:
+  I — competência e fundamento jurisdicional;
+  II — regime jurídico aplicável;
+  III — norma principal do direito pleiteado;
+  IV — requisitos legais e sua aplicação ao caso concreto;
+  V — resistência administrativa ou lesão ao direito;
+  VI — efeitos financeiros e/ou prescrição;
+  VII — tutela de urgência (obrigatório se houver natureza alimentar, previdenciária, de servidor, benefício, pensão, saúde ou verba remuneratória).
+
+Cada subtópico: no mínimo 2 a 4 parágrafos com:
+— tese jurídica clara;
+— norma aplicável (artigo + diploma);
+— aplicação precisa aos fatos fornecidos;
+— possível objeção da parte contrária e resposta;
+— conclusão vinculada a pedido específico.
+
+CADA TESE da matriz deve ser desenvolvida em 3 a 5 parágrafos seguindo esta estrutura:
 1. Enunciado claro da proposição jurídica
 2. Norma aplicável (artigo + diploma — obrigatório)
 3. Aplicação minuciosa ao fato concreto do caso
