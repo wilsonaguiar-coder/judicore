@@ -1,4 +1,5 @@
 export { LegalPipeline, LegalClassifierService, LegalExtractionService, LegalMatrixService, LegalDraftService, LegalAuditService, LegalValidator } from "./pipeline.js";
+export { EvidenceAnalyzerService } from "./evidence-analyzer.js";
 export type {
   PipelineInput,
   PipelineContext,
@@ -16,4 +17,8 @@ export type {
   RegimeJuridico,
   GenerationMode,
   ExtractionQuality,
+  EvidenceAnalysis,
+  EvidenceStance,
+  EvidenceUseMode,
+  JurisprudenciaAnalyzed,
 } from "./types.js";
