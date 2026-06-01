@@ -68,7 +68,14 @@ DIPLOMAS — nunca confunda numeração:
 • CC/2002: arts. 186, 187, 206, 421, 422, 927, 944...
 • CPC/2015: arts. 300, 303, 319, 330, 485, 487, 537...
 • CF/88: arts. 5º, 37, 109, 127, 196, 205...
-• Sempre indique: "art. X do CC/2002", "art. X do CPC/2015", "art. X da CF/88".`;
+• Sempre indique: "art. X do CC/2002", "art. X do CPC/2015", "art. X da CF/88".
+
+⚠ DISTINÇÃO CRÍTICA — REGIMES PREVIDENCIÁRIOS (confusão aqui é erro grave visível):
+• Art. 40 da CF/88 → RPPS: regime próprio dos SERVIDORES PÚBLICOS (aposentadoria, pensão, irredutibilidade de benefício). Use este para ações envolvendo servidores estatutários e seus dependentes.
+• Art. 201 da CF/88 → RGPS: regime geral do INSS (trabalhadores CLT, autônomos). NUNCA cite art. 201 em ação de servidor público — são regimes distintos e incompatíveis.
+• Art. 40, §7º → concessão de pensão por morte de servidor.
+• Art. 40, §8º → irredutibilidade e reajuste dos benefícios de servidor (NÃO use art. 7º, VI — este é salário de empregado CLT, não benefício previdenciário de servidor).
+• Art. 7º, VI → irredutibilidade de SALÁRIO de empregado: PROIBIDO usar em ações de servidor público ou de benefício previdenciário.`;
 }
 
 export function buildRagContext(jurisprudencias: Jurisprudencia[]): string {
@@ -123,6 +130,8 @@ export function buildDocumentPrompt(
 
     DESPACHO: `Redija uma MINUTA DE DESPACHO com linguagem judicial precisa e impessoal.
 
+Inicie com: "Processo nº [NÚMERO DO PROCESSO]" (ou [DADO NÃO FORNECIDO] se não disponível), seguido diretamente do corpo da peça.
+
 ESTRUTURA:
 I — RELATÓRIO SUMÁRIO: síntese objetiva do que motivou o despacho.
 II — FUNDAMENTAÇÃO: fundamente com artigo(s) aplicável(is) do CPC/2015 ou legislação específica. Se houver jurisprudência no contexto, aplique-a ao raciocínio.
@@ -131,6 +140,8 @@ III — DISPOSITIVO: determinação clara, direta e sem ambiguidade.
 ESTILO: impessoal, técnico, conciso. Despacho não é sentença — evite prolixidade.`,
 
     DECISAO: `Redija uma MINUTA DE DECISÃO INTERLOCUTÓRIA completa e fundamentada.
+
+Inicie com: "Processo nº [NÚMERO DO PROCESSO]" (ou [DADO NÃO FORNECIDO] se não disponível), seguido diretamente do corpo da peça.
 
 SENTIDO DA DECISÃO — leia a instrução do usuário:
 • "defiro" / "deferido" → fundamente acolhendo o requerimento; use [JUR-N] favoráveis ao deferimento; omita as contrárias.
@@ -158,10 +169,11 @@ ESTRUTURA:
 I — RELATÓRIO: síntese cronológica dos fatos, qualificação das partes, pedidos do autor e defesa do réu.
 II — FUNDAMENTAÇÃO JURÍDICA (seção central — desenvolva com máxima profundidade):
    2.1 QUESTÕES PRELIMINARES (se houver): prescrição, decadência, legitimidade — cada uma com artigo específico; acolha ou rejeite explicitamente com fundamento.
-   2.2 MÉRITO:
-      • Para cada tese relevante ao resultado: Tese → artigo específico → [JUR-N] favorável ao sentido adotado (raciocínio desenvolvido) → aplicação ao caso → conclusão parcial.
-      • Aborde todas as alegações das partes, acolhendo ou rejeitando com fundamento legal.
-      • Construa fundamentação coesa que conduza logicamente ao dispositivo.
+   2.2 MÉRITO (seção mais extensa — mínimo 4 parágrafos por tese):
+      • Para cada tese relevante ao resultado: enuncie a proposição jurídica → cite artigo específico → aplique a jurisprudência disponível com tese e raciocínio desenvolvido → analise concretamente os fatos do caso → conclua parcialmente.
+      • Analise INDIVIDUALMENTE cada requisito legal discutido: não basta dizer "não foram preenchidos os requisitos" — especifique qual requisito, por que não foi demonstrado e qual a consequência jurídica.
+      • Aborde TODAS as alegações das partes, acolhendo ou rejeitando cada uma com fundamento legal expresso.
+      • Construa fundamentação coesa e progressiva que conduza logicamente ao dispositivo — o leitor deve entender o resultado antes de chegar ao III.
 III — DISPOSITIVO:
    • Julgamento expresso conforme o sentido indicado (procedente / improcedente / parcialmente procedente).
    • Condenação em honorários advocatícios (art. 85 do CPC/2015) e custas processuais — indique quem paga.
@@ -223,6 +235,8 @@ III — DOS FATOS E DA DECISÃO RECORRIDA
 Resuma os fatos e aponte com precisão cirúrgica os erros da decisão recorrida.
 
 IV — DAS RAZÕES RECURSAIS
+Identifique e desenvolva NO MÍNIMO 2 pontos autônomos de impugnação. Cada ponto deve atacar um erro distinto da decisão recorrida (ex: erro de subsunção legal, omissão de fundamentação, violação de princípio constitucional, equívoco na valoração de prova). Peça recursal com apenas 1 ponto é fraca e insuficiente.
+
 Para cada ponto impugnado, abra um subitem com a estrutura OBRIGATÓRIA:
 
    ► PONTO [número]: [erro específico da decisão]
@@ -233,12 +247,11 @@ Para cada ponto impugnado, abra um subitem com a estrutura OBRIGATÓRIA:
 
    ARGUMENTO LEGAL: desenvolva como a norma citada foi violada — premissa legal, fato processual, vício da decisão.
 
-   JURISPRUDÊNCIA [JUR-N]: use APENAS as que forem favoráveis ao recorrente.
-   • Se a tese da [JUR-N] for desfavorável ao recorrente: OMITA completamente — não cite nem mencione.
-   • Para as favoráveis: cite pelo rótulo exato.
+   JURISPRUDÊNCIA: use APENAS as decisões favoráveis ao recorrente (omita completamente as desfavoráveis).
+   • Cite pelos dados reais: tribunal + número do processo + relator (ex: "TRF1, AI 1014483-13.2024.4.01.0000, Rel. Des. Federal Rui Gonçalves"). NUNCA escreva "[JUR-N]" no texto.
    • Norma interpretada: qual artigo/princípio essa decisão aplica.
    • Tese consagrada: o que o tribunal decidiu (contraponha à decisão recorrida).
-   • Distinção ou reforço: mostre como a tese da [JUR-N] contradiz ou expõe o erro da decisão recorrida.
+   • Distinção ou reforço: mostre como essa tese contradiz ou expõe o erro da decisão recorrida.
 
    CONCLUSÃO: o que deve ser reformado/anulado e qual o resultado pretendido.
 
