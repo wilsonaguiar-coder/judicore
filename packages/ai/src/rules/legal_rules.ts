@@ -69,17 +69,17 @@ export const STRUCTURAL_REQUIREMENTS: Record<string, PieceStructuralRequirements
   },
   RECURSO: {
     required_text_patterns: [
-      { pattern: /decis[aã]o\s+recorrida|senten[cç]a\s+(de|recorrida)|acord[aã]o\s+recorrido|decis[aã]o\s+de\s+primeiro/i, label: "Identificação da decisão recorrida", fatal: true },
-      { pattern: /requer(-se)?|pedido\s+(recursal|de\s+reforma)|pede\s+(deferimento|provimento)|pede\-se/i, label: "Pedido recursal", fatal: true },
+      { pattern: /decis[aã]o\s+recorrida|senten[cç]a\s+(de|recorrida)|acord[aã]o\s+recorrido|decis[aã]o\s+de\s+primeiro/i, label: "Identificação da decisão recorrida", fatal: false },
+      { pattern: /requer(-se)?|pedido\s+(recursal|de\s+reforma)|pede\s+(deferimento|provimento)|pede\-se/i, label: "Pedido recursal", fatal: false },
     ],
     required_structural_patterns: [],
     forbidden_patterns: [],
   },
   PETICAO_INICIAL: {
     required_text_patterns: [
-      { pattern: /dos\s+fatos|i\.?\s*[—\-]?\s*dos\s+fatos|dos\s+fatos\s+e/i, label: "Seção de Fatos", fatal: true },
-      { pattern: /dos\s+pedidos|iv\.?\s*[—\-]?\s*dos\s+pedidos|dos\s+requerimentos|v\.?\s*[—\-]?\s*dos\s+pedidos/i, label: "Seção de Pedidos", fatal: true },
-      { pattern: /valor\s+da\s+causa|d[ao]\s+valor\s+da\s+causa/i, label: "Valor da Causa", fatal: true },
+      { pattern: /dos\s+fatos|i\.?\s*[—\-]?\s*dos\s+fatos|dos\s+fatos\s+e/i, label: "Seção de Fatos", fatal: false },
+      { pattern: /dos\s+pedidos|iv\.?\s*[—\-]?\s*dos\s+pedidos|dos\s+requerimentos|v\.?\s*[—\-]?\s*dos\s+pedidos/i, label: "Seção de Pedidos", fatal: false },
+      { pattern: /valor\s+da\s+causa|d[ao]\s+valor\s+da\s+causa/i, label: "Valor da Causa", fatal: false },
     ],
     required_structural_patterns: [],
     forbidden_patterns: [],
