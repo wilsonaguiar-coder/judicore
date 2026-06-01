@@ -114,6 +114,8 @@ interface ThemeNarrative {
   pedido: string;
   norma: string;
   jurisprudencias?: JurisprudenciaInput[];
+  /** Instrução específica para a fase SENTENÇA (usada em temas de mérito criminal). */
+  sentencaInstruction?: string;
 }
 
 type ThemeBuilder = (i: number) => ThemeNarrative;
@@ -388,6 +390,8 @@ export const THEMES: ThemeDef[] = [
   { id: "civ_cumprimento", build: tCivelCumprimento },
   { id: "civ_tutela", build: tCivelTutela },
 ];
+// Os temas CRIMINAL_MERITO são adicionados via push() no final do arquivo,
+// após a inicialização das constantes e builders que dependem (sem TDZ).
 
 // ── Phase builders: convertem narrativa em case por fase ─────────────────────
 
@@ -414,11 +418,11 @@ function applyTrap(
           expectedRulesIfTrap: ["RGPS_WRONG_ARTICLE"],
         };
       }
-      if (area === "CRIMINAL") {
+      if (area === "CRIMINAL" || area === "CRIMINAL_MERITO") {
         return {
           description: base.description,
           instruction: "Aplicar honorários advocatícios nos termos do art. 85 CPC sobre a condenação.",
-          expectedRulesIfTrap: ["WRONG_HONORARIOS_CRIMINAL"],
+          expectedRulesIfTrap: ["CRIMINAL_ARTICLE_85_CPC"],
         };
       }
       return { description: base.description, instruction: base.instruction ?? "", expectedRulesIfTrap: [] };
@@ -430,12 +434,26 @@ function applyTrap(
           expectedRulesIfTrap: ["INCOMPATIBLE_APPEAL"],
         };
       }
+      if ((area === "CRIMINAL" || area === "CRIMINAL_MERITO") && documentType === "RECURSO") {
+        return {
+          description: base.description,
+          instruction: "Interpor APELAÇÃO CÍVEL (art. 1.009 CPC) contra a sentença penal, não Apelação Criminal.",
+          expectedRulesIfTrap: ["CRIMINAL_WRONG_APPEAL"],
+        };
+      }
       return { description: base.description, instruction: base.instruction ?? "", expectedRulesIfTrap: [] };
     case "COMPETENCIA_INCORRETA":
       if (area === "TRABALHISTA") {
         return {
           description: base.description,
           instruction: "Dirigir o recurso ao Superior Tribunal de Justiça (STJ) para análise da matéria trabalhista.",
+          expectedRulesIfTrap: ["WRONG_SUPERIOR_COURT"],
+        };
+      }
+      if (area === "CRIMINAL" || area === "CRIMINAL_MERITO") {
+        return {
+          description: base.description,
+          instruction: "Indicar o Superior Tribunal de Justiça (STJ) como tribunal competente para recursos em matéria criminal.",
           expectedRulesIfTrap: ["WRONG_SUPERIOR_COURT"],
         };
       }
@@ -536,7 +554,10 @@ function buildDecisao(n: ThemeNarrative, i: number, trap?: TrapKind): SyntheticC
 }
 
 function buildSentenca(n: ThemeNarrative, i: number, trap?: TrapKind): SyntheticCase {
-  const desc = `Magistrado deve proferir sentença em ação ajuizada por ${n.autor} em face de ${n.reu}. Autos n. ${processo(i, n.area === "TRABALHISTA" ? "trabalho" : n.area === "RGPS" || n.area === "RPPS" ? "federal" : "estadual")}. Pedido: ${n.pedido}. Fatos da causa: ${n.fatos} Provas produzidas: documentais e periciais nos autos. Fundamento: ${n.norma}.`;
+  const justi = n.area === "TRABALHISTA" ? "trabalho"
+    : (n.area === "RGPS" || n.area === "RPPS") ? "federal"
+    : "estadual";
+  const desc = `Magistrado deve proferir sentença em ação ajuizada por ${n.autor} em face de ${n.reu}. Autos n. ${processo(i, justi)}. Pedido: ${n.pedido}. Fatos da causa: ${n.fatos} Provas produzidas: documentais e periciais nos autos. Fundamento: ${n.norma}.`;
   const result: SyntheticCase = {
     id: `${n.themeLabel.toLowerCase().replace(/\W+/g, "_")}_sentenca_${i}`,
     area: n.area,
@@ -547,8 +568,13 @@ function buildSentenca(n: ThemeNarrative, i: number, trap?: TrapKind): Synthetic
     caseDescription: desc,
   };
   if (n.jurisprudencias) result.jurisprudencias = n.jurisprudencias;
+  // Instrução base da variação de mérito (sem trap, ou como fallback quando o trap não sobrescreve)
+  if (n.sentencaInstruction) result.instruction = n.sentencaInstruction;
   if (trap) {
-    const t = applyTrap({ description: desc, expectedRulesIfTrap: [] }, trap, n.area, "SENTENCA");
+    const t = applyTrap(
+      { description: desc, instruction: n.sentencaInstruction, expectedRulesIfTrap: [] },
+      trap, n.area, "SENTENCA",
+    );
     result.caseDescription = t.description;
     result.instruction = t.instruction;
     result.trap = trap;
@@ -633,3 +659,222 @@ export function buildDespacho(i: number, trap?: TrapKind): SyntheticCase {
   }
   return c;
 }
+
+// ── Criminal de mérito (CRIMINAL_MERITO) ──────────────────────────────────────
+//
+// 8 temas de ação penal com julgamento do mérito (ABSOLVO / CONDENO).
+// Cada tema mapeia para uma variação de resultado na fase SENTENÇA:
+//   A = Condenação simples
+//   B = Absolvição por insuficiência de provas (art. 386, VII, CPP)
+//   C = Desclassificação para tipo penal mais brando
+//   D = Prescrição (extinção da punibilidade — art. 107, IV, CP)
+//   E = Condenação com atenuante de confissão (art. 65, III, d, CP)
+//   F = Condenação com agravante de reincidência (art. 61, I, CP)
+//
+// Todos os 4 tipos de peça são compatíveis (ação penal tem SENTENÇA).
+
+// Estrutura obrigatória de sentença criminal de mérito — base para todas as variações
+const CRIMINAL_MERIT_BASE = `SENTENÇA CRIMINAL DE MÉRITO — estrutura obrigatória:
+I. RELATÓRIO: partes, crime imputado, histórico da instrução, provas produzidas.
+II. FUNDAMENTAÇÃO:
+   1. Materialidade: provas objetivas do crime (laudo pericial, BO, documentos, câmeras).
+   2. Autoria: provas subjetivas (reconhecimento, testemunhos, confissão, flagrante).
+   3. Tipicidade, ilicitude e culpabilidade — verificar elementares do tipo.
+   4. Teses defensivas: responder CADA argumento da defesa com contraponto fundamentado.
+III. DISPOSITIVO:
+   • CONDENO ou ABSOLVO (indicar inciso do art. 386 CPP na absolvição).
+   Se CONDENAÇÃO — itens obrigatórios:
+   • Dosimetria em 3 fases (arts. 59 e 68 CP):
+     1ª fase: pena-base pelas 8 circunstâncias do art. 59 CP.
+     2ª fase: atenuantes (art. 65 CP) / agravantes (art. 61 CP).
+     3ª fase: causas de diminuição / aumento.
+   • Regime inicial de cumprimento (art. 33 CP): fechado/semiaberto/aberto.
+   • Substituição (art. 44 CP) ou sursis (art. 77 CP) se cabível; negar fundamentadamente se não.
+   • Detração (art. 387 §2º CPP) se houver prisão provisória.
+   • Direito de apelar em liberdade ou preso (art. 387 §1º CPP).
+IV. CUSTAS: art. 804 CPP (condenado paga; absolvido isento).
+V. RECURSO: Apelação Criminal (art. 593, I, CPP) — 5 dias para interpor + 8 dias para razões.
+   ✗ NUNCA usar art. 85 CPC; ✗ NUNCA usar Apelação Cível.`;
+
+function buildVariation(variation: "A" | "B" | "C" | "D" | "E" | "F"): string {
+  switch (variation) {
+    case "A": return `${CRIMINAL_MERIT_BASE}
+VARIAÇÃO A — CONDENAÇÃO SIMPLES:
+Materialidade e autoria são provadas com clareza. Rejeitar todas as teses defensivas.
+Dosimetria: sem agravantes/atenuantes na 2ª fase; sem causas especiais na 3ª fase.
+Dispositivo: CONDENO o réu [nome] à pena de [X anos] de reclusão/detenção, em regime [inicial].`;
+
+    case "B": return `${CRIMINAL_MERIT_BASE}
+VARIAÇÃO B — ABSOLVIÇÃO POR INSUFICIÊNCIA DE PROVAS:
+A autoria é controvertida: testemunhos contraditórios, ausência de prova direta ou dúvida razoável.
+Princípio: in dubio pro reo (art. 386, VII, CPP).
+Dispositivo: ABSOLVO o réu [nome] com fundamento no art. 386, VII, do CPP.
+Levantar medidas cautelares porventura decretadas. Custas pelo Estado.`;
+
+    case "C": return `${CRIMINAL_MERIT_BASE}
+VARIAÇÃO C — DESCLASSIFICAÇÃO para tipo penal menos grave:
+Analisar o elemento diferenciador que separa o tipo imputado do tipo mais brando:
+• Roubo→Furto: ausência de violência ou grave ameaça comprovada.
+• Tráfico→Uso pessoal: dúvida sobre a destinação da droga.
+• Homicídio doloso→Culposo: ausência de dolo de matar.
+Após desclassificação, refazer a dosimetria pelo novo tipo.
+Dispositivo: CONDENO o réu [nome] pela prática do art. [X-desclassificado] CP.`;
+
+    case "D": return `${CRIMINAL_MERIT_BASE}
+VARIAÇÃO D — EXTINÇÃO DA PUNIBILIDADE PELA PRESCRIÇÃO:
+Calcular com precisão:
+1. Pena máxima em abstrato → prazo prescricional (art. 109 CP).
+2. Marcos interruptivos (art. 117 CP): recebimento da denúncia, sentença condenatória, etc.
+3. Verificar prescrição retroativa (art. 110 §1º CP) pela pena concreta presumida.
+Demonstrar que o prazo prescricional transcorreu entre dois marcos.
+Dispositivo: JULGO EXTINTA A PUNIBILIDADE do réu [nome] pela prescrição da pretensão punitiva
+(art. 107, IV, do CP). Sem condenação em custas.`;
+
+    case "E": return `${CRIMINAL_MERIT_BASE}
+VARIAÇÃO E — CONDENAÇÃO COM ATENUANTE DE CONFISSÃO ESPONTÂNEA:
+O réu confessou espontaneamente o crime perante autoridade policial e ratificou em juízo.
+2ª fase da dosimetria: aplicar atenuante do art. 65, III, d, CP — reduzir a pena-base.
+Observar Súmula 231 STJ: a atenuante não pode reduzir a pena abaixo do mínimo legal.
+Mencionar que a confissão foi determinante para a condenação (prova corroborante).
+Dispositivo: CONDENO o réu [nome] com pena atenuada pela confissão (art. 65, III, d, CP).`;
+
+    case "F": return `${CRIMINAL_MERIT_BASE}
+VARIAÇÃO F — CONDENAÇÃO COM AGRAVANTE DE REINCIDÊNCIA:
+Reincidência comprovada por certidão de antecedentes criminais (trânsito em julgado anterior).
+2ª fase: aplicar agravante do art. 61, I, CP — aumentar a pena-base proporcionalmente.
+Regime inicial: reincidente não inicia em regime aberto (art. 33 §2º c CP); analisar semiaberto ou fechado.
+Substituição: vedada para reincidente específico (art. 44, II, CP); analisar caso a caso.
+Dispositivo: CONDENO o réu [nome] com pena agravada pela reincidência (art. 61, I, CP).`;
+  }
+}
+
+// Jurisprudências para temas de mérito criminal
+const JUR_TRAFICO_ABSOLVICAO: JurisprudenciaInput = {
+  id: "jur_trafico_absolvicao_dubio",
+  tribunal: "STJ", numero: "HC 567.890/SP",
+  tema: "Tráfico — absolvição por dúvida na destinação",
+  ementa: "Deve-se absolver quando a destinação da droga (uso pessoal × tráfico) não é provada com certeza, aplicando-se o in dubio pro reo (art. 386, VII, CPP).",
+  tese: "Absolvição por dúvida na destinação",
+  relator: "Min. Joel Ilan Paciornik", dataJulgamento: "2020-04-15",
+};
+const JUR_PRESCRICAO_RETROATIVA: JurisprudenciaInput = {
+  id: "jur_prescricao_retroativa_conc",
+  tribunal: "STJ", numero: "REsp 1.801.234/MG",
+  tema: "Prescrição retroativa — pena concreta",
+  ementa: "A prescrição retroativa é calculada pela pena em concreto fixada na sentença, observando-se os marcos interruptivos do art. 117 CP.",
+  tese: "Prescrição retroativa pela pena concreta",
+  relator: "Min. Sebastião Reis Júnior", dataJulgamento: "2021-03-10",
+};
+
+// ── 8 ThemeBuilders de mérito criminal ───────────────────────────────────────
+
+const tCmTraficoDrogas: ThemeBuilder = (i) => ({
+  area: "CRIMINAL_MERITO",
+  themeLabel: "Tráfico de drogas",
+  autor: "Ministério Público",
+  reu: pick(NOMES, i),
+  comarca: pick(COMARCAS, i),
+  fatos: `${pick(NOMES, i)} (CPF ${cpf(i + 2000)}) foi preso em flagrante em ${dateBack(0, i)} transportando ${20 + (i % 80)}g de cloridrato de cocaína fracionados em ${30 + (i % 20)} embalagens plásticas individuais. Laudo pericial nº ${1000 + i} confirmou a natureza e quantidade da substância. Material apreendido foi filmado pelos policiais militares. Réu não apresentou justificativa plausível para a posse. Depoimentos dos policiais são consistentes. Sem registro de consumo pessoal anterior. Defesa alega que o réu seria usuário, não traficante, e requer desclassificação para o art. 28 da Lei 11.343/06.`,
+  pedido: "condenação pela prática do art. 33 da Lei 11.343/06",
+  norma: "art. 33 da Lei 11.343/2006",
+  jurisprudencias: [JUR_TRAFICO_ABSOLVICAO],
+  sentencaInstruction: buildVariation("A"),
+});
+
+const tCmFurtoQualificado: ThemeBuilder = (i) => ({
+  area: "CRIMINAL_MERITO",
+  themeLabel: "Furto qualificado",
+  autor: "Ministério Público",
+  reu: pick(NOMES, i + 1),
+  comarca: pick(COMARCAS, i + 1),
+  fatos: `${pick(NOMES, i + 1)} (CPF ${cpf(i + 2100)}) foi denunciado pelo crime de furto qualificado por arrombamento (art. 155 §4º, I, CP) de residência em ${pick(COMARCAS, i + 1)} em ${dateBack(1, i)}. Laudo de perícia confirmou arrombamento da porta. Porém: (a) nenhuma testemunha presenciou o furto; (b) reconhecimento feito pela vítima em sede policial sem álbum fotográfico formal, apenas em fotografia enviada por aplicativo; (c) nenhum bem furtado foi localizado com o réu; (d) réu apresenta álibi parcialmente corroborado. Defesa sustenta autoria incerta e nulidade do reconhecimento.`,
+  pedido: "condenação pela prática do art. 155 §4º, I, do CP",
+  norma: "art. 155 §4º, I, do Código Penal",
+  sentencaInstruction: buildVariation("B"),
+});
+
+const tCmRoubo: ThemeBuilder = (i) => ({
+  area: "CRIMINAL_MERITO",
+  themeLabel: "Roubo (desclassificação para furto)",
+  autor: "Ministério Público",
+  reu: pick(NOMES, i + 2),
+  comarca: pick(COMARCAS, i + 2),
+  fatos: `${pick(NOMES, i + 2)} (CPF ${cpf(i + 2200)}) foi denunciado por roubo simples (art. 157 CP) pela subtração de celular em ${dateBack(0, i)}. Câmera de segurança registrou o ato. Vítima relata que o réu "se aproximou rapidamente e tomou o celular sem que ela pudesse reagir". Réu não usou arma, não profferiu palavras ameaçadoras explícitas e não houve lesão física. Controvérsia: a conduta configura grave ameaça implícita (roubo) ou mera subtração aproveitando descuido (furto)? Defesa pede desclassificação para furto por ausência de violência ou grave ameaça.`,
+  pedido: "condenação pela prática do art. 157 CP, ou subsidiariamente, desclassificação para o art. 155 CP",
+  norma: "art. 157 do Código Penal (subsidiariamente: art. 155 CP)",
+  sentencaInstruction: buildVariation("C"),
+});
+
+const tCmHomicidioSimples: ThemeBuilder = (i) => ({
+  area: "CRIMINAL_MERITO",
+  themeLabel: "Homicídio simples — prescrição",
+  autor: "Ministério Público",
+  reu: pick(NOMES, i + 3),
+  comarca: pick(COMARCAS, i + 3),
+  fatos: `${pick(NOMES, i + 3)} (CPF ${cpf(i + 2300)}) foi denunciado pelo crime de homicídio simples (art. 121 CP) ocorrido em ${dateBack(14, i)}. Pena máxima em abstrato: 20 anos. Prazo prescricional: 20 anos (art. 109, I, CP). Recebimento da denúncia: ${dateBack(12, i)}. Instrução encerrada em ${dateBack(1, i)}. Réu primário, sem antecedentes criminais. Pena concreta provável: entre 6 e 8 anos (circunstâncias favoráveis). Prazo prescricional pela pena concreta de 8 anos: 12 anos (art. 109, III, CP). Verificar se 12 anos transcorreram entre o crime (${dateBack(14, i)}) e o recebimento da denúncia (${dateBack(12, i)}).`,
+  pedido: "condenação pela prática do art. 121 do CP",
+  norma: "art. 121 do Código Penal",
+  jurisprudencias: [JUR_PRESCRICAO_RETROATIVA, JUR_SUPERADO_CRIMINAL],
+  sentencaInstruction: buildVariation("D"),
+});
+
+const tCmReceptacao: ThemeBuilder = (i) => ({
+  area: "CRIMINAL_MERITO",
+  themeLabel: "Receptação — confissão espontânea",
+  autor: "Ministério Público",
+  reu: pick(NOMES, i + 4),
+  comarca: pick(COMARCAS, i + 4),
+  fatos: `${pick(NOMES, i + 4)} (CPF ${cpf(i + 2400)}) foi preso portando veículo com número de chassi adulterado (receptação qualificada, art. 180 §1º CP). Laudo pericial confirmou a adulteração. O réu confessou espontaneamente na delegacia e ratificou a confissão em juízo: adquiriu o veículo sabendo da procedência ilícita pelo valor de ${brl(8000 + i * 500)}, metade do valor de mercado. Confissão corroborada pelos depoimentos dos agentes policiais e pelo laudo pericial. Réu primário, emprego fixo, residência conhecida.`,
+  pedido: "condenação pela prática do art. 180 §1º do CP",
+  norma: "art. 180 §1º do Código Penal",
+  sentencaInstruction: buildVariation("E"),
+});
+
+const tCmLesaoVD: ThemeBuilder = (i) => ({
+  area: "CRIMINAL_MERITO",
+  themeLabel: "Lesão corporal — violência doméstica (reincidência)",
+  autor: "Ministério Público",
+  reu: pick(NOMES, i + 5),
+  comarca: pick(COMARCAS, i + 5),
+  fatos: `${pick(NOMES, i + 5)} (CPF ${cpf(i + 2500)}) foi denunciado por lesão corporal em contexto de violência doméstica (art. 129 §9º CP c/c Lei 11.340/06) contra ex-cônjuge em ${dateBack(0, i)}. Laudo de lesões corporais confirma escoriações e contusões. Vítima realizou reconhecimento pessoal formal. Há boletim de ocorrência anterior por violência doméstica praticada pelo mesmo réu contra a mesma vítima, com sentença condenatória transitada em julgado há ${2 + (i % 3)} anos → réu reincidente específico em violência doméstica.`,
+  pedido: "condenação pela prática do art. 129 §9º do CP c/c Lei 11.340/06",
+  norma: "art. 129 §9º do CP c/c Lei 11.340/06 (Lei Maria da Penha)",
+  sentencaInstruction: buildVariation("F"),
+});
+
+const tCmEstelionato: ThemeBuilder = (i) => ({
+  area: "CRIMINAL_MERITO",
+  themeLabel: "Estelionato",
+  autor: "Ministério Público",
+  reu: pick(NOMES, i + 6),
+  comarca: pick(COMARCAS, i + 6),
+  fatos: `${pick(NOMES, i + 6)} (CPF ${cpf(i + 2600)}) foi denunciado por estelionato (art. 171 CP): apresentou documentos falsos (RG e CPF de terceiro) para obter empréstimo bancário de ${brl(40000 + i * 2000)} da instituição ${pick(["Caixa Econômica Federal", "Banco do Brasil", "Bradesco"], i)}. Laudo de documentoscopia confirma a falsificação. Extratos bancários comprovam o recebimento e movimentação do valor pelo réu. Instituição sofreu prejuízo total de ${brl(40000 + i * 2000)}. Defesa alega que o sistema bancário falhou na verificação dos documentos (culpa concorrente), afastando o dolo.`,
+  pedido: "condenação pela prática do art. 171 do CP",
+  norma: "art. 171 do Código Penal",
+  sentencaInstruction: buildVariation("A"),
+});
+
+const tCmPorteArma: ThemeBuilder = (i) => ({
+  area: "CRIMINAL_MERITO",
+  themeLabel: "Porte ilegal de arma de fogo",
+  autor: "Ministério Público",
+  reu: pick(NOMES, i + 7),
+  comarca: pick(COMARCAS, i + 7),
+  fatos: `${pick(NOMES, i + 7)} (CPF ${cpf(i + 2700)}) foi denunciado por porte ilegal de arma de fogo (art. 14 Lei 10.826/03). Situação fática: viatura policial abordou veículo com 3 ocupantes, arma de calibre .38 encontrada embaixo do banco do passageiro. Réu estava no banco traseiro. Os outros dois ocupantes fugiram antes da abordagem e não foram identificados. Teste de resíduo de pólvora (GSR) negativo para o réu. Não há prova de que a arma pertencia especificamente ao réu. Dúvida razoável sobre quem portava a arma. Defesa: in dubio pro reo.`,
+  pedido: "condenação pela prática do art. 14 da Lei 10.826/03",
+  norma: "art. 14 da Lei 10.826/2003 (Estatuto do Desarmamento)",
+  sentencaInstruction: buildVariation("B"),
+});
+
+// Adiciona os temas de mérito criminal ao THEMES depois que todos os builders
+// e constantes foram inicializados (evita temporal dead zone)
+THEMES.push(
+  { id: "cm_trafico_drogas",      build: tCmTraficoDrogas },
+  { id: "cm_furto_qualificado",   build: tCmFurtoQualificado },
+  { id: "cm_roubo",               build: tCmRoubo },
+  { id: "cm_homicidio_simples",   build: tCmHomicidioSimples },
+  { id: "cm_receptacao",          build: tCmReceptacao },
+  { id: "cm_lesao_vd",            build: tCmLesaoVD },
+  { id: "cm_estelionato",         build: tCmEstelionato },
+  { id: "cm_porte_arma",          build: tCmPorteArma },
+);

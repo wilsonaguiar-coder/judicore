@@ -53,12 +53,18 @@ function decideTrap(slotIndex: number, area: LegalArea, phase: Phase | "DESPACHO
   if (kind === "RECURSO_INADEQUADO" && phase !== "RECURSO") kind = "ARTIGO_INCOMPATIVEL";
   if (kind === "COMPETENCIA_INCORRETA" && phase !== "RECURSO") kind = "JURISPRUDENCIA_CONTRARIA";
   if (kind === "LINGUAGEM_DECISORIA" && phase !== "DESPACHO") kind = "ARTIGO_INCOMPATIVEL";
-  if (kind === "ARTIGO_INCOMPATIVEL" && !["RPPS", "RGPS", "CRIMINAL"].includes(area)) {
+  const criminalAreas = ["CRIMINAL", "CRIMINAL_MERITO"] as const;
+  if (kind === "ARTIGO_INCOMPATIVEL" && !["RPPS", "RGPS", ...criminalAreas].includes(area as "RPPS" | "RGPS" | "CRIMINAL" | "CRIMINAL_MERITO")) {
     kind = "JURISPRUDENCIA_CONTRARIA";
   }
-  // RECURSO_INADEQUADO só faz sentido em TRABALHISTA / JEF (não temos JEF aqui)
-  if (kind === "RECURSO_INADEQUADO" && area !== "TRABALHISTA") kind = "JURISPRUDENCIA_CONTRARIA";
-  if (kind === "COMPETENCIA_INCORRETA" && area !== "TRABALHISTA") kind = "JURISPRUDENCIA_CONTRARIA";
+  // RECURSO_INADEQUADO: válido para TRABALHISTA e criminal (apelação cível em sentença penal)
+  if (kind === "RECURSO_INADEQUADO" && area !== "TRABALHISTA" && !criminalAreas.includes(area as "CRIMINAL" | "CRIMINAL_MERITO")) {
+    kind = "JURISPRUDENCIA_CONTRARIA";
+  }
+  // COMPETENCIA_INCORRETA: válido para TRABALHISTA e criminal (STJ em matéria penal)
+  if (kind === "COMPETENCIA_INCORRETA" && area !== "TRABALHISTA" && !criminalAreas.includes(area as "CRIMINAL" | "CRIMINAL_MERITO")) {
+    kind = "JURISPRUDENCIA_CONTRARIA";
+  }
 
   return kind;
 }

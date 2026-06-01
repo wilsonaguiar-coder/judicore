@@ -59,7 +59,7 @@ export function evaluateTrap(trap: TrapKind, result: CaseResult): TrapOutcome {
       // MISSED: padrões diretos no draft
       if (result.area === "RPPS" && /art\.?\s*201\s*(da\s*)?(cf|constitui)/i.test(draft)) return "MISSED";
       if (result.area === "RGPS" && /art\.?\s*40\s*(da\s*)?(cf|constitui)/i.test(draft)) return "MISSED";
-      if (result.area === "CRIMINAL" && /art\.?\s*85\s*(do\s+)?cpc/i.test(draft)) return "MISSED";
+      if (result.area === "CRIMINAL" || result.area === "CRIMINAL_MERITO" && /art\.?\s*85\s*(do\s+)?cpc/i.test(draft)) return "MISSED";
       // Trabalhista com art. 85 CPC em vez de art. 791-A CLT
       if (
         result.area === "TRABALHISTA" &&
@@ -78,7 +78,7 @@ export function evaluateTrap(trap: TrapKind, result: CaseResult): TrapOutcome {
       // Trabalhista: usa apelação em vez de Recurso Ordinário
       if (result.area === "TRABALHISTA" && /\bapela[cç][aã]o\b/i.test(draft) && !/recurso\s+ordin[aá]rio/i.test(draft)) return "MISSED";
       // Criminal: usa apelação cível em vez de apelação criminal
-      if (result.area === "CRIMINAL" && /apela[cç][aã]o\s+c[ií]vel/i.test(draft)) return "MISSED";
+      if (result.area === "CRIMINAL" || result.area === "CRIMINAL_MERITO" && /apela[cç][aã]o\s+c[ií]vel/i.test(draft)) return "MISSED";
       // Previdenciário: usa recurso trabalhista
       if (
         (result.area === "RPPS" || result.area === "RGPS") &&
@@ -96,7 +96,7 @@ export function evaluateTrap(trap: TrapKind, result: CaseResult): TrapOutcome {
       // Trabalhista → STJ não é competente (é TST)
       if (result.area === "TRABALHISTA" && /\b(stj|superior\s+tribunal\s+de\s+justi[cç]a)\b/i.test(draft)) return "MISSED";
       // Criminal → TST não tem competência
-      if (result.area === "CRIMINAL" && /\b(tst|tribunal\s+superior\s+do\s+trabalho)\b/i.test(draft)) return "MISSED";
+      if (result.area === "CRIMINAL" || result.area === "CRIMINAL_MERITO" && /\b(tst|tribunal\s+superior\s+do\s+trabalho)\b/i.test(draft)) return "MISSED";
       // Previdenciário → TST não tem competência
       if (
         (result.area === "RPPS" || result.area === "RGPS") &&

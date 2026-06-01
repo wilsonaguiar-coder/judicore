@@ -7,7 +7,13 @@ import type {
   DocumentStatus,
 } from "../src/pipeline/types.js";
 
-export type LegalArea = "RPPS" | "RGPS" | "TRABALHISTA" | "CRIMINAL" | "CIVEL";
+export type LegalArea =
+  | "RPPS"
+  | "RGPS"
+  | "TRABALHISTA"
+  | "CRIMINAL"          // decisões incidentais: HC, liberdade provisória, preventiva, progressão
+  | "CRIMINAL_MERITO"   // ação penal de mérito: ABSOLVO/CONDENO com dosimetria
+  | "CIVEL";
 
 // Tipos de armadilhas jurídicas inseridas em ~30% dos casos
 export type TrapKind =
@@ -47,6 +53,16 @@ export type ValidatorComponent =
   | "Other";
 
 /** Mapeia uma rule de ValidationError para o validator que a emitiu. */
+// Mapeamento de área → rótulo legível para relatório HTML
+export const AREA_LABELS: Record<LegalArea, string> = {
+  RPPS: "RPPS",
+  RGPS: "RGPS",
+  TRABALHISTA: "Trabalhista",
+  CRIMINAL: "Criminal (cautelar)",
+  CRIMINAL_MERITO: "Criminal (mérito)",
+  CIVEL: "Cível",
+};
+
 export function mapRuleToValidator(rule: string): ValidatorComponent {
   if (rule.startsWith("EVIDENCE_")) return "EvidenceAnalyzer";
   if (rule.startsWith("MATRIX_")) return "MatrixQualityValidator";

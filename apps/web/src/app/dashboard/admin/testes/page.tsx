@@ -357,7 +357,8 @@ export default function TestesPage() {
                 <option value="RPPS">RPPS</option>
                 <option value="RGPS">RGPS</option>
                 <option value="TRABALHISTA">Trabalhista</option>
-                <option value="CRIMINAL">Criminal</option>
+                <option value="CRIMINAL">Criminal (cautelar)</option>
+                <option value="CRIMINAL_MERITO">Criminal (mérito)</option>
                 <option value="CIVEL">Cível</option>
               </select>
             </div>
