@@ -84,19 +84,11 @@ function determineGenerationMode(
     };
   }
 
-  // Fatos ou pedidos insuficientes → TEMPLATE_MODEL
-  if (extraction.fatos.length < 2 || extraction.pedidos.length < 1) {
+  // Sem nenhum fato E sem nenhum pedido → TEMPLATE_MODEL
+  if (extraction.fatos.length < 1 && extraction.pedidos.length < 1) {
     return {
       mode: "TEMPLATE_MODEL",
-      reason: `Informações insuficientes: ${extraction.fatos.length} fato(s), ${extraction.pedidos.length} pedido(s) — gerando modelo`,
-    };
-  }
-
-  // Extração parcial → TEMPLATE_MODEL
-  if (extraction.qualidade_extracao === "PARCIAL") {
-    return {
-      mode: "TEMPLATE_MODEL",
-      reason: extraction.motivo_qualidade ?? "Fatos parcialmente identificados — gerando modelo estruturado",
+      reason: "Nenhum fato ou pedido identificado — gerando modelo estruturado",
     };
   }
 

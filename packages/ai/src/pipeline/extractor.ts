@@ -2,7 +2,7 @@ import { getOpenAIClient } from "../client.js";
 import type { LegalClassification, LegalExtraction, JurisprudenciaInput, ServiceUsage, ExtractionQuality } from "./types.js";
 import { buildExtractionPrompt } from "../prompts/extractor.prompt.js";
 
-const EXTRACTOR_MODEL = "gpt-4.1-mini";
+const EXTRACTOR_MODEL = "gpt-4.1";
 
 export class LegalExtractionService {
   async extract(
