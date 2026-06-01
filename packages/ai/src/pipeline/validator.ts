@@ -1,5 +1,5 @@
 import type { LegalClassification, LegalExtraction, ValidationResult, ValidationError, TipoPeca } from "./types.js";
-import { FORBIDDEN_COMBINATIONS, LEGAL_RULES, STRUCTURAL_REQUIREMENTS, GENERIC_EXPRESSIONS } from "../rules/legal_rules.js";
+import { FORBIDDEN_COMBINATIONS, STRUCTURAL_REQUIREMENTS, GENERIC_EXPRESSIONS, getJurisdicaoRules } from "../rules/legal_rules.js";
 
 export class LegalValidator {
   validateClassification(classification: LegalClassification): ValidationResult {
@@ -40,7 +40,7 @@ export class LegalValidator {
     const lowerDraft = draft.toLowerCase();
 
     // Check blocked articles/terms for this jurisdiction
-    const rules = LEGAL_RULES[classification.tipo_justica];
+    const rules = getJurisdicaoRules(classification.tipo_justica);
     for (const blocked of rules.artigos_bloqueados) {
       if (lowerDraft.includes(blocked.toLowerCase())) {
         errors.push({

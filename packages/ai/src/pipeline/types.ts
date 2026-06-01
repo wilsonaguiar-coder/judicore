@@ -1,8 +1,29 @@
 export type GenerationMode = "FINAL_DRAFT" | "TEMPLATE_MODEL" | "SAFE_SKELETON";
 export type ExtractionQuality = "SUFICIENTE" | "PARCIAL" | "INSUFICIENTE";
-export type TipoJustica = "TRABALHO" | "FEDERAL" | "ESTADUAL" | "INDETERMINADA";
+
+export type TipoJustica =
+  | "TRABALHO"
+  | "FEDERAL"
+  | "ESTADUAL"
+  | "JEF"
+  | "JEC"
+  | "CRIMINAL"
+  | "EXECUCAO_FISCAL"
+  | "INDETERMINADA";
+
 export type TipoPeca = "PETICAO_INICIAL" | "RECURSO" | "SENTENCA" | "DECISAO" | "DESPACHO";
-export type RegimeJuridico = "CLT" | "RPPS" | "RGPS" | "ESTATUTARIO" | "CIVIL" | "INDETERMINADO" | null;
+
+export type RegimeJuridico =
+  | "CLT"
+  | "RPPS"
+  | "RGPS"
+  | "ESTATUTARIO"
+  | "CIVIL"
+  | "CRIMINAL"
+  | "TRIBUTARIO"
+  | "INDETERMINADO"
+  | null;
+
 export type Grau = "PRIMEIRO" | "SEGUNDO" | "SUPERIOR";
 
 export interface LegalClassification {
@@ -117,7 +138,7 @@ export type PipelineEvent =
   | { event: "matrix"; data: ArgumentationMatrix }
   | { event: "chunk"; data: string }
   | { event: "audit"; data: LegalAudit }
-  | { event: "done"; data: { generationId: string; documentId?: string | undefined; aprovada: boolean; mode?: GenerationMode | undefined } }
+  | { event: "done"; data: { generationId: string; documentId?: string | undefined; aprovada: boolean; mode?: GenerationMode | undefined; status?: string | undefined; safe_message?: string | undefined } }
   | { event: "error"; data: { message: string; phase: string; fatal: boolean } }
   | { event: "validation_errors"; data: ValidationError[] };
 

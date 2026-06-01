@@ -4,6 +4,7 @@ import { LegalMatrixService } from "./matrix.js";
 import { LegalDraftService } from "./drafter.js";
 import { LegalAuditService } from "./auditor.js";
 import { LegalValidator } from "./validator.js";
+import { FinalValidator } from "../validators/index.js";
 import type {
   PipelineInput,
   PipelineContext,
@@ -139,6 +140,7 @@ export class LegalPipeline {
   private drafter = new LegalDraftService();
   private auditor = new LegalAuditService();
   private validator = new LegalValidator();
+  private finalValidator = new FinalValidator();
 
   async *run(
     input: PipelineInput,
@@ -301,13 +303,33 @@ export class LegalPipeline {
       yield { event: "audit", data: ctx.audit };
     } catch (err: unknown) {
       yield { event: "error", data: { message: String(err), phase: "auditing", fatal: false } };
-      yield { event: "done", data: { generationId, aprovada: false, mode } };
+      yield { event: "done", data: { generationId, aprovada: false, mode, status: "MINUTA PARA REVISÃO" } };
       return;
+    }
+
+    // ── Validação final integrada ─────────────────────────────────────────────
+    const finalResult = this.finalValidator.validate(
+      ctx.draft!,
+      ctx.classification!,
+      ctx.extraction!,
+      ctx.matrix!,
+      ctx.audit!,
+      ctx.jurisprudencias,
+      mode,
+    );
+    if (finalResult.errors.length > 0) {
+      yield { event: "validation_errors", data: finalResult.errors };
     }
 
     yield {
       event: "done",
-      data: { generationId, aprovada: ctx.audit!.aprovada, mode },
+      data: {
+        generationId,
+        aprovada: ctx.audit!.aprovada && !finalResult.hasFatalErrors,
+        mode,
+        status: finalResult.status_minuta,
+        safe_message: finalResult.safe_message,
+      },
     };
   }
 }
