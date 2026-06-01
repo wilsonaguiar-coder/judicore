@@ -21,6 +21,7 @@ import { fileURLToPath } from "node:url";
 import type { SyntheticCase, LegalArea, TrapKind } from "./case-types.js";
 import type { TipoPeca } from "../src/pipeline/types.js";
 import { THEMES, PHASE_BUILDERS, buildDespacho } from "./case-templates.js";
+import { PieceCompatibilityValidator } from "./piece-compatibility.js";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
@@ -79,8 +80,14 @@ export function generateSyntheticCases(
     const narrative = theme.build(slot);
     for (const phase of PHASES) {
       const trap = decideTrap(slot, narrative.area, phase);
-      const builder = PHASE_BUILDERS[phase];
-      cases.push(builder(narrative, slot, trap));
+
+      // Validação de compatibilidade: só gera caso se o tipo for compatível com o tema.
+      // O slot é incrementado mesmo quando o caso é pulado — mantém a distribuição
+      // determinística de traps estável independente dos filtros aplicados.
+      if (PieceCompatibilityValidator.isCompatible(theme.id, phase)) {
+        const builder = PHASE_BUILDERS[phase];
+        cases.push(builder(narrative, slot, trap));
+      }
       slot++;
     }
   }

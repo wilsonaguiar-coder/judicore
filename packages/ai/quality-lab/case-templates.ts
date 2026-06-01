@@ -9,6 +9,7 @@
 
 import type { JurisprudenciaInput, TipoPeca } from "../src/pipeline/types.js";
 import type { LegalArea, SyntheticCase, TrapKind } from "./case-types.js";
+import { PHASES_NO_SENTENCA } from "./piece-compatibility.js";
 
 // ── Pools sintéticos ──────────────────────────────────────────────────────────
 
@@ -348,30 +349,40 @@ const tCivelTutela: ThemeBuilder = (i) => ({
 
 // ── Lista canônica dos 20 temas ──────────────────────────────────────────────
 
-interface ThemeDef { id: string; build: ThemeBuilder; }
+interface ThemeDef {
+  id: string;
+  build: ThemeBuilder;
+  /**
+   * Tipos de peça compatíveis com o tema.
+   * Ausente = todos os 4 tipos permitidos (PETICAO_INICIAL, RECURSO, DECISAO, SENTENCA).
+   * Temas incidentais criminais restringem a PHASES_NO_SENTENCA porque não envolvem
+   * julgamento do mérito da ação penal — o resultado processual correto é DECISÃO.
+   */
+  compatibleTypes?: readonly TipoPeca[];
+}
 
 export const THEMES: ThemeDef[] = [
-  // RPPS
+  // RPPS — todos os 4 tipos (julgamento de mérito cabível)
   { id: "rpps_paridade", build: tRppsParidade },
   { id: "rpps_integralidade", build: tRppsIntegralidade },
   { id: "rpps_pensao_morte", build: tRppsPensaoMorte },
   { id: "rpps_ec41_2003", build: tRppsEc412003 },
-  // RGPS
+  // RGPS — todos os 4 tipos
   { id: "rgps_auxilio_temporario", build: tRgpsAuxilioTemporario },
   { id: "rgps_incapacidade_permanente", build: tRgpsIncapacidadePermanente },
   { id: "rgps_pensao_morte", build: tRgpsPensaoMorte },
   { id: "rgps_bpc_loas", build: tRgpsBpcLoas },
-  // Trabalhista
+  // Trabalhista — todos os 4 tipos
   { id: "trab_vinculo", build: tTrabVinculo },
   { id: "trab_horas_extras", build: tTrabHorasExtras },
   { id: "trab_gestante", build: tTrabGestante },
   { id: "trab_insalubridade", build: tTrabInsalubridade },
-  // Criminal
-  { id: "crim_hc_liberatorio", build: tCrimHcLiberatorio },
-  { id: "crim_liberdade_provisoria", build: tCrimLiberdadeProv },
-  { id: "crim_preventiva", build: tCrimPreventiva },
-  { id: "crim_progressao", build: tCrimProgressao },
-  // Cível
+  // Criminal — procedimentos incidentais: sem SENTENCA (resultado é sempre DECISÃO)
+  { id: "crim_hc_liberatorio",       build: tCrimHcLiberatorio,  compatibleTypes: PHASES_NO_SENTENCA },
+  { id: "crim_liberdade_provisoria", build: tCrimLiberdadeProv,  compatibleTypes: PHASES_NO_SENTENCA },
+  { id: "crim_preventiva",           build: tCrimPreventiva,     compatibleTypes: PHASES_NO_SENTENCA },
+  { id: "crim_progressao",           build: tCrimProgressao,     compatibleTypes: PHASES_NO_SENTENCA },
+  // Cível — todos os 4 tipos
   { id: "civ_danos_morais", build: tCivelDanosMorais },
   { id: "civ_cobranca", build: tCivelCobranca },
   { id: "civ_cumprimento", build: tCivelCumprimento },
