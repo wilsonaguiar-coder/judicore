@@ -1,6 +1,8 @@
-export type TipoJustica = "TRABALHO" | "FEDERAL" | "ESTADUAL";
+export type GenerationMode = "FINAL_DRAFT" | "TEMPLATE_MODEL" | "SAFE_SKELETON";
+export type ExtractionQuality = "SUFICIENTE" | "PARCIAL" | "INSUFICIENTE";
+export type TipoJustica = "TRABALHO" | "FEDERAL" | "ESTADUAL" | "INDETERMINADA";
 export type TipoPeca = "PETICAO_INICIAL" | "RECURSO" | "SENTENCA" | "DECISAO" | "DESPACHO";
-export type RegimeJuridico = "CLT" | "RPPS" | "RGPS" | "ESTATUTARIO" | "CIVIL" | null;
+export type RegimeJuridico = "CLT" | "RPPS" | "RGPS" | "ESTATUTARIO" | "CIVIL" | "INDETERMINADO" | null;
 export type Grau = "PRIMEIRO" | "SEGUNDO" | "SUPERIOR";
 
 export interface LegalClassification {
@@ -36,6 +38,8 @@ export interface LegalExtraction {
   questoes_juridicas: string[];
   artigos_citados: string[];
   jurisprudencias_relevantes: string[];
+  qualidade_extracao: ExtractionQuality;
+  motivo_qualidade?: string | undefined;
 }
 
 export interface ArgumentacaoTese {
@@ -63,6 +67,8 @@ export interface LegalAudit {
   score: number;
   erros: AuditError[];
   resumo: string;
+  document_confidence?: number | undefined;
+  status_minuta?: "MINUTA APROVADA" | "MINUTA PARA REVISÃO" | undefined;
 }
 
 export interface ValidationError {
@@ -89,6 +95,7 @@ export interface PipelineContext {
   audit?: LegalAudit | undefined;
   retryOf?: string | undefined;
   corrections?: string | undefined;
+  generationMode?: GenerationMode | undefined;
 }
 
 export interface PipelineInput {
@@ -104,12 +111,13 @@ export interface PipelineInput {
 
 export type PipelineEvent =
   | { event: "phase"; data: { phase: string; generationId: string } }
+  | { event: "mode"; data: { mode: GenerationMode; reason: string } }
   | { event: "classification"; data: LegalClassification }
   | { event: "extraction"; data: LegalExtraction }
   | { event: "matrix"; data: ArgumentationMatrix }
   | { event: "chunk"; data: string }
   | { event: "audit"; data: LegalAudit }
-  | { event: "done"; data: { generationId: string; documentId?: string | undefined; aprovada: boolean } }
+  | { event: "done"; data: { generationId: string; documentId?: string | undefined; aprovada: boolean; mode?: GenerationMode | undefined } }
   | { event: "error"; data: { message: string; phase: string; fatal: boolean } }
   | { event: "validation_errors"; data: ValidationError[] };
 

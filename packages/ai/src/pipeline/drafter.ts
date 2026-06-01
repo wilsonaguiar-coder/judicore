@@ -1,7 +1,44 @@
 import { getOpenAIClient, MODEL } from "../client.js";
 import { buildSystemPrompt } from "../prompts.js";
-import type { LegalClassification, LegalExtraction, ArgumentationMatrix, JurisprudenciaInput } from "./types.js";
-import { LEGAL_RULES, PIECE_TEMPLATES, APPEAL_RULES } from "../rules/legal_rules.js";
+import type { LegalClassification, LegalExtraction, ArgumentationMatrix, JurisprudenciaInput, GenerationMode } from "./types.js";
+import { LEGAL_RULES, PIECE_TEMPLATES, APPEAL_RULES, TEMPLATE_MODEL_PROHIBITIONS } from "../rules/legal_rules.js";
+
+function buildModeBlock(mode: GenerationMode): string {
+  if (mode === "TEMPLATE_MODEL") {
+    return `
+⚠ MODO MODELO DE PEÇA — LEIA ANTES DE REDIGIR:
+Esta geração não possui fatos suficientemente identificados para uma peça definitiva.
+Gere um MODELO ESTRUTURADO com marcações de placeholder onde faltam dados concretos.
+
+REGRAS ABSOLUTAS PARA ESTE MODO:
+1. Use [INSERIR FATO ESPECÍFICO], [INSERIR NOME DA PARTE], [IDENTIFICAR TRIBUNAL], [DATA DO FATO], etc. onde não houver dados reais.
+2. PROIBIDO usar qualquer linguagem decisória. NUNCA escreva:
+   ${TEMPLATE_MODEL_PROHIBITIONS.map((p) => `"${p}"`).join(" | ")}
+3. Substitua decisões por: "[INSERIR FUNDAMENTAÇÃO ESPECÍFICA]", "[ANALISAR PEDIDO CONCRETO]", "[PREENCHER CONFORME O CASO]"
+4. O objetivo é gerar um MODELO REUTILIZÁVEL — não uma decisão aparentemente válida sobre fatos inexistentes.
+5. Inclua no início da peça a seguinte nota: "⚠ MODELO ESTRUTURAL — Preencha os campos entre colchetes com os dados reais do caso antes de usar."
+
+`;
+  }
+
+  if (mode === "SAFE_SKELETON") {
+    return `
+⚠ MODO ESQUELETO SEGURO — LEIA ANTES DE REDIGIR:
+A classificação do caso tem baixa confiança ou o caso está incompleto.
+Gere apenas um ESQUELETO ESTRUTURAL — sem conteúdo jurídico afirmativo.
+
+REGRAS ABSOLUTAS PARA ESTE MODO:
+1. Cada seção deve conter apenas o título e um placeholder explicativo entre colchetes.
+2. NUNCA use linguagem decisória, afirmativa ou conclusiva.
+3. Use apenas: [A DETERMINAR], [VERIFICAR COMPETÊNCIA], [INSERIR FATOS DO CASO CONCRETO], [PREENCHER COM DADOS REAIS]
+4. Inclua no início: "⚠ ATENÇÃO: Esta peça foi gerada sem informações suficientes para uma minuta real. Complete todos os campos antes de qualquer uso."
+5. NÃO invente fatos, normas ou jurisprudência para preencher lacunas.
+
+`;
+  }
+
+  return "";
+}
 
 function buildDraftPrompt(
   classification: LegalClassification,
@@ -10,6 +47,7 @@ function buildDraftPrompt(
   jurisprudencias: JurisprudenciaInput[],
   instruction?: string,
   corrections?: string,
+  mode: GenerationMode = "FINAL_DRAFT",
 ): string {
   const rules = LEGAL_RULES[classification.tipo_justica];
   const template = PIECE_TEMPLATES[classification.tipo_peca];
@@ -23,8 +61,8 @@ function buildDraftPrompt(
 
   const matrixBlock = `\nMATRIZ DE ARGUMENTAÇÃO (use como estrutura obrigatória):\n${matrix.teses.map((t, i) => `Tese ${i + 1}: ${t.pedido}\n  Fato: ${t.fato}\n  Norma: ${t.norma}\n  Jurisprudência: ${t.jurisprudencia_id ?? "nenhuma"}\n  Conclusão: ${t.conclusao}`).join("\n\n")}`;
 
-  const appealInfo = classification.tipo_peca === "SENTENCA" && classification.tipo_justica in APPEAL_RULES.SENTENCA
-    ? `\nRECURSO CABÍVEL: ${(APPEAL_RULES.SENTENCA as Record<string, {recurso: string; prazo_dias: number; fundamento: string}>)[classification.tipo_justica]?.recurso ?? "ver legislação"}`
+  const appealInfo = classification.tipo_peca === "SENTENCA" && classification.tipo_justica in (APPEAL_RULES.SENTENCA as Record<string, unknown>)
+    ? `\nRECURSO CABÍVEL: ${(APPEAL_RULES.SENTENCA as Record<string, { recurso: string }>)[classification.tipo_justica]?.recurso ?? "ver legislação"}`
     : "";
 
   const correctionsBlock = corrections
@@ -34,7 +72,13 @@ function buildDraftPrompt(
   const templateProibicoes = (template as { proibicoes?: readonly string[] }).proibicoes ?? ([] as const);
   const prohibitions = [...templateProibicoes, ...rules.artigos_bloqueados];
 
-  return `Redija a peça jurídica com base na classificação, extração e matriz de argumentação abaixo.
+  const estruturaInstrucao = (template as unknown as { estrutura?: readonly string[] }).estrutura
+    ?.map((s, i) => `${i + 1}. ${s}`)
+    .join("\n") ?? "";
+
+  const modeBlock = buildModeBlock(mode);
+
+  return `${modeBlock}Redija a peça jurídica com base na classificação, extração e matriz de argumentação abaixo.
 
 CLASSIFICAÇÃO:
 - Tipo: ${classification.tipo_peca}
@@ -55,8 +99,10 @@ ${jurBlock}
 ${appealInfo}
 ${correctionsBlock}
 
-ESTRUTURA OBRIGATÓRIA: ${(template as unknown as {estrutura?: readonly string[]}).estrutura?.join(" → ") ?? "ver template"}
-TOM: ${(template as unknown as {tom?: string}).tom ?? "técnico"}
+ESTRUTURA OBRIGATÓRIA (siga esta ordem — estes são TÍTULOS DE SEÇÃO, NÃO os escreva literalmente no texto):
+${estruturaInstrucao}
+
+TOM: ${(template as unknown as { tom?: string }).tom ?? "técnico"}
 PROIBIÇÕES ABSOLUTAS: ${prohibitions.join(" | ")}
 HONORÁRIOS (se aplicável): ${rules.honorarios_artigo}
 
@@ -77,6 +123,7 @@ export class LegalDraftService {
     onUsage?: (input: number, output: number) => void,
     instruction?: string,
     corrections?: string,
+    mode: GenerationMode = "FINAL_DRAFT",
   ): AsyncGenerator<string> {
     const client = getOpenAIClient();
     const isPostulatorio = classification.tipo_peca === "PETICAO_INICIAL" || classification.tipo_peca === "RECURSO";
@@ -84,12 +131,12 @@ export class LegalDraftService {
     const stream = await client.chat.completions.create({
       model: MODEL,
       max_tokens: isPostulatorio ? 16384 : 8192,
-      temperature: isPostulatorio ? 0.85 : 0.65,
+      temperature: mode === "SAFE_SKELETON" ? 0.3 : isPostulatorio ? 0.85 : 0.65,
       messages: [
         { role: "system", content: buildSystemPrompt() },
         {
           role: "user",
-          content: buildDraftPrompt(classification, extraction, matrix, jurisprudencias, instruction, corrections),
+          content: buildDraftPrompt(classification, extraction, matrix, jurisprudencias, instruction, corrections, mode),
         },
       ],
       stream: true,

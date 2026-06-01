@@ -1,5 +1,5 @@
 import { getOpenAIClient } from "../client.js";
-import type { LegalClassification, LegalExtraction, JurisprudenciaInput, ServiceUsage } from "./types.js";
+import type { LegalClassification, LegalExtraction, JurisprudenciaInput, ServiceUsage, ExtractionQuality } from "./types.js";
 
 const EXTRACTOR_MODEL = "gpt-4.1";
 
@@ -30,15 +30,22 @@ Retorne SOMENTE um JSON válido com esta estrutura:
   "pedidos": ["pedido 1", "pedido 2", ...],
   "questoes_juridicas": ["questão 1", "questão 2", ...],
   "artigos_citados": ["art. X da Lei Y", ...],
-  "jurisprudencias_relevantes": ["id_da_jur_relevante", ...]
+  "jurisprudencias_relevantes": ["id_da_jur_relevante", ...],
+  "qualidade_extracao": "SUFICIENTE" | "PARCIAL" | "INSUFICIENTE",
+  "motivo_qualidade": "razão se PARCIAL ou INSUFICIENTE, caso contrário null"
 }
 
 REGRAS:
-- fatos: lista os fatos materiais do caso (mínimo 3)
+- fatos: lista os fatos materiais concretos e específicos do caso (mínimo 3)
 - pedidos: lista os pedidos inferíveis do caso (mínimo 2)
 - questoes_juridicas: questões de direito que precisam ser resolvidas (mínimo 2)
 - artigos_citados: artigos mencionados no caso ou evidentemente aplicáveis
-- jurisprudencias_relevantes: SOMENTE IDs de jurisprudências que sejam TEMATICAMENTE RELEVANTES ao assunto "${classification.assunto_principal}". Se nenhuma for relevante, retorne array vazio.
+- jurisprudencias_relevantes: SOMENTE IDs de jurisprudências TEMATICAMENTE RELEVANTES ao assunto "${classification.assunto_principal}". Se nenhuma for relevante, retorne array vazio.
+- qualidade_extracao:
+  SUFICIENTE — fatos >= 3 concretos e específicos, pedidos >= 2 identificados, assunto claro
+  PARCIAL    — alguns fatos presentes mas incompletos, partes não identificadas, pedidos vagos, ou assunto genérico
+  INSUFICIENTE — caso extremamente vago, sem fatos concretos identificáveis (ex: "pesquisa livre", "teste", input genérico)
+- motivo_qualidade: obrigatório se PARCIAL ou INSUFICIENTE; null se SUFICIENTE
 
 Retorne SOMENTE o JSON, sem texto adicional.`;
 }
@@ -76,12 +83,16 @@ export class LegalExtractionService {
       throw new Error(`Extrator retornou JSON inválido: ${raw.slice(0, 200)}`);
     }
 
+    const qualidade = (parsed["qualidade_extracao"] as ExtractionQuality | undefined) ?? "INSUFICIENTE";
+
     const extraction: LegalExtraction = {
       fatos: (parsed["fatos"] as string[] | undefined) ?? [],
       pedidos: (parsed["pedidos"] as string[] | undefined) ?? [],
       questoes_juridicas: (parsed["questoes_juridicas"] as string[] | undefined) ?? [],
       artigos_citados: (parsed["artigos_citados"] as string[] | undefined) ?? [],
       jurisprudencias_relevantes: (parsed["jurisprudencias_relevantes"] as string[] | undefined) ?? [],
+      qualidade_extracao: qualidade,
+      motivo_qualidade: (parsed["motivo_qualidade"] as string | null | undefined) ?? undefined,
     };
 
     const validIds = new Set(jurisprudencias.map((j) => j.id));

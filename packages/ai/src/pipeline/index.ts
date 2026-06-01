@@ -14,4 +14,6 @@ export type {
   TipoJustica,
   TipoPeca,
   RegimeJuridico,
+  GenerationMode,
+  ExtractionQuality,
 } from "./types.js";
