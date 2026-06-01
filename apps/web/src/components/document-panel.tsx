@@ -473,11 +473,6 @@ export function DocumentPanel({ caseId, token, userRole, jurisprudencias, active
             </div>
           )}
 
-          {/* Progresso do pipeline durante geração */}
-          {showPipeline && isGenerating && (
-            <PhaseProgress currentPhase={pipelinePhase} completedPhases={completedPhases} />
-          )}
-
           {/* Contador de jurisprudências */}
           {mode !== "premium" && (
             <div className={`rounded-lg border px-3 py-2 text-xs flex items-center gap-1.5 ${jurisprudencias.length === 0 ? "text-muted-foreground bg-muted/50" : "text-foreground"}`}>
