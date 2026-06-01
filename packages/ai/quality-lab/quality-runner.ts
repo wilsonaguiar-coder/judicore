@@ -165,7 +165,7 @@ async function main(): Promise<void> {
 
   console.log(`[quality-runner] Configuração:`);
   console.log(`  modo:        ${args.dryRun ? "DRY-RUN (sem OpenAI)" : "REAL (OpenAI)"}`);
-  console.log(`  casos:       ${cases.length}`);
+  console.log(`  casos:       ${cases.length}${cases.length < args.count ? ` (máximo disponível para área+tipo — solicitado: ${args.count})` : ""}`);
   console.log(`  área filtro: ${args.area ?? "todas"}`);
   console.log(`  tipo filtro: ${args.documentType ?? "todos"}`);
   console.log(`  limites:     ${limits.maxCases} casos / ${limits.maxTokens} tokens / $${limits.maxCostUsd}`);
