@@ -89,7 +89,8 @@ export interface CaseResult {
   themeLabel: string;
   title: string;
   trap?: TrapKind;
-  trapDetected?: boolean;        // true se ao menos uma regra esperada foi emitida
+  trapDetected?: boolean;        // legacy: true se DETECTED ou AVOIDED
+  trapOutcome?: "DETECTED" | "AVOIDED" | "MISSED";
   status: "success" | "error";
   errorMessage?: string;
   mode?: GenerationMode;
@@ -121,6 +122,8 @@ export interface ThemeStats extends AreaStats {
   area: LegalArea;
   trapTotal: number;
   trapDetected: number;
+  trapAvoided: number;
+  trapMissed: number;
   topCriticalRules: { rule: string; count: number }[];
 }
 
@@ -150,8 +153,9 @@ export interface RunSummary {
   trapStats: {
     totalWithTraps: number;
     detected: number;
+    avoided: number;
     missed: number;
-    byKind: Record<string, { total: number; detected: number }>;
+    byKind: Record<string, { total: number; detected: number; avoided: number; missed: number }>;
   };
   topCriticalRules: { rule: string; count: number }[];
   results: CaseResult[];

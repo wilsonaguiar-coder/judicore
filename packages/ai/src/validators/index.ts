@@ -8,5 +8,7 @@ export { RichnessValidator } from "./richness.validator.js";
 export { FinalValidator, resolveDocumentStatus } from "./final.validator.js";
 export type { FinalValidationResult } from "./final.validator.js";
 export { EvidenceStanceValidator } from "./evidence-stance.validator.js";
+export { SentencaValidator } from "./sentenca.validator.js";
+export { CriminalSentenceValidator } from "./criminal-sentenca.validator.js";
 export { detectArticleContext, isArticleUsedAsDistinction } from "./article-context.js";
 export type { ArticleContext } from "./article-context.js";

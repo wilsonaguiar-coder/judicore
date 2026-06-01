@@ -1,6 +1,7 @@
 import type { LegalClassification, LegalExtraction, ArgumentationMatrix, JurisprudenciaAnalyzed, GenerationMode } from "../pipeline/types.js";
 import { PIECE_TEMPLATES, APPEAL_RULES, getJurisdicaoRules } from "../rules/legal_rules.js";
 import { buildModeBlock } from "./template-mode.prompt.js";
+import { buildSentencaPrompt } from "./sentenca.prompt.js";
 
 const TUTELA_KEYWORDS_RE = /previdenci|pensão\s+por\s+morte|benefício|servidor\s+públic|alimentar|saúde|remuneratório|salarial|vencimentos|proventos|aposentadori|paridade|reajuste/i;
 
@@ -79,6 +80,10 @@ export function buildDraftPrompt(
 
   const modeBlock = buildModeBlock(mode);
 
+  const sentencaBlock = (mode === "FINAL_DRAFT" && classification.tipo_peca === "SENTENCA")
+    ? buildSentencaPrompt(classification)
+    : "";
+
   const peticaoInicialBlock = (() => {
     if (mode !== "FINAL_DRAFT" || classification.tipo_peca !== "PETICAO_INICIAL") return "";
     const hasTutela = requiresTutelaUrgencia(classification, extraction);
@@ -88,7 +93,7 @@ export function buildDraftPrompt(
     return `\n📋 PETICAO_INICIAL FINAL_DRAFT — EXIGÊNCIAS MÍNIMAS:\nA seção DO DIREITO DEVE conter no mínimo 6 subtópicos com numeração romana (I, II, III, IV, V, VI...):\n  I — Competência e fundamento jurisdicional\n  II — Regime jurídico aplicável\n  III — Norma principal do direito pleiteado\n  IV — Requisitos legais e aplicação ao caso concreto\n  V — Resistência administrativa ou lesão ao direito${hasTutela ? "\n  VI — Efeitos financeiros e/ou prescrição\n  VII — Da Tutela de Urgência (obrigatório)" : "\n  VI — Efeitos financeiros e/ou prescrição"}\nCada subtópico: 2-4 parágrafos. Tese → norma → aplicação → objeção → resposta → conclusão.${tutelaInstrucao}`;
   })();
 
-  return `${modeBlock}${peticaoInicialBlock}
+  return `${modeBlock}${sentencaBlock}${peticaoInicialBlock}
 Redija a peça jurídica com base na classificação, extração e matriz de argumentação abaixo.
 
 CLASSIFICAÇÃO:

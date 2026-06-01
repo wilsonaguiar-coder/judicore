@@ -17,6 +17,8 @@ import { GenericityValidator } from "./genericity.validator.js";
 import { MatrixQualityValidator } from "./matrix-quality.validator.js";
 import { RichnessValidator } from "./richness.validator.js";
 import { EvidenceStanceValidator } from "./evidence-stance.validator.js";
+import { SentencaValidator } from "./sentenca.validator.js";
+import { CriminalSentenceValidator } from "./criminal-sentenca.validator.js";
 
 export interface FinalValidationResult {
   valid: boolean;
@@ -74,6 +76,8 @@ export class FinalValidator {
   private matrixQuality = new MatrixQualityValidator();
   private richness = new RichnessValidator();
   private evidenceStance = new EvidenceStanceValidator();
+  private sentenca = new SentencaValidator();
+  private criminalSentenca = new CriminalSentenceValidator();
 
   validate(
     draft: string,
@@ -90,6 +94,13 @@ export class FinalValidator {
     // 1. Validação estrutural
     const structResult = this.structural.validate(draft, classification.tipo_peca);
     allErrors.push(...structResult.errors);
+
+    // 1b. Validação específica de SENTENCA (geral)
+    if (classification.tipo_peca === "SENTENCA") {
+      allErrors.push(...this.sentenca.validate(draft, classification).errors);
+      // 1c. Validação específica de SENTENCA criminal
+      allErrors.push(...this.criminalSentenca.validate(draft, classification).errors);
+    }
 
     // 2. Validação de regras jurídicas (artigos, diplomas)
     const legalResult = this.legal.validateDraftArticles(draft, classification);

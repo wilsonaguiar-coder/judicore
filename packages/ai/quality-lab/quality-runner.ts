@@ -25,6 +25,7 @@ import {
   type LegalArea,
   type SyntheticCase,
 } from "./case-types.js";
+import { evaluateTrap } from "./trap-evaluator.js";
 import type {
   LegalAudit,
   ValidationError,
@@ -115,11 +116,6 @@ async function runOneCase(fx: SyntheticCase): Promise<CaseResult> {
   const durationMs = Date.now() - start;
   const cost = estimateCost(inputTokens, outputTokens);
 
-  const emittedRules = validationErrors.map((e) => e.rule);
-  const trapDetected = fx.trap && fx.expectedRulesIfTrap && fx.expectedRulesIfTrap.length > 0
-    ? fx.expectedRulesIfTrap.some((rule) => emittedRules.includes(rule))
-    : undefined;
-
   const result: CaseResult = {
     caseId: fx.id,
     area: fx.area,
@@ -144,11 +140,16 @@ async function runOneCase(fx: SyntheticCase): Promise<CaseResult> {
   if (documentStatus) result.documentStatus = documentStatus;
   if (audit) result.score = audit.score;
   if (safeMessage) result.safeMessage = safeMessage;
-  if (fx.trap) result.trap = fx.trap;
-  if (trapDetected !== undefined) result.trapDetected = trapDetected;
   if (draft) {
     result.draft = draft;
     result.draftExcerpt = draft.slice(0, 600);
+  }
+  if (fx.trap) {
+    result.trap = fx.trap;
+    // Avalia outcome com o draft já preenchido em result
+    const outcome = evaluateTrap(fx.trap, result);
+    result.trapOutcome = outcome;
+    result.trapDetected = outcome !== "MISSED";
   }
   return result;
 }

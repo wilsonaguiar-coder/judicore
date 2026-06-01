@@ -91,8 +91,8 @@ function summarize(results: CaseResult[]): RunSummary {
   let scoreSum = 0, scoreN = 0;
   let inputTokens = 0, outputTokens = 0, costUsd = 0, durationSum = 0;
 
-  let totalWithTraps = 0, trapsDetected = 0;
-  const trapByKind = new Map<string, { total: number; detected: number }>();
+  let totalWithTraps = 0, trapsDetected = 0, trapsAvoided = 0, trapsMissed = 0;
+  const trapByKind = new Map<string, { total: number; detected: number; avoided: number; missed: number }>();
 
   for (const r of results) {
     if (r.status === "success") succeeded++; else failed++;
@@ -129,6 +129,8 @@ function summarize(results: CaseResult[]): RunSummary {
         area: r.area,
         trapTotal: 0,
         trapDetected: 0,
+        trapAvoided: 0,
+        trapMissed: 0,
         topCriticalRules: [],
       };
       themeRuleCounts.set(r.themeLabel, new Map());
@@ -136,16 +138,19 @@ function summarize(results: CaseResult[]): RunSummary {
     const t = byTheme[r.themeLabel]!;
     t.total++; applyStatus(t, r.documentStatus);
 
-    // Traps
+    // Traps — outcome tripartite (DETECTED/AVOIDED/MISSED)
     if (r.trap) {
       totalWithTraps++;
       t.trapTotal++;
-      const bk = trapByKind.get(r.trap) ?? { total: 0, detected: 0 };
+      const bk = trapByKind.get(r.trap) ?? { total: 0, detected: 0, avoided: 0, missed: 0 };
       bk.total++;
-      if (r.trapDetected) {
-        trapsDetected++;
-        t.trapDetected++;
-        bk.detected++;
+      const outcome = r.trapOutcome ?? (r.trapDetected ? "DETECTED" : "MISSED");
+      if (outcome === "DETECTED") {
+        trapsDetected++; t.trapDetected++; bk.detected++;
+      } else if (outcome === "AVOIDED") {
+        trapsAvoided++; t.trapAvoided++; bk.avoided++;
+      } else {
+        trapsMissed++; t.trapMissed++; bk.missed++;
       }
       trapByKind.set(r.trap, bk);
     }
@@ -197,7 +202,8 @@ function summarize(results: CaseResult[]): RunSummary {
     trapStats: {
       totalWithTraps,
       detected: trapsDetected,
-      missed: totalWithTraps - trapsDetected,
+      avoided: trapsAvoided,
+      missed: trapsMissed,
       byKind: Object.fromEntries(trapByKind),
     },
     topCriticalRules: topN(ruleCounts, 10),
@@ -211,6 +217,9 @@ function escapeHtml(s: string): string {
 
 function renderHtml(s: RunSummary): string {
   const passRate = s.totalCases > 0 ? Math.round(((s.approved + s.approvedWithCaveats) / s.totalCases) * 100) : 0;
+  const trapHandledRate = s.trapStats.totalWithTraps > 0
+    ? Math.round(((s.trapStats.detected + s.trapStats.avoided) / s.trapStats.totalWithTraps) * 100)
+    : 0;
   const trapDetRate = s.trapStats.totalWithTraps > 0
     ? Math.round((s.trapStats.detected / s.trapStats.totalWithTraps) * 100)
     : 0;
@@ -243,7 +252,7 @@ function renderHtml(s: RunSummary): string {
       <td class="ok">${t.approved}</td>
       <td class="warn">${t.withCaveats}</td>
       <td class="bad">${t.rejected}</td>
-      <td>${t.trapTotal > 0 ? `${t.trapDetected}/${t.trapTotal}` : `<span class="muted">—</span>`}</td>
+      <td>${t.trapTotal > 0 ? `<span class="ok">${t.trapDetected}D</span> / <span class="warn">${t.trapAvoided}A</span> / <span class="bad">${t.trapMissed}M</span>` : `<span class="muted">—</span>`}</td>
       <td>${t.topCriticalRules.length > 0
         ? t.topCriticalRules.map((r) => `<code>${escapeHtml(r.rule)}</code>×${r.count}`).join("<br>")
         : `<span class="muted">—</span>`}</td>
@@ -264,8 +273,9 @@ function renderHtml(s: RunSummary): string {
       <td><code>${escapeHtml(kind)}</code></td>
       <td>${stats.total}</td>
       <td class="ok">${stats.detected}</td>
-      <td class="bad">${stats.total - stats.detected}</td>
-      <td>${Math.round((stats.detected / Math.max(stats.total, 1)) * 100)}%</td>
+      <td class="warn">${stats.avoided}</td>
+      <td class="bad">${stats.missed}</td>
+      <td>${Math.round(((stats.detected + stats.avoided) / Math.max(stats.total, 1)) * 100)}%</td>
     </tr>`).join("");
 
   const caseRows = s.results.map((r) => {
@@ -282,7 +292,7 @@ function renderHtml(s: RunSummary): string {
       ? `<details><summary>Trecho</summary><pre>${escapeHtml(r.draftExcerpt)}</pre></details>`
       : "";
     const trapInfo = r.trap
-      ? `<br><span class="badge ${r.trapDetected ? "ok" : "bad"}" title="${r.trapDetected ? "Trap detectada" : "Trap NÃO detectada"}">${escapeHtml(r.trap)}</span>`
+      ? `<br><span class="badge ${r.trapOutcome === "DETECTED" ? "ok" : r.trapOutcome === "AVOIDED" ? "warn" : "bad"}" title="${r.trapOutcome ?? "unknown"}">${escapeHtml(r.trap)}: ${r.trapOutcome ?? "?"}</span>`
       : "";
     return `
       <tr class="row-${statusClass}">
@@ -356,7 +366,8 @@ function renderHtml(s: RunSummary): string {
     <div class="card"><div class="v">$${s.totalCostUsd.toFixed(2)}</div><div>Custo estimado</div></div>
     <div class="card"><div class="v">${Math.round(s.avgDurationMs)}ms</div><div>Tempo médio</div></div>
     <div class="card bad"><div class="v">${s.failed}</div><div>Erros de execução</div></div>
-    <div class="card"><div class="v">${trapDetRate}%</div><div>Traps detectadas</div></div>
+    <div class="card ok"><div class="v">${trapHandledRate}%</div><div>Traps tratadas (detect+avoid)</div></div>
+    <div class="card"><div class="v">${trapDetRate}%</div><div>Detec. determinística</div></div>
   </div>
 
   <h2>Por tipo de documento</h2>
@@ -367,7 +378,7 @@ function renderHtml(s: RunSummary): string {
 
   <h2>Por tema</h2>
   <table>
-    <thead><tr><th>Tema</th><th>Total</th><th>Score médio</th><th>Aprov</th><th>C/ress</th><th>Reprov</th><th>Traps detect.</th><th>Top erros críticos</th></tr></thead>
+    <thead><tr><th>Tema</th><th>Total</th><th>Score médio</th><th>Aprov</th><th>C/ress</th><th>Reprov</th><th>Traps D/A/M</th><th>Top erros críticos</th></tr></thead>
     <tbody>${themeRows}</tbody>
   </table>
 
@@ -379,7 +390,7 @@ function renderHtml(s: RunSummary): string {
 
   <h2>Detecção de armadilhas (traps)</h2>
   ${trapRows
-    ? `<table><thead><tr><th>Trap</th><th>Total</th><th>Detectadas</th><th>Não detectadas</th><th>Taxa</th></tr></thead><tbody>${trapRows}</tbody></table>`
+    ? `<table><thead><tr><th>Trap</th><th>Total</th><th>Detectadas (rule)</th><th>Evitadas (AI dodge)</th><th>Missed (problema)</th><th>Taxa tratamento</th></tr></thead><tbody>${trapRows}</tbody></table>`
     : `<p class="muted">Nenhuma armadilha aplicada.</p>`}
 
   <h2>Por área jurídica</h2>
@@ -420,7 +431,7 @@ async function main(): Promise<void> {
   console.log(`  reprov:   ${summary.rejected}`);
   console.log(`  erros:    ${summary.failed}`);
   console.log(`  score:    ${summary.avgScore.toFixed(1)}`);
-  console.log(`  traps:    ${summary.trapStats.detected}/${summary.trapStats.totalWithTraps} detectadas`);
+  console.log(`  traps:    ${summary.trapStats.detected} DETECTED / ${summary.trapStats.avoided} AVOIDED / ${summary.trapStats.missed} MISSED (de ${summary.trapStats.totalWithTraps})`);
   console.log(`  tokens:   ${summary.totalInputTokens + summary.totalOutputTokens}`);
   console.log(`  custo:    $${summary.totalCostUsd.toFixed(2)}`);
   console.log(`  JSON:     ${join(OUTPUT_DIR, "report.json")}`);
