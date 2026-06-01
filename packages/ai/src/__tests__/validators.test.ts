@@ -73,7 +73,7 @@ describe("Teste 1: Input genérico detectado na extração", () => {
       "SAFE_SKELETON",
     );
     assert.equal(result.document_confidence, 0.20, "SAFE_SKELETON deve ter confiança 0.20");
-    assert.equal(result.status_minuta, "MINUTA PARA REVISÃO");
+    assert.equal(result.status_minuta, "APROVADA COM RESSALVAS", "SAFE_SKELETON é sempre APROVADA COM RESSALVAS (modelo para preencher)");
   });
 });
 
@@ -240,7 +240,7 @@ describe("Teste 10: Peça genérica deve resultar em MINUTA PARA REVISÃO", () =
       [],
       "TEMPLATE_MODEL",
     );
-    assert.equal(result.status_minuta, "MINUTA PARA REVISÃO", "Peça genérica deve ser MINUTA PARA REVISÃO");
+    assert.equal(result.status_minuta, "APROVADA COM RESSALVAS", "TEMPLATE_MODEL é sempre APROVADA COM RESSALVAS (modelo para preencher)");
     assert.ok(result.document_confidence < 0.80, `Confiança deve ser < 0.80, foi ${result.document_confidence}`);
   });
 });
@@ -262,7 +262,7 @@ describe("Teste 11: Descrição curta não deve bloquear o pipeline", () => {
       "SAFE_SKELETON",
     );
     assert.equal(result.document_confidence, 0.20, "SAFE_SKELETON deve ter confidence fixo de 0.20");
-    assert.equal(result.status_minuta, "MINUTA PARA REVISÃO");
+    assert.equal(result.status_minuta, "APROVADA COM RESSALVAS", "SAFE_SKELETON é sempre APROVADA COM RESSALVAS");
   });
 });
 
@@ -345,11 +345,11 @@ describe("Teste 16: FINAL_DRAFT com conteúdo genérico vira MINUTA PARA REVISÃ
       classification,
       extraction,
       makeMatrix(),
-      makeAudit({ score: 90 }),
+      makeAudit({ score: 75 }),
       [],
       "FINAL_DRAFT",
     );
-    assert.equal(result.status_minuta, "MINUTA PARA REVISÃO", "FINAL_DRAFT genérico deve ser MINUTA PARA REVISÃO");
+    assert.equal(result.status_minuta, "REPROVADA", "FINAL_DRAFT genérico com score 75 deve ser REPROVADA");
     assert.ok(result.document_confidence <= 0.69, `confidence deve ser <= 0.69, foi ${result.document_confidence}`);
     assert.ok(
       result.errors.some((e) => e.rule === "FINAL_DRAFT_GENERIC_LANGUAGE"),

@@ -4,7 +4,8 @@ import { LegalMatrixService } from "./matrix.js";
 import { LegalDraftService } from "./drafter.js";
 import { LegalAuditService } from "./auditor.js";
 import { LegalValidator } from "./validator.js";
-import { FinalValidator, MatrixQualityValidator } from "../validators/index.js";
+import { FinalValidator, MatrixQualityValidator, resolveDocumentStatus } from "../validators/index.js";
+import type { FinalValidationResult } from "../validators/index.js";
 import type {
   PipelineInput,
   PipelineContext,
@@ -155,9 +156,9 @@ export class LegalPipeline {
     onStageComplete?: (stage: string, data: unknown) => Promise<void>,
   ): AsyncGenerator<PipelineEvent> {
     // ── Verificação de input ───────────────────────────────────────────────────
-    const blocked = checkInputBlocked(input.caseDescription);
-    if (blocked) {
-      yield { event: "error", data: { message: blocked, phase: "input_validation", fatal: true } };
+    const inputError = checkInputBlocked(input.caseDescription);
+    if (inputError) {
+      yield { event: "error", data: { message: inputError, phase: "input_validation", fatal: true } };
       return;
     }
 
@@ -288,8 +289,9 @@ export class LegalPipeline {
       yield { event: "validation_errors", data: genericErrors };
     }
 
-    // ── Fase 5: Auditoria ──────────────────────────────────────────────────────
+    // ── Fase 5: Auditoria + Validação final ───────────────────────────────────
     yield { event: "phase", data: { phase: "auditing", generationId } };
+    let finalResult: FinalValidationResult | undefined;
     try {
       const { audit, usage } = await this.auditor.audit(
         ctx.draft!,
@@ -298,47 +300,45 @@ export class LegalPipeline {
       );
       ctx.audit = audit;
 
-      // Calcular document_confidence e status_minuta
-      const docConfidence = calculateDocumentConfidence(
+      // Validação final integrada (usa audit.score para resolver status)
+      finalResult = this.finalValidator.validate(
+        ctx.draft!,
         ctx.classification!,
         ctx.extraction!,
         ctx.matrix!,
         audit,
+        ctx.jurisprudencias,
         mode,
       );
-      ctx.audit.document_confidence = docConfidence;
-      ctx.audit.status_minuta = docConfidence >= 0.80 ? "MINUTA APROVADA" : "MINUTA PARA REVISÃO";
+      if (finalResult.errors.length > 0) {
+        yield { event: "validation_errors", data: finalResult.errors };
+      }
+
+      // Enriquecer audit com status resolvido
+      ctx.audit.document_confidence = finalResult.document_confidence;
+      ctx.audit.status_minuta = finalResult.status_minuta;
+      ctx.audit.blocked = finalResult.blocked;
+      ctx.audit.ressalvas = finalResult.ressalvas;
+      ctx.audit.aprovada = !finalResult.blocked;
 
       await onStageComplete?.("audit", { audit: ctx.audit, usage });
       yield { event: "audit", data: ctx.audit };
     } catch (err: unknown) {
       yield { event: "error", data: { message: String(err), phase: "auditing", fatal: false } };
-      yield { event: "done", data: { generationId, aprovada: false, mode, status: "MINUTA PARA REVISÃO" } };
+      yield { event: "done", data: { generationId, aprovada: false, blocked: true, mode, status: "REPROVADA" } };
       return;
-    }
-
-    // ── Validação final integrada ─────────────────────────────────────────────
-    const finalResult = this.finalValidator.validate(
-      ctx.draft!,
-      ctx.classification!,
-      ctx.extraction!,
-      ctx.matrix!,
-      ctx.audit!,
-      ctx.jurisprudencias,
-      mode,
-    );
-    if (finalResult.errors.length > 0) {
-      yield { event: "validation_errors", data: finalResult.errors };
     }
 
     yield {
       event: "done",
       data: {
         generationId,
-        aprovada: ctx.audit!.aprovada && !finalResult.hasFatalErrors,
+        aprovada: !ctx.audit!.blocked,
+        blocked: ctx.audit!.blocked ?? false,
+        ressalvas: ctx.audit!.ressalvas ?? [],
         mode,
-        status: finalResult.status_minuta,
-        safe_message: finalResult.safe_message,
+        status: ctx.audit!.status_minuta,
+        safe_message: finalResult?.safe_message,
       },
     };
   }

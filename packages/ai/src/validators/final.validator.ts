@@ -6,6 +6,7 @@ import type {
   GenerationMode,
   JurisprudenciaInput,
   ValidationError,
+  DocumentStatus,
 } from "../pipeline/types.js";
 import { StructuralValidator } from "./structural.validator.js";
 import { LegalRulesValidator } from "./legal.validator.js";
@@ -20,8 +21,46 @@ export interface FinalValidationResult {
   hasFatalErrors: boolean;
   errors: ValidationError[];
   document_confidence: number;
-  status_minuta: "MINUTA APROVADA" | "MINUTA PARA REVISÃO";
+  status_minuta: DocumentStatus;
+  blocked: boolean;
+  ressalvas: string[];
   safe_message?: string | undefined;
+}
+
+export function resolveDocumentStatus(
+  score: number,
+  errors: ValidationError[],
+  mode?: GenerationMode,
+): { status: DocumentStatus; blocked: boolean; ressalvas: string[] } {
+  // SAFE_SKELETON e TEMPLATE_MODEL são modelos intencionalmente incompletos:
+  // erros estruturais são esperados e não bloqueiam.
+  if (mode === "SAFE_SKELETON" || mode === "TEMPLATE_MODEL") {
+    return {
+      status: "APROVADA COM RESSALVAS",
+      blocked: false,
+      ressalvas: ["Modelo estruturado — preencha os campos entre colchetes com os dados reais do caso antes de usar."],
+    };
+  }
+
+  // Para FINAL_DRAFT: erros fatais sempre bloqueiam, independente do score.
+  const hasCritical = errors.some((e) => e.fatal);
+  if (hasCritical) {
+    return { status: "REPROVADA", blocked: true, ressalvas: errors.map((e) => e.message) };
+  }
+
+  if (score >= 90) {
+    return { status: "MINUTA APROVADA", blocked: false, ressalvas: [] };
+  }
+
+  if (score >= 81) {
+    return {
+      status: "APROVADA COM RESSALVAS",
+      blocked: false,
+      ressalvas: errors.map((e) => e.message),
+    };
+  }
+
+  return { status: "REPROVADA", blocked: true, ressalvas: errors.map((e) => e.message) };
 }
 
 export class FinalValidator {
@@ -71,7 +110,7 @@ export class FinalValidator {
     const hasFatalErrors = allErrors.some((e) => e.fatal);
     const genericityScore = this.genericity.calculateScore(draft, extraction);
 
-    // 7. FINAL_DRAFT: genericidade >= 3 → rebaixar para revisão
+    // 7. FINAL_DRAFT: genericidade >= 3 → adiciona aviso (não bloqueia sozinho)
     if (mode === "FINAL_DRAFT" && genericityScore >= 3) {
       allErrors.push({
         rule: "FINAL_DRAFT_GENERIC_LANGUAGE",
@@ -90,41 +129,36 @@ export class FinalValidator {
       }));
     }
 
-    // Calcular document_confidence
-    // Para SAFE_SKELETON e TEMPLATE_MODEL os valores são fixos (0.20 / 0.50) e não sofrem capping.
+    // document_confidence — para display e ranking (não drive o status final)
     let confidence = this.calculateConfidence(classification, extraction, matrix, audit, mode, genericityScore);
-
-    // Capping de confidence — só se aplica a FINAL_DRAFT
     if (mode === "FINAL_DRAFT") {
       if (hasFatalErrors) confidence = Math.min(confidence, 0.49);
       if (genericityScore >= 3) confidence = Math.min(confidence, 0.69);
     }
 
-    const isWeakFinalDraft = mode === "FINAL_DRAFT" && genericityScore >= 3;
-    const status_minuta: "MINUTA APROVADA" | "MINUTA PARA REVISÃO" =
-      confidence >= 0.80 && !hasFatalErrors && !isWeakFinalDraft
-        ? "MINUTA APROVADA"
-        : "MINUTA PARA REVISÃO";
+    // Status final baseado no score do auditor
+    const resolved = resolveDocumentStatus(audit.score, allErrors, mode);
 
-    let safe_message: string | undefined;
-    if (hasFatalErrors) {
-      safe_message = "A minuta contém erros jurídicos graves e exige revisão antes de qualquer uso.";
-    } else if (mode !== "FINAL_DRAFT") {
-      safe_message = "A minuta é um modelo estruturado. Preencha os campos entre colchetes com os dados reais do caso antes de usar.";
-    } else if (isWeakFinalDraft) {
-      safe_message = "A minuta contém linguagem genérica — revise a fundamentação antes de usar.";
-    } else if (status_minuta === "MINUTA PARA REVISÃO") {
-      safe_message = "A minuta exige revisão jurídica antes de uso.";
-    }
+    const safe_message = this.buildSafeMessage(resolved.status, mode, hasFatalErrors);
 
     return {
       valid: !hasFatalErrors,
       hasFatalErrors,
       errors: allErrors,
       document_confidence: confidence,
-      status_minuta,
+      status_minuta: resolved.status,
+      blocked: resolved.blocked,
+      ressalvas: resolved.ressalvas,
       safe_message,
     };
+  }
+
+  private buildSafeMessage(status: DocumentStatus, mode: GenerationMode, hasFatalErrors: boolean): string | undefined {
+    if (hasFatalErrors) return "A minuta contém erros jurídicos graves e exige revisão antes de qualquer uso.";
+    if (mode !== "FINAL_DRAFT") return "A minuta é um modelo estruturado. Preencha os campos entre colchetes com os dados reais do caso antes de usar.";
+    if (status === "APROVADA COM RESSALVAS") return "A minuta foi aprovada com ressalvas. Revise os pontos indicados antes de usar.";
+    if (status === "REPROVADA") return "A minuta exige revisão jurídica antes de uso.";
+    return undefined;
   }
 
   private calculateConfidence(

@@ -52,43 +52,49 @@ Retorne SOMENTE um JSON válido com esta estrutura:
 }
 
 CRITÉRIOS GERAIS:
-- aprovada: true apenas se score >= 75 e nenhum erro CRITICO
-- score: 100 = perfeito; -10 por erro CRITICO; -5 por IMPORTANTE; -2 por SUGESTAO
-- CRITICO: artigo de lei errado para o regime/justiça, jurisprudência inventada, estrutura completamente errada
-- IMPORTANTE: tese da matriz não coberta, proibição violada, honorários errados
-- SUGESTAO: melhoria de redação, completude, clareza
+- aprovada: true apenas se score >= 90 e nenhum erro CRITICO
+- score: 100 = perfeito; -10 por erro CRITICO; -3 por IMPORTANTE; -1 por SUGESTAO
+- CRITICO: erro jurídico grave e objetivo — artigo de regime/justiça errado, recurso incompatível, tribunal incompatível, jurisprudência inventada, estrutura completamente errada, mistura RPPS/RGPS, despacho com fundamentação de mérito
+- IMPORTANTE: tese da matriz não coberta na peça, proibição violada, honorários com artigo errado
+- SUGESTAO: preferência estilística, "poderia aprofundar tese", "poderia individualizar melhor fatos", ausência de jurisprudência quando a matriz não tinha jur associada, "poderia melhorar redação", "poderia detalhar pedidos"
+
+ATENÇÃO — NÃO CLASSIFIQUE COMO CRITICO NEM IMPORTANTE:
+- "Os fatos poderiam ser mais detalhados" → SUGESTAO
+- "Ausência de menção a jurisprudência" quando nenhuma foi fornecida → SUGESTAO
+- Qualquer preferência sobre estilo, tamanho ou completude → SUGESTAO
+- "Poderia individualizar melhor" → SUGESTAO
 
 VERIFICAÇÕES ESPECÍFICAS OBRIGATÓRIAS:
 
 1. SENTENÇA com linguagem de habeas corpus:
-   Se tipo_peca for SENTENCA, verifique se usa "concedo a ordem", "denego a ordem", "writ", "ordem de habeas corpus" — esses termos são de HC, não de sentença de ação comum. Se detectado → CRITICO.
+   Se tipo_peca for SENTENCA, verifique se usa "concedo a ordem", "denego a ordem", "writ" — esses termos são de HC. Se detectado → CRITICO.
 
 2. Habeas corpus com linguagem ordinária:
-   Se o assunto menciona habeas corpus mas a peça usa linguagem de ação ordinária cível ("direito alegado", "matéria cível", "ação declaratória") → IMPORTANTE.
+   Se o assunto menciona habeas corpus mas a peça usa "julgo procedente/improcedente" em vez de "concedo/denego a ordem" → CRITICO.
 
 3. DECISÃO sem "É o relatório. Decido.":
-   Se tipo_peca for DECISAO, verifique se a frase "É o relatório. Decido." (ou variante próxima) está presente. Se ausente → IMPORTANTE.
+   Se tipo_peca for DECISAO e a frase estiver ausente → IMPORTANTE.
 
 4. DESPACHO com fundamentação excessiva:
-   Se tipo_peca for DESPACHO e o texto contiver análise de mérito, apreciação de provas ou fundamentação jurídica extensa → CRITICO.
+   Se tipo_peca for DESPACHO e o texto contiver análise de mérito ou fundamentação jurídica extensa → CRITICO.
 
 5. RECURSO sem impugnação específica:
-   Se tipo_peca for RECURSO e não houver identificação clara da decisão recorrida ou dos pontos específicos impugnados → IMPORTANTE.
+   Se tipo_peca for RECURSO e não houver identificação da decisão recorrida → IMPORTANTE.
 
-6. PETIÇÃO INICIAL sem fatos individualizados:
-   Se tipo_peca for PETICAO_INICIAL e os fatos forem genéricos (sem datas, nomes, valores ou eventos concretos) → IMPORTANTE.
+6. PETIÇÃO INICIAL absolutamente genérica:
+   Se tipo_peca for PETICAO_INICIAL e não houver NENHUM fato concreto → IMPORTANTE. Fatos incompletos ou parciais → SUGESTAO.
 
 7. Tese sem norma:
-   Para cada tese do matriz verificada na peça, se não houver artigo de lei específico → IMPORTANTE.
+   Para cada tese da matriz, se não houver artigo de lei específico → IMPORTANTE.
 
 8. Diploma incompatível:
-   Se matéria criminal detectada e a peça usa diplomas civis (CC/2002, CPC/2015 como regra principal) sem menção ao CPP → CRITICO.
+   Se matéria criminal detectada e a peça usa diplomas civis sem menção ao CPP → CRITICO.
 
 9. Honorários em matéria criminal:
-   Se matéria criminal e a peça condena em honorários advocatícios citando art. 85 CPC → IMPORTANTE (criminal não tem honorários).
+   Se matéria criminal e a peça cita art. 85 CPC → CRITICO.
 
 10. Linguagem de template não substituída:
-    Se o texto contiver "[INSERIR", "[A DETERMINAR", "[PREENCHER", "[VERIFICAR" ou similares → SUGESTAO (modelo não foi completado).
+    Se o texto contiver "[INSERIR", "[A DETERMINAR", "[PREENCHER", "[VERIFICAR" ou similares → SUGESTAO.
 
 Retorne SOMENTE o JSON, sem texto adicional.`;
 }

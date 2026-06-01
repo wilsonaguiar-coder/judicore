@@ -87,13 +87,17 @@ export interface AuditError {
   severidade: "CRITICO" | "IMPORTANTE" | "SUGESTAO";
 }
 
+export type DocumentStatus = "MINUTA APROVADA" | "APROVADA COM RESSALVAS" | "REPROVADA";
+
 export interface LegalAudit {
   aprovada: boolean;
   score: number;
   erros: AuditError[];
   resumo: string;
   document_confidence?: number | undefined;
-  status_minuta?: "MINUTA APROVADA" | "MINUTA PARA REVISÃO" | undefined;
+  status_minuta?: DocumentStatus | undefined;
+  blocked?: boolean | undefined;
+  ressalvas?: string[] | undefined;
 }
 
 export interface ValidationError {
@@ -142,7 +146,7 @@ export type PipelineEvent =
   | { event: "matrix"; data: ArgumentationMatrix }
   | { event: "chunk"; data: string }
   | { event: "audit"; data: LegalAudit }
-  | { event: "done"; data: { generationId: string; documentId?: string | undefined; aprovada: boolean; mode?: GenerationMode | undefined; status?: string | undefined; safe_message?: string | undefined } }
+  | { event: "done"; data: { generationId: string; documentId?: string | undefined; aprovada: boolean; mode?: GenerationMode | undefined; status?: string | undefined; blocked?: boolean | undefined; ressalvas?: string[] | undefined; safe_message?: string | undefined } }
   | { event: "error"; data: { message: string; phase: string; fatal: boolean } }
   | { event: "validation_errors"; data: ValidationError[] };
 

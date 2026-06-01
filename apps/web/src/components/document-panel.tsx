@@ -32,6 +32,9 @@ interface AuditResult {
   score: number;
   erros: AuditError[];
   resumo: string;
+  status_minuta?: "MINUTA APROVADA" | "APROVADA COM RESSALVAS" | "REPROVADA" | undefined;
+  blocked?: boolean | undefined;
+  ressalvas?: string[] | undefined;
 }
 
 const PHASE_LABELS: Record<string, string> = {
@@ -85,17 +88,25 @@ function PhaseProgress({ currentPhase, completedPhases }: {
 }
 
 function AuditBadge({ audit }: { audit: AuditResult }) {
+  const status = audit.status_minuta ?? (audit.aprovada ? "MINUTA APROVADA" : "REPROVADA");
+  const isApproved  = status === "MINUTA APROVADA";
+  const isRessalvas = status === "APROVADA COM RESSALVAS";
+  const colorClass = isApproved
+    ? "bg-green-50 border-green-200 text-green-700"
+    : isRessalvas
+      ? "bg-amber-50 border-amber-200 text-amber-700"
+      : "bg-red-50 border-red-200 text-red-700";
+  const icon = isApproved
+    ? <CheckCircle2 size={12} />
+    : isRessalvas
+      ? <AlertCircle size={12} />
+      : <XCircle size={12} />;
+  const label = isApproved ? "Aprovada" : isRessalvas ? "Aprovada com ressalvas" : "Reprovada";
+
   return (
-    <div className={`rounded-lg border px-3 py-2 text-xs ${
-      audit.aprovada
-        ? "bg-green-50 border-green-200 text-green-700"
-        : "bg-red-50 border-red-200 text-red-700"
-    }`}>
+    <div className={`rounded-lg border px-3 py-2 text-xs ${colorClass}`}>
       <div className="flex items-center gap-1.5 font-medium mb-0.5">
-        {audit.aprovada
-          ? <CheckCircle2 size={12} />
-          : <XCircle size={12} />}
-        {audit.aprovada ? "Aprovada" : "Reprovada"} — Score: {audit.score}/100
+        {icon}{label} — Score: {audit.score}/100
       </div>
       <p className="text-[11px] opacity-80">{audit.resumo}</p>
     </div>
@@ -533,8 +544,8 @@ export function DocumentPanel({ caseId, token, userRole, jurisprudencias, caseDe
                 {`Gerar ${DOCUMENT_TYPES[docType]!.toLowerCase()}`}
               </button>
 
-              {/* Corrigir e regerar — aparece quando pipeline reprova */}
-              {showPipeline && audit && !audit.aprovada && pipelineGenerationId && (
+              {/* Corrigir e regerar — aparece apenas quando a peça está bloqueada (REPROVADA) */}
+              {showPipeline && audit && (audit.blocked ?? !audit.aprovada) && pipelineGenerationId && (
                 <button
                   onClick={handleRetry}
                   className="w-full flex items-center justify-center gap-2 py-2 rounded-md border border-amber-300 bg-amber-50 text-amber-700 text-sm font-medium hover:bg-amber-100 transition-colors"
@@ -582,7 +593,7 @@ export function DocumentPanel({ caseId, token, userRole, jurisprudencias, caseDe
           {showPipeline && audit && !isGenerating && (
             <div className="mb-3 space-y-2">
               <AuditBadge audit={audit} />
-              {!audit.aprovada && (
+              {audit.status_minuta !== "MINUTA APROVADA" && (
                 <details className="group">
                   <summary className="cursor-pointer text-xs text-muted-foreground hover:text-foreground flex items-center gap-1">
                     <AlertCircle size={11} />
@@ -590,6 +601,13 @@ export function DocumentPanel({ caseId, token, userRole, jurisprudencias, caseDe
                     <span className="ml-1 group-open:hidden">▸ ver</span>
                     <span className="ml-1 hidden group-open:inline">▾ ocultar</span>
                   </summary>
+                  {(audit.ressalvas ?? []).length > 0 && (
+                    <div className="mt-2 space-y-1">
+                      {(audit.ressalvas ?? []).map((r, i) => (
+                        <p key={i} className="text-[11px] text-amber-700 bg-amber-50 rounded px-2 py-1">• {r}</p>
+                      ))}
+                    </div>
+                  )}
                   <AuditErrors erros={audit.erros} />
                 </details>
               )}
