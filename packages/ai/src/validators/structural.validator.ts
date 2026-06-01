@@ -19,7 +19,7 @@ export class StructuralValidator {
     }
     for (const forbidden of reqs.forbidden_patterns) {
       if (forbidden.pattern.test(draft)) {
-        errors.push({ rule: "FORBIDDEN_STRUCTURE", message: forbidden.label, fatal: forbidden.fatal });
+        errors.push({ rule: forbidden.rule ?? "FORBIDDEN_STRUCTURE", message: forbidden.label, fatal: forbidden.fatal });
       }
     }
 

@@ -244,3 +244,154 @@ describe("Teste 10: Peça genérica deve resultar em MINUTA PARA REVISÃO", () =
     assert.ok(result.document_confidence < 0.80, `Confiança deve ser < 0.80, foi ${result.document_confidence}`);
   });
 });
+
+// ── Teste 11: Descrição curta não bloqueia — gera SAFE_SKELETON ───────────────
+
+describe("Teste 11: Descrição curta não deve bloquear o pipeline", () => {
+  it("FinalValidator com SAFE_SKELETON deve ter confidence 0.20", () => {
+    const finalValidator = new FinalValidator();
+    const classification = makeClassification({ confianca: 0.80 });
+    const extraction = makeExtraction();
+    const result = finalValidator.validate(
+      "Peça qualquer",
+      classification,
+      extraction,
+      makeMatrix(),
+      makeAudit(),
+      [],
+      "SAFE_SKELETON",
+    );
+    assert.equal(result.document_confidence, 0.20, "SAFE_SKELETON deve ter confidence fixo de 0.20");
+    assert.equal(result.status_minuta, "MINUTA PARA REVISÃO");
+  });
+});
+
+// ── Teste 12: STJ em trabalhista → erro fatal ─────────────────────────────────
+
+describe("Teste 12: STJ mencionado em processo trabalhista", () => {
+  it("deve gerar erro fatal pois TST é o tribunal superior trabalhista", () => {
+    const validator = new AppealValidator();
+    const classification = makeClassification({ tipo_justica: "TRABALHO", tipo_peca: "RECURSO", regime_juridico: "CLT" });
+    const draft = "Interpõe-se Recurso de Revista ao Superior Tribunal de Justiça — STJ, requerendo provimento.";
+    const result = validator.validate(draft, classification);
+    const fatalErrors = result.errors.filter((e) => e.fatal);
+    assert.ok(fatalErrors.length > 0, "Menção ao STJ em processo trabalhista deve gerar erro fatal");
+    assert.ok(
+      result.errors.some((e) => e.rule === "WRONG_SUPERIOR_COURT"),
+      "Deve haver erro WRONG_SUPERIOR_COURT",
+    );
+  });
+});
+
+// ── Teste 13: art. 85 CPC em criminal → erro fatal ───────────────────────────
+
+describe("Teste 13: art. 85 CPC em matéria criminal", () => {
+  it("deve gerar erro fatal pois em processo penal não há honorários advocatícios", () => {
+    const validator = new LegalRulesValidator();
+    const classification = makeClassification({ tipo_justica: "CRIMINAL", tipo_peca: "SENTENCA", regime_juridico: "CRIMINAL" });
+    const draft = "Condeno o réu em honorários advocatícios nos termos do art. 85 CPC no percentual de 10%.";
+    const result = validator.validateDraftArticles(draft, classification);
+    const fatalErrors = result.errors.filter((e) => e.fatal);
+    assert.ok(fatalErrors.length > 0, "art. 85 CPC em matéria criminal deve gerar erro fatal");
+    assert.ok(
+      result.errors.some((e) => e.rule === "WRONG_HONORARIOS_CRIMINAL"),
+      "Deve haver erro WRONG_HONORARIOS_CRIMINAL",
+    );
+  });
+});
+
+// ── Teste 14: Despacho com "defiro" → erro fatal ─────────────────────────────
+
+describe("Teste 14: Despacho com 'defiro'", () => {
+  it("deve gerar erro fatal DESPACHO_WITH_DECISION_LANGUAGE", () => {
+    const validator = new StructuralValidator();
+    const draft = "Processo nº 0001234-56.2024.8.26.0000\nDefiro o pedido de tutela de urgência formulado pela parte autora.";
+    const result = validator.validate(draft, "DESPACHO");
+    const fatalError = result.errors.find((e) => e.rule === "DESPACHO_WITH_DECISION_LANGUAGE" && e.fatal);
+    assert.ok(fatalError, "Despacho com 'defiro' deve gerar erro fatal DESPACHO_WITH_DECISION_LANGUAGE");
+  });
+});
+
+// ── Teste 15: Despacho com "indefiro" → erro fatal ───────────────────────────
+
+describe("Teste 15: Despacho com 'indefiro'", () => {
+  it("deve gerar erro fatal DESPACHO_WITH_DECISION_LANGUAGE", () => {
+    const validator = new StructuralValidator();
+    const draft = "Processo nº 0001234-56.2024.8.26.0000\nIndefiro o requerimento de gratuidade da justiça.";
+    const result = validator.validate(draft, "DESPACHO");
+    const fatalError = result.errors.find((e) => e.rule === "DESPACHO_WITH_DECISION_LANGUAGE" && e.fatal);
+    assert.ok(fatalError, "Despacho com 'indefiro' deve gerar erro fatal DESPACHO_WITH_DECISION_LANGUAGE");
+  });
+});
+
+// ── Teste 16: FINAL_DRAFT genérico → MINUTA PARA REVISÃO ────────────────────
+
+describe("Teste 16: FINAL_DRAFT com conteúdo genérico vira MINUTA PARA REVISÃO", () => {
+  it("genericityScore >= 4 em FINAL_DRAFT deve forçar MINUTA PARA REVISÃO e confidence <= 0.69", () => {
+    const finalValidator = new FinalValidator();
+    const classification = makeClassification({ confianca: 0.90 });
+    const extraction = makeExtraction();
+    // Draft com expressões genéricas que atingem score >= 4
+    const genericDraft = `
+      O direito alegado pelo autor merece acolhimento.
+      O reconhecimento do direito alegado é medida necessária.
+      A pretensão da parte autora encontra amparo na legislação vigente.
+      O cumprimento da obrigação deve ser imposto ao réu.
+      O direito material postulado está demonstrado nos autos.
+      [INSERIR FATOS ESPECÍFICOS] [INSERIR FUNDAMENTAÇÃO]
+    `;
+    const result = finalValidator.validate(
+      genericDraft,
+      classification,
+      extraction,
+      makeMatrix(),
+      makeAudit({ score: 90 }),
+      [],
+      "FINAL_DRAFT",
+    );
+    assert.equal(result.status_minuta, "MINUTA PARA REVISÃO", "FINAL_DRAFT genérico deve ser MINUTA PARA REVISÃO");
+    assert.ok(result.document_confidence <= 0.69, `confidence deve ser <= 0.69, foi ${result.document_confidence}`);
+    assert.ok(
+      result.errors.some((e) => e.rule === "FINAL_DRAFT_TOO_GENERIC"),
+      "Deve haver erro FINAL_DRAFT_TOO_GENERIC",
+    );
+  });
+});
+
+// ── Teste 17: TEMPLATE_MODEL mantém confidence 0.50 ─────────────────────────
+
+describe("Teste 17: TEMPLATE_MODEL mantém confidence 0.50 independente de outros fatores", () => {
+  it("confidence deve ser exatamente 0.50 em modo TEMPLATE_MODEL sem erros fatais", () => {
+    const finalValidator = new FinalValidator();
+    const classification = makeClassification({ confianca: 0.95 });
+    const extraction = makeExtraction({ fatos: ["fato 1", "fato 2", "fato 3"] });
+    const result = finalValidator.validate(
+      "Peça estruturada com fatos concretos e pedidos definidos.",
+      classification,
+      extraction,
+      makeMatrix(),
+      makeAudit({ score: 95 }),
+      [],
+      "TEMPLATE_MODEL",
+    );
+    assert.equal(result.document_confidence, 0.50, "TEMPLATE_MODEL deve ter confidence fixo de 0.50");
+  });
+});
+
+// ── Teste 18: SAFE_SKELETON mantém confidence 0.20 ──────────────────────────
+
+describe("Teste 18: SAFE_SKELETON mantém confidence 0.20 independente de outros fatores", () => {
+  it("confidence deve ser exatamente 0.20 em modo SAFE_SKELETON", () => {
+    const finalValidator = new FinalValidator();
+    const result = finalValidator.validate(
+      "Esqueleto estruturado com placeholders.",
+      makeClassification({ confianca: 0.99 }),
+      makeExtraction({ fatos: ["f1", "f2", "f3"], pedidos: ["p1", "p2"] }),
+      makeMatrix(),
+      makeAudit({ score: 100 }),
+      [],
+      "SAFE_SKELETON",
+    );
+    assert.equal(result.document_confidence, 0.20, "SAFE_SKELETON deve ter confidence fixo de 0.20");
+  });
+});

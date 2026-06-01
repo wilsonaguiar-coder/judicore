@@ -19,17 +19,16 @@ import type {
 
 // ── Padrões que indicam input genérico/inválido ───────────────────────────────
 
+// Bloqueia fatalmente apenas inputs completamente inválidos (vazios ou tokens sem sentido)
 const BLOCKED_INPUT_PATTERNS = [
   /^\s*$/,
-  /^pesquisa\s+livre$/i,
   /^teste$/i,
-  /^modelo$/i,
-  /^exemplo$/i,
   /^não\s+informado$/i,
   /^n\/a$/i,
   /^s\/n$/i,
 ];
 
+// Padrões que indicam input genérico → TEMPLATE_MODEL
 const GENERIC_INPUT_PATTERNS = [
   /pesquisa\s+livre/i,
   /^teste\b/i,
@@ -43,7 +42,6 @@ function checkInputBlocked(desc: string): string | null {
   for (const p of BLOCKED_INPUT_PATTERNS) {
     if (p.test(trimmed)) return `Descrição inválida para geração: "${trimmed}"`;
   }
-  if (trimmed.length < 20) return "Descrição do caso é muito curta para gerar uma peça jurídica";
   return null;
 }
 
@@ -54,6 +52,14 @@ function determineGenerationMode(
   classification: LegalClassification,
   extraction: LegalExtraction,
 ): { mode: GenerationMode; reason: string } {
+  // Descrição muito curta → SAFE_SKELETON (sem bloquear o pipeline)
+  if (caseDescription.trim().length < 20) {
+    return {
+      mode: "SAFE_SKELETON",
+      reason: "Descrição curta/incompleta — gerando esqueleto seguro",
+    };
+  }
+
   // Classificação incerta → SAFE_SKELETON
   if (classification.confianca < 0.75 || classification.tipo_justica === "INDETERMINADA") {
     return {

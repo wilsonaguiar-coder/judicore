@@ -16,7 +16,7 @@ export { TAX_KEY_ARTICLES, EXECUCAO_FISCAL_RULES } from "./tax.rules.js";
 
 // ── Requisitos estruturais por tipo de peça ──────────────────────────────────
 
-type PiecePattern = { pattern: RegExp; label: string; fatal: boolean };
+type PiecePattern = { pattern: RegExp; label: string; fatal: boolean; rule?: string };
 type PieceStructuralRequirements = {
   required_text_patterns: PiecePattern[];
   required_structural_patterns: PiecePattern[];
@@ -59,6 +59,12 @@ export const STRUCTURAL_REQUIREMENTS: Record<string, PieceStructuralRequirements
       { pattern: /analis[eo]\s+(as?\s+provas?|o\s+m[eé]rito|probat[oó]rio)/i, label: "Análise probatória/mérito proibida em despacho", fatal: true },
       { pattern: /julgamento\s+de\s+m[eé]rito|m[eé]rito\s+da\s+causa/i, label: "Decisão de mérito proibida em despacho", fatal: true },
       { pattern: /\bjulgo\b/i, label: '"julgo" proibido em despacho', fatal: true },
+      {
+        pattern: /\b(defiro|indefiro|rejeito|acolho|condeno|absolvo|nego\s+provimento|dou\s+provimento)\b/i,
+        label: "Despacho não deve conter linguagem decisória ou análise de mérito.",
+        rule: "DESPACHO_WITH_DECISION_LANGUAGE",
+        fatal: true,
+      },
     ],
   },
   RECURSO: {
@@ -82,15 +88,17 @@ export const STRUCTURAL_REQUIREMENTS: Record<string, PieceStructuralRequirements
 
 // ── Detector de conteúdo genérico ─────────────────────────────────────────────
 
+// Não usar flag `g` nestas expressões: .test() com `g` mantém lastIndex entre chamadas,
+// causando falsos negativos quando o mesmo padrão é testado mais de uma vez por chamada.
 export const GENERIC_EXPRESSIONS: Array<{ pattern: RegExp; label: string }> = [
-  { pattern: /\bo\s+direito\s+alegado\b/gi, label: '"o direito alegado" sem especificação do direito concreto' },
-  { pattern: /\breconhecimento\s+do\s+direito\s+alegado\b/gi, label: '"reconhecimento do direito alegado" — genérico demais' },
-  { pattern: /\bpretens[aã]o\s+da\s+parte\s+(recorrente|autora|r[eé])\b/gi, label: '"pretensão da parte" sem identificar o pedido concreto' },
-  { pattern: /\bcumprimento\s+d[ao]\s+obriga[cç][aã]o\b/gi, label: '"cumprimento da obrigação" sem identificar qual obrigação' },
-  { pattern: /\bdireito\s+material\s+postulado\b/gi, label: '"direito material postulado" sem especificação' },
-  { pattern: /\bmat[eé]ria\s+c[ií]vel\b/gi, label: '"matéria cível" — verifique se o caso não é criminal ou trabalhista' },
-  { pattern: /\ba[cç][aã]o\s+declarat[oó]ria\b.*\b(flagrante|habeas|criminal|penal|pris[aã]o)/gis, label: '"ação declaratória" em contexto criminal — tipo de ação incorreto' },
-  { pattern: /\bpesquisa\s+livre\b/gi, label: '"pesquisa livre" — descrição genérica, sem fatos reais' },
+  { pattern: /\bo\s+direito\s+alegado\b/i, label: '"o direito alegado" sem especificação do direito concreto' },
+  { pattern: /\breconhecimento\s+do\s+direito\s+alegado\b/i, label: '"reconhecimento do direito alegado" — genérico demais' },
+  { pattern: /\bpretens[aã]o\s+da\s+parte\s+(recorrente|autora|r[eé])\b/i, label: '"pretensão da parte" sem identificar o pedido concreto' },
+  { pattern: /\bcumprimento\s+d[ao]\s+obriga[cç][aã]o\b/i, label: '"cumprimento da obrigação" sem identificar qual obrigação' },
+  { pattern: /\bdireito\s+material\s+postulado\b/i, label: '"direito material postulado" sem especificação' },
+  { pattern: /\bmat[eé]ria\s+c[ií]vel\b/i, label: '"matéria cível" — verifique se o caso não é criminal ou trabalhista' },
+  { pattern: /\ba[cç][aã]o\s+declarat[oó]ria\b.*\b(flagrante|habeas|criminal|penal|pris[aã]o)/is, label: '"ação declaratória" em contexto criminal — tipo de ação incorreto' },
+  { pattern: /\bpesquisa\s+livre\b/i, label: '"pesquisa livre" — descrição genérica, sem fatos reais' },
 ];
 
 // ── Proibições absolutas no modo TEMPLATE_MODEL ───────────────────────────────

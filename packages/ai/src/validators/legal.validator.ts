@@ -68,7 +68,7 @@ export class LegalRulesValidator {
       errors.push({
         rule: "WRONG_HONORARIOS_CRIMINAL",
         message: "Em matéria criminal não há honorários advocatícios — não citar art. 85 CPC",
-        fatal: false,
+        fatal: true,
       });
     }
 

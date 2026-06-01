@@ -65,16 +65,42 @@ export class FinalValidator {
     const hasFatalErrors = allErrors.some((e) => e.fatal);
     const genericityScore = this.genericity.calculateScore(draft, extraction);
 
+    // FINAL_DRAFT com conteúdo excessivamente genérico → rebaixar para REVISÃO
+    if (mode === "FINAL_DRAFT" && genericityScore >= 4) {
+      allErrors.push({
+        rule: "FINAL_DRAFT_TOO_GENERIC",
+        message: "A peça foi classificada como FINAL_DRAFT, mas contém conteúdo excessivamente genérico.",
+        fatal: false,
+      });
+    }
+
     // Calcular document_confidence
-    const confidence = this.calculateConfidence(classification, extraction, matrix, audit, mode, genericityScore);
+    // Para SAFE_SKELETON e TEMPLATE_MODEL os valores são fixos (0.20 / 0.50) e não sofrem capping.
+    let confidence = this.calculateConfidence(classification, extraction, matrix, audit, mode, genericityScore);
+
+    // Capping de confidence — só se aplica a FINAL_DRAFT (modos fixos já são conservadores por natureza)
+    if (mode === "FINAL_DRAFT") {
+      if (hasFatalErrors) {
+        confidence = Math.min(confidence, 0.49);
+      }
+      if (genericityScore >= 4) {
+        confidence = Math.min(confidence, 0.69);
+      }
+    }
+
+    const isTooGenericFinalDraft = mode === "FINAL_DRAFT" && genericityScore >= 4;
     const status_minuta: "MINUTA APROVADA" | "MINUTA PARA REVISÃO" =
-      confidence >= 0.80 && !hasFatalErrors ? "MINUTA APROVADA" : "MINUTA PARA REVISÃO";
+      confidence >= 0.80 && !hasFatalErrors && !isTooGenericFinalDraft
+        ? "MINUTA APROVADA"
+        : "MINUTA PARA REVISÃO";
 
     let safe_message: string | undefined;
     if (hasFatalErrors) {
       safe_message = "A minuta contém erros jurídicos graves e exige revisão antes de qualquer uso.";
     } else if (mode !== "FINAL_DRAFT") {
       safe_message = "A minuta é um modelo estruturado. Preencha os campos entre colchetes com os dados reais do caso antes de usar.";
+    } else if (isTooGenericFinalDraft) {
+      safe_message = "A minuta contém conteúdo genérico demais para um FINAL_DRAFT — revise os fatos e pedidos antes de usar.";
     } else if (status_minuta === "MINUTA PARA REVISÃO") {
       safe_message = "A minuta exige revisão jurídica antes de uso.";
     }

@@ -25,7 +25,7 @@ export class AppealValidator {
       errors.push({
         rule: "WRONG_SUPERIOR_COURT",
         message: "O TST é o tribunal superior trabalhista — STJ não revisa matéria trabalhista",
-        fatal: false,
+        fatal: true,
       });
     }
 
