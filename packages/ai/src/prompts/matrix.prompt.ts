@@ -5,10 +5,15 @@ export function buildMatrixPrompt(
   classification: LegalClassification,
   jurisprudencias: JurisprudenciaInput[],
 ): string {
-  const relevantJurs = jurisprudencias.filter((j) => extraction.jurisprudencias_relevantes.includes(j.id));
-  const jurBlock = relevantJurs.length > 0
-    ? relevantJurs.map((j) => `ID "${j.id}": ${j.tribunal} — Tese: ${j.tese}`).join("\n")
-    : "Nenhuma jurisprudência relevante identificada";
+  // Usa todas as jurisprudências selecionadas pelo usuário.
+  // O extrator pode filtrar agressivamente quando o assunto é genérico — nesse caso
+  // caímos back para a lista completa, respeitando a seleção manual do usuário.
+  const jursParaMatriz = extraction.jurisprudencias_relevantes.length > 0
+    ? jurisprudencias.filter((j) => extraction.jurisprudencias_relevantes.includes(j.id))
+    : jurisprudencias;
+  const jurBlock = jursParaMatriz.length > 0
+    ? jursParaMatriz.map((j) => `ID "${j.id}": ${j.tribunal} — Tese: ${j.tese}`).join("\n")
+    : "Nenhuma jurisprudência fornecida";
 
   return `Monte a matriz de argumentação para a peça ${classification.tipo_peca} na ${classification.tipo_justica}.
 
@@ -21,7 +26,7 @@ ${extraction.questoes_juridicas.map((q, i) => `${i + 1}. ${q}`).join("\n")}
 FATOS RELEVANTES:
 ${extraction.fatos.map((f, i) => `${i + 1}. ${f}`).join("\n")}
 
-JURISPRUDÊNCIAS DISPONÍVEIS (relevantes já filtradas):
+JURISPRUDÊNCIAS DISPONÍVEIS (selecionadas pelo usuário):
 ${jurBlock}
 
 Retorne SOMENTE um JSON válido com esta estrutura:
