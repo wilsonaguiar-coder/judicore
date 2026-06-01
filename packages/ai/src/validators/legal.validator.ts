@@ -72,21 +72,21 @@ export class LegalRulesValidator {
       });
     }
 
-    // Bloquear art. 201 CF em regime RPPS
+    // Alertar art. 201 CF em regime RPPS (não fatal — pode aparecer para contraste/distinção legítima)
     if (classification.regime_juridico === "RPPS" && /art\.\s*201\s*(da\s*)?(CF|Constitui[cç][aã]o\s+Federal)/i.test(draft)) {
       errors.push({
         rule: "RPPS_WRONG_ARTICLE",
-        message: "Regime RPPS usa art. 40 CF/88 — art. 201 CF regula RGPS (INSS)",
-        fatal: true,
+        message: "Regime RPPS usa art. 40 CF/88 — verifique se art. 201 CF está sendo citado corretamente (RGPS/INSS)",
+        fatal: false,
       });
     }
 
-    // Bloquear art. 40 CF em regime RGPS
+    // Alertar art. 40 CF em regime RGPS (não fatal — pode aparecer para contraste/distinção legítima)
     if (classification.regime_juridico === "RGPS" && /art\.\s*40\s*(da\s*)?(CF|Constitui[cç][aã]o\s+Federal)/i.test(draft)) {
       errors.push({
         rule: "RGPS_WRONG_ARTICLE",
-        message: "Regime RGPS usa art. 201 CF/88 — art. 40 CF regula RPPS (servidor público)",
-        fatal: true,
+        message: "Regime RGPS usa art. 201 CF/88 — verifique se art. 40 CF está sendo citado corretamente (RPPS/servidor público)",
+        fatal: false,
       });
     }
 
