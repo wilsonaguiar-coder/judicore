@@ -53,6 +53,24 @@ export interface JurisprudenciaInput {
   url?: string | undefined;
 }
 
+export type EvidenceStance = "FAVORAVEL" | "CONTRARIO" | "NEUTRO" | "INCONCLUSIVO";
+export type EvidenceUseMode = "FOUNDATION" | "COUNTER_ARGUMENT" | "DISCARD" | "CONTEXT_ONLY";
+
+export interface EvidenceAnalysis {
+  id: string;
+  stance: EvidenceStance;
+  use_mode: EvidenceUseMode;
+  confidence: number;
+  tese_extraida: string;
+  fundamento_da_classificacao: string;
+  pode_citar_na_peca: boolean;
+  regra_de_uso: string;
+}
+
+export interface JurisprudenciaAnalyzed extends JurisprudenciaInput {
+  evidence?: EvidenceAnalysis | undefined;
+}
+
 export interface LegalExtraction {
   fatos: string[];
   pedidos: string[];
@@ -73,6 +91,8 @@ export interface ArgumentacaoTese {
   contraponto?: string | undefined;
   resposta_contraponto?: string | undefined;
   jurisprudencia_id: string | null;
+  counter_jurisprudencia_id?: string | null | undefined;
+  distinguishing?: string | null | undefined;
   conclusao: string;
 }
 
@@ -125,6 +145,7 @@ export interface PipelineContext {
   retryOf?: string | undefined;
   corrections?: string | undefined;
   generationMode?: GenerationMode | undefined;
+  evidenceAnalysis?: EvidenceAnalysis[] | undefined;
 }
 
 export interface PipelineInput {
@@ -147,6 +168,7 @@ export type PipelineEvent =
   | { event: "chunk"; data: string }
   | { event: "audit"; data: LegalAudit }
   | { event: "done"; data: { generationId: string; documentId?: string | undefined; aprovada: boolean; mode?: GenerationMode | undefined; status?: string | undefined; blocked?: boolean | undefined; ressalvas?: string[] | undefined; safe_message?: string | undefined } }
+  | { event: "evidence"; data: EvidenceAnalysis[] }
   | { event: "error"; data: { message: string; phase: string; fatal: boolean } }
   | { event: "validation_errors"; data: ValidationError[] };
 

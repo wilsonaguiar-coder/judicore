@@ -1,14 +1,14 @@
 import { getOpenAIClient, MODEL } from "../client.js";
 import { buildSystemPrompt } from "../prompts/system.prompt.js";
 import { buildDraftPrompt } from "../prompts/drafter.prompt.js";
-import type { LegalClassification, LegalExtraction, ArgumentationMatrix, JurisprudenciaInput, GenerationMode } from "./types.js";
+import type { LegalClassification, LegalExtraction, ArgumentationMatrix, JurisprudenciaAnalyzed, GenerationMode } from "./types.js";
 
 export class LegalDraftService {
   async *draft(
     classification: LegalClassification,
     extraction: LegalExtraction,
     matrix: ArgumentationMatrix,
-    jurisprudencias: JurisprudenciaInput[],
+    jurisprudencias: JurisprudenciaAnalyzed[],
     onUsage?: (input: number, output: number) => void,
     instruction?: string,
     corrections?: string,

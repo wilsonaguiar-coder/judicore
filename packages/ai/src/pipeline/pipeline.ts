@@ -4,6 +4,7 @@ import { LegalMatrixService } from "./matrix.js";
 import { LegalDraftService } from "./drafter.js";
 import { LegalAuditService } from "./auditor.js";
 import { LegalValidator } from "./validator.js";
+import { EvidenceAnalyzerService } from "./evidence-analyzer.js";
 import { FinalValidator, MatrixQualityValidator, resolveDocumentStatus } from "../validators/index.js";
 import type { FinalValidationResult } from "../validators/index.js";
 import type {
@@ -16,6 +17,8 @@ import type {
   LegalExtraction,
   ArgumentationMatrix,
   LegalAudit,
+  EvidenceAnalysis,
+  JurisprudenciaAnalyzed,
 } from "./types.js";
 
 // ── Padrões que indicam input genérico/inválido ───────────────────────────────
@@ -149,6 +152,7 @@ export class LegalPipeline {
   private auditor = new LegalAuditService();
   private validator = new LegalValidator();
   private finalValidator = new FinalValidator();
+  private evidenceAnalyzer = new EvidenceAnalyzerService();
 
   async *run(
     input: PipelineInput,
@@ -224,13 +228,37 @@ export class LegalPipeline {
       yield { event: "validation_errors", data: extractionValidation.errors };
     }
 
-    // ── Fase 3: Matriz de argumentação ────────────────────────────────────────
+    // ── Fase 3: Análise de posicionamento das evidências ─────────────────────
+    yield { event: "phase", data: { phase: "analyzing_evidence", generationId } };
+    let analyzedJurs: JurisprudenciaAnalyzed[] = ctx.jurisprudencias.map((j) => ({ ...j }));
+    if (ctx.jurisprudencias.length > 0) {
+      try {
+        const { analyses, usage } = await this.evidenceAnalyzer.analyze(
+          ctx.caseDescription,
+          ctx.classification!,
+          ctx.extraction!,
+          ctx.jurisprudencias,
+        );
+        ctx.evidenceAnalysis = analyses;
+        analyzedJurs = ctx.jurisprudencias.map((j) => ({
+          ...j,
+          evidence: analyses.find((a) => a.id === j.id),
+        }));
+        await onStageComplete?.("evidence", { analyses, usage });
+        yield { event: "evidence", data: analyses };
+      } catch (err: unknown) {
+        // Não-fatal: continua sem análise de evidências
+        yield { event: "error", data: { message: `Evidence analysis falhou: ${String(err)}`, phase: "analyzing_evidence", fatal: false } };
+      }
+    }
+
+    // ── Fase 4: Matriz de argumentação ────────────────────────────────────────
     yield { event: "phase", data: { phase: "building_matrix", generationId } };
     try {
       const { matrix, usage } = await this.matrixBuilder.buildMatrix(
         ctx.extraction!,
         ctx.classification!,
-        ctx.jurisprudencias,
+        analyzedJurs,
       );
       ctx.matrix = matrix;
       await onStageComplete?.("matrix", { matrix, usage });
@@ -245,7 +273,7 @@ export class LegalPipeline {
     ctx.generationMode = mode;
     yield { event: "mode", data: { mode, reason } };
 
-    // ── Fase 4: Geração da peça ────────────────────────────────────────────────
+    // ── Fase 5: Geração da peça ────────────────────────────────────────────────
     yield { event: "phase", data: { phase: "drafting", generationId } };
     let fullDraft = "";
     let draftInput = 0, draftOutput = 0;
@@ -254,7 +282,7 @@ export class LegalPipeline {
         ctx.classification!,
         ctx.extraction!,
         ctx.matrix!,
-        ctx.jurisprudencias,
+        analyzedJurs,
         (inp, out) => { draftInput = inp; draftOutput = out; },
         ctx.instruction,
         ctx.corrections,
@@ -289,7 +317,7 @@ export class LegalPipeline {
       yield { event: "validation_errors", data: genericErrors };
     }
 
-    // ── Fase 5: Auditoria + Validação final ───────────────────────────────────
+    // ── Fase 6: Auditoria + Validação final ───────────────────────────────────
     yield { event: "phase", data: { phase: "auditing", generationId } };
     let finalResult: FinalValidationResult | undefined;
     try {
@@ -309,6 +337,7 @@ export class LegalPipeline {
         audit,
         ctx.jurisprudencias,
         mode,
+        ctx.evidenceAnalysis ?? [],
       );
       if (finalResult.errors.length > 0) {
         yield { event: "validation_errors", data: finalResult.errors };

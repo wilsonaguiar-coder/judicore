@@ -7,3 +7,4 @@ export { MatrixQualityValidator } from "./matrix-quality.validator.js";
 export { RichnessValidator } from "./richness.validator.js";
 export { FinalValidator, resolveDocumentStatus } from "./final.validator.js";
 export type { FinalValidationResult } from "./final.validator.js";
+export { EvidenceStanceValidator } from "./evidence-stance.validator.js";

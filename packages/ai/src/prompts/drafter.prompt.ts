@@ -1,4 +1,4 @@
-import type { LegalClassification, LegalExtraction, ArgumentationMatrix, JurisprudenciaInput, GenerationMode } from "../pipeline/types.js";
+import type { LegalClassification, LegalExtraction, ArgumentationMatrix, JurisprudenciaAnalyzed, GenerationMode } from "../pipeline/types.js";
 import { PIECE_TEMPLATES, APPEAL_RULES, getJurisdicaoRules } from "../rules/legal_rules.js";
 import { buildModeBlock } from "./template-mode.prompt.js";
 
@@ -17,7 +17,7 @@ export function buildDraftPrompt(
   classification: LegalClassification,
   extraction: LegalExtraction,
   matrix: ArgumentationMatrix,
-  jurisprudencias: JurisprudenciaInput[],
+  jurisprudencias: JurisprudenciaAnalyzed[],
   instruction?: string,
   corrections?: string,
   mode: GenerationMode = "FINAL_DRAFT",
@@ -25,11 +25,24 @@ export function buildDraftPrompt(
   const rules = getJurisdicaoRules(classification.tipo_justica);
   const template = PIECE_TEMPLATES[classification.tipo_peca];
   const relevantJurs = jurisprudencias.filter((j) =>
-    matrix.teses.some((t) => t.jurisprudencia_id === j.id),
+    matrix.teses.some(
+      (t) => t.jurisprudencia_id === j.id || t.counter_jurisprudencia_id === j.id,
+    ),
   );
 
-  const jurBlock = relevantJurs.length > 0
-    ? `\nJURISPRUDÊNCIAS APROVADAS PARA USO (use SOMENTE estas, pelos dados reais abaixo):\n${relevantJurs.map((j) => `[${j.id}] ${j.tribunal} — ${j.numero} — Relator: ${j.relator ?? "N/I"} — Data: ${j.dataJulgamento ?? "N/I"}\nTese: ${j.tese}\nEmenta (resumo): ${j.ementa.slice(0, 300)}...`).join("\n\n")}`
+  const foundationJurs = relevantJurs.filter((j) => !j.evidence || j.evidence.use_mode === "FOUNDATION");
+  const counterJurs = relevantJurs.filter((j) => j.evidence?.use_mode === "COUNTER_ARGUMENT");
+
+  const foundationBlock = foundationJurs.length > 0
+    ? `\nJURISPRUDÊNCIAS FAVORÁVEIS — FOUNDATION (use como fundamento direto da tese):\n${foundationJurs.map((j) => `[${j.id}] ${j.tribunal} — ${j.numero} — Relator: ${j.relator ?? "N/I"} — Data: ${j.dataJulgamento ?? "N/I"}\nTese: ${j.tese}\nEmenta: ${j.ementa.slice(0, 300)}...`).join("\n\n")}`
+    : "";
+
+  const counterBlock = counterJurs.length > 0
+    ? `\nJURISPRUDÊNCIAS CONTRÁRIAS — COUNTER_ARGUMENT (NUNCA como fundamento favorável — somente para distinguishing/refutação):\n${counterJurs.map((j) => `[${j.id}] ${j.tribunal} — ${j.numero} — Tese contrária: ${j.tese}`).join("\n\n")}`
+    : "";
+
+  const jurBlock = (foundationBlock || counterBlock)
+    ? `${foundationBlock}${counterBlock}`
     : "\nNenhuma jurisprudência aprovada para uso. NÃO mencione nenhuma decisão judicial.";
 
   const matrixBlock = `\nMATRIZ DE ARGUMENTAÇÃO (use como estrutura obrigatória — desenvolva cada tese em 3 a 5 parágrafos):\n${matrix.teses.map((t, i) => {
@@ -42,6 +55,8 @@ export function buildDraftPrompt(
       t.contraponto ? `  Contraponto: ${t.contraponto}` : null,
       t.resposta_contraponto ? `  Resposta: ${t.resposta_contraponto}` : null,
       `  Jurisprudência: ${t.jurisprudencia_id ?? "nenhuma"}`,
+      t.counter_jurisprudencia_id ? `  Jur. Contrária (distinguishing): ${t.counter_jurisprudencia_id}` : null,
+      t.distinguishing ? `  Distinguishing: ${t.distinguishing}` : null,
       `  Conclusão: ${t.conclusao}`,
     ].filter(Boolean);
     return lines.join("\n");
@@ -102,10 +117,14 @@ TOM: ${(template as unknown as { tom?: string }).tom ?? "técnico"}
 PROIBIÇÕES ABSOLUTAS: ${prohibitions.join(" | ")}
 HONORÁRIOS (se aplicável): ${rules.honorarios_artigo}
 
-REGRA CRÍTICA PARA JURISPRUDÊNCIAS:
-- Use SOMENTE as jurisprudências listadas acima com seus dados reais (tribunal, número, relator, data)
+REGRA CRÍTICA — POSICIONAMENTO DE JURISPRUDÊNCIAS:
+- Use jurisprudências FOUNDATION como fundamento positivo das teses
+- Jurisprudências COUNTER_ARGUMENT: NUNCA apresente como se apoiassem a tese do autor
+- Se citar precedente COUNTER_ARGUMENT, OBRIGATORIAMENTE use: "Embora exista precedente em sentido contrário (${classification.tribunal_competente}...), o caso dos autos distingue-se porque [argumento do distinguishing]"
+- Se não houver distinguishing viável para o precedente contrário, NÃO o cite expressamente
+- Jamais escreva "conforme entendimento do [tribunal]" usando decisão classificada como CONTRÁRIA
+- Use SOMENTE os dados reais dos tribunais/números/relatores listados acima
 - NUNCA escreva "[JUR-1]", "[JUR-N]" ou qualquer rótulo no texto final
-- Se não houver jurisprudência aprovada, não mencione nenhuma decisão judicial
 
 ${instruction ? `INSTRUÇÃO ADICIONAL DO USUÁRIO: ${instruction}` : ""}`;
 }

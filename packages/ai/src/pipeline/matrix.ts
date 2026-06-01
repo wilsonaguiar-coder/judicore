@@ -1,5 +1,5 @@
 import { getOpenAIClient } from "../client.js";
-import type { LegalClassification, LegalExtraction, ArgumentationMatrix, JurisprudenciaInput, ServiceUsage } from "./types.js";
+import type { LegalClassification, LegalExtraction, ArgumentationMatrix, JurisprudenciaAnalyzed, ServiceUsage } from "./types.js";
 import { buildMatrixPrompt } from "../prompts/matrix.prompt.js";
 
 const MATRIX_MODEL = "gpt-4.1";
@@ -8,7 +8,7 @@ export class LegalMatrixService {
   async buildMatrix(
     extraction: LegalExtraction,
     classification: LegalClassification,
-    jurisprudencias: JurisprudenciaInput[],
+    jurisprudencias: JurisprudenciaAnalyzed[],
   ): Promise<{ matrix: ArgumentationMatrix; usage: ServiceUsage }> {
     const client = getOpenAIClient();
 

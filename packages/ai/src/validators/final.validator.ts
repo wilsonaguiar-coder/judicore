@@ -7,6 +7,7 @@ import type {
   JurisprudenciaInput,
   ValidationError,
   DocumentStatus,
+  EvidenceAnalysis,
 } from "../pipeline/types.js";
 import { StructuralValidator } from "./structural.validator.js";
 import { LegalRulesValidator } from "./legal.validator.js";
@@ -15,6 +16,7 @@ import { JurisprudenceValidator } from "./jurisprudence.validator.js";
 import { GenericityValidator } from "./genericity.validator.js";
 import { MatrixQualityValidator } from "./matrix-quality.validator.js";
 import { RichnessValidator } from "./richness.validator.js";
+import { EvidenceStanceValidator } from "./evidence-stance.validator.js";
 
 export interface FinalValidationResult {
   valid: boolean;
@@ -71,6 +73,7 @@ export class FinalValidator {
   private genericity = new GenericityValidator();
   private matrixQuality = new MatrixQualityValidator();
   private richness = new RichnessValidator();
+  private evidenceStance = new EvidenceStanceValidator();
 
   validate(
     draft: string,
@@ -80,6 +83,7 @@ export class FinalValidator {
     audit: LegalAudit,
     jurisprudencias: JurisprudenciaInput[],
     mode: GenerationMode,
+    evidenceAnalyses: EvidenceAnalysis[] = [],
   ): FinalValidationResult {
     const allErrors: ValidationError[] = [];
 
@@ -106,6 +110,10 @@ export class FinalValidator {
     // 6. Qualidade da matriz (emite avisos sem bloquear)
     const matrixResult = this.matrixQuality.validate(matrix, extraction);
     allErrors.push(...matrixResult.errors);
+
+    // Validação de posicionamento de evidências (stance)
+    allErrors.push(...this.evidenceStance.validateMatrix(matrix, evidenceAnalyses));
+    allErrors.push(...this.evidenceStance.validate(draft, jurisprudencias, evidenceAnalyses));
 
     const hasFatalErrors = allErrors.some((e) => e.fatal);
     const genericityScore = this.genericity.calculateScore(draft, extraction);

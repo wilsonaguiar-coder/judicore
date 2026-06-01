@@ -38,13 +38,14 @@ interface AuditResult {
 }
 
 const PHASE_LABELS: Record<string, string> = {
-  classifying:     "Classificando caso",
-  extracting:      "Extraindo informações",
-  building_matrix: "Construindo argumentação",
-  drafting:        "Redigindo peça",
-  auditing:        "Auditando qualidade",
+  classifying:        "Classificando caso",
+  extracting:         "Extraindo informações",
+  analyzing_evidence: "Analisando precedentes",
+  building_matrix:    "Construindo argumentação",
+  drafting:           "Redigindo peça",
+  auditing:           "Auditando qualidade",
 };
-const PHASES_ORDER = ["classifying", "extracting", "building_matrix", "drafting", "auditing"] as const;
+const PHASES_ORDER = ["classifying", "extracting", "analyzing_evidence", "building_matrix", "drafting", "auditing"] as const;
 
 function toJurPipeline(j: Jurisprudencia) {
   return {
@@ -217,6 +218,8 @@ export function DocumentPanel({ caseId, token, userRole, jurisprudencias, caseDe
           setAudit(data);
           setCompletedPhases((prev) => new Set([...prev, "auditing"]));
           setPipelinePhase(null);
+        } else if (evt === "evidence") {
+          // evidence analyses received — noop for now, could display in debug panel
         } else if (evt === "error") {
           const data = parsed["data"] as { message: string; fatal: boolean };
           throw new Error(data.message);
