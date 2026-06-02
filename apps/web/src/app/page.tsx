@@ -6,7 +6,7 @@ import Image from "next/image";
 import {
   ArrowRight, Shield, Zap, Lock, Sparkles,
   Users, FileText, Database, Clock, CheckCircle,
-  LayoutGrid, Gem, PlayCircle, HelpCircle,
+  LayoutGrid, Gem, PlayCircle, HelpCircle, Award,
 } from "lucide-react";
 
 const JUDICALC_URL = process.env["NEXT_PUBLIC_JUDICALC_URL"] ?? "https://calculos.judicore.com.br/login.html";
@@ -117,6 +117,37 @@ function JudiCalcMockup() {
       {/* linha "=" verde */}
       <div className="mt-0.5 mx-0 bg-emerald-500 rounded h-4 flex items-center justify-center text-[8px] font-bold text-white">
         =
+      </div>
+    </div>
+  );
+}
+
+// Mockup de score do JudiQuali
+function JudiQualiMockup() {
+  return (
+    <div className="w-[130px] h-[110px] rounded-xl bg-[#1a1208] border border-amber-500/20 overflow-hidden shrink-0 shadow-xl p-3 flex flex-col gap-2">
+      <div className="flex items-center justify-between">
+        <span className="text-[8px] text-amber-300/60 uppercase tracking-wide font-semibold">Score</span>
+        <span className="text-sm font-extrabold text-amber-400">87</span>
+      </div>
+      {/* barra de progresso */}
+      <div className="w-full h-1.5 rounded-full bg-white/8">
+        <div className="h-full rounded-full bg-gradient-to-r from-amber-500 to-amber-300" style={{ width: "87%" }} />
+      </div>
+      {/* itens */}
+      <div className="space-y-1">
+        {[
+          { ok: true,  label: "Estrutura" },
+          { ok: false, label: "Fundament." },
+          { ok: true,  label: "Pedidos" },
+        ].map((r) => (
+          <div key={r.label} className="flex items-center gap-1.5">
+            <span className={`text-[7px] font-bold ${r.ok ? "text-emerald-400" : "text-amber-400"}`}>
+              {r.ok ? "✓" : "⚠"}
+            </span>
+            <span className="text-[8px] text-white/45">{r.label}</span>
+          </div>
+        ))}
       </div>
     </div>
   );
@@ -258,7 +289,7 @@ export default function LandingPage() {
         </div>
 
         {/* ── Product cards ──────────────────────────────────────────── */}
-        <div className="max-w-6xl mx-auto mt-12 grid md:grid-cols-2 gap-5">
+        <div className="max-w-6xl mx-auto mt-12 grid md:grid-cols-3 gap-5">
 
           {/* JudiCore */}
           <motion.div custom={5} variants={fadeUp} initial="hidden" animate="visible">
@@ -349,6 +380,52 @@ export default function LandingPage() {
               </div>
             </a>
           </motion.div>
+
+          {/* JudiQuali */}
+          <motion.div custom={7} variants={fadeUp} initial="hidden" animate="visible">
+            <Link
+              href="/login"
+              className="group flex items-stretch h-full p-6 rounded-2xl border border-white/8 bg-white/[0.025] hover:bg-white/[0.045] hover:border-amber-500/25 transition-all gap-4"
+            >
+              {/* Left content */}
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center gap-3 mb-3">
+                  <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-amber-600/40 to-orange-600/40 border border-amber-500/30 flex items-center justify-center shrink-0">
+                    <Award size={18} className="text-amber-300" />
+                  </div>
+                  <div>
+                    <h2 className="text-lg font-bold leading-none">Judi<span className="text-amber-400">Quali</span></h2>
+                    <p className="text-[11px] text-white/35 mt-0.5">Auditoria Inteligente de Peças</p>
+                  </div>
+                </div>
+                <p className="text-sm text-white/45 leading-relaxed mb-4">
+                  Envie sua peça e receba um score detalhado com pontos de melhoria,
+                  defeitos identificados e sugestões fundamentadas em jurisprudência.
+                </p>
+                <ul className="space-y-1.5 mb-4">
+                  {[
+                    "Análise de estrutura e pedidos compatíveis",
+                    "Análise de jurisprudência pertinente",
+                    "Análise de fundamentação suficiente",
+                  ].map((item) => (
+                    <li key={item} className="flex items-start gap-2 text-sm text-white/55">
+                      <CheckCircle size={13} className="text-amber-400 mt-0.5 shrink-0" />
+                      {item}
+                    </li>
+                  ))}
+                </ul>
+                <span className="inline-flex items-center gap-1.5 text-sm font-semibold text-amber-400 group-hover:text-amber-300 transition-colors">
+                  Acessar JudiQuali
+                  <ArrowRight size={13} className="group-hover:translate-x-1 transition-transform" />
+                </span>
+              </div>
+              {/* Right mockup */}
+              <div className="hidden lg:flex items-center">
+                <JudiQualiMockup />
+              </div>
+            </Link>
+          </motion.div>
+
         </div>
       </section>
 
