@@ -16,11 +16,11 @@ const HC_DISPOSITIVO_RE = /(concedo\s+(parcialmente\s+)?a?\s*ordem|denego\s+a?\s
 const HC_WRONG_DISPOSITIVO_RE = /(julgo\s+(procedente|improcedente|parcialmente\s+procedente)|julgo\s+extinto|condeno\s+o\s+paciente|absolvo\s+o\s+paciente)/i;
 
 // Dispositivos válidos em sentença penal de mérito:
-//   CONDENO / ABSOLVO — ação penal de mérito
+//   CONDENO / ABSOLVO — ação penal de mérito (ambos os gêneros: "o réu" e "a ré")
 //   DECLARO EXTINTA A PUNIBILIDADE — prescrição, decadência, etc. (art. 107 CP)
 //   DESCLASSIFICO — reclassificação para tipo penal menos grave
 const CRIMINAL_DISPOSITIVO_RE =
-  /(absolvo|condeno)\s+o\s+(r[eé]u|acusado|denunciado)|declaro\s+extinta?\s+a\s+punibilidade|desclassifico\s+(a\s+(?:conduta|infra[cç][aã]o)|o\s+crime|para\s+o)/i;
+  /(absolvo|condeno)\s+[ao]s?\s+(r[eé][u]?s?|acusad[ao]s?|denunciad[ao]s?)|declaro\s+extinta?\s+a\s+punibilidade|desclassifico\s+(a\s+(?:conduta|infra[cç][aã]o)|o\s+crime|para\s+o)/i;
 
 // Proibido em sentença penal: linguagem dispositiva civil
 const CRIMINAL_WRONG_CIVIL_RE = /julgo\s+(procedente|improcedente|parcialmente\s+procedente)/i;
