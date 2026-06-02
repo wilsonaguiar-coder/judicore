@@ -15,9 +15,12 @@ import type { LegalClassification, ValidationError, ValidationResult } from "../
 const RELATORIO_RE = /relat[oó]rio/i;
 const FUNDAMENTACAO_RE = /fundamenta[cç][aã]o/i;
 const DISPOSITIVO_RE = /(dispositivo|ante\s+o\s+exposto|isso\s+posto|isto\s+posto|pelo\s+exposto)/i;
-// Inclui verbos de decisões incidentais criminais (defiro/indefiro/revogo/mantenho)
-// além dos verbos de mérito (julgo/absolvo/condeno) e de HC (concedo/denego a ordem)
-const DECISION_VERB_RE = /julgo\s+(procedente|improcedente|extinto|parcialmente)|absolvo|condeno|concedo\s+(a\s+)?(parcial(mente)?\s+)?ordem|denego\s+(a\s+)?ordem|\bdefiro\b|\bindefiro\b|revogo\s+(a\s+)?pris[aã]o|mantenho\s+(a\s+)?pris[aã]o/i;
+// Verbos dispositivos reconhecidos em SENTENÇA:
+//   cível/trabalhista/previdenciário: julgo procedente/improcedente/extinto
+//   penal de mérito: absolvo, condeno, declaro extinta a punibilidade, desclassifico
+//   HC: concedo/denego a ordem   |   incidentais criminais: defiro/indefiro/revogo/mantenho
+const DECISION_VERB_RE =
+  /julgo\s+(procedente|improcedente|extinto|parcialmente)|absolvo|condeno|desclassifico|declaro\s+extinta?\s+a\s+punibilidade|concedo\s+(a\s+)?(parcial(mente)?\s+)?ordem|denego\s+(a\s+)?ordem|\bdefiro\b|\bindefiro\b|revogo\s+(a\s+)?pris[aã]o|mantenho\s+(a\s+)?pris[aã]o/i;
 const RECURSO_RE = /(recurso\s+(ord[ií]n[aá]rio|cab[ií]vel|inominado|de\s+revista|em\s+sentido\s+estrito|especial|extraordin[aá]rio)|apela[cç][aã]o(\s+criminal)?|RO\b|RR\b|REsp\b|RE\b|APL\b|art\.\s*(593|895|1\.?009|1009|42)\s+(CPP|CLT|CPC|Lei\s*9\.?099))/i;
 
 // Dispositivo genérico sem detalhamento de pedido ou benefício

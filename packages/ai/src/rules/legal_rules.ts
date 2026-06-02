@@ -28,11 +28,15 @@ export const STRUCTURAL_REQUIREMENTS: Record<string, PieceStructuralRequirements
     required_text_patterns: [
       { pattern: /relat[oó]rio/i, label: "Seção de Relatório", fatal: true },
       { pattern: /fundament[aã]/i, label: "Seção de Fundamentação", fatal: true },
-      // Dispositivo de sentença: cobre mérito cível/trabalhista/previdenciário (julgo/absolvo/condeno),
-      // HC (concedo/denego a ordem) e decisões incidentais criminais (defiro/revogo/mantenho)
+      // Dispositivo de sentença — cobre todos os tipos:
+      //   cível/trabalhista/previdenciário: julgo procedente/improcedente/extinto
+      //   penal de mérito: absolvo, condeno, desclassifico, declaro extinta a punibilidade
+      //   HC: concedo/denego a ordem
+      //   incidentais criminais: defiro/indefiro/revogo/mantenho/relaxo/decreto a
       {
-        pattern: /ante\s+o\s+exposto|julgo\s+(procedente|improcedente|extinto|parcialmente)|absolvo|condeno|defiro|indefiro|revogo|mantenho|concedo\s+(parcialmente\s+)?a?\s*ordem|denego\s+a?\s*ordem|decreto\s+a\s+pris[aã]o|relaxo/i,
-        label: "Dispositivo (julgo/absolvo/condeno/defiro/indefiro/revogo/mantenho/concedo a ordem/denego a ordem)",
+        pattern:
+          /ante\s+o\s+exposto|julgo\s+(procedente|improcedente|extinto|parcialmente)|absolvo|condeno|desclassifico|declaro\s+extinta?\s+a\s+punibilidade|defiro|indefiro|revogo|mantenho|concedo\s+(parcialmente\s+)?a?\s*ordem|denego\s+a?\s*ordem|decreto\s+a|relaxo/i,
+        label: "Dispositivo (julgo/absolvo/condeno/desclassifico/declaro extinta/defiro/indefiro/revogo/mantenho/concedo a ordem)",
         fatal: true,
       },
     ],
