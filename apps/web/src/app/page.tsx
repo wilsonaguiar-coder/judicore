@@ -6,7 +6,7 @@ import Image from "next/image";
 import {
   ArrowRight, Shield, Zap, Lock, Sparkles,
   Users, FileText, Database, Clock, CheckCircle,
-  LayoutGrid, Gem, PlayCircle, HelpCircle, User,
+  LayoutGrid, Gem, PlayCircle, HelpCircle,
 } from "lucide-react";
 
 const JUDICALC_URL = process.env["NEXT_PUBLIC_JUDICALC_URL"] ?? "https://calculos.judicore.com.br/login.html";
@@ -153,14 +153,6 @@ export default function LandingPage() {
           ))}
         </div>
 
-        {/* CTA */}
-        <Link
-          href="/login"
-          className="flex items-center gap-2 px-4 py-1.5 rounded-full border border-white/15 bg-white/5 hover:bg-white/10 text-sm font-medium transition-all"
-        >
-          <User size={13} className="text-white/60" />
-          Entrar
-        </Link>
       </motion.nav>
 
       {/* ── Hero ───────────────────────────────────────────────────── */}
