@@ -171,7 +171,7 @@ export default function LandingPage() {
         <div className="max-w-6xl mx-auto grid md:grid-cols-2 gap-8 items-end">
 
           {/* Coluna esquerda */}
-          <div className="pb-10">
+          <div>
             <motion.div
               custom={0} variants={fadeUp} initial="hidden" animate="visible"
               className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-violet-500/30 bg-violet-500/10 text-violet-300 text-xs font-medium mb-5"
@@ -210,11 +210,11 @@ export default function LandingPage() {
                 { icon: <Lock size={15} className="text-emerald-400" />, label: "Seguro",    sub: "Seus dados protegidos" },
                 { icon: <Link2 size={15} className="text-blue-400" />,   label: "Integrado", sub: "Processo Judicial Eletrônico - PJE" },
               ].map((f) => (
-                <div key={f.label} className="flex items-center gap-2.5 px-3 py-2.5 rounded-xl border border-white/8 bg-white/[0.03]">
+                <div key={f.label} className="flex items-center gap-3 px-4 py-3 rounded-xl border border-white/8 bg-white/[0.03]">
                   <div className="shrink-0">{f.icon}</div>
                   <div className="min-w-0">
-                    <p className="text-[13px] font-semibold text-white/80 leading-none">{f.label}</p>
-                    <p className="text-[11px] text-white/35 mt-0.5 leading-tight">{f.sub}</p>
+                    <p className="text-sm font-semibold text-white/85 leading-none">{f.label}</p>
+                    <p className="text-xs text-white/45 mt-1 leading-tight">{f.sub}</p>
                   </div>
                 </div>
               ))}
@@ -222,16 +222,16 @@ export default function LandingPage() {
 
             {/* Card "Base de Conhecimento" — abaixo dos pills, simétrico */}
             <motion.div custom={3.5} variants={fadeUp} initial="hidden" animate="visible" className="mt-3 max-w-[440px]">
-              <div className="flex items-center justify-between gap-4 px-4 py-3 rounded-xl border border-violet-500/20 bg-[#10142a]/80 backdrop-blur-sm">
+              <div className="flex items-center justify-between gap-4 px-5 py-4 rounded-xl border border-violet-500/20 bg-[#10142a]/80 backdrop-blur-sm">
                 <div>
-                  <div className="flex items-center gap-1.5 mb-0.5">
-                    <Sparkles size={9} className="text-violet-400" />
-                    <span className="text-[8px] text-violet-300 uppercase tracking-widest font-semibold">Base de Conhecimento</span>
+                  <div className="flex items-center gap-2 mb-1">
+                    <Sparkles size={11} className="text-violet-400" />
+                    <span className="text-[10px] text-violet-300 uppercase tracking-widest font-semibold">Base de Conhecimento</span>
                   </div>
-                  <p className="text-[22px] font-extrabold leading-none text-white">1M+</p>
-                  <p className="text-[10px] text-white/40 leading-tight mt-0.5">Acórdãos e Decisões atualizados diariamente</p>
+                  <p className="text-3xl font-extrabold leading-none text-white">1M+</p>
+                  <p className="text-xs text-white/45 leading-tight mt-1">Acórdãos e Decisões atualizados diariamente</p>
                 </div>
-                <div className="w-[100px] shrink-0">
+                <div className="w-[110px] shrink-0">
                   <Sparkline />
                 </div>
               </div>
@@ -268,7 +268,7 @@ export default function LandingPage() {
         </div>
 
         {/* Cards dos produtos */}
-        <div className="max-w-6xl mx-auto mt-6 grid md:grid-cols-3 gap-5">
+        <div className="max-w-6xl mx-auto mt-0 grid md:grid-cols-3 gap-5">
 
           {/* JudiCore */}
           <motion.div custom={5} variants={fadeUp} initial="hidden" animate="visible" className="h-full">
@@ -283,7 +283,7 @@ export default function LandingPage() {
                     <p className="text-[10px] text-white/35 mt-0.5">Geração Inteligente de Peças</p>
                   </div>
                 </div>
-                <p className="text-sm text-white/45 leading-relaxed mb-3">
+                <p className="text-sm text-white/45 leading-relaxed mb-3 text-left">
                   Gere petições, decisões, sentenças e recursos com IA especializada,
                   fundamentadas em jurisprudência real do STJ, STF e TRFs.
                 </p>
@@ -295,7 +295,7 @@ export default function LandingPage() {
                     </li>
                   ))}
                 </ul>
-                <span className="mt-auto inline-flex items-center gap-1.5 text-sm font-semibold text-white bg-violet-600 hover:bg-violet-500 transition-colors px-4 py-2 rounded-lg w-fit">
+                <span className="mt-auto flex items-center justify-center gap-1.5 text-sm font-semibold text-white bg-violet-600 hover:bg-violet-500 transition-colors px-4 py-2.5 rounded-lg w-full">
                   Gerar peça agora <ArrowRight size={13} className="group-hover:translate-x-1 transition-transform" />
                 </span>
               </div>
@@ -318,7 +318,7 @@ export default function LandingPage() {
                     <p className="text-[10px] text-white/35 mt-0.5">Automação Completa de Cálculos</p>
                   </div>
                 </div>
-                <p className="text-sm text-white/45 leading-relaxed mb-3">
+                <p className="text-sm text-white/45 leading-relaxed mb-3 text-left">
                   Conecte-se ao PJe, gere cálculos previdenciários, trabalhistas e cíveis,
                   assine e protocole diretamente no processo em poucos cliques.
                 </p>
@@ -330,7 +330,7 @@ export default function LandingPage() {
                     </li>
                   ))}
                 </ul>
-                <span className="mt-auto inline-flex items-center gap-1.5 text-sm font-semibold text-white bg-emerald-600 hover:bg-emerald-500 transition-colors px-4 py-2 rounded-lg w-fit">
+                <span className="mt-auto flex items-center justify-center gap-1.5 text-sm font-semibold text-white bg-emerald-600 hover:bg-emerald-500 transition-colors px-4 py-2.5 rounded-lg w-full">
                   Fazer cálculo agora <ArrowRight size={13} className="group-hover:translate-x-1 transition-transform" />
                 </span>
               </div>
@@ -353,7 +353,7 @@ export default function LandingPage() {
                     <p className="text-[10px] text-white/35 mt-0.5">Auditoria Inteligente de Peças</p>
                   </div>
                 </div>
-                <p className="text-sm text-white/45 leading-relaxed mb-3">
+                <p className="text-sm text-white/45 leading-relaxed mb-3 text-left">
                   Envie sua peça e receba uma análise completa com score de qualidade,
                   pontos de melhoria e sugestões fundamentadas.
                 </p>
@@ -365,7 +365,7 @@ export default function LandingPage() {
                     </li>
                   ))}
                 </ul>
-                <span className="mt-auto inline-flex items-center gap-1.5 text-sm font-semibold text-white bg-amber-600 hover:bg-amber-500 transition-colors px-4 py-2 rounded-lg w-fit">
+                <span className="mt-auto flex items-center justify-center gap-1.5 text-sm font-semibold text-white bg-amber-600 hover:bg-amber-500 transition-colors px-4 py-2.5 rounded-lg w-full">
                   Auditar peça agora <ArrowRight size={13} className="group-hover:translate-x-1 transition-transform" />
                 </span>
               </div>
