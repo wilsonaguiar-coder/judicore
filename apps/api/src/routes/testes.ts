@@ -154,7 +154,7 @@ export async function testesRoutes(app: FastifyInstance) {
       const count = Math.max(1, Math.min(100, Number.parseInt(String(body.count ?? 10), 10)));
       const maxCostUsd = Math.max(0.5, Math.min(50, Number.parseFloat(String(body.maxCostUsd ?? 5))));
       const maxTokens = Math.max(10_000, Math.min(2_000_000, Number.parseInt(String(body.maxTokens ?? 500_000), 10)));
-      const validAreas = ["RPPS", "RGPS", "TRABALHISTA", "CRIMINAL", "CRIMINAL_MERITO", "CIVEL", "CIVEL_GERAL", "CONSUMIDOR"];
+      const validAreas = ["RPPS", "RGPS", "TRABALHISTA", "CRIMINAL", "CRIMINAL_MERITO", "CIVEL", "CIVEL_GERAL", "CONSUMIDOR", "FAZENDA_PUBLICA"];
       const area = body.area && validAreas.includes(body.area) ? body.area : undefined;
       const validTypes = ["PETICAO_INICIAL", "RECURSO", "SENTENCA", "DECISAO", "DESPACHO"];
       const documentType = body.documentType && validTypes.includes(body.documentType) ? body.documentType : undefined;

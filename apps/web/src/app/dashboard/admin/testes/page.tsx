@@ -362,6 +362,7 @@ export default function TestesPage() {
                 <option value="CIVEL">Cível (todas as sub-áreas)</option>
                 <option value="CIVEL_GERAL">Cível Geral</option>
                 <option value="CONSUMIDOR">Consumidor (CDC)</option>
+                <option value="FAZENDA_PUBLICA">Fazenda Pública</option>
               </select>
             </div>
             <div>
