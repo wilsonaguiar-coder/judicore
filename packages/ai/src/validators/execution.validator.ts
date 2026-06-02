@@ -46,11 +46,24 @@ const FATAL_RULES: Array<{
     rule: "EC_PENHORA_SALARIO_TOTAL",
     description: "Penhora de 100% de salário/aposentadoria do executado — viola impenhorabilidade do art. 833, IV, CPC. Limite jurisprudencial: até 30% em casos excepcionais (EREsp 1.518.169/DF).",
     detect: (draft, _ctx) => {
-      const penhoraTotal =
-        /penhora\s+(?:d[oe]s?|sobre|integral|total|de\s+100[%])/i.test(draft) &&
-        /sal[aá]rio|vencimento|remunera[cç][aã]o|aposentadoria|proventos/i.test(draft);
-      const temProtecao = /art\.\s*833|impenhor[aá]vel|limite|30[%]|eresp\s*1\.?518/i.test(draft);
-      return penhoraTotal && !temProtecao;
+      // Exige que penhora/bloqueio + verba alimentar + integral/total/100% estejam
+      // na mesma frase (sem cruzar ponto/quebra de linha), evitando falsos positivos
+      // quando o texto apenas menciona "indicar bens à penhora" + "salário" em partes distintas.
+      const VERBAS_RE = /sal[aá]rio|vencimento|remunera[cç][aã]o|aposentadoria|proventos|verba\s+alimentar/i;
+      const TOTAL_RE  = /integral|totalidade|100\s*%|cem\s+por\s+cento|na\s+integralidade/i;
+      const temProtecao = /art\.\s*833|impenhor[aá]vel|limite|30\s*%|eresp\s*1\.?518/i.test(draft);
+      if (temProtecao) return false;
+      // Janela: penhora/bloqueio/constrição → busca até fim da frase por verba + quantum total
+      for (const m of draft.matchAll(/(?:penhora|bloqueio|constri[cç][aã]o)[^.!?\n]{0,200}/gi)) {
+        const trecho = m[0]!;
+        if (VERBAS_RE.test(trecho) && TOTAL_RE.test(trecho)) return true;
+      }
+      // Janela inversa: verba → busca por penhora + quantum total
+      for (const m of draft.matchAll(/(?:sal[aá]rio|vencimento|remunera[cç][aã]o|aposentadoria|proventos|verba\s+alimentar)[^.!?\n]{0,200}/gi)) {
+        const trecho = m[0]!;
+        if (/penhora|bloqueio|constri[cç][aã]o/i.test(trecho) && TOTAL_RE.test(trecho)) return true;
+      }
+      return false;
     },
   },
   {
@@ -243,6 +256,20 @@ const SISBAJUD_RE =
 const QUANTIA_CERTA_RE =
   /\b(execu[cç][aã]o\s+de\s+quantia|cumprimento\s+de\s+senten[cç]a|cobran[cç]a\s+de\s+valor|cobran[cç]a\s+de\s+d[íi]vida|pagamento\s+de\s+quantia)\b/i;
 
+// Detector de peça defensiva (impugnação ou embargos) — usado para flexibilizar seções III/IV
+// e suprimir sugestão de SISBAJUD (que não faz sentido para o executado)
+const DEFESA_EXEC_RE =
+  /\b(impugna[cç][aã]o\s+ao\s+cumprimento|embargos?\s+(à|[aà])\s+execu[cç][aã]o|impugnante\b|embargante\b|excesso\s+de\s+execu[cç][aã]o.*impugn|impugn.*excesso\s+de\s+execu[cç][aã]o)\b/i;
+
+// Seções III equivalentes para impugnação/embargos: tópicos que cumprem a função de
+// "requisitos legais" mas com nomenclatura própria da defesa executiva
+const IMPUGNACAO_SECTION_III_RE =
+  /\b(d[ao]s?\s+)?(limita[cç][aã]o\s+da\s+execu[cç][aã]o|argui[cç][aã]o\s+de\s+excesso|excesso\s+de\s+execu[cç][aã]o|limites?\s+d[oa]?\s+t[íi]tulo|nulidade\s+do\s+excesso|inexigibilidade\s+do\s+t[íi]tulo|prescri[cç][aã]o\s+intercorrente|impenhorabilidade|fundamentos?\s+da\s+impugna[cç][aã]o|fundamentos?\s+dos?\s+embargos|mem[oó]ria\s+de\s+c[aá]lculo)\b/i;
+
+// Seções IV equivalentes para impugnação/embargos: análise concreta dos cálculos/excesso
+const IMPUGNACAO_SECTION_IV_RE =
+  /\b(d[ao]s?\s+)?(aplica[cç][aã]o\s+correta|an[aá]lise\s+dos?\s+c[aá]lculos?|demonstra[cç][aã]o\s+do\s+excesso|valor\s+correto\s+da\s+execu[cç][aã]o|revis[aã]o\s+do\s+valor|vedac[aã]o\s+ao\s+enriquecimento|crit[eé]rios?\s+de\s+c[aá]lculo|necessidade\s+de\s+efeito\s+suspensivo|efeito\s+suspensivo)\b/i;
+
 // ── ExecutionValidator ────────────────────────────────────────────────────────
 
 export class ExecutionValidator {
@@ -280,7 +307,7 @@ export class ExecutionValidator {
 
     // Qualidade de PETICAO_INICIAL
     if (classification.tipo_peca === "PETICAO_INICIAL") {
-      errors.push(...this.validatePeticaoInicial(draft));
+      errors.push(...this.validatePeticaoInicial(draft, ctx));
     }
 
     return { errors };
@@ -290,12 +317,22 @@ export class ExecutionValidator {
     return EXECUTION_CONTEXT_RE.test(classification.assunto_principal ?? "");
   }
 
-  private validatePeticaoInicial(draft: string): ValidationError[] {
+  private validatePeticaoInicial(draft: string, ctx: ExecutionContext): ValidationError[] {
     const errors: ValidationError[] = [];
+    // Peça defensiva: impugnação ao cumprimento ou embargos à execução
+    const isDefesa = ctx.tem_impugnacao || DEFESA_EXEC_RE.test(draft);
 
     // 1. Seções obrigatórias I–V
     for (const section of EXECUTION_SECTIONS) {
-      if (!section.pattern.test(draft)) {
+      let presente = section.pattern.test(draft);
+
+      // Para impugnação/embargos: aceitar nomenclaturas defensivas equivalentes
+      if (!presente && isDefesa) {
+        if (section.label.startsWith("III")) presente = IMPUGNACAO_SECTION_III_RE.test(draft);
+        if (section.label.startsWith("IV"))  presente = IMPUGNACAO_SECTION_IV_RE.test(draft);
+      }
+
+      if (!presente) {
         errors.push({
           rule: "EXECUTION_MISSING_SECTION",
           message:
@@ -343,8 +380,8 @@ export class ExecutionValidator {
       });
     }
 
-    // 5. SISBAJUD — sugestão em execuções de quantia (não-fatal, eleva score quando presente)
-    if (QUANTIA_CERTA_RE.test(draft) && !SISBAJUD_RE.test(draft)) {
+    // 5. SISBAJUD — apenas para peças do exequente (não para impugnação/embargos)
+    if (!isDefesa && QUANTIA_CERTA_RE.test(draft) && !SISBAJUD_RE.test(draft)) {
       errors.push({
         rule: "EXECUTION_SISBAJUD_MISSING",
         message:
