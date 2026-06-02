@@ -34,7 +34,7 @@ function emptyByArea(): Record<LegalArea, AreaStats> {
     RPPS: emptyArea(), RGPS: emptyArea(), TRABALHISTA: emptyArea(),
     CRIMINAL: emptyArea(), CRIMINAL_MERITO: emptyArea(),
     CIVEL: emptyArea(), CIVEL_GERAL: emptyArea(), CONSUMIDOR: emptyArea(),
-    FAZENDA_PUBLICA: emptyArea(),
+    FAZENDA_PUBLICA: emptyArea(), EXECUCAO_CUMPRIMENTO: emptyArea(),
   };
 }
 
@@ -84,8 +84,8 @@ function summarize(results: CaseResult[]): RunSummary {
     CivilValidator: new Map(), ConsumerValidator: new Map(), Other: new Map(),
   };
 
-  const areaScoreSum: Record<LegalArea, number> = { RPPS: 0, RGPS: 0, TRABALHISTA: 0, CRIMINAL: 0, CRIMINAL_MERITO: 0, CIVEL: 0, CIVEL_GERAL: 0, CONSUMIDOR: 0, FAZENDA_PUBLICA: 0 };
-  const areaScoreN: Record<LegalArea, number> = { RPPS: 0, RGPS: 0, TRABALHISTA: 0, CRIMINAL: 0, CRIMINAL_MERITO: 0, CIVEL: 0, CIVEL_GERAL: 0, CONSUMIDOR: 0, FAZENDA_PUBLICA: 0 };
+  const areaScoreSum: Record<LegalArea, number> = { RPPS: 0, RGPS: 0, TRABALHISTA: 0, CRIMINAL: 0, CRIMINAL_MERITO: 0, CIVEL: 0, CIVEL_GERAL: 0, CONSUMIDOR: 0, FAZENDA_PUBLICA: 0, EXECUCAO_CUMPRIMENTO: 0 };
+  const areaScoreN: Record<LegalArea, number> = { RPPS: 0, RGPS: 0, TRABALHISTA: 0, CRIMINAL: 0, CRIMINAL_MERITO: 0, CIVEL: 0, CIVEL_GERAL: 0, CONSUMIDOR: 0, FAZENDA_PUBLICA: 0, EXECUCAO_CUMPRIMENTO: 0 };
   const docScoreSum: Record<string, number> = {};
   const docScoreN: Record<string, number> = {};
   const themeScoreSum: Record<string, number> = {};

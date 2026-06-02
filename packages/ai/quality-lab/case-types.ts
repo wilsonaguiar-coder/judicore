@@ -15,8 +15,9 @@ export type LegalArea =
   | "CRIMINAL_MERITO"    // ação penal de mérito: ABSOLVO/CONDENO com dosimetria
   | "CIVEL"              // casos cíveis gerais (temas originais do QA)
   | "CIVEL_GERAL"        // novos casos cíveis: obrigação de fazer, danos morais, cobrança, etc.
-  | "CONSUMIDOR"         // direito do consumidor: CDC, negativação, plano de saúde, banco
-  | "FAZENDA_PUBLICA";   // direito público: saúde, concursos, servidores, prescrição quinquenal
+  | "CONSUMIDOR"            // direito do consumidor: CDC, negativação, plano de saúde, banco
+  | "FAZENDA_PUBLICA"     // direito público: saúde, concursos, servidores, prescrição quinquenal
+  | "EXECUCAO_CUMPRIMENTO"; // fase executiva: cumprimento de sentença, impugnação, penhora
 
 // Tipos de armadilhas jurídicas inseridas em ~30% dos casos
 export type TrapKind =
@@ -34,7 +35,18 @@ export type TrapKind =
   | "PRESCRICAO_QUINQUENAL_IGNORADA"   // DL 4.597/42 não aplicado — verbas funcionais
   | "LEGITIMIDADE_PASSIVA_INCORRETA"   // ente público errado no polo passivo
   | "SEPARACAO_PODERES_INCORRETA"      // separação de poderes usado para negar mínimo existencial
-  | "SOLIDARIEDADE_INCORRETA";         // responsabilidade solidária dos entes negada (Tema STF 793)
+  | "SOLIDARIEDADE_INCORRETA"           // responsabilidade solidária dos entes negada (Tema STF 793)
+  // Traps específicas de Execução / Cumprimento de Sentença
+  | "EXCESSO_EXECUCAO_IGNORADO"         // excesso de execução não arguido (art. 525 §1º III CPC)
+  | "TITULO_INEXIGIVEL_IGNORADO"        // título inexigível não reconhecido (art. 525 §1º I CPC)
+  | "ERRO_CALCULO_IGNORADO"             // erro nos cálculos (juros/correção) aceito sem correção
+  | "PRESCRICAO_INTERCORRENTE_IGNORADA" // prescrição intercorrente não declarada (art. 921 §4º CPC)
+  | "PENHORA_VERBA_ALIMENTAR"           // penhora total de salário/aposentadoria — impenhorável
+  | "IMPENHORABILIDADE_IGNORADA"        // bem impenhorável (imóvel de família) penhorado
+  | "RITO_FAZENDA_CONFUNDIDO"           // cumprimento contra Fazenda tratado como rito comum (RPV/precatório omitido)
+  | "JUROS_INCORRETOS"                  // juros moratórios fora do padrão legal (não SELIC — art. 406 CC)
+  | "CORRECAO_MONETARIA_INCORRETA"      // índice de correção monetária errado (não IPCA-E)
+  | "LEGITIMIDADE_EC_INCORRETA";        // ente/pessoa ilegítima no polo passivo do cumprimento
 
 export interface SyntheticCase {
   id: string;
@@ -76,6 +88,7 @@ export const AREA_LABELS: Record<LegalArea, string> = {
   CIVEL_GERAL: "Cível Geral",
   CONSUMIDOR: "Consumidor (CDC)",
   FAZENDA_PUBLICA: "Fazenda Pública",
+  EXECUCAO_CUMPRIMENTO: "Execução / Cumprimento",
 };
 
 export function mapRuleToValidator(rule: string): ValidatorComponent {

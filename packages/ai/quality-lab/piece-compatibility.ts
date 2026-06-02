@@ -94,6 +94,33 @@ export const PIECE_COMPATIBILITY: Readonly<Record<string, readonly TipoPeca[]>> 
   fp_contrarrazoes_recurso:       ["RECURSO"],
   fp_agravo_tutela_recurso:       ["RECURSO"],
   fp_embargos_declaracao_recurso: ["RECURSO"],
+
+  // ── Execução / Cumprimento de Sentença — 20 temas, um tipo de peça cada ───
+  // Petições / Requerimentos (4)
+  ec_cumprimento_inicial:          ["PETICAO_INICIAL"],
+  ec_cumprimento_fazenda_inicial:  ["PETICAO_INICIAL"],
+  ec_obrigacao_fazer_inicial:      ["PETICAO_INICIAL"],
+  ec_obrigacao_pagar_inicial:      ["PETICAO_INICIAL"],
+  // Impugnações (4) — petições do executado
+  ec_impugnacao_excesso:           ["PETICAO_INICIAL"],
+  ec_impugnacao_inexigibilidade:   ["PETICAO_INICIAL"],
+  ec_impugnacao_erro_calculo:      ["PETICAO_INICIAL"],
+  ec_impugnacao_prescricao:        ["PETICAO_INICIAL"],
+  // Decisões (5)
+  ec_sisbajud_decisao:             ["DECISAO"],
+  ec_renajud_decisao:              ["DECISAO"],
+  ec_penhora_ativos_decisao:       ["DECISAO"],
+  ec_desbloqueio_valores_decisao:  ["DECISAO"],
+  ec_penhora_salario_decisao:      ["DECISAO"],
+  // Sentenças terminativas (4)
+  ec_impugnacao_proc_sentenca:     ["SENTENCA"],
+  ec_impugnacao_improc_sentenca:   ["SENTENCA"],
+  ec_extincao_satisfacao_sentenca: ["SENTENCA"],
+  ec_extincao_prescricao_sentenca: ["SENTENCA"],
+  // Recursos (3)
+  ec_agravo_penhora_recurso:       ["RECURSO"],
+  ec_agravo_impugnacao_recurso:    ["RECURSO"],
+  ec_embargos_declaracao_ec_recurso: ["RECURSO"],
 };
 
 // ── PieceCompatibilityValidator ──────────────────────────────────────────────

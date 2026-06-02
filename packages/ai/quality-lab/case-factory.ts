@@ -74,6 +74,29 @@ function decideTrap(slotIndex: number, area: LegalArea, phase: Phase | "DESPACHO
     kind = "JURISPRUDENCIA_CONTRARIA";
   }
 
+  // EXECUCAO_CUMPRIMENTO: rotação com traps específicas da fase executiva
+  if (area === "EXECUCAO_CUMPRIMENTO") {
+    const ecTrapTable: TrapKind[] = [
+      "EXCESSO_EXECUCAO_IGNORADO",
+      "TITULO_INEXIGIVEL_IGNORADO",
+      "ERRO_CALCULO_IGNORADO",
+      "PRESCRICAO_INTERCORRENTE_IGNORADA",
+      "PENHORA_VERBA_ALIMENTAR",
+      "IMPENHORABILIDADE_IGNORADA",
+      "RITO_FAZENDA_CONFUNDIDO",
+      "JUROS_INCORRETOS",
+      "CORRECAO_MONETARIA_INCORRETA",
+      "LEGITIMIDADE_EC_INCORRETA",
+    ];
+    kind = ecTrapTable[cycleIdx % ecTrapTable.length]!;
+    // Ajuste fase: PENHORA_VERBA_ALIMENTAR só faz sentido em DECISAO
+    if (kind === "PENHORA_VERBA_ALIMENTAR" && phase !== "DECISAO") kind = "IMPENHORABILIDADE_IGNORADA";
+    // RITO_FAZENDA_CONFUNDIDO faz sentido em PETICAO_INICIAL e DECISAO
+    if (kind === "RITO_FAZENDA_CONFUNDIDO" && phase === "RECURSO") kind = "EXCESSO_EXECUCAO_IGNORADO";
+    if (kind === "RITO_FAZENDA_CONFUNDIDO" && phase === "SENTENCA") kind = "PRESCRICAO_INTERCORRENTE_IGNORADA";
+    return kind;
+  }
+
   // FAZENDA_PUBLICA: rotação com traps específicas de direito público
   if (area === "FAZENDA_PUBLICA") {
     const fpTrapTable: TrapKind[] = [

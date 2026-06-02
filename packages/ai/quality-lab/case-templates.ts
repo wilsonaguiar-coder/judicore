@@ -542,6 +542,67 @@ function applyTrap(
         instruction: "Argumentar que cada ente federativo (União, Estado, Município) responde INDIVIDUALMENTE apenas pela sua parcela de competência no SUS, afastando a responsabilidade solidária — contradizer diretamente o Tema STF 793 (RE 855.178) sem distinguishing justificado.",
         expectedRulesIfTrap: [],
       };
+    // ── Traps específicas de Execução / Cumprimento de Sentença ──────────────
+    case "EXCESSO_EXECUCAO_IGNORADO":
+      return {
+        description: base.description,
+        instruction: "ARMADILHA: O executado arguiu excesso de execução (art. 525 §1º, III, CPC) comprovando que o valor correto é menor. Ignorar completamente essa arguição — prosseguir pelo valor integral apresentado pelo exequente sem examinar o excesso.",
+        expectedRulesIfTrap: [],
+      };
+    case "TITULO_INEXIGIVEL_IGNORADO":
+      return {
+        description: base.description,
+        instruction: "ARMADILHA: O executado arguiu inexigibilidade do título (art. 525 §1º, I, CPC) por vício processual grave (citação nula ou incompetência absoluta). Ignorar a arguição e prosseguir como se o título fosse plenamente exigível.",
+        expectedRulesIfTrap: [],
+      };
+    case "ERRO_CALCULO_IGNORADO":
+      return {
+        description: base.description,
+        instruction: "ARMADILHA: Aplicar juros moratórios de 6% ao mês (72% ao ano capitalizado) em vez da taxa SELIC (taxa legal — art. 406 CC). Usar INPC como índice de correção monetária em vez do IPCA-E.",
+        expectedRulesIfTrap: [],
+      };
+    case "PRESCRICAO_INTERCORRENTE_IGNORADA":
+      return {
+        description: base.description,
+        instruction: "ARMADILHA: O processo ficou paralisado por mais de 5 anos sem movimentação por culpa do exequente, configurando prescrição intercorrente (art. 921 §4º CPC). Ignorar completamente essa prescrição e prosseguir a execução normalmente como se o prazo não tivesse fluído.",
+        expectedRulesIfTrap: [],
+      };
+    case "PENHORA_VERBA_ALIMENTAR":
+      return {
+        description: base.description,
+        instruction: "ARMADILHA: Deferir a penhora de 100% do salário/aposentadoria do executado, sem respeitar a impenhorabilidade do art. 833, IV, CPC. Não aplicar os limites jurisprudenciais do STJ (EREsp 1.518.169) nem mencionar a exceção de 30% para casos excepcionais.",
+        expectedRulesIfTrap: [],
+      };
+    case "IMPENHORABILIDADE_IGNORADA":
+      return {
+        description: base.description,
+        instruction: "ARMADILHA: Deferir a penhora do imóvel residencial único do executado (bem de família), ignorando a proteção da Lei 8.009/90 e a impenhorabilidade do art. 833, VIII, CPC. Tratar o imóvel como bem penhorável comum.",
+        expectedRulesIfTrap: [],
+      };
+    case "RITO_FAZENDA_CONFUNDIDO":
+      return {
+        description: base.description,
+        instruction: "ARMADILHA: Processar o cumprimento de sentença contra a Fazenda Pública pelo rito comum do art. 523 CPC (multa de 10% + penhora imediata), ignorando o rito especial dos arts. 534/535 CPC — não mencionar precatório (art. 100 CF/88) nem RPV (art. 100 §3º CF/88).",
+        expectedRulesIfTrap: [],
+      };
+    case "JUROS_INCORRETOS":
+      return {
+        description: base.description,
+        instruction: "ARMADILHA: Calcular juros moratórios como simples a 12% ao ano (1% ao mês), sem citar a Súmula 54 STJ (fluem desde o evento danoso — ato ilícito) nem o art. 406 CC (taxa SELIC como taxa legal). Ignorar a diferença entre responsabilidade contratual e extracontratual para fixação do dies a quo.",
+        expectedRulesIfTrap: [],
+      };
+    case "CORRECAO_MONETARIA_INCORRETA":
+      return {
+        description: base.description,
+        instruction: "ARMADILHA: Aplicar o IGP-M como índice de correção monetária da condenação cível, em vez do IPCA-E (padrão consolidado pelo STJ para condenações judiciais — Tema 905 / REsp 1.492.221).",
+        expectedRulesIfTrap: [],
+      };
+    case "LEGITIMIDADE_EC_INCORRETA":
+      return {
+        description: base.description,
+        instruction: "ARMADILHA: Prosseguir o cumprimento de sentença contra parte que NÃO consta como condenada no título executivo — estender a obrigação a terceiro (sócio da empresa, fiador não incluído na sentença, familiar do devedor) sem base no art. 513 §5º CPC.",
+        expectedRulesIfTrap: [],
+      };
   }
 }
 
@@ -1551,6 +1612,317 @@ const tFpEmbargosDeclaracaoRecurso = (i: number): ThemeNarrative => ({
   norma: "arts. 1.022 e 1.025 CPC (embargos de declaração — omissão, contradição, obscuridade)",
 });
 
+// ── JURISPRUDÊNCIAS REUTILIZÁVEIS — EXECUÇÃO / CUMPRIMENTO ───────────────────
+
+const JUR_PRESCRICAO_INTERCORRENTE: JurisprudenciaInput = {
+  id: "jur_prescricao_intercorrente",
+  tribunal: "STJ", numero: "REsp 1.340.553/RS (Tema 566)",
+  tema: "Prescrição intercorrente na execução fiscal",
+  ementa: "Transcorrido o prazo de 1 ano de suspensão do art. 40 da LEF, inicia-se o prazo prescricional de 5 anos, independentemente de intimação do credor, cabendo ao juiz declará-la de ofício.",
+  tese: "Prescrição intercorrente — 1 ano + 5 anos (aplicável por analogia ao CPC)",
+  relator: "Min. Mauro Campbell Marques", dataJulgamento: "2016-11-09",
+};
+
+const JUR_IMPENHORABILIDADE_SALARIO: JurisprudenciaInput = {
+  id: "jur_impenhorabilidade_salario",
+  tribunal: "STJ", numero: "EREsp 1.518.169/DF",
+  tema: "Impenhorabilidade de salário — mitigação para percentual",
+  ementa: "A impenhorabilidade de salários (art. 833, IV, CPC) pode ser mitigada quando o valor excede substancialmente o necessário à subsistência do devedor. Admitido percentual de até 30% do salário líquido em casos excepcionais.",
+  tese: "Penhora de percentual do salário (até 30%) — hipótese excepcional",
+  relator: "Min. Luis Felipe Salomão", dataJulgamento: "2019-05-08",
+};
+
+const JUR_FAZENDA_PRECATORIO: JurisprudenciaInput = {
+  id: "jur_fazenda_precatorio",
+  tribunal: "STF", numero: "RE 729.107/DF (Tema 897)",
+  tema: "Cumprimento de sentença contra Fazenda Pública — precatório e RPV",
+  ementa: "As condenações impostas à Fazenda Pública devem ser liquidadas por precatório (art. 100 CF/88) ou RPV (valores ≤ 60 salários mínimos — art. 100 §3º CF/88), sendo vedado o cumprimento pelo rito comum.",
+  tese: "Fazenda Pública: precatório/RPV — rito especial obrigatório",
+  relator: "Min. Luiz Fux", dataJulgamento: "2014-06-11",
+};
+
+// ── SENTENÇA BASE — EXECUÇÃO / CUMPRIMENTO ───────────────────────────────────
+
+const SENT_EC_BASE = `SENTENÇA — EXECUÇÃO / CUMPRIMENTO DE SENTENÇA — estrutura obrigatória:
+I. RELATÓRIO: partes, título executivo, valor exequendo, incidentes processuais (impugnação, exceção).
+II. FUNDAMENTAÇÃO: análise da matéria arguida (excesso, inexigibilidade, prescrição intercorrente, impenhorabilidade) + preceitos legais do CPC Livro II (arts. 513 a 925).
+III. DISPOSITIVO: extinguir a execução (art. 924 CPC) OU julgar impugnação (procedente/improcedente) + honorários advocatícios (art. 85 CPC) + recurso cabível.
+ATENÇÃO — Recurso na execução: Agravo de Instrumento (art. 1.015, XIV, CPC) contra decisões interlocutórias; Apelação (art. 1.009 CPC) contra sentenças terminativas.`;
+
+// ── TEMAS DE EXECUÇÃO / CUMPRIMENTO DE SENTENÇA (20) ─────────────────────────
+//
+// Distribuição:
+//   4 Petições/Requerimentos    → PETICAO_INICIAL
+//   4 Impugnações               → PETICAO_INICIAL
+//   5 Decisões                  → DECISAO
+//   4 Sentenças terminativas    → SENTENCA
+//   3 Recursos                  → RECURSO
+// Total: 20 temas
+
+// ── Petições / Requerimentos (casos 1-4) ─────────────────────────────────────
+
+const tEcCumprimentoInicial = (i: number): ThemeNarrative => ({
+  area: "EXECUCAO_CUMPRIMENTO",
+  themeLabel: "Cumprimento de sentença — requerimento inicial",
+  autor: pick(NOMES, i),
+  reu: pick(NOMES, i + 10),
+  comarca: pick(COMARCAS, i),
+  fatos: `${pick(NOMES, i)} (CPF ${cpf(i + 6000)}) obteve sentença condenatória transitada em julgado em face de ${pick(NOMES, i + 10)} (CPF ${cpf(i + 6100)}), condenando ao pagamento de ${brl(25000 + i * 3000)} com correção monetária pelo IPCA-E desde o evento danoso e juros de mora de 1% ao mês desde a citação (art. 406 CC c/c Súmula 54 STJ). O prazo de 15 dias para pagamento voluntário (art. 523 CPC) transcorreu sem qualquer pagamento. Demonstrativo atualizado totaliza ${brl(28500 + i * 3200)}.`,
+  pedido: "instauração do cumprimento de sentença com aplicação da multa de 10% (art. 523 §1º CPC), honorários de 10% e penhora eletrônica via SISBAJUD",
+  norma: "arts. 523, 524 e 854 do CPC/2015; Súmula 54 STJ; IPCA-E como índice de correção",
+});
+
+const tEcCumprimentoFazendaInicial = (i: number): ThemeNarrative => ({
+  area: "EXECUCAO_CUMPRIMENTO",
+  themeLabel: "Cumprimento contra Fazenda Pública — RPV/precatório",
+  autor: pick(NOMES, i + 1),
+  reu: pick(FP_ENTES, i),
+  comarca: pick(COMARCAS, i + 1),
+  fatos: `${pick(NOMES, i + 1)} (CPF ${cpf(i + 6200)}) obteve sentença condenatória transitada em julgado contra ${pick(FP_ENTES, i)} ao pagamento de verbas funcionais. O prazo de 60 dias para cumprimento voluntário pela Fazenda (art. 535 §3º CPC) transcorreu sem pagamento. O valor atualizado totaliza ${brl(42000 + i * 4000)}. ${i % 2 === 0 ? "O montante supera 60 salários mínimos — deve ser pago por PRECATÓRIO (art. 100 CF/88)." : "O montante é inferior a 60 salários mínimos — deve ser pago por RPV — Requisição de Pequeno Valor (art. 100 §3º CF/88)."}`,
+  pedido: `expedição de ${i % 2 === 0 ? "precatório (art. 100 CF/88)" : "RPV — Requisição de Pequeno Valor (art. 100 §3º CF/88)"} pelo valor atualizado`,
+  norma: "arts. 534, 535 CPC; art. 100 CF/88 (precatório/RPV); Tema STF 897 (RE 729.107)",
+  jurisprudencias: [JUR_FAZENDA_PRECATORIO],
+});
+
+const tEcObrigacaoFazerInicial = (i: number): ThemeNarrative => ({
+  area: "EXECUCAO_CUMPRIMENTO",
+  themeLabel: "Cumprimento de obrigação de fazer — astreintes acumuladas",
+  autor: pick(NOMES, i + 2),
+  reu: pick(EMPRESAS, i).nome,
+  comarca: pick(COMARCAS, i + 2),
+  fatos: `${pick(NOMES, i + 2)} obteve sentença definitiva condenando ${pick(EMPRESAS, i).nome} (CNPJ ${pick(EMPRESAS, i).cnpj}) a ${pick(["concluir a reforma do imóvel comercial", "instalar o sistema de segurança contratado", "entregar o equipamento médico adquirido"], i)} no prazo de 30 dias, com astreinte de ${brl(500 + i * 100)}/dia (art. 536 §1º CPC). Decorridos ${45 + (i % 30)} dias do trânsito em julgado, a obrigação não foi cumprida. Multa acumulada: ${brl((500 + i * 100) * (45 + (i % 30)))}.`,
+  pedido: "exigibilidade das astreintes acumuladas e, alternativamente, conversão da obrigação em perdas e danos (art. 499 CPC)",
+  norma: "arts. 497, 499, 523 e 536 §1º do CPC/2015; art. 389 do CC/2002",
+});
+
+const tEcObrigacaoPagarInicial = (i: number): ThemeNarrative => ({
+  area: "EXECUCAO_CUMPRIMENTO",
+  themeLabel: "Cumprimento — demonstrativo de cálculo (obrigação de pagar)",
+  autor: pick(NOMES, i + 3),
+  reu: pick(NOMES, i + 13),
+  comarca: pick(COMARCAS, i + 3),
+  fatos: `${pick(NOMES, i + 3)} apresenta demonstrativo de cálculo nos autos de cumprimento de sentença. Condenação original: ${brl(80000 + i * 5000)}. Devem ser somados: (a) correção monetária pelo IPCA-E desde o ajuizamento; (b) juros de mora de 1% ao mês a partir da citação (arts. 406 CC e 523 §1º CPC); (c) multa de 10% do art. 523 §1º CPC; (d) honorários de 10% do art. 523 §1º CPC. Total atualizado: ${brl(96000 + i * 5500)}. O executado ${pick(NOMES, i + 13)} não impugnou os cálculos no prazo legal.`,
+  pedido: "homologação do demonstrativo de cálculo e expedição de mandado de penhora pelo saldo total",
+  norma: "arts. 523, 524 e 526 CPC; IPCA-E como índice de correção; Súmula 54 STJ",
+});
+
+// ── Impugnações ao cumprimento (casos 5-8) ───────────────────────────────────
+
+const tEcImpugnacaoExcesso = (i: number): ThemeNarrative => ({
+  area: "EXECUCAO_CUMPRIMENTO",
+  themeLabel: "Impugnação ao cumprimento — excesso de execução",
+  autor: pick(NOMES, i + 4),
+  reu: pick(NOMES, i + 14),
+  comarca: pick(COMARCAS, i + 4),
+  fatos: `${pick(NOMES, i + 4)} (executado) apresenta impugnação ao cumprimento de sentença. O demonstrativo do exequente aponta ${brl(58000 + i * 3000)}, porém: (a) a correção monetária aplicou INPC em vez de IPCA-E — diferença de ${brl(2800 + i * 200)}; (b) os juros foram calculados sobre o total incluída a multa, configurando capitalização vedada — diferença de ${brl(1500 + i * 100)}. O valor correto é ${brl(53700 + i * 2700)}, configurando excesso de execução de ${brl(4300 + i * 300)} (art. 525 §1º, III, CPC).`,
+  pedido: "acolhimento da impugnação para reduzir o valor exequendo ao correto e suspender a execução no excesso",
+  norma: "art. 525 §1º, III, CPC (excesso de execução); arts. 523 e 524 CPC; IPCA-E e SELIC como parâmetros legais",
+});
+
+const tEcImpugnacaoInexigibilidade = (i: number): ThemeNarrative => ({
+  area: "EXECUCAO_CUMPRIMENTO",
+  themeLabel: "Impugnação ao cumprimento — inexigibilidade do título",
+  autor: pick(NOMES, i + 5),
+  reu: pick(NOMES, i + 15),
+  comarca: pick(COMARCAS, i + 5),
+  fatos: `${pick(NOMES, i + 5)} apresenta impugnação alegando inexigibilidade do título executivo. Fundamento: ${pick(["a sentença exequenda foi prolatada por juízo estadual em matéria de competência federal exclusiva (art. 109, I, CF/88) — nulidade absoluta insanável", "o réu nunca foi citado regularmente no processo de conhecimento — nulidade da citação viola o art. 238 CPC e o art. 5º, LV, CF/88", "o título consiste em sentença proferida com violação manifesta do contraditório — ausência de intimação para produção de prova essencial"], i)}. O vício é insanável e impede a exigibilidade do título (art. 525 §1º, I, CPC).`,
+  pedido: "declaração de inexigibilidade do título executivo e extinção do cumprimento de sentença sem resolução do mérito",
+  norma: "art. 525 §1º, I, CPC (inexigibilidade do título); art. 803, I, CPC; arts. 239 e 280 CPC (nulidade de citação)",
+});
+
+const tEcImpugnacaoErroCalculo = (i: number): ThemeNarrative => ({
+  area: "EXECUCAO_CUMPRIMENTO",
+  themeLabel: "Impugnação ao cumprimento — erro nos cálculos (juros e correção)",
+  autor: pick(NOMES, i + 6),
+  reu: pick(NOMES, i + 16),
+  comarca: pick(COMARCAS, i + 6),
+  fatos: `${pick(NOMES, i + 6)} (executado) impugna o demonstrativo por erros materiais nos cálculos: (a) aplicou-se taxa de juros de ${4 + (i % 4)}% ao mês (${(4 + (i % 4)) * 12}% ao ano) em vez da taxa SELIC — diferença de ${brl(12000 + i * 1000)}; (b) a data-base da correção monetária foi fixada na sentença, quando o correto, por tratar-se de responsabilidade extracontratual, é a data do evento danoso (Súmula 54 STJ) — diferença de ${brl(3500 + i * 500)}. O impacto total do erro é de ${brl(15500 + i * 1500)}.`,
+  pedido: "acolhimento da impugnação para corrigir os cálculos: juros pela SELIC e data-base da Súmula 54 STJ",
+  norma: "art. 525 §1º, III, CPC; art. 406 CC (SELIC); Súmula 54 STJ (dies a quo dos juros moratórios — extracontratual)",
+});
+
+const tEcImpugnacaoPrescricao = (i: number): ThemeNarrative => ({
+  area: "EXECUCAO_CUMPRIMENTO",
+  themeLabel: "Impugnação ao cumprimento — prescrição intercorrente",
+  autor: pick(NOMES, i + 7),
+  reu: pick(NOMES, i + 17),
+  comarca: pick(COMARCAS, i + 7),
+  fatos: `${pick(NOMES, i + 7)} apresenta impugnação por prescrição intercorrente. O cumprimento de sentença ficou paralisado por ${5 + (i % 4)} anos e ${3 + (i % 9)} meses sem qualquer movimentação útil por culpa do exequente. Última movimentação efetiva: ${dateBack(5 + (i % 4), i)}. O exequente não promoveu os atos de execução necessários (art. 921 §1º CPC) nem postulou qualquer diligência. O prazo prescricional correspondente à pretensão originária (${2 + (i % 2)} anos) fluiu integralmente durante a paralisia.`,
+  pedido: "reconhecimento da prescrição intercorrente e extinção do cumprimento de sentença com resolução do mérito (art. 924, V, CPC c/c art. 921 §§4º e 5º CPC)",
+  norma: "art. 921 §§4º e 5º CPC; art. 924, V, CPC; Tema STJ 1.062 (EREsp 1.655.682)",
+  jurisprudencias: [JUR_PRESCRICAO_INTERCORRENTE],
+});
+
+// ── Decisões (casos 9-13) ─────────────────────────────────────────────────────
+
+const tEcSisbajudDecisao = (i: number): ThemeNarrative => ({
+  area: "EXECUCAO_CUMPRIMENTO",
+  themeLabel: "SISBAJUD — decisão de penhora eletrônica",
+  autor: pick(NOMES, i),
+  reu: pick(NOMES, i + 10),
+  comarca: pick(COMARCAS, i),
+  fatos: `Fase de cumprimento de sentença. O prazo do art. 523 CPC transcorreu sem pagamento voluntário. Exequente ${pick(NOMES, i)} requer bloqueio eletrônico de ativos financeiros de ${pick(NOMES, i + 10)} via SISBAJUD (BacenJud 2.0). Pesquisa prévia de bens imóveis e veículos não localizou patrimônio suficiente. O sistema deve consultar e bloquear contas correntes, aplicações financeiras e investimentos até o limite de ${brl(32000 + i * 2000)} (principal + multa + honorários).`,
+  pedido: "autorização e expedição de ordem de penhora eletrônica via SISBAJUD até o valor integral da execução",
+  norma: "arts. 854 e 855 CPC (penhora eletrônica); art. 835, I, CPC (preferência legal sobre dinheiro/créditos bancários)",
+});
+
+const tEcRenajudDecisao = (i: number): ThemeNarrative => ({
+  area: "EXECUCAO_CUMPRIMENTO",
+  themeLabel: "RENAJUD — decisão de restrição veicular",
+  autor: pick(NOMES, i + 1),
+  reu: pick(NOMES, i + 11),
+  comarca: pick(COMARCAS, i + 1),
+  fatos: `Exequente ${pick(NOMES, i + 1)} requer restrição de veículos do executado ${pick(NOMES, i + 11)} via RENAJUD. O bloqueio via SISBAJUD resultou em apenas ${brl(800 + i * 100)} bloqueados, insuficientes para cobrir o débito de ${brl(22000 + i * 2000)}. Pesquisa no DETRAN/SENATRAN aponta ${1 + (i % 2)} veículo(s) registrado(s) em nome do executado: ${pick(["Chevrolet Onix 2020, avaliado em R$ 48.000,00", "Toyota Corolla 2019, avaliado em R$ 82.000,00", "Honda HRV 2021, avaliado em R$ 97.000,00"], i)}.`,
+  pedido: "restrição de transferência dos veículos via RENAJUD e posterior leilão para satisfação do crédito",
+  norma: "art. 835, III, CPC (penhora de veículos automotores); arts. 845 §1º e 856 CPC; art. 879 e ss. CPC (avaliação e alienação)",
+});
+
+const tEcPenhoraAtivosDecisao = (i: number): ThemeNarrative => ({
+  area: "EXECUCAO_CUMPRIMENTO",
+  themeLabel: "Penhora de faturamento / créditos — decisão",
+  autor: pick(NOMES, i + 2),
+  reu: pick(EMPRESAS, i).nome,
+  comarca: pick(COMARCAS, i + 2),
+  fatos: `Fase de cumprimento de sentença. Exequente ${pick(NOMES, i + 2)} requer penhora de faturamento da executada ${pick(EMPRESAS, i).nome} (CNPJ ${pick(EMPRESAS, i).cnpj}). SISBAJUD bloqueou apenas ${brl(9000 + i * 500)} de ${brl(35000 + i * 3000)} devidos. Pesquisa patrimonial não localizou imóveis ou veículos. A empresa está em plena atividade comercial com faturamento mensal de aproximadamente ${brl(150000 + i * 20000)}, confirmado por declarações fiscais juntadas.`,
+  pedido: "deferimento da penhora de 10% do faturamento mensal até atingir o saldo remanescente da execução",
+  norma: "art. 835, XI, CPC (penhora de outros direitos); art. 866 CPC (penhora de estabelecimento / faturamento); art. 836 CPC (gradação)",
+});
+
+const tEcDesbloqueioValoresDecisao = (i: number): ThemeNarrative => ({
+  area: "EXECUCAO_CUMPRIMENTO",
+  themeLabel: "Desbloqueio de valores — excesso e verba salarial",
+  autor: pick(NOMES, i + 3),
+  reu: pick(NOMES, i + 13),
+  comarca: pick(COMARCAS, i + 3),
+  fatos: `O executado ${pick(NOMES, i + 3)} requer desbloqueio parcial de valores. O SISBAJUD bloqueou ${brl(46000 + i * 3000)}, superior ao débito de ${brl(30000 + i * 2000)} — excesso de ${brl(16000 + i * 1000)} (art. 831 CPC — penhora suficiente). Adicionalmente, ${brl(7500 + i * 400)} do montante bloqueado correspondem ao salário líquido do mês corrente, impenhorável nos termos do art. 833, IV, CPC.`,
+  pedido: "desbloqueio imediato do excesso de penhora (art. 854 §3º CPC) e da verba salarial impenhorável (art. 833, IV, CPC)",
+  norma: "art. 831 CPC (penhora deve ser suficiente); art. 833, IV, CPC (impenhorabilidade de salário); art. 854 §3º CPC (liberação do bloqueado a maior)",
+  jurisprudencias: [JUR_IMPENHORABILIDADE_SALARIO],
+});
+
+const tEcPenhoraSalarioDecisao = (i: number): ThemeNarrative => ({
+  area: "EXECUCAO_CUMPRIMENTO",
+  themeLabel: "Penhora de percentual do salário — decisão",
+  autor: pick(NOMES, i + 4),
+  reu: pick(NOMES, i + 14),
+  comarca: pick(COMARCAS, i + 4),
+  fatos: `Exequente ${pick(NOMES, i + 4)} requer penhora de 30% do salário líquido do executado ${pick(NOMES, i + 14)}, servidor público com remuneração de ${brl(9000 + i * 600)}/mês. O executado invoca a impenhorabilidade do art. 833, IV, CPC. O exequente contra-argumenta com o EREsp 1.518.169/DF do STJ: quando o salário supera o necessário à subsistência (acima de 50 salários mínimos ou para dívidas alimentares), admite-se penhora de até 30% do valor líquido. O débito total é de ${brl(85000 + i * 5000)}.`,
+  pedido: "autorização de penhora de 20 a 30% do salário líquido mensal até a satisfação integral do crédito",
+  norma: "art. 833, IV e §2º, CPC; EREsp 1.518.169/DF (STJ); art. 548, I, CLT (proteção ao salário mínimo)",
+  jurisprudencias: [JUR_IMPENHORABILIDADE_SALARIO],
+});
+
+// ── Sentenças terminativas (casos 14-17) ─────────────────────────────────────
+
+const tEcImpugnacaoProcSentenca = (i: number): ThemeNarrative => ({
+  area: "EXECUCAO_CUMPRIMENTO",
+  themeLabel: "Impugnação ao cumprimento — sentença procedente",
+  autor: pick(NOMES, i),
+  reu: pick(NOMES, i + 10),
+  comarca: pick(COMARCAS, i),
+  fatos: `Impugnante demonstrou excesso de execução por laudo de contador judicial: o valor correto é ${brl(54000 + i * 3500)}, e não ${brl(61500 + i * 4000)} como calculado pelo exequente. Excesso de ${brl(7500 + i * 500)}. Adicionalmente, ${brl(4800 + i * 200)} bloqueados via SISBAJUD representam salário do mês corrente, impenhorável. Instrução encerrada com perícia contábil favorável ao impugnante.`,
+  pedido: "procedência da impugnação, redução do débito ao valor correto e desbloqueio do salário impenhorável",
+  norma: "art. 525 §§1º e 14 CPC; art. 833, IV, CPC",
+  sentencaInstruction: `${SENT_EC_BASE}
+VARIAÇÃO — PROCEDENTE (EXCESSO DE EXECUÇÃO + IMPENHORABILIDADE):
+1. Acolher a impugnação por excesso de execução (art. 525 §1º, III, CPC): reduzir o débito ao valor correto apurado pela perícia.
+2. Determinar o desbloqueio da verba salarial impenhorável (art. 833, IV, CPC).
+3. Prosseguir o cumprimento pelo valor correto (principal + correção IPCA-E + juros SELIC + multa e honorários legais).
+4. Honorários da impugnação: ao impugnado, proporcionais ao êxito (art. 85 §2º CPC).
+5. Recurso cabível: Agravo de Instrumento (art. 1.015, XIV, CPC) se for decisão interlocutória; Apelação (art. 1.009 CPC) se encerrar a fase executiva.`,
+});
+
+const tEcImpugnacaoImprocSentenca = (i: number): ThemeNarrative => ({
+  area: "EXECUCAO_CUMPRIMENTO",
+  themeLabel: "Impugnação ao cumprimento — sentença improcedente",
+  autor: pick(NOMES, i + 1),
+  reu: pick(NOMES, i + 11),
+  comarca: pick(COMARCAS, i + 1),
+  fatos: `Executado ${pick(NOMES, i + 1)} apresentou impugnação alegando: (a) excesso de execução — refutado por perícia que confirmou os cálculos do exequente; (b) inexigibilidade do título — afastada, pois o processo de conhecimento seguiu o rito regular com citação válida. Instrução encerrada. Os cálculos do exequente foram confirmados pelo contador judicial: ${brl(48000 + i * 3000)}.`,
+  pedido: "improcedência da impugnação e prosseguimento do cumprimento de sentença",
+  norma: "art. 525 §§1º e 14 CPC; arts. 523 e 524 CPC",
+  sentencaInstruction: `${SENT_EC_BASE}
+VARIAÇÃO — IMPROCEDENTE (IMPUGNAÇÃO REJEITADA):
+1. Rejeitar a arguição de excesso de execução: perícia confirmou os cálculos do exequente.
+2. Rejeitar a alegação de inexigibilidade: citação válida, processo regular.
+3. Prosseguir imediatamente a execução pelo valor total: ${brl(48000 + i * 3000)}.
+4. Honorários da impugnação rejeitada: ao exequente (art. 85 §2º CPC).
+5. Multa por impugnação manifestamente protelatória: verificar se houve litigância de má-fé (art. 80 CPC).`,
+});
+
+const tEcExtincaoSatisfacaoSentenca = (i: number): ThemeNarrative => ({
+  area: "EXECUCAO_CUMPRIMENTO",
+  themeLabel: "Extinção da execução por satisfação do crédito",
+  autor: pick(NOMES, i + 2),
+  reu: pick(NOMES, i + 12),
+  comarca: pick(COMARCAS, i + 2),
+  fatos: `${pick(NOMES, i + 12)} (executado) realizou o pagamento integral do débito exequendo, depositando em juízo ${brl(37000 + i * 2500)} — valor integral correspondente a principal + correção IPCA-E + juros SELIC + multa de 10% + honorários de 10%. O exequente ${pick(NOMES, i + 2)} requereu o levantamento dos valores e a extinção da execução. O depósito foi confirmado pelo cartório.`,
+  pedido: "extinção do cumprimento de sentença por satisfação integral (art. 924, II, CPC) e liberação dos valores ao exequente",
+  norma: "art. 924, II, CPC (extinção por satisfação do crédito); art. 925 CPC (extinção da execução)",
+  sentencaInstruction: `${SENT_EC_BASE}
+VARIAÇÃO — EXTINÇÃO POR SATISFAÇÃO (art. 924, II, CPC):
+1. Verificar que o depósito cobre o valor integral: principal + correção + juros + multa de 10% + honorários de 10%.
+2. Declarar extinto o cumprimento de sentença por satisfação do crédito (art. 924, II c/c art. 925 CPC).
+3. Autorizar o levantamento imediato dos valores ao exequente.
+4. Cancelar eventuais penhoras e restrições (SISBAJUD, RENAJUD, ARISP).
+5. Não há honorários adicionais para a extinção em si — apenas os já incluídos nos 10% do art. 523 §1º CPC.`,
+});
+
+const tEcExtincaoPrescricaoSentenca = (i: number): ThemeNarrative => ({
+  area: "EXECUCAO_CUMPRIMENTO",
+  themeLabel: "Extinção da execução por prescrição intercorrente",
+  autor: pick(NOMES, i + 3),
+  reu: pick(NOMES, i + 13),
+  comarca: pick(COMARCAS, i + 3),
+  fatos: `Fase de cumprimento de sentença. O processo ficou paralisado por ${5 + (i % 4)} anos sem qualquer movimentação útil do exequente ${pick(NOMES, i + 3)}. O executado ${pick(NOMES, i + 13)} apresentou impugnação por prescrição intercorrente. A análise dos autos confirma: (a) inércia total do exequente no período; (b) o prazo da pretensão originária (${2 + (i % 2)} anos) fluiu por completo durante a paralisia; (c) exequente intimado sobre a possível prescrição (art. 921 §5º CPC) quedou-se inerte por ${12 + (i % 6)} meses adicionais.`,
+  pedido: "declaração da prescrição intercorrente e extinção do cumprimento de sentença com resolução do mérito",
+  norma: "art. 921 §§4º e 5º CPC; art. 924, V, CPC; Tema STJ 1.062; art. 487, II, CPC (resolução de mérito)",
+  jurisprudencias: [JUR_PRESCRICAO_INTERCORRENTE],
+  sentencaInstruction: `${SENT_EC_BASE}
+VARIAÇÃO — EXTINÇÃO POR PRESCRIÇÃO INTERCORRENTE (art. 924, V, CPC):
+1. Verificar os requisitos: (a) paralisação do processo por prazo superior ao da prescrição da pretensão; (b) inércia do exequente; (c) intimação prévia (art. 921 §5º CPC).
+2. Declarar a prescrição intercorrente de ofício ou acolher a impugnação (art. 921 §4º CPC).
+3. Extinguir o cumprimento de sentença com resolução do mérito (art. 924, V c/c art. 487, II, CPC).
+4. Honorários sucumbenciais ao executado (art. 85 §2º CPC).
+5. Recurso: Apelação (art. 1.009 CPC) — sentença terminativa.`,
+});
+
+// ── Recursos (casos 18-20) ────────────────────────────────────────────────────
+
+const tEcAgravoPenhoraRecurso = (i: number): ThemeNarrative => ({
+  area: "EXECUCAO_CUMPRIMENTO",
+  themeLabel: "Agravo de instrumento — contra decisão de penhora",
+  autor: pick(NOMES, i),
+  reu: pick(NOMES, i + 10),
+  comarca: pick(COMARCAS, i),
+  fatos: `O executado ${pick(NOMES, i)} interpõe agravo de instrumento contra decisão que deferiu a penhora de 30% do seu salário líquido de ${brl(8500 + i * 500)}/mês. A decisão recorrida entendeu que o salário supera o necessário à subsistência, aplicando o EREsp 1.518.169/DF. Agravante sustenta: (a) o salário é seu único rendimento; (b) possui 3 dependentes; (c) o percentual é excessivo. Cabimento do AI: art. 1.015, XIV, CPC (decisão sobre penhora). Prazo: 15 dias (art. 1.003 §5º CPC).`,
+  pedido: "reforma da decisão para reduzir ou afastar a penhora salarial por respeito ao art. 833, IV, CPC",
+  norma: "art. 1.015, XIV, CPC (AI cabível contra penhora); art. 833, IV, CPC; EREsp 1.518.169/DF (STJ)",
+  jurisprudencias: [JUR_IMPENHORABILIDADE_SALARIO],
+});
+
+const tEcAgravoImpugnacaoRecurso = (i: number): ThemeNarrative => ({
+  area: "EXECUCAO_CUMPRIMENTO",
+  themeLabel: "Agravo de instrumento — contra rejeição de impugnação",
+  autor: pick(NOMES, i + 1),
+  reu: pick(NOMES, i + 11),
+  comarca: pick(COMARCAS, i + 1),
+  fatos: `O executado ${pick(NOMES, i + 1)} interpõe agravo de instrumento contra a decisão que rejeitou sua impugnação ao cumprimento de sentença. A impugnação arguiu excesso de execução comprovado por laudo contábil: o valor correto é ${brl(51000 + i * 3000)} e não ${brl(58000 + i * 3500)} como calculado pelo exequente. A decisão rejeitou o laudo sem fundamentação adequada. Agravante: a rejeição viola o art. 525 §1º, III e §14, CPC. Cabimento do AI: art. 1.015, XIV, CPC.`,
+  pedido: "reforma da decisão para acolher a impugnação e reduzir o débito ao valor correto apurado pela perícia",
+  norma: "art. 1.015, XIV, CPC; art. 525 §§1º, III, e 14, CPC (impugnação por excesso de execução)",
+});
+
+const tEcEmbargosDeclaracaoRecurso = (i: number): ThemeNarrative => ({
+  area: "EXECUCAO_CUMPRIMENTO",
+  themeLabel: "Embargos de declaração — execução",
+  autor: pick(NOMES, i + 2),
+  reu: pick(NOMES, i + 12),
+  comarca: pick(COMARCAS, i + 2),
+  fatos: `${pick(NOMES, i + 2)} opõe embargos de declaração em face de sentença que extinguiu o cumprimento de sentença por satisfação (art. 924, II, CPC). Pontos omissos ou contraditórios: (a) omissão quanto ao cancelamento formal das restrições SISBAJUD e RENAJUD; (b) contradição entre a declaração de quitação total e a ressalva sobre eventuais honorários sucumbenciais pendentes; (c) obscuridade quanto ao valor final levantado e se inclui os honorários dos arts. 523 §1º e 85 CPC. Prazo: 5 dias (art. 1.023 CPC).`,
+  pedido: "sanear a omissão quanto às restrições e a contradição quanto a honorários, para fins de prequestionamento",
+  norma: "arts. 1.022 e 1.025 CPC (embargos de declaração — omissão, contradição, obscuridade); art. 924, II, CPC",
+});
+
 // Adiciona os 20 temas de Fazenda Pública ao THEMES
 THEMES.push(
   // Petições iniciais (5)
@@ -1577,4 +1949,33 @@ THEMES.push(
   { id: "fp_contrarrazoes_recurso",       build: tFpContrarrazoesRecurso,       compatibleTypes: ["RECURSO"] },
   { id: "fp_agravo_tutela_recurso",       build: tFpAgravoTutelaRecurso,        compatibleTypes: ["RECURSO"] },
   { id: "fp_embargos_declaracao_recurso", build: tFpEmbargosDeclaracaoRecurso,  compatibleTypes: ["RECURSO"] },
+);
+
+// Adiciona os 20 temas de Execução / Cumprimento de Sentença ao THEMES
+THEMES.push(
+  // Petições / Requerimentos (4)
+  { id: "ec_cumprimento_inicial",          build: tEcCumprimentoInicial,          compatibleTypes: ["PETICAO_INICIAL"] },
+  { id: "ec_cumprimento_fazenda_inicial",  build: tEcCumprimentoFazendaInicial,   compatibleTypes: ["PETICAO_INICIAL"] },
+  { id: "ec_obrigacao_fazer_inicial",      build: tEcObrigacaoFazerInicial,       compatibleTypes: ["PETICAO_INICIAL"] },
+  { id: "ec_obrigacao_pagar_inicial",      build: tEcObrigacaoPagarInicial,       compatibleTypes: ["PETICAO_INICIAL"] },
+  // Impugnações (4)
+  { id: "ec_impugnacao_excesso",           build: tEcImpugnacaoExcesso,           compatibleTypes: ["PETICAO_INICIAL"] },
+  { id: "ec_impugnacao_inexigibilidade",   build: tEcImpugnacaoInexigibilidade,   compatibleTypes: ["PETICAO_INICIAL"] },
+  { id: "ec_impugnacao_erro_calculo",      build: tEcImpugnacaoErroCalculo,       compatibleTypes: ["PETICAO_INICIAL"] },
+  { id: "ec_impugnacao_prescricao",        build: tEcImpugnacaoPrescricao,        compatibleTypes: ["PETICAO_INICIAL"] },
+  // Decisões (5)
+  { id: "ec_sisbajud_decisao",             build: tEcSisbajudDecisao,             compatibleTypes: ["DECISAO"] },
+  { id: "ec_renajud_decisao",              build: tEcRenajudDecisao,              compatibleTypes: ["DECISAO"] },
+  { id: "ec_penhora_ativos_decisao",       build: tEcPenhoraAtivosDecisao,        compatibleTypes: ["DECISAO"] },
+  { id: "ec_desbloqueio_valores_decisao",  build: tEcDesbloqueioValoresDecisao,   compatibleTypes: ["DECISAO"] },
+  { id: "ec_penhora_salario_decisao",      build: tEcPenhoraSalarioDecisao,       compatibleTypes: ["DECISAO"] },
+  // Sentenças terminativas (4)
+  { id: "ec_impugnacao_proc_sentenca",     build: tEcImpugnacaoProcSentenca,      compatibleTypes: ["SENTENCA"] },
+  { id: "ec_impugnacao_improc_sentenca",   build: tEcImpugnacaoImprocSentenca,    compatibleTypes: ["SENTENCA"] },
+  { id: "ec_extincao_satisfacao_sentenca", build: tEcExtincaoSatisfacaoSentenca,  compatibleTypes: ["SENTENCA"] },
+  { id: "ec_extincao_prescricao_sentenca", build: tEcExtincaoPrescricaoSentenca,  compatibleTypes: ["SENTENCA"] },
+  // Recursos (3)
+  { id: "ec_agravo_penhora_recurso",           build: tEcAgravoPenhoraRecurso,        compatibleTypes: ["RECURSO"] },
+  { id: "ec_agravo_impugnacao_recurso",         build: tEcAgravoImpugnacaoRecurso,     compatibleTypes: ["RECURSO"] },
+  { id: "ec_embargos_declaracao_ec_recurso",    build: tEcEmbargosDeclaracaoRecurso,   compatibleTypes: ["RECURSO"] },
 );

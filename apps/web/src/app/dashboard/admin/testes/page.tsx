@@ -363,6 +363,7 @@ export default function TestesPage() {
                 <option value="CIVEL_GERAL">Cível Geral</option>
                 <option value="CONSUMIDOR">Consumidor (CDC)</option>
                 <option value="FAZENDA_PUBLICA">Fazenda Pública</option>
+                <option value="EXECUCAO_CUMPRIMENTO">Execução / Cumprimento</option>
               </select>
             </div>
             <div>
