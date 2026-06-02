@@ -199,17 +199,33 @@ const NON_FATAL_RULES: Array<{
 // ── Seções obrigatórias para PETICAO_INICIAL de execução ──────────────────────
 
 const EXECUTION_SECTIONS: Array<{ pattern: RegExp; label: string }> = [
-  { pattern: /\bdos?\s+fatos?\b/i, label: "I — DOS FATOS" },
-  { pattern: /\bdo\s+direito\b/i,  label: "II — DO DIREITO" },
   {
-    pattern: /\b(dos?\s+requisitos?\s+(legais?|da\s+execu[cç][aã]o|processuais?)|dos?\s+pressupostos?\s+(legais?|da\s+execu[cç][aã]o))\b/i,
+    pattern: /\bdos?\s+fatos?\b/i,
+    label: "I — DOS FATOS",
+  },
+  {
+    // DO DIREITO / FUNDAMENTOS JURÍDICOS / FUNDAMENTOS DE DIREITO / FUNDAMENTOS LEGAIS
+    pattern: /\b(do\s+direito|fundamentos?\s+(jur[íi]dicos?|legais?|de\s+direito))\b/i,
+    label: "II — DO DIREITO",
+  },
+  {
+    // DOS REQUISITOS LEGAIS / REQUISITOS LEGAIS / PRESSUPOSTOS LEGAIS /
+    // REQUISITOS DA EXECUÇÃO / heading combinado "REQUISITOS LEGAIS E SUA APLICAÇÃO..."
+    pattern: /\b(dos?\s+)?(requisitos?|pressupostos?)\s+(legais?|da\s+execu[cç][aã]o|processuais?)/i,
     label: "III — DOS REQUISITOS LEGAIS",
   },
   {
-    pattern: /\b(da\s+aplica[cç][aã]o\s+ao\s+caso\s+concreto|da\s+an[aá]lise\s+do\s+caso\s+concreto|do\s+caso\s+concreto)\b/i,
+    // DA APLICAÇÃO AO CASO CONCRETO / APLICAÇÃO AO CASO / APLICAÇÃO AO QUADRO CONCRETO /
+    // DA ANÁLISE DO CASO CONCRETO / DO CASO CONCRETO / SUBSUNÇÃO DOS FATOS À NORMA /
+    // ENQUADRAMENTO JURÍDICO DO CASO / heading combinado "...APLICAÇÃO AO QUADRO CONCRETO"
+    pattern:
+      /\b(da\s+)?(aplica[cç][aã]o\s+(ao|à)\s+(caso|quadro)|aplica[cç][aã]o\s+à\s+esp[eé]cie|subsun[cç][aã]o\s+dos?\s+fatos?|enquadramento\s+jur[íi]dico|an[aá]lise\s+do\s+caso\s+concreto|do\s+caso\s+concreto)\b|aplica[cç][aã]o.{0,60}concreto/i,
     label: "IV — DA APLICAÇÃO AO CASO CONCRETO",
   },
-  { pattern: /\bdos?\s+pedidos?\b/i, label: "V — DOS PEDIDOS" },
+  {
+    pattern: /\bdos?\s+pedidos?\b/i,
+    label: "V — DOS PEDIDOS",
+  },
 ];
 
 const EXECUTION_CPC_RE =
