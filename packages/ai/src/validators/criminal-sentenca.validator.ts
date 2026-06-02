@@ -134,19 +134,19 @@ export class CriminalSentenceValidator {
         });
       }
 
-      // "julgo procedente/improcedente" é linguagem cível — proibida em ação penal
-      // Não dispara quando há verbo penal correto (CONDENO/ABSOLVO/DESCLASSIFICO/DECLARO EXTINTA)
-      if (
-        CRIMINAL_WRONG_CIVIL_RE.test(draft) &&
-        !ABSOLVICAO_RE.test(draft) &&
-        !CONDENACAO_RE.test(draft) &&
-        !PRESCRICAO_RE.test(draft) &&
-        !DESCLASSIFICACAO_RE.test(draft)
-      ) {
+      // "julgo procedente/improcedente" é linguagem cível — proibida em TODA sentença penal,
+      // inclusive em prescrição (dispositivo deve ser DECLARO EXTINTA A PUNIBILIDADE, não julgo procedente)
+      if (CRIMINAL_WRONG_CIVIL_RE.test(draft)) {
+        const hasPenalVerb =
+          ABSOLVICAO_RE.test(draft) ||
+          CONDENACAO_RE.test(draft) ||
+          PRESCRICAO_RE.test(draft) ||
+          DESCLASSIFICACAO_RE.test(draft);
         errors.push({
           rule: "CRIMINAL_WRONG_CIVIL_VERB",
           message: 'Sentença penal NÃO usa "julgo procedente/improcedente" — use CONDENO, ABSOLVO, DECLARO EXTINTA A PUNIBILIDADE ou DESCLASSIFICO',
-          fatal: true,
+          // Fatal se não há verbo penal; warning se mistura (ex: "julgo procedente... DECLARO EXTINTA")
+          fatal: !hasPenalVerb,
         });
       }
 

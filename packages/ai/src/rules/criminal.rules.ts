@@ -3,7 +3,9 @@
 export const CRIMINAL_BLOCKED_TERMS = [
   "art. 85 cpc",
   "art. 85 §2º cpc",
-  "honorários advocatícios",
+  // "honorários advocatícios" — removido: o prompt proíbe qualquer menção (inclusive negação),
+  // então não há draft correto que contenha essa string; bloquear causava falsos positivos
+  // quando o AI escrevia "não há honorários" (linguagem correta que virou errada pelo prompt).
   "julgo procedente",
   "julgo improcedente",
   "julgo parcialmente procedente",

@@ -92,8 +92,11 @@ DISPOSITIVOS VÁLIDOS — use EXATAMENTE uma destas formas:
   ✓ CONDENAÇÃO:    "CONDENO o réu [NOME] pela prática do art. [X] à pena de [X] anos e [Y] meses de reclusão/detenção"
   ✓ ABSOLVIÇÃO:    "ABSOLVO o réu [NOME], da imputação do art. [X], com fundamento no art. 386, [INCISO], do CPP"
                    — o INCISO (I a VII) é OBRIGATÓRIO na absolvição
-  ✓ PRESCRIÇÃO:    "DECLARO EXTINTA A PUNIBILIDADE do réu [NOME] pela prescrição da pretensão punitiva,
-                   nos termos do art. 107, IV, c/c art. 109, [INCISO], do CP"
+  ✓ PRESCRIÇÃO:    "DECLARO EXTINTA A PUNIBILIDADE de [NOME], com fundamento no art. 107, IV, do
+                   Código Penal, reconhecida a prescrição da pretensão punitiva, calculada nos
+                   termos do art. 109, [INCISO], do CP."
+                   — NUNCA usar "julgo procedente/improcedente" em prescrição penal
+                   — o dispositivo DEVE começar com "DECLARO EXTINTA A PUNIBILIDADE"
   ✓ DESCLASSIFICAÇÃO: "DESCLASSIFICO a conduta para o crime previsto no art. [X] do CP e
                    CONDENO/ABSOLVO o réu [NOME]..."
 
@@ -103,8 +106,11 @@ PROIBIDO em sentença penal (causa REPROVAÇÃO automática):
   ✗ "julgo procedente... para CONDENAR" — use diretamente "CONDENO" (conjugado, não infinitivo)
   ✗ "CONDENAR" (infinitivo) no dispositivo — use sempre "CONDENO" (conjugado)
   ✗ "ABSOLVAR" (infinitivo) no dispositivo — use sempre "ABSOLVO" (conjugado)
-  ✗ QUALQUER FORMA de "julgo procedente/improcedente" — são expressões CÍVEIS proibidas em processo penal
-  ✗ citar art. 85 CPC ou honorários sucumbenciais (inexistentes em processo penal)
+  ✗ QUALQUER FORMA de "julgo procedente/improcedente" — proibido em TODA sentença penal, incluindo prescrição
+  ✗ "procedente a ação penal" — proibido mesmo combinado com DECLARO EXTINTA
+  ✗ Não mencionar honorários advocatícios de NENHUMA FORMA — nem "não há honorários", nem "deixo de aplicar",
+    nem "sem condenação em honorários". Simplesmente omitir. Apenas tratar custas (art. 804 CPP) se necessário.
+  ✗ art. 85 CPC — não existe em processo penal; não citar nunca
   ✗ usar linguagem de ação ordinária civil em processo crime
 
 ESTRUTURA DA ABSOLVIÇÃO:
