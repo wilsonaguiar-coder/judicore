@@ -112,14 +112,24 @@ export class LegalRulesValidator {
       }
     }
 
-    // Bloquear termos cíveis em matéria criminal (julgo procedente/improcedente são erros graves em processo penal)
+    // Bloquear termos cíveis em matéria criminal
     if (classification.tipo_justica === "CRIMINAL" || classification.regime_juridico === "CRIMINAL") {
+      // "julgo procedente/improcedente" é civil — mas se o draft já contém verbo penal correto
+      // (CONDENO/ABSOLVO/DECLARO EXTINTA/DESCLASSIFICO), é WARNING não-fatal (mix de linguagem).
+      // Fatal apenas quando não há verbo penal adequado (linguagem exclusivamente cível).
+      const CIVIL_JUDGMENT_TERMS = ["julgo procedente", "julgo improcedente", "julgo parcialmente procedente"];
+      const PENAL_VERBS = ["condeno", "absolvo", "declaro extinta", "desclassifico", "concedo a ordem", "denego a ordem"];
+      const hasPenalVerb = PENAL_VERBS.some((v) => lowerDraft.includes(v));
+
       for (const term of CRIMINAL_BLOCKED_TERMS) {
         if (lowerDraft.includes(term.toLowerCase())) {
+          const isCivilJudgment = CIVIL_JUDGMENT_TERMS.includes(term);
           errors.push({
             rule: "CRIMINAL_WRONG_TERM",
             message: `"${term}" é termo proibido em matéria criminal — use linguagem processual penal (ABSOLVO/CONDENO em sentença; concedo/denego a ordem em HC)`,
-            fatal: ["julgo procedente", "julgo improcedente", "julgo parcialmente procedente"].includes(term),
+            // Fatal se: (a) é uma forma de "julgo procedente/improcedente" E não há verbo penal no draft
+            // Não-fatal se: há verbo penal correto junto (mix de linguagem, menos grave)
+            fatal: isCivilJudgment ? !hasPenalVerb : false,
           });
         }
       }

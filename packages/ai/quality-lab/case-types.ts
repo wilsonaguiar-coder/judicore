@@ -110,7 +110,9 @@ export function mapRuleToValidator(rule: string): ValidatorComponent {
     rule === "CRIMINAL_WRONG_CIVIL_VERB" ||
     rule === "CRIMINAL_MISSING_DOSIMETRIA" ||
     rule === "CRIMINAL_MISSING_REGIME" ||
-    rule === "CRIMINAL_ABSOLVICAO_MISSING_ART386"
+    rule === "CRIMINAL_ABSOLVICAO_MISSING_ART386" ||
+    rule === "CRIMINAL_PRESCRICAO_MISSING_ART" ||
+    rule === "CRIMINAL_DESCLASSIFICACAO_MISSING_TIPO"
   ) return "LegalValidator";
   return "Other";
 }

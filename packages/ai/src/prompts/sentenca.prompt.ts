@@ -86,19 +86,23 @@ RECURSO CABÍVEL (indicar obrigatoriamente):
 
   if (isCriminal(classification)) {
     return `${baseRules}
-⚠ SENTENÇA CRIMINAL CONDENATÓRIA OU ABSOLUTÓRIA — LINGUAGEM PROCESSUAL PENAL OBRIGATÓRIA:
+⚠ SENTENÇA CRIMINAL DE MÉRITO — LINGUAGEM PROCESSUAL PENAL OBRIGATÓRIA:
 
-DISPOSITIVO obrigatório usa termos do processo penal:
-  ✓ "ABSOLVO o réu [NOME], qualificado nos autos, da imputação do art. [X], com fundamento no art. 386, [INCISO], do CPP"
-  ✓ "CONDENO o réu [NOME] pela prática do art. [X] à pena de [X] anos e [Y] meses de reclusão/detenção"
-  — O INCISO do art. 386 CPP é OBRIGATÓRIO na absolvição (I a VII)
+DISPOSITIVOS VÁLIDOS — use EXATAMENTE uma destas formas:
+  ✓ CONDENAÇÃO:    "CONDENO o réu [NOME] pela prática do art. [X] à pena de [X] anos e [Y] meses de reclusão/detenção"
+  ✓ ABSOLVIÇÃO:    "ABSOLVO o réu [NOME], da imputação do art. [X], com fundamento no art. 386, [INCISO], do CPP"
+                   — o INCISO (I a VII) é OBRIGATÓRIO na absolvição
+  ✓ PRESCRIÇÃO:    "DECLARO EXTINTA A PUNIBILIDADE do réu [NOME] pela prescrição da pretensão punitiva,
+                   nos termos do art. 107, IV, c/c art. 109, [INCISO], do CP"
+  ✓ DESCLASSIFICAÇÃO: "DESCLASSIFICO a conduta para o crime previsto no art. [X] do CP e
+                   CONDENO/ABSOLVO o réu [NOME]..."
 
-PROIBIDO em sentença criminal (causa REPROVAÇÃO automática):
-  ✗ "julgo procedente / improcedente o pedido" — usar ABSOLVO/CONDENO
-  ✗ tratar o acusado como "réu civil" — usar "RÉU/ACUSADO" no processo penal
-  ✗ citar art. 85 CPC (não há honorários em processo penal — causa vício grave)
-  ✗ aplicar regras civis de sucumbência
-  ✗ mencionar STJ como instância recursal criminal (é STF para questão constitucional)
+PROIBIDO em sentença penal (causa REPROVAÇÃO automática):
+  ✗ "julgo procedente a denúncia" / "julgo improcedente a denúncia" / "procedente a pretensão punitiva"
+  ✗ QUALQUER FORMA de "julgo procedente" ou "julgo improcedente" — essas são expressões CÍVEIS
+  ✗ citar art. 85 CPC ou honorários sucumbenciais (inexistentes em processo penal)
+  ✗ tratar o acusado como "réu civil" — use "RÉU" ou "ACUSADO" no contexto penal
+  ✗ usar linguagem de ação ordinária civil em processo crime
 
 ESTRUTURA DA ABSOLVIÇÃO:
   1. Relatório dos fatos imputados

@@ -26,8 +26,19 @@ type PieceStructuralRequirements = {
 export const STRUCTURAL_REQUIREMENTS: Record<string, PieceStructuralRequirements> = {
   SENTENCA: {
     required_text_patterns: [
-      { pattern: /relat[oó]rio/i, label: "Seção de Relatório", fatal: true },
-      { pattern: /fundament[aã]/i, label: "Seção de Fundamentação", fatal: true },
+      // Aceita "RELATÓRIO" literal ou narrativa inicial equivalente (trata-se de / cuida-se de)
+      // — sentenças criminais frequentemente abrem com a narrativa sem título explícito
+      {
+        pattern: /relat[oó]rio|trata[\s-]se\s+de|cuida[\s-]se\s+de|trata\s+o\s+feito/i,
+        label: "Relatório ou narrativa inicial dos fatos",
+        fatal: true,
+      },
+      // Aceita "FUNDAMENTAÇÃO" ou seções equivalentes: MOTIVAÇÃO, ANÁLISE DO MÉRITO, FUNDAMENTO
+      {
+        pattern: /fundamenta[cç][aã]o|motiva[cç][aã]o|an[aá]lise\s+do\s+m[eé]rito|\bfundamento\b/i,
+        label: "Fundamentação ou seção equivalente (MOTIVAÇÃO / ANÁLISE DO MÉRITO / FUNDAMENTO)",
+        fatal: true,
+      },
       // Dispositivo de sentença — cobre todos os tipos:
       //   cível/trabalhista/previdenciário: julgo procedente/improcedente/extinto
       //   penal de mérito: absolvo, condeno, desclassifico, declaro extinta a punibilidade

@@ -48,13 +48,19 @@ function parseArgs(): CliArgs {
   const args = process.argv.slice(2);
   const countArg = args.find((a) => a.startsWith("--count="));
   const areaArg = args.find((a) => a.startsWith("--area="));
-  const typeArg = args.find((a) => a.startsWith("--type="));
+  // Aceita --type= ou --documentType= (ambos equivalentes)
+  const typeArg = args.find((a) => a.startsWith("--type=") || a.startsWith("--documentType="));
   const result: CliArgs = {
     count: countArg ? Number.parseInt(countArg.slice("--count=".length), 10) : 100,
     dryRun: args.includes("--dry-run"),
   };
   if (areaArg) result.area = areaArg.slice("--area=".length) as LegalArea;
-  if (typeArg) result.documentType = typeArg.slice("--type=".length) as TipoPeca;
+  if (typeArg) {
+    const val = typeArg.startsWith("--documentType=")
+      ? typeArg.slice("--documentType=".length)
+      : typeArg.slice("--type=".length);
+    result.documentType = val as TipoPeca;
+  }
   return result;
 }
 

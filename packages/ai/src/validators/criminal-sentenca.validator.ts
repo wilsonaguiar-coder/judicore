@@ -35,6 +35,12 @@ const APELACAO_CIVEL_RE = /apela[cç][aã]o\s+c[ií]vel|recurso\s+ordin[aá]rio\
 const ABSOLVICAO_RE = /absolvo/i;
 const CONDENACAO_RE = /condeno/i;
 const PRESCRICAO_RE = /declaro\s+extinta?\s+a\s+punibilidade/i;
+const DESCLASSIFICACAO_RE = /desclassifico/i;
+
+// Prescrição deve citar art. 107 (extinção) e/ou art. 109 CP (prazos)
+const PRESCRICAO_ART_RE = /art\.?\s*10[79]\s*(do\s+)?cp/i;
+// Desclassificação deve indicar o novo tipo penal
+const NOVO_TIPO_PENAL_RE = /art\.?\s*\d+[^\n]{0,60}c\.?\s*p\.|para\s+o\s+(crime\s+de|art\.?\s*\d+)|para\s+(furto|lesão|estelionato|uso\s+pessoal|receptação|porte)/i;
 
 // Dosimetria em 3 fases — cada fase verificada separadamente para mensagem específica
 const DOSIMETRIA_FASE1_RE = /(pena[\s-]*base|art\.\s*59\s*(do\s+)?cp|primeira\s+fase|1[ªa]\s+fase\b)/i;
@@ -116,11 +122,13 @@ export class CriminalSentenceValidator {
       }
 
       // "julgo procedente/improcedente" é linguagem cível — proibida em ação penal
+      // Não dispara quando há verbo penal correto (CONDENO/ABSOLVO/DESCLASSIFICO/DECLARO EXTINTA)
       if (
         CRIMINAL_WRONG_CIVIL_RE.test(draft) &&
         !ABSOLVICAO_RE.test(draft) &&
         !CONDENACAO_RE.test(draft) &&
-        !PRESCRICAO_RE.test(draft)
+        !PRESCRICAO_RE.test(draft) &&
+        !DESCLASSIFICACAO_RE.test(draft)
       ) {
         errors.push({
           rule: "CRIMINAL_WRONG_CIVIL_VERB",
@@ -129,11 +137,29 @@ export class CriminalSentenceValidator {
         });
       }
 
-      // Absolvição deve citar o inciso do art. 386 CPP
+      // Absolvição: deve citar o inciso do art. 386 CPP
       if (ABSOLVICAO_RE.test(draft) && !ART_386_RE.test(draft)) {
         errors.push({
           rule: "CRIMINAL_ABSOLVICAO_MISSING_ART386",
-          message: "Sentença absolutória deve indicar o inciso específico do art. 386 CPP (ex: art. 386, VI, CPP — insuficiência de provas)",
+          message: "Sentença absolutória deve indicar o inciso específico do art. 386 CPP (ex: art. 386, VII, CPP — insuficiência de provas)",
+          fatal: false,
+        });
+      }
+
+      // Prescrição: DECLARO EXTINTA A PUNIBILIDADE deve citar art. 107 e/ou art. 109 CP
+      if (PRESCRICAO_RE.test(draft) && !PRESCRICAO_ART_RE.test(draft)) {
+        errors.push({
+          rule: "CRIMINAL_PRESCRICAO_MISSING_ART",
+          message: "Extinção da punibilidade por prescrição deve citar art. 107, IV c/c art. 109 CP (prazo prescricional aplicável)",
+          fatal: false,
+        });
+      }
+
+      // Desclassificação: DESCLASSIFICO deve indicar o novo tipo penal
+      if (DESCLASSIFICACAO_RE.test(draft) && !NOVO_TIPO_PENAL_RE.test(draft)) {
+        errors.push({
+          rule: "CRIMINAL_DESCLASSIFICACAO_MISSING_TIPO",
+          message: "Desclassificação deve indicar o novo tipo penal (ex: DESCLASSIFICO para o art. 155, caput, CP — furto simples)",
           fatal: false,
         });
       }
