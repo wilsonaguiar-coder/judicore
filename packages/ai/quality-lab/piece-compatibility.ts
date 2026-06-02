@@ -72,6 +72,28 @@ export const PIECE_COMPATIBILITY: Readonly<Record<string, readonly TipoPeca[]>> 
   cs_banco_cobranca_sentenca: ["SENTENCA"],
   cs_apelacao_consumidor:     ["RECURSO"],
   cs_despacho_provas:         ["DESPACHO"],
+
+  // ── Fazenda Pública — 20 temas, um tipo de peça cada ────────────────────
+  fp_medicamento_inicial:         ["PETICAO_INICIAL"],
+  fp_sus_cirurgia_inicial:        ["PETICAO_INICIAL"],
+  fp_concurso_nomeacao_inicial:   ["PETICAO_INICIAL"],
+  fp_servidor_progressao_inicial: ["PETICAO_INICIAL"],
+  fp_servidor_verba_inicial:      ["PETICAO_INICIAL"],
+  fp_tutela_medicamento_decisao:  ["DECISAO"],
+  fp_tutela_cirurgia_decisao:     ["DECISAO"],
+  fp_concurso_suspensao_decisao:  ["DECISAO"],
+  fp_gratuidade_decisao:          ["DECISAO"],
+  fp_pericia_decisao:             ["DECISAO"],
+  fp_medicamento_proc_sentenca:   ["SENTENCA"],
+  fp_medicamento_improc_sentenca: ["SENTENCA"],
+  fp_concurso_proc_sentenca:      ["SENTENCA"],
+  fp_concurso_improc_sentenca:    ["SENTENCA"],
+  fp_servidor_proc_sentenca:      ["SENTENCA"],
+  fp_servidor_improc_sentenca:    ["SENTENCA"],
+  fp_apelacao_fazenda_recurso:    ["RECURSO"],
+  fp_contrarrazoes_recurso:       ["RECURSO"],
+  fp_agravo_tutela_recurso:       ["RECURSO"],
+  fp_embargos_declaracao_recurso: ["RECURSO"],
 };
 
 // ── PieceCompatibilityValidator ──────────────────────────────────────────────

@@ -505,6 +505,43 @@ function applyTrap(
             : "Construir a fundamentação sobre tese juridicamente discutível.",
         expectedRulesIfTrap: [],
       };
+    // ── Traps específicas de Fazenda Pública ─────────────────────────────
+    case "TEMA_STF_IGNORADO":
+      return {
+        description: base.description,
+        instruction: "Fundamentar os pedidos SEM mencionar nem aplicar o Tema STF vinculante aplicável ao caso (ex: Tema 784 para concurso público, Tema 793 para responsabilidade solidária em saúde). Ignorar o precedente obrigatório como se não existisse.",
+        expectedRulesIfTrap: [],
+      };
+    case "RESERVA_POSSIVEL_SEM_MIN_EXIST":
+      return {
+        description: base.description,
+        instruction: "Aplicar a reserva do possível como óbice SUFICIENTE e DEFINITIVO ao direito pleiteado, SEM analisar se a negativa viola o mínimo existencial do requerente. Omitir completamente a teoria do mínimo existencial e a dignidade da pessoa humana (art. 1º, III, CF/88).",
+        expectedRulesIfTrap: [],
+      };
+    case "PRESCRICAO_QUINQUENAL_IGNORADA":
+      return {
+        description: base.description,
+        instruction: "Pedir o pagamento de TODAS as parcelas vencidas, mesmo as anteriores a 5 anos, como se não houvesse prescrição. NÃO mencionar o DL 4.597/42 nem a Súmula 85 do STJ. Tratar o prazo prescricional como se fosse o prazo geral do CC (10 anos).",
+        expectedRulesIfTrap: [],
+      };
+    case "LEGITIMIDADE_PASSIVA_INCORRETA":
+      return {
+        description: base.description,
+        instruction: "Ajuizar a ação EXCLUSIVAMENTE contra o Município, sem incluir o Estado nem a União no polo passivo — ignorar a solidariedade dos entes federativos prevista no Tema STF 793 (RE 855.178). Sustentar que cada ente responde apenas pela sua parcela de competência no SUS.",
+        expectedRulesIfTrap: [],
+      };
+    case "SEPARACAO_PODERES_INCORRETA":
+      return {
+        description: base.description,
+        instruction: "Utilizar o princípio da separação dos poderes como fundamento ISOLADO e SUFICIENTE para negar o direito à saúde ou ao concurso público — sem analisar o mínimo existencial, sem aplicar os requisitos do Tema STF 793 ou 784, e sem ponderar os princípios constitucionais em conflito.",
+        expectedRulesIfTrap: [],
+      };
+    case "SOLIDARIEDADE_INCORRETA":
+      return {
+        description: base.description,
+        instruction: "Argumentar que cada ente federativo (União, Estado, Município) responde INDIVIDUALMENTE apenas pela sua parcela de competência no SUS, afastando a responsabilidade solidária — contradizer diretamente o Tema STF 793 (RE 855.178) sem distinguishing justificado.",
+        expectedRulesIfTrap: [],
+      };
   }
 }
 
@@ -1184,4 +1221,349 @@ THEMES.push(
   { id: "cs_banco_cobranca_sentenca",build: tCsBancoCobrancaSentenca,  compatibleTypes: ["SENTENCA"] },
   { id: "cs_apelacao_consumidor",    build: tCsApelacaoConsumidor,     compatibleTypes: ["RECURSO"] },
   { id: "cs_despacho_provas",        build: tCsDespachoProvas,         compatibleTypes: ["DESPACHO"] },
+);
+
+// ── FAZENDA PÚBLICA ───────────────────────────────────────────────────────────
+//
+// 20 temas de direito público — um tipo de peça por tema.
+// Traps em ~30% dos casos (6 traps):
+//   Caso 3 (inicial concurso):    TEMA_STF_IGNORADO (Tema 784 não aplicado)
+//   Caso 5 (inicial verba):       PRESCRICAO_QUINQUENAL_IGNORADA
+//   Caso 6 (decisão tutela med):  RESERVA_POSSIVEL_SEM_MIN_EXIST
+//   Caso 8 (decisão concurso):    LEGITIMIDADE_PASSIVA_INCORRETA
+//   Caso 12 (sentença med improc):SEPARACAO_PODERES_INCORRETA
+//   Caso 17 (recurso apelação):   SOLIDARIEDADE_INCORRETA
+
+const FP_ENTES = [
+  "Estado de São Paulo", "Município de São Paulo/SP", "União Federal",
+  "Estado do Rio de Janeiro", "Município do Rio de Janeiro/RJ",
+  "Estado de Minas Gerais", "Estado do Rio Grande do Sul", "Município de Curitiba/PR",
+];
+
+const JUR_STF_TEMA784: JurisprudenciaInput = {
+  id: "jur_stf_tema784",
+  tribunal: "STF", numero: "RE 837.311/PI",
+  tema: "Concurso — direito subjetivo à nomeação",
+  ementa: "Dentro do prazo de validade do concurso, a Administração poderá escolher o momento no qual se realizará a nomeação, mas fica vinculada ao dever de nomear os candidatos aprovados até o limite das vagas previstas no edital. Eventual necessidade de admissão de novos servidores afasta a discricionariedade.",
+  tese: "Direito subjetivo à nomeação de aprovado dentro do número de vagas",
+  relator: "Min. Luiz Fux", dataJulgamento: "2015-08-09",
+};
+const JUR_STF_TEMA793: JurisprudenciaInput = {
+  id: "jur_stf_tema793",
+  tribunal: "STF", numero: "RE 855.178/SE",
+  tema: "Saúde — responsabilidade solidária dos entes federativos",
+  ementa: "Os entes da federação, em decorrência da competência comum, são solidariamente responsáveis nas demandas prestacionais na área da saúde e, diante dos critérios constitucionais de descentralização e hierarquização, é permitido ao julgador direcionar o cumprimento conforme as regras de repartição de competências.",
+  tese: "Responsabilidade solidária União/Estado/Município em demandas de saúde",
+  relator: "Min. Edson Fachin", dataJulgamento: "2019-05-23",
+};
+
+// ── Petições iniciais (casos 1-5) ──────────────────────────────────────────
+
+const tFpMedicamentoInicial = (i: number): ThemeNarrative => ({
+  area: "FAZENDA_PUBLICA",
+  themeLabel: "Medicamento — petição inicial",
+  autor: pick(NOMES, i),
+  reu: pick(FP_ENTES, i),
+  comarca: pick(COMARCAS, i),
+  fatos: `${pick(NOMES, i)} (CPF ${cpf(i + 5000)}), portador(a) de ${pick(["diabetes tipo 1 insulinodependente", "esclerose múltipla progressiva", "doença de Crohn refratária", "hipertensão arterial pulmonar"], i)}, necessita de ${pick(["insulina glargina U-300", "natalizumabe 300mg", "vedolizumabe 300mg", "macitentan 10mg"], i)}, medicamento não disponível no RENAME/SUS. Laudo médico de ${dateBack(0, i)} atesta caráter essencial e urgência. O ${pick(FP_ENTES, i)} foi notificado em ${dateBack(0, i)} e não forneceu no prazo de 10 dias.`,
+  pedido: "fornecimento do medicamento prescrito e tutela de urgência para entrega imediata",
+  norma: "art. 196 CF/88; arts. 6º e 7º da Lei 8.080/90; art. 300 CPC",
+  jurisprudencias: [JUR_STF_TEMA793],
+});
+
+const tFpSusCircurgiaInicial = (i: number): ThemeNarrative => ({
+  area: "FAZENDA_PUBLICA",
+  themeLabel: "Tratamento SUS — petição inicial",
+  autor: pick(NOMES, i + 1),
+  reu: pick(FP_ENTES, i + 1),
+  comarca: pick(COMARCAS, i + 1),
+  fatos: `${pick(NOMES, i + 1)} (CPF ${cpf(i + 5100)}) necessita de ${pick(["cirurgia de revascularização miocárdica", "transplante renal", "radioterapia oncológica"], i)} prescrita há ${30 + (i % 60)} dias. O procedimento consta nos protocolos do SUS mas o ${pick(FP_ENTES, i + 1)} não disponibilizou vaga. Risco à vida documentado em laudo médico.`,
+  pedido: "agendamento imediato do procedimento cirúrgico e tutela de urgência",
+  norma: "art. 196 CF/88; arts. 7º e 9º da Lei 8.080/90 (integralidade); art. 300 CPC",
+  jurisprudencias: [JUR_STF_TEMA793],
+});
+
+const tFpConcursoNomeacaoInicial = (i: number): ThemeNarrative => ({
+  area: "FAZENDA_PUBLICA",
+  themeLabel: "Concurso público — nomeação",
+  autor: pick(NOMES, i + 2),
+  reu: pick(FP_ENTES, i + 2),
+  comarca: pick(COMARCAS, i + 2),
+  fatos: `${pick(NOMES, i + 2)} (CPF ${cpf(i + 5200)}) foi aprovado(a) em ${dateBack(2, i)} no concurso público para ${pick(["Agente Administrativo", "Técnico em Saúde", "Analista Jurídico", "Fiscal Tributário"], i)} — edital n. ${1000 + i}/${2022 + (i % 3)}, classificado(a) na ${5 + (i % 10)}ª colocação dentro das ${20 + (i % 30)} vagas previstas. O prazo de validade venceu em ${dateBack(0, i)} sem nomeação. O ente público contratou ${10 + i} temporários para exercer as mesmas funções do cargo durante o período de validade.`,
+  pedido: "nomeação e posse no cargo público e indenização pelo período de preterição",
+  norma: "art. 37 §2º CF/88; Tema STF 784 (RE 837.311) — direito subjetivo à nomeação dentro das vagas",
+  jurisprudencias: [JUR_STF_TEMA784],
+});
+
+const tFpServidorProgressaoInicial = (i: number): ThemeNarrative => ({
+  area: "FAZENDA_PUBLICA",
+  themeLabel: "Servidor — progressão funcional",
+  autor: pick(NOMES, i + 3),
+  reu: pick(FP_ENTES, i + 3),
+  comarca: pick(COMARCAS, i + 3),
+  fatos: `${pick(NOMES, i + 3)} (CPF ${cpf(i + 5300)}), servidor(a) ${pick(["estadual", "municipal", "federal"], i)} ocupante do cargo de ${pick(["Analista Técnico", "Agente de Saúde", "Fiscal Municipal", "Técnico Administrativo"], i)}, preencheu todos os requisitos legais para progressão em ${dateBack(1, i)}: avaliação de desempenho SATISFATÓRIA (nota ${70 + (i % 25)}/100) e interstício de ${2 + (i % 2)} anos cumprido. A Administração negou a progressão sem fundamentação suficiente.`,
+  pedido: "progressão funcional e pagamento das diferenças de vencimentos desde a data em que o direito surgiu",
+  norma: "estatuto dos servidores — arts. 67 e 68 Lei 8.112/90 (ou lei estadual equivalente); art. 37 caput CF/88",
+});
+
+const tFpServidorVerbaInicial = (i: number): ThemeNarrative => ({
+  area: "FAZENDA_PUBLICA",
+  themeLabel: "Servidor — verba funcional não paga",
+  autor: pick(NOMES, i + 4),
+  reu: pick(FP_ENTES, i + 4),
+  comarca: pick(COMARCAS, i + 4),
+  fatos: `${pick(NOMES, i + 4)} (CPF ${cpf(i + 5400)}), servidor(a) ${pick(["estadual", "municipal"], i)} do cargo de ${pick(["Agente Fiscal", "Técnico em Saúde", "Auxiliar Administrativo"], i)}, deixou de receber o ${pick(["adicional de insalubridade de 20%", "adicional noturno de 25%", "gratificação de produtividade"], i)} a que faz jus desde ${dateBack(8, i)}. Total não pago: ${brl(25000 + i * 3000)} (${84 + i * 6} meses × ${brl(300 + i * 30)}/mês). O servidor entende que não há prescrição alguma sobre as parcelas.`,
+  pedido: "pagamento de todas as parcelas vencidas e vincendas do adicional/gratificação devida",
+  norma: "estatuto dos servidores; DL 4.597/42 (prescrição quinquenal); Súmula 85 STJ",
+});
+
+// ── Decisões (casos 6-10) ──────────────────────────────────────────────────
+
+const tFpTutelaMedicamentoDecisao = (i: number): ThemeNarrative => ({
+  area: "FAZENDA_PUBLICA",
+  themeLabel: "Tutela — medicamento urgente (decisão)",
+  autor: pick(NOMES, i + 5),
+  reu: pick(FP_ENTES, i + 5),
+  comarca: pick(COMARCAS, i + 5),
+  fatos: `Juiz deve decidir tutela de urgência. ${pick(NOMES, i + 5)} requer fornecimento imediato de ${pick(["nivolumabe para câncer de pulmão", "adalimumabe para artrite reumatoide grave", "imatinibe para LMC"], i)} prescrito por especialista. Laudo médico de ${dateBack(0, i)} documenta urgência — risco de agravamento irreversível em ${7 + i % 14} dias. Fumus boni iuris (art. 196 CF/88) e periculum in mora (urgência médica) presentes.`,
+  pedido: "deferimento de tutela de urgência para fornecimento imediato do medicamento",
+  norma: "art. 300 CPC; art. 196 CF/88; Tema STF 793 (responsabilidade solidária dos entes)",
+  jurisprudencias: [JUR_STF_TEMA793],
+});
+
+const tFpTutelaCirurgiaDecisao = (i: number): ThemeNarrative => ({
+  area: "FAZENDA_PUBLICA",
+  themeLabel: "Tutela — cirurgia urgente (decisão)",
+  autor: pick(NOMES, i + 6),
+  reu: pick(FP_ENTES, i + 6),
+  comarca: pick(COMARCAS, i + 6),
+  fatos: `${pick(NOMES, i + 6)} (CPF ${cpf(i + 5600)}) necessita de ${pick(["cirurgia cardíaca de urgência (valvoplastia)", "cirurgia de tumor cerebral benigno", "amputação de membro em risco de gangrena"], i)} prescrita há ${15 + (i % 30)} dias. Fila SUS prevê atendimento em ${6 + (i % 12)} meses, incompatível com a urgência. Laudo pericial confirma urgência. Probabilidade do direito: alta. Periculum: documentado.`,
+  pedido: "tutela de urgência para agendamento imediato da cirurgia ou custeio pelo réu",
+  norma: "art. 300 CPC; art. 196 CF/88; art. 2º da Lei 8.080/90",
+});
+
+const tFpConcursoSuspensaoDecisao = (i: number): ThemeNarrative => ({
+  area: "FAZENDA_PUBLICA",
+  themeLabel: "Concurso público — suspensão de ato (decisão)",
+  autor: pick(NOMES, i + 7),
+  reu: pick(FP_ENTES, i + 7),
+  comarca: pick(COMARCAS, i + 7),
+  fatos: `Candidato(a) ${pick(NOMES, i + 7)} foi eliminado(a) do concurso ${pick(["estadual para Delegado de Polícia", "municipal para Fiscal de Tributos", "federal para Analista"], i)} por critério subjetivo não previsto no edital, aplicado pela banca em ${dateBack(0, i)}. Fumus boni iuris (ausência de base editalícia) e periculum in mora (posse agendada para ${dateBack(-1, i)}).`,
+  pedido: "suspensão do ato de eliminação e reintegração ao certame até julgamento de mérito",
+  norma: "art. 300 CPC; art. 37 caput CF/88 (legalidade e publicidade); Súmula 684 STF",
+});
+
+const tFpGratuidadeDecisao = (i: number): ThemeNarrative => ({
+  area: "FAZENDA_PUBLICA",
+  themeLabel: "Gratuidade da justiça — decisão",
+  autor: pick(NOMES, i + 8),
+  reu: pick(FP_ENTES, i + 8),
+  comarca: pick(COMARCAS, i + 8),
+  fatos: `${pick(NOMES, i + 8)} pleiteou gratuidade em ação contra ${pick(FP_ENTES, i + 8)}. Réu impugnou com base em pesquisa patrimonial: veículo de ${brl(18000 + i * 2000)} e imóvel residencial único de ${brl(180000 + i * 20000)}. Requerente declarou insuficiência de recursos (art. 99 §1º CPC). Juiz decide o incidente.`,
+  pedido: "manutenção da gratuidade da justiça",
+  norma: "arts. 98-102 CPC; art. 5º, LXXIV, CF/88; Tema STJ 1.070",
+});
+
+const tFpPericiaDecisao = (i: number): ThemeNarrative => ({
+  area: "FAZENDA_PUBLICA",
+  themeLabel: "Prova pericial — decisão de deferimento",
+  autor: pick(NOMES, i + 9),
+  reu: pick(FP_ENTES, i + 9),
+  comarca: pick(COMARCAS, i + 9),
+  fatos: `Ação de fornecimento de medicamento. Réu impugna a necessidade médica alegando existência de alternativa no RENAME. Autor requer perícia médica para atestar a necessidade do medicamento prescrito em detrimento das alternativas do SUS. Prova é pertinente e necessária para resolução do mérito.`,
+  pedido: "deferimento de prova pericial médica para atestar necessidade terapêutica",
+  norma: "arts. 369, 464 e 465 CPC; art. 5º, LV, CF/88 (contraditório e ampla defesa)",
+});
+
+// ── Sentenças (casos 11-16) ────────────────────────────────────────────────
+
+const SENT_FP_BASE = `SENTENÇA — FAZENDA PÚBLICA — estrutura obrigatória:
+I. RELATÓRIO: partes, pedido, fatos, histórico processual e provas produzidas.
+II. FUNDAMENTAÇÃO: análise constitucional do direito pleiteado + aplicação dos temas vinculantes + análise das teses defensivas.
+III. DISPOSITIVO: JULGO PROCEDENTE/IMPROCEDENTE + honorários (art. 85 CPC) + remessa necessária (art. 496 CPC) + recurso cabível (Apelação — art. 1.009 CPC, 30 dias para a Fazenda — art. 183 CPC).`;
+
+const tFpMedicamentoProcSentenca = (i: number): ThemeNarrative => ({
+  area: "FAZENDA_PUBLICA",
+  themeLabel: "Medicamento SUS — sentença procedente",
+  autor: pick(NOMES, i),
+  reu: pick(FP_ENTES, i),
+  comarca: pick(COMARCAS, i),
+  fatos: `Ação de fornecimento de medicamento. Prova documental demonstrou: (a) necessidade por laudo de especialista; (b) medicamento prescrito com eficácia científica comprovada; (c) ausência de alternativa equivalente no RENAME; (d) incapacidade financeira do autor. Réu não comprovou reserva do possível nem alternativa terapêutica. Perícia confirmou a necessidade médica.`,
+  pedido: "fornecimento do medicamento prescrito às expensas do Estado",
+  norma: "art. 196 CF/88; Tema STF 793; art. 6º Lei 8.080/90",
+  jurisprudencias: [JUR_STF_TEMA793],
+  sentencaInstruction: `${SENT_FP_BASE}
+VARIAÇÃO — PROCEDENTE (FORNECIMENTO DE MEDICAMENTO):
+1. Direito à saúde (art. 196 CF/88): obrigação do Estado de fornecer tratamento necessário.
+2. Tema STF 793 (RE 855.178): responsabilidade SOLIDÁRIA da União, Estado e Município — mencionar expressamente. O julgador pode direcionar o cumprimento ao ente processado.
+3. Mínimo existencial: a negativa viola a dignidade da pessoa humana (art. 1º, III, CF/88). Reserva do possível NÃO prevalece quando viola o mínimo existencial.
+4. Comprovação dos requisitos: laudo médico + ausência de alternativa no SUS + hipossuficiência financeira.
+5. Dispositivo: JULGO PROCEDENTE para CONDENAR o réu a fornecer [medicamento] no prazo de 15 dias, sob pena de multa diária de R$ 500,00, com fundamento no art. 536 CPC.`,
+});
+
+const tFpMedicamentoImprocSentenca = (i: number): ThemeNarrative => ({
+  area: "FAZENDA_PUBLICA",
+  themeLabel: "Medicamento SUS — sentença improcedente",
+  autor: pick(NOMES, i + 1),
+  reu: pick(FP_ENTES, i + 1),
+  comarca: pick(COMARCAS, i + 1),
+  fatos: `Autor requer medicamento experimental sem registro ANVISA para uso oncológico. Laudos periciais (do Estado e independente) indicam alternativa terapêutica equivalente disponível no RENAME não tentada pelo paciente. Réu comprovou disponibilidade do protocolo clínico alternativo. Peritos concordam que há alternativa adequada.`,
+  pedido: "fornecimento de medicamento sem protocolo clínico MS aprovado",
+  norma: "art. 196 CF/88 — limites da intervenção judicial em políticas públicas de saúde",
+  sentencaInstruction: `${SENT_FP_BASE}
+VARIAÇÃO — IMPROCEDENTE (ALTERNATIVA TERAPÊUTICA DISPONÍVEL):
+1. O direito à saúde não é absoluto: deve ser confrontado com a Política Nacional de Medicamentos e os protocolos do MS.
+2. Reserva do possível como limitação legítima (não absoluta): Administração comprovou existência de alternativa no RENAME.
+3. Limite da intervenção judicial: o Judiciário não substitui as políticas públicas de saúde quando a Administração oferece tratamento alternativo adequado — separação dos poderes como ELEMENTO de ponderação, não como óbice absoluto.
+4. Análise do mínimo existencial: não atingido, pois há alternativa terapêutica disponível no SUS.
+5. Laudo pericial confirmou viabilidade da alternativa.
+6. Dispositivo: JULGO IMPROCEDENTE o pedido. Sem honorários (beneficiário da gratuidade ou isento).`,
+});
+
+const tFpConcursoProcSentenca = (i: number): ThemeNarrative => ({
+  area: "FAZENDA_PUBLICA",
+  themeLabel: "Concurso público — sentença procedente",
+  autor: pick(NOMES, i + 2),
+  reu: pick(FP_ENTES, i + 2),
+  comarca: pick(COMARCAS, i + 2),
+  fatos: `${pick(NOMES, i + 2)} aprovado(a) na ${3 + (i % 7)}ª colocação dentro das ${15 + (i % 20)} vagas do edital. Certame venceu sem nomeação. Prova: (a) aprovação dentro das vagas; (b) ente contratou ${5 + i} temporários para as mesmas funções; (c) não houve justificativa de escassez orçamentária; (d) prazo não prorrogado.`,
+  pedido: "nomeação e posse, mais indenização pelas diferenças salariais",
+  norma: "Tema STF 784 (RE 837.311); art. 37 §2º CF/88",
+  jurisprudencias: [JUR_STF_TEMA784],
+  sentencaInstruction: `${SENT_FP_BASE}
+VARIAÇÃO — PROCEDENTE (DIREITO SUBJETIVO À NOMEAÇÃO):
+1. Tema STF 784 (RE 837.311/PI, Min. Luiz Fux): candidato aprovado DENTRO do número de vagas adquire DIREITO SUBJETIVO à nomeação — não é mera expectativa.
+2. Requisitos do Tema 784 preenchidos: (a) aprovado dentro das vagas; (b) prazo de validade vigente; (c) necessidade real demonstrada (contratação de temporários para as mesmas funções).
+3. Ausência de justificativa legítima: não há escassez orçamentária comprovada.
+4. Indenização: diferenças salariais do período de preterição — liquidação futura.
+5. Dispositivo: JULGO PROCEDENTE para CONDENAR o réu a nomear e empossar no prazo de 30 dias, pena de multa de R$ 1.000,00/dia, e ao pagamento das diferenças salariais (liquidação futura).`,
+});
+
+const tFpConcursoImprocSentenca = (i: number): ThemeNarrative => ({
+  area: "FAZENDA_PUBLICA",
+  themeLabel: "Concurso público — improcedente (cadastro reserva)",
+  autor: pick(NOMES, i + 3),
+  reu: pick(FP_ENTES, i + 3),
+  comarca: pick(COMARCAS, i + 3),
+  fatos: `${pick(NOMES, i + 3)} aprovado(a) na ${45 + (i % 30)}ª colocação FORA das ${20 + (i % 10)} vagas do edital (cadastro de reserva). Não convocado. Ente público comprovou ausência de necessidade real durante a validade do concurso. Sem contratação de temporários para a função.`,
+  pedido: "nomeação por expectativa de direito em cadastro de reserva",
+  norma: "art. 37 §2º CF/88; Tema STF 784 — fora das vagas: mera expectativa",
+  sentencaInstruction: `${SENT_FP_BASE}
+VARIAÇÃO — IMPROCEDENTE (CADASTRO DE RESERVA):
+1. Tema STF 784: o direito subjetivo à nomeação pressupõe aprovação DENTRO do número de vagas. Candidato em cadastro de reserva tem mera expectativa de direito.
+2. Discricionariedade administrativa: a convocação do cadastro de reserva é faculdade, não obrigação — desde que não demonstrada necessidade real por contratação de temporários.
+3. Ausência dos requisitos do Tema 784: candidato não está dentro das vagas; ente não demonstrou necessidade que forçasse a convocação.
+4. Dispositivo: JULGO IMPROCEDENTE o pedido.`,
+});
+
+const tFpServidorProcSentenca = (i: number): ThemeNarrative => ({
+  area: "FAZENDA_PUBLICA",
+  themeLabel: "Servidor — progressão funcional — procedente",
+  autor: pick(NOMES, i + 4),
+  reu: pick(FP_ENTES, i + 4),
+  comarca: pick(COMARCAS, i + 4),
+  fatos: `Servidor(a) preencheu requisitos legais para progressão: avaliação de desempenho SATISFATÓRIA e interstício cumprido. Administração negou a progressão alegando restrição orçamentária genérica sem demonstrar impacto concreto. Prova documental inequívoca dos requisitos cumpridos.`,
+  pedido: "progressão funcional e pagamento de diferenças vencimentais",
+  norma: "estatuto dos servidores; art. 37, X, CF/88; DL 4.597/42 (prescrição quinquenal das parcelas)",
+  sentencaInstruction: `${SENT_FP_BASE}
+VARIAÇÃO — PROCEDENTE (PROGRESSÃO FUNCIONAL):
+1. A progressão funcional é ato vinculado: preenchidos os requisitos objetivos, a Administração é obrigada a concedê-la.
+2. Avaliação satisfatória e interstício: demonstrados documentalmente.
+3. Restrição orçamentária genérica: não é fundamentação suficiente para negar ato vinculado — exigiria demonstração de situação fiscal excepcional.
+4. Prescrição quinquenal (DL 4.597/42): declarar de ofício. Apenas as parcelas dos últimos 5 anos são devidas (Súmula 85 STJ).
+5. Dispositivo: JULGO PROCEDENTE para determinar a progressão e condenar ao pagamento das diferenças dos últimos 5 anos.`,
+});
+
+const tFpServidorImprocSentenca = (i: number): ThemeNarrative => ({
+  area: "FAZENDA_PUBLICA",
+  themeLabel: "Servidor — verba funcional — parcialmente procedente (prescrição)",
+  autor: pick(NOMES, i + 5),
+  reu: pick(FP_ENTES, i + 5),
+  comarca: pick(COMARCAS, i + 5),
+  fatos: `Servidor requer adicional de insalubridade desde ${dateBack(9, i)} (${96 + i * 6} meses de inadimplência). Ação ajuizada em ${dateBack(0, i)}. Laudo pericial confirma atividade insalubre — o direito ao adicional existe. Porém, a maioria das parcelas tem mais de 5 anos.`,
+  pedido: "pagamento de todo o período de inadimplência (96+ meses)",
+  norma: "DL 4.597/42 (prescrição quinquenal para servidores); Súmula 85 STJ",
+  sentencaInstruction: `${SENT_FP_BASE}
+VARIAÇÃO — PARCIALMENTE PROCEDENTE (PRESCRIÇÃO QUINQUENAL):
+1. Mérito: o direito ao adicional existe — laudo pericial confirmou atividade insalubre.
+2. Prescrição quinquenal (DL 4.597/42): para servidores, a pretensão de cobrança de verbas funcionais prescreve em 5 anos (prazo especial, não o geral do CC/2002 de 10 anos).
+3. Súmula 85 STJ (prestações periódicas): a prescrição não atinge o fundo de direito — atinge apenas as parcelas anteriores ao quinquênio. Declarar de ofício.
+4. Cálculo: retroagem 5 anos da data do ajuizamento — parcelas anteriores: prescritas.
+5. Dispositivo: JULGO PARCIALMENTE PROCEDENTE — condena ao pagamento apenas das parcelas dos 5 anos anteriores ao ajuizamento. Parcelas anteriores: prescritas nos termos do DL 4.597/42 c/c Súmula 85 STJ.`,
+});
+
+// ── Recursos (casos 17-20) ─────────────────────────────────────────────────
+
+const tFpApelacaoFazendaRecurso = (i: number): ThemeNarrative => ({
+  area: "FAZENDA_PUBLICA",
+  themeLabel: "Apelação — Fazenda Pública",
+  autor: pick(FP_ENTES, i),
+  reu: pick(NOMES, i),
+  comarca: pick(COMARCAS, i),
+  fatos: `${pick(FP_ENTES, i)} apela de sentença que a condenou a fornecer medicamento ao autor ${pick(NOMES, i)}, com prazo de 15 dias e multa diária de R$ 500,00. A sentença aplicou o Tema STF 793 (responsabilidade solidária). Fazenda alega: (a) violação da separação dos poderes; (b) reserva do possível; (c) alternativa no RENAME não analisada. Prazo da Fazenda: 30 dias corridos (art. 183 CPC). Remessa necessária (art. 496, I, CPC) também se aplica.`,
+  pedido: "reforma da sentença para improcedência ou redução da multa diária",
+  norma: "arts. 1.009, 183 e 496 CPC; Tema STF 793 (responsabilidade solidária); art. 196 CF/88",
+  jurisprudencias: [JUR_STF_TEMA793],
+});
+
+const tFpContrarrazoesRecurso = (i: number): ThemeNarrative => ({
+  area: "FAZENDA_PUBLICA",
+  themeLabel: "Contrarrazões — Fazenda Pública",
+  autor: pick(NOMES, i + 1),
+  reu: pick(FP_ENTES, i + 1),
+  comarca: pick(COMARCAS, i + 1),
+  fatos: `${pick(NOMES, i + 1)}, beneficiário da sentença que condenou o ${pick(FP_ENTES, i + 1)} a fornecer medicamento, deve apresentar contrarrazões à apelação da Fazenda. A apelação argumenta reserva do possível, separação dos poderes e alternativa terapêutica. Prazo: 15 dias (art. 1.010 §3º CPC), contados da intimação eletrônica.`,
+  pedido: "manutenção integral da sentença condenatória",
+  norma: "arts. 1.010 §3º e 1.013 CPC; art. 196 CF/88; Tema STF 793",
+  jurisprudencias: [JUR_STF_TEMA793],
+});
+
+const tFpAgravoTutelaRecurso = (i: number): ThemeNarrative => ({
+  area: "FAZENDA_PUBLICA",
+  themeLabel: "Agravo de instrumento — contra tutela (Fazenda)",
+  autor: pick(FP_ENTES, i + 2),
+  reu: pick(NOMES, i + 2),
+  comarca: pick(COMARCAS, i + 2),
+  fatos: `${pick(FP_ENTES, i + 2)} interpõe agravo de instrumento contra decisão que deferiu tutela de urgência para fornecimento imediato de medicamento. Agravante alega: (a) ausência de fumus boni iuris — medicamento não consta no RENAME; (b) ausência de periculum in mora — paciente pode usar alternativa. Prazo de 15 dias (art. 1.003 §5º CPC). Cabimento: art. 1.015, I, CPC (tutela provisória).`,
+  pedido: "suspensão da tutela e seu posterior cancelamento",
+  norma: "art. 1.015, I, CPC; art. 300 CPC; art. 196 CF/88",
+});
+
+const tFpEmbargosDeclaracaoRecurso = (i: number): ThemeNarrative => ({
+  area: "FAZENDA_PUBLICA",
+  themeLabel: "Embargos de declaração — Fazenda Pública",
+  autor: pick(FP_ENTES, i + 3),
+  reu: pick(NOMES, i + 3),
+  comarca: pick(COMARCAS, i + 3),
+  fatos: `${pick(FP_ENTES, i + 3)} opõe embargos de declaração em face de sentença que a condenou a fornecer medicamento. Apontam-se: (a) omissão quanto à modulação temporal da condenação; (b) contradição entre a declaração de solidariedade (Tema 793) e a ausência de chamamento dos demais entes; (c) obscuridade quanto ao prazo inicial de incidência da multa diária. Prazo: 5 dias (art. 1.023 CPC). Finalidade: prequestionamento.`,
+  pedido: "sanar omissão, contradição e obscuridade para fins de prequestionamento",
+  norma: "arts. 1.022 e 1.025 CPC (embargos de declaração — omissão, contradição, obscuridade)",
+});
+
+// Adiciona os 20 temas de Fazenda Pública ao THEMES
+THEMES.push(
+  // Petições iniciais (5)
+  { id: "fp_medicamento_inicial",         build: tFpMedicamentoInicial,         compatibleTypes: ["PETICAO_INICIAL"] },
+  { id: "fp_sus_cirurgia_inicial",        build: tFpSusCircurgiaInicial,        compatibleTypes: ["PETICAO_INICIAL"] },
+  { id: "fp_concurso_nomeacao_inicial",   build: tFpConcursoNomeacaoInicial,    compatibleTypes: ["PETICAO_INICIAL"] },
+  { id: "fp_servidor_progressao_inicial", build: tFpServidorProgressaoInicial,  compatibleTypes: ["PETICAO_INICIAL"] },
+  { id: "fp_servidor_verba_inicial",      build: tFpServidorVerbaInicial,       compatibleTypes: ["PETICAO_INICIAL"] },
+  // Decisões (5)
+  { id: "fp_tutela_medicamento_decisao",  build: tFpTutelaMedicamentoDecisao,   compatibleTypes: ["DECISAO"] },
+  { id: "fp_tutela_cirurgia_decisao",     build: tFpTutelaCirurgiaDecisao,      compatibleTypes: ["DECISAO"] },
+  { id: "fp_concurso_suspensao_decisao",  build: tFpConcursoSuspensaoDecisao,   compatibleTypes: ["DECISAO"] },
+  { id: "fp_gratuidade_decisao",          build: tFpGratuidadeDecisao,          compatibleTypes: ["DECISAO"] },
+  { id: "fp_pericia_decisao",             build: tFpPericiaDecisao,             compatibleTypes: ["DECISAO"] },
+  // Sentenças (6)
+  { id: "fp_medicamento_proc_sentenca",   build: tFpMedicamentoProcSentenca,    compatibleTypes: ["SENTENCA"] },
+  { id: "fp_medicamento_improc_sentenca", build: tFpMedicamentoImprocSentenca,  compatibleTypes: ["SENTENCA"] },
+  { id: "fp_concurso_proc_sentenca",      build: tFpConcursoProcSentenca,       compatibleTypes: ["SENTENCA"] },
+  { id: "fp_concurso_improc_sentenca",    build: tFpConcursoImprocSentenca,     compatibleTypes: ["SENTENCA"] },
+  { id: "fp_servidor_proc_sentenca",      build: tFpServidorProcSentenca,       compatibleTypes: ["SENTENCA"] },
+  { id: "fp_servidor_improc_sentenca",    build: tFpServidorImprocSentenca,     compatibleTypes: ["SENTENCA"] },
+  // Recursos (4)
+  { id: "fp_apelacao_fazenda_recurso",    build: tFpApelacaoFazendaRecurso,     compatibleTypes: ["RECURSO"] },
+  { id: "fp_contrarrazoes_recurso",       build: tFpContrarrazoesRecurso,       compatibleTypes: ["RECURSO"] },
+  { id: "fp_agravo_tutela_recurso",       build: tFpAgravoTutelaRecurso,        compatibleTypes: ["RECURSO"] },
+  { id: "fp_embargos_declaracao_recurso", build: tFpEmbargosDeclaracaoRecurso,  compatibleTypes: ["RECURSO"] },
 );

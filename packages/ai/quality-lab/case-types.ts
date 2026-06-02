@@ -11,22 +11,30 @@ export type LegalArea =
   | "RPPS"
   | "RGPS"
   | "TRABALHISTA"
-  | "CRIMINAL"          // decisões incidentais: HC, liberdade provisória, preventiva, progressão
-  | "CRIMINAL_MERITO"   // ação penal de mérito: ABSOLVO/CONDENO com dosimetria
-  | "CIVEL"             // casos cíveis gerais (temas originais do QA)
-  | "CIVEL_GERAL"       // novos casos cíveis: obrigação de fazer, danos morais, cobrança, etc.
-  | "CONSUMIDOR";       // direito do consumidor: CDC, negativação, plano de saúde, banco
+  | "CRIMINAL"           // decisões incidentais: HC, liberdade provisória, preventiva, progressão
+  | "CRIMINAL_MERITO"    // ação penal de mérito: ABSOLVO/CONDENO com dosimetria
+  | "CIVEL"              // casos cíveis gerais (temas originais do QA)
+  | "CIVEL_GERAL"        // novos casos cíveis: obrigação de fazer, danos morais, cobrança, etc.
+  | "CONSUMIDOR"         // direito do consumidor: CDC, negativação, plano de saúde, banco
+  | "FAZENDA_PUBLICA";   // direito público: saúde, concursos, servidores, prescrição quinquenal
 
 // Tipos de armadilhas jurídicas inseridas em ~30% dos casos
 export type TrapKind =
-  | "JURISPRUDENCIA_CONTRARIA"   // precedente contrário não distinguido
-  | "ARTIGO_INCOMPATIVEL"        // ex: RPPS com art. 201 CF, criminal com art. 85 CPC
-  | "RECURSO_INADEQUADO"         // ex: trabalhista com apelação, JEF com apelação
-  | "COMPETENCIA_INCORRETA"      // ex: STJ em matéria trabalhista
-  | "TESE_EQUIVOCADA"            // tese juridicamente errada
-  | "PRECEDENTE_SUPERADO"        // súmula/precedente já revogado
-  | "FATO_INCOMPLETO"            // descrição faltando elementos essenciais
-  | "LINGUAGEM_DECISORIA";       // despacho com "defiro/julgo"
+  | "JURISPRUDENCIA_CONTRARIA"         // precedente contrário não distinguido
+  | "ARTIGO_INCOMPATIVEL"              // ex: RPPS com art. 201 CF, criminal com art. 85 CPC
+  | "RECURSO_INADEQUADO"               // ex: trabalhista com apelação, JEF com apelação
+  | "COMPETENCIA_INCORRETA"            // ex: STJ em matéria trabalhista
+  | "TESE_EQUIVOCADA"                  // tese juridicamente errada
+  | "PRECEDENTE_SUPERADO"              // súmula/precedente já revogado
+  | "FATO_INCOMPLETO"                  // descrição faltando elementos essenciais
+  | "LINGUAGEM_DECISORIA"              // despacho com "defiro/julgo"
+  // Traps específicas de Fazenda Pública
+  | "TEMA_STF_IGNORADO"                // tema repetitivo STF/STJ vinculante não aplicado
+  | "RESERVA_POSSIVEL_SEM_MIN_EXIST"   // reserva do possível sem análise do mínimo existencial
+  | "PRESCRICAO_QUINQUENAL_IGNORADA"   // DL 4.597/42 não aplicado — verbas funcionais
+  | "LEGITIMIDADE_PASSIVA_INCORRETA"   // ente público errado no polo passivo
+  | "SEPARACAO_PODERES_INCORRETA"      // separação de poderes usado para negar mínimo existencial
+  | "SOLIDARIEDADE_INCORRETA";         // responsabilidade solidária dos entes negada (Tema STF 793)
 
 export interface SyntheticCase {
   id: string;
@@ -67,6 +75,7 @@ export const AREA_LABELS: Record<LegalArea, string> = {
   CIVEL: "Cível",
   CIVEL_GERAL: "Cível Geral",
   CONSUMIDOR: "Consumidor (CDC)",
+  FAZENDA_PUBLICA: "Fazenda Pública",
 };
 
 export function mapRuleToValidator(rule: string): ValidatorComponent {

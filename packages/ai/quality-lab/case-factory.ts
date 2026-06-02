@@ -74,6 +74,25 @@ function decideTrap(slotIndex: number, area: LegalArea, phase: Phase | "DESPACHO
     kind = "JURISPRUDENCIA_CONTRARIA";
   }
 
+  // FAZENDA_PUBLICA: rotação com traps específicas de direito público
+  if (area === "FAZENDA_PUBLICA") {
+    const fpTrapTable: TrapKind[] = [
+      "TEMA_STF_IGNORADO",
+      "RESERVA_POSSIVEL_SEM_MIN_EXIST",
+      "PRESCRICAO_QUINQUENAL_IGNORADA",
+      "LEGITIMIDADE_PASSIVA_INCORRETA",
+      "SEPARACAO_PODERES_INCORRETA",
+      "JURISPRUDENCIA_CONTRARIA",
+      "SOLIDARIEDADE_INCORRETA",
+      "FATO_INCOMPLETO",
+      "TESE_EQUIVOCADA",
+      "COMPETENCIA_INCORRETA",
+    ];
+    kind = fpTrapTable[cycleIdx % fpTrapTable.length]!;
+    if (kind === "COMPETENCIA_INCORRETA" && phase !== "RECURSO") kind = "TEMA_STF_IGNORADO";
+    if (kind === "SOLIDARIEDADE_INCORRETA" && phase !== "RECURSO") kind = "RESERVA_POSSIVEL_SEM_MIN_EXIST";
+  }
+
   return kind;
 }
 
