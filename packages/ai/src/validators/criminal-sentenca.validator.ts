@@ -16,11 +16,18 @@ const HC_DISPOSITIVO_RE = /(concedo\s+(parcialmente\s+)?a?\s*ordem|denego\s+a?\s
 const HC_WRONG_DISPOSITIVO_RE = /(julgo\s+(procedente|improcedente|parcialmente\s+procedente)|julgo\s+extinto|condeno\s+o\s+paciente|absolvo\s+o\s+paciente)/i;
 
 // Dispositivos válidos em sentença penal de mérito:
-//   CONDENO / ABSOLVO — ação penal de mérito (ambos os gêneros: "o réu" e "a ré")
-//   DECLARO EXTINTA A PUNIBILIDADE — prescrição, decadência, etc. (art. 107 CP)
-//   DESCLASSIFICO — reclassificação para tipo penal menos grave
+//   CONDENO / ABSOLVO — ação penal (masculino "o réu", feminino "a ré", ou nome direto)
+//   DECLARO EXTINTA A PUNIBILIDADE — prescrição, decadência (art. 107 CP)
+//   DESCLASSIFICO — reclassificação para tipo menos grave
+//
+// Exemplos aceitos:
+//   "CONDENO o réu João"      → artigo + substantivo (masculino)
+//   "CONDENO a ré Maria"      → artigo + substantivo (feminino)
+//   "CONDENO Maria da Silva"  → nome direto sem artigo+substantivo ← FIX
+//   "ABSOLVO o acusado"       → substantivo masculino
+//   "ABSOLVO a acusada"       → substantivo feminino
 const CRIMINAL_DISPOSITIVO_RE =
-  /(absolvo|condeno)\s+[ao]s?\s+(r[eé][u]?s?|acusad[ao]s?|denunciad[ao]s?)|declaro\s+extinta?\s+a\s+punibilidade|desclassifico\s+(a\s+(?:conduta|infra[cç][aã]o)|o\s+crime|para\s+o)/i;
+  /(absolvo|condeno)\s+(?:[ao]s?\s+)?(r[eé][u]?s?|acusad[ao]s?|denunciad[ao]s?|\S{2,})|declaro\s+extinta?\s+a\s+punibilidade|desclassifico\s+(a\s+(?:conduta|infra[cç][aã]o)|o\s+crime|para\s+o)/i;
 
 // Proibido em sentença penal: linguagem dispositiva civil
 const CRIMINAL_WRONG_CIVIL_RE = /julgo\s+(procedente|improcedente|parcialmente\s+procedente)/i;
@@ -47,8 +54,14 @@ const DOSIMETRIA_FASE1_RE = /(pena[\s-]*base|art\.\s*59\s*(do\s+)?cp|primeira\s+
 const DOSIMETRIA_FASE2_RE = /(segunda\s+fase|2[ªa]\s+fase\b|atenuante|agravante|art\.\s*65\s*(do\s+)?cp|art\.\s*61\s*(do\s+)?cp)/i;
 const DOSIMETRIA_FASE3_RE = /(terceira\s+fase|3[ªa]\s+fase\b|causa[s]?\s+de\s+(aumento|diminui[cç][aã]o)|art\.\s*68\s*(do\s+)?cp)/i;
 
-// Regime inicial de cumprimento da pena (art. 33 CP)
-const REGIME_CUMPRIMENTO_RE = /(regime\s+(inicial\s+)?(fechado|semiaberto|aberto)|art\.?\s*33\s*(do\s+)?cp|regime\s+de\s+cumprimento)/i;
+// Regime inicial de cumprimento da pena (art. 33 CP).
+// Cobre padrões naturais da escrita jurídica:
+//   "regime inicial fechado"                 → palavras adjacentes
+//   "regime inicial de cumprimento... fechado" → palavras separadas por texto intermediário ← FIX
+//   "art. 33, §2º, alínea 'b', do CP"        → art. 33 seguido de pontuação ← FIX
+//   "art. 33 do CP" / "art. 33 CP"           → formas compactas (já funcionavam)
+const REGIME_CUMPRIMENTO_RE =
+  /(regime\s+(inicial\s+)?(fechado|semiaberto|aberto)|regime\b[^.\n]{0,100}(fechado|semiaberto|aberto)\b|art\.?\s*33\b|regime\s+(inicial|de\s+cumprimento))/i;
 
 // Inciso do art. 386 CPP em absolvição
 const ART_386_RE = /art\.?\s*386\s*(do\s+)?cpp/i;

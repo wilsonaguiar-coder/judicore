@@ -98,10 +98,13 @@ DISPOSITIVOS VÁLIDOS — use EXATAMENTE uma destas formas:
                    CONDENO/ABSOLVO o réu [NOME]..."
 
 PROIBIDO em sentença penal (causa REPROVAÇÃO automática):
-  ✗ "julgo procedente a denúncia" / "julgo improcedente a denúncia" / "procedente a pretensão punitiva"
-  ✗ QUALQUER FORMA de "julgo procedente" ou "julgo improcedente" — essas são expressões CÍVEIS
+  ✗ "julgo procedente a denúncia/ação penal" — NUNCA usar essa forma
+  ✗ "julgo improcedente a denúncia/ação penal" — NUNCA usar essa forma
+  ✗ "julgo procedente... para CONDENAR" — use diretamente "CONDENO" (conjugado, não infinitivo)
+  ✗ "CONDENAR" (infinitivo) no dispositivo — use sempre "CONDENO" (conjugado)
+  ✗ "ABSOLVAR" (infinitivo) no dispositivo — use sempre "ABSOLVO" (conjugado)
+  ✗ QUALQUER FORMA de "julgo procedente/improcedente" — são expressões CÍVEIS proibidas em processo penal
   ✗ citar art. 85 CPC ou honorários sucumbenciais (inexistentes em processo penal)
-  ✗ tratar o acusado como "réu civil" — use "RÉU" ou "ACUSADO" no contexto penal
   ✗ usar linguagem de ação ordinária civil em processo crime
 
 ESTRUTURA DA ABSOLVIÇÃO:
@@ -116,16 +119,31 @@ ESTRUTURA DA CONDENAÇÃO:
   2. Tipicidade — enquadramento no tipo penal
   3. Ilicitude / culpabilidade
   4. DOSIMETRIA EM 3 FASES OBRIGATÓRIAS (art. 68 CP):
-     - 1ª fase: pena-base (art. 59 CP — fixar com análise das 8 circunstâncias judiciais)
-     - 2ª fase: atenuantes (art. 65 CP) / agravantes (arts. 61-62 CP) — se houver
-     - 3ª fase: causas de diminuição (-) / aumento (+) — se houver
-     - Resultado: "Pena definitiva: X anos e Y meses de reclusão/detenção"
-  5. REGIME INICIAL DE CUMPRIMENTO (art. 33 CP) — OBRIGATÓRIO:
-     - Regime fechado / semiaberto / aberto (conforme pena e reincidência)
+     - 1ª fase: pena-base (art. 59 CP — analisar as 8 circunstâncias e FIXAR VALOR CONCRETO)
+       Exemplo: "fixo a pena-base em 5 (cinco) anos de reclusão"
+     - 2ª fase: atenuantes / agravantes — APLICAR ou declarar ausência expressamente
+       Exemplo: "não há atenuantes ou agravantes"
+     - 3ª fase: causas de aumento/diminuição — APLICAR ou declarar ausência expressamente
+     - Pena definitiva: escrever o VALOR FINAL CONCRETO, ex: "Pena definitiva: 5 (cinco) anos de reclusão"
+  5. REGIME INICIAL DE CUMPRIMENTO (art. 33 CP) — OBRIGATÓRIO COM VALOR CONCRETO:
+     - Escrever EXATAMENTE: "regime inicial FECHADO" ou "regime inicial SEMIABERTO" ou "regime inicial ABERTO"
      - Citar fundamento: "art. 33, §2º, [a/b/c], do CP"
-  6. Substituição (art. 44 CP) ou sursis (art. 77 CP) se cabível
+  6. Substituição (art. 44 CP) ou sursis (art. 77 CP) — DECIDIR COM FUNDAMENTO
   7. Detração: art. 387, §2º, CPP se houver prisão anterior
   8. Custas processuais
+
+⛔ PROIBIDO NO DISPOSITIVO E DOSIMETRIA — causa REPROVAÇÃO automática:
+  ✗ Placeholders como [X anos], [fixar], [conforme dosimetria], [regime a definir], [VALOR]
+  ✗ Deixar qualquer campo em branco ou com "[...]" — preencher com valores concretos baseados nos fatos
+  ✗ "pena de [fixar na dosimetria]" — escrever "pena de 5 (cinco) anos" com valor real
+  ✗ "regime [fixar conforme dosimetria]" — escrever "regime inicial fechado" com valor definido
+  ✗ "Relatório: [a ser preenchido]" — o RELATÓRIO deve ser redigido integralmente
+
+ATENÇÃO ESPECIAL — CABEÇALHO E RELATÓRIO:
+  A seção RELATÓRIO é OBRIGATÓRIA e deve conter:
+  - "RELATÓRIO" como título explícito da seção, OU
+  - Abrir com "Trata-se de ação penal em que..." ou "Cuida-se de denúncia..."
+  Nunca omitir o relatório ou começar a sentença direto na fundamentação.
 
 FUNDAMENTOS LEGAIS obrigatórios:
   - Tipo penal aplicado (CP ou lei extravagante)

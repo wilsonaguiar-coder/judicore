@@ -121,17 +121,29 @@ export class LegalRulesValidator {
       const PENAL_VERBS = ["condeno", "absolvo", "declaro extinta", "desclassifico", "concedo a ordem", "denego a ordem"];
       const hasPenalVerb = PENAL_VERBS.some((v) => lowerDraft.includes(v));
 
+      // Padrão de negação/exclusão antes do termo (contexto de até 160 chars)
+      // — o AI frequentemente escreve "Não há honorários advocatícios" ou
+      //   "Deixo de aplicar honorários advocatícios", que é linguagem CORRETA
+      const NEGATION_BEFORE_RE = /n[ãa]o\s+h[aá]|deixo\s+de|sem\s+condena|n[ãa]o\s+cabe|isento|inexist|ausente|vedado|inaplicável/i;
+
       for (const term of CRIMINAL_BLOCKED_TERMS) {
-        if (lowerDraft.includes(term.toLowerCase())) {
-          const isCivilJudgment = CIVIL_JUDGMENT_TERMS.includes(term);
-          errors.push({
-            rule: "CRIMINAL_WRONG_TERM",
-            message: `"${term}" é termo proibido em matéria criminal — use linguagem processual penal (ABSOLVO/CONDENO em sentença; concedo/denego a ordem em HC)`,
-            // Fatal se: (a) é uma forma de "julgo procedente/improcedente" E não há verbo penal no draft
-            // Não-fatal se: há verbo penal correto junto (mix de linguagem, menos grave)
-            fatal: isCivilJudgment ? !hasPenalVerb : false,
-          });
+        const termLower = term.toLowerCase();
+        const termIdx = lowerDraft.indexOf(termLower);
+        if (termIdx === -1) continue;
+
+        // Para "honorários advocatícios": verificar contexto de negação antes do termo
+        // Se precedido de "não há", "deixo de aplicar", etc. → não é erro, é linguagem correta
+        if (termLower === "honorários advocatícios") {
+          const contextBefore = lowerDraft.slice(Math.max(0, termIdx - 160), termIdx);
+          if (NEGATION_BEFORE_RE.test(contextBefore)) continue;
         }
+
+        const isCivilJudgment = CIVIL_JUDGMENT_TERMS.includes(term);
+        errors.push({
+          rule: "CRIMINAL_WRONG_TERM",
+          message: `"${term}" é termo proibido em matéria criminal — use linguagem processual penal (ABSOLVO/CONDENO em sentença; concedo/denego a ordem em HC)`,
+          fatal: isCivilJudgment ? !hasPenalVerb : false,
+        });
       }
     }
 
