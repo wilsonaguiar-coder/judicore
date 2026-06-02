@@ -2,7 +2,7 @@
 
 import { useRouter, usePathname } from "next/navigation";
 import { useAuthStore } from "@/store/auth";
-import { LogOut, Search, Settings, BarChart2, FlaskConical } from "lucide-react";
+import { LogOut, Search, Settings, BarChart2, FlaskConical, Users } from "lucide-react";
 import Image from "next/image";
 import type { User } from "@/types";
 
@@ -47,6 +47,8 @@ export function Sidebar({ user }: { user: User | null }) {
           navItem("Indexação", <Settings size={15} />, "/dashboard/admin")}
         {user?.role === "ADMIN" &&
           navItem("Uso de IA", <BarChart2 size={15} />, "/dashboard/admin/uso")}
+        {user?.role === "ADMIN" &&
+          navItem("Usuários", <Users size={15} />, "/dashboard/admin/usuarios")}
         {user?.role === "ADMIN" &&
           navItem("Testes", <FlaskConical size={15} />, "/dashboard/admin/testes")}
       </nav>

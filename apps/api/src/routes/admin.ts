@@ -4,7 +4,7 @@ import { spawn } from "node:child_process";
 import { promises as fsp } from "node:fs";
 import { resolve, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
-import { randomUUID } from "node:crypto";
+import { randomUUID, createHash } from "node:crypto";
 import { getIndexingQueue } from "../queues/queue.js";
 import { buildJobData, SCHEDULE_CONFIG } from "../queues/schedule-config.js";
 import { getElasticsearchClient, JURISPRUDENCIA_INDEX, ensureIndices } from "@judicore/search";
@@ -86,6 +86,8 @@ export async function adminRoutes(app: FastifyInstance) {
       return reply.status(403).send({ error: "Acesso restrito a administradores" });
     }
   }
+
+  await registerUserRoutes(app, authenticate, requireAdmin);
 
   // GET /admin/stats — estatísticas do índice Elasticsearch
   app.get(
@@ -535,6 +537,89 @@ export async function adminRoutes(app: FastifyInstance) {
       return reply.status(204).send();
     }
   );
+}
+
+function hashPassword(password: string): string {
+  return createHash("sha256").update(password + (process.env["JWT_SECRET"] ?? "")).digest("hex");
+}
+
+// ── User management ───────────────────────────────────────────────────────────
+
+async function registerUserRoutes(app: FastifyInstance, authenticate: any, requireAdmin: any) {
+  // GET /admin/users — lista todos os usuários
+  app.get("/users", { onRequest: [authenticate, requireAdmin] }, async () => {
+    return prisma.user.findMany({
+      select: { id: true, email: true, name: true, role: true, accessExpiresAt: true, createdAt: true },
+      orderBy: { createdAt: "desc" },
+    });
+  });
+
+  // POST /admin/users — cria usuário
+  app.post("/users", { onRequest: [authenticate, requireAdmin] }, async (request, reply) => {
+    const schema = z.object({
+      name: z.string().min(2),
+      email: z.string().email(),
+      password: z.string().min(8),
+      role: z.enum(["COMUM", "SERVIDOR", "ADMIN"]).default("COMUM"),
+      accessExpiresAt: z.string().datetime().nullable().optional(),
+    });
+    const body = schema.safeParse(request.body);
+    if (!body.success) return reply.status(400).send({ error: body.error.flatten() });
+
+    const existing = await prisma.user.findUnique({ where: { email: body.data.email } });
+    if (existing) return reply.status(409).send({ error: "E-mail já cadastrado" });
+
+    const user = await prisma.user.create({
+      data: {
+        name: body.data.name,
+        email: body.data.email,
+        passwordHash: hashPassword(body.data.password),
+        role: body.data.role,
+        accessExpiresAt: body.data.accessExpiresAt ? new Date(body.data.accessExpiresAt) : null,
+      },
+      select: { id: true, email: true, name: true, role: true, accessExpiresAt: true, createdAt: true },
+    });
+    return reply.status(201).send(user);
+  });
+
+  // PATCH /admin/users/:id — atualiza papel, nome, expiração ou senha
+  app.patch("/users/:id", { onRequest: [authenticate, requireAdmin] }, async (request, reply) => {
+    const schema = z.object({
+      name: z.string().min(2).optional(),
+      role: z.enum(["COMUM", "SERVIDOR", "ADMIN"]).optional(),
+      accessExpiresAt: z.string().datetime().nullable().optional(),
+      password: z.string().min(8).optional(),
+    });
+    const { id } = request.params as { id: string };
+    const body = schema.safeParse(request.body);
+    if (!body.success) return reply.status(400).send({ error: body.error.flatten() });
+
+    const data: Record<string, unknown> = {};
+    if (body.data.name !== undefined) data["name"] = body.data.name;
+    if (body.data.role !== undefined) data["role"] = body.data.role;
+    if (body.data.accessExpiresAt !== undefined) {
+      data["accessExpiresAt"] = body.data.accessExpiresAt ? new Date(body.data.accessExpiresAt) : null;
+    }
+    if (body.data.password) data["passwordHash"] = hashPassword(body.data.password);
+
+    const user = await prisma.user.update({
+      where: { id },
+      data,
+      select: { id: true, email: true, name: true, role: true, accessExpiresAt: true, createdAt: true },
+    });
+    return user;
+  });
+
+  // DELETE /admin/users/:id — remove usuário (não permite auto-exclusão)
+  app.delete("/users/:id", { onRequest: [authenticate, requireAdmin] }, async (request, reply) => {
+    const { id } = request.params as { id: string };
+    const requester = request.user as { sub: string };
+    if (id === requester.sub) {
+      return reply.status(400).send({ error: "Não é possível excluir o próprio usuário" });
+    }
+    await prisma.user.delete({ where: { id } });
+    return reply.status(204).send();
+  });
 }
 
 function serializeJob(job: any) {

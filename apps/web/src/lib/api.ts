@@ -30,6 +30,13 @@ export const api = {
       headers: token ? { Authorization: `Bearer ${token}` } : {},
     });
   },
+  patch<T>(path: string, body: unknown, token: string): Promise<T> {
+    return request<T>(path, {
+      method: "PATCH",
+      body: JSON.stringify(body),
+      headers: { Authorization: `Bearer ${token}` },
+    });
+  },
   delete<T>(path: string, token: string): Promise<T> {
     return request<T>(path, {
       method: "DELETE",
