@@ -141,16 +141,16 @@ export default function LandingPage() {
             <div className="absolute w-[360px] h-[360px] rounded-full border border-violet-500/10 bg-violet-600/5 blur-sm" />
             <div className="absolute w-[260px] h-[260px] rounded-full border border-violet-500/15 bg-violet-700/8" />
 
-            {/* Hero image slot — substitua /hero.png pela imagem da Themis */}
-            <div className="relative w-[300px] h-[340px] flex items-end justify-center">
-              <img
+            {/* Hero image */}
+            <div className="relative w-[300px] h-[380px]">
+              <Image
                 src="/hero.png"
                 alt="Justiça"
-                className="max-h-full max-w-full object-contain drop-shadow-2xl opacity-80"
-                onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }}
+                fill
+                className="object-contain object-bottom drop-shadow-2xl"
+                style={{ filter: "drop-shadow(0 0 40px rgba(139,92,246,0.3))" }}
+                priority
               />
-              {/* Fallback glow when image is absent */}
-              <div className="absolute inset-0 rounded-full bg-gradient-to-t from-violet-900/30 via-transparent to-transparent" />
             </div>
 
             {/* Floating stat card */}
