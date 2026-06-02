@@ -79,7 +79,8 @@ function summarize(results: CaseResult[]): RunSummary {
     EvidenceAnalyzer: new Map(), LegalValidator: new Map(), AppealValidator: new Map(),
     StructuralValidator: new Map(), FinalValidator: new Map(),
     JurisprudenceValidator: new Map(), GenericityValidator: new Map(),
-    MatrixQualityValidator: new Map(), RichnessValidator: new Map(), Other: new Map(),
+    MatrixQualityValidator: new Map(), RichnessValidator: new Map(),
+    CivilValidator: new Map(), ConsumerValidator: new Map(), Other: new Map(),
   };
 
   const areaScoreSum: Record<LegalArea, number> = { RPPS: 0, RGPS: 0, TRABALHISTA: 0, CRIMINAL: 0, CRIMINAL_MERITO: 0, CIVEL: 0, CIVEL_GERAL: 0, CONSUMIDOR: 0 };
