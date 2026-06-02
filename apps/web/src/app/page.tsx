@@ -36,7 +36,6 @@ const STATS = [
   { icon: <Users size={22} className="text-blue-400" />,    value: "+10.000",    label: "Usuários ativos em todo o Brasil" },
 ];
 
-const COURT_LOGOS = ["STJ", "Supremo Tribunal Federal", "TST", "TRFs", "PJe", "Processo Judicial Eletrônico"];
 
 function Sparkline() {
   return (
@@ -173,19 +172,14 @@ export default function LandingPage() {
           ))}
         </div>
 
-        <div className="flex items-center gap-3">
-          <Link href="/login" className="text-sm text-white/60 hover:text-white/90 transition-colors px-3 py-1.5 rounded-lg border border-white/10 hover:border-white/20">
-            Entrar
-          </Link>
-          <Link href="/login" className="text-sm font-semibold text-white bg-violet-600 hover:bg-violet-500 transition-colors px-4 py-1.5 rounded-lg">
-            Testar agora
-          </Link>
-        </div>
+        <Link href="/login" className="text-sm font-semibold text-white bg-violet-600 hover:bg-violet-500 transition-colors px-4 py-1.5 rounded-lg">
+          Entrar
+        </Link>
       </motion.nav>
 
       {/* Hero */}
-      <section className="relative z-10 px-6 md:px-12 pt-14 pb-8 md:pt-18">
-        <div className="max-w-6xl mx-auto grid md:grid-cols-2 gap-8 items-center">
+      <section className="relative z-10 px-6 md:px-12 pt-14 md:pt-18">
+        <div className="max-w-6xl mx-auto grid md:grid-cols-2 gap-8 items-end">
 
           {/* Left */}
           <div>
@@ -221,16 +215,16 @@ export default function LandingPage() {
               className="flex flex-wrap gap-3"
             >
               {[
-                { icon: <Shield size={13} className="text-violet-400" />, label: "Confiável", sub: "Baseado em jurisprudência" },
-                { icon: <Zap size={13} className="text-amber-400" />,    label: "Rápido",    sub: "IA de Alta Performance" },
-                { icon: <Lock size={13} className="text-emerald-400" />, label: "Seguro",    sub: "Seus dados protegidos" },
-                { icon: <Link2 size={13} className="text-blue-400" />,   label: "Integrado", sub: "PJe, PJeOffice e mais" },
+                { icon: <Shield size={16} className="text-violet-400" />, label: "Confiável", sub: "Baseado em jurisprudência real" },
+                { icon: <Zap size={16} className="text-amber-400" />,    label: "Rápido",    sub: "IA de Alta Performance" },
+                { icon: <Lock size={16} className="text-emerald-400" />, label: "Seguro",    sub: "Seus dados protegidos" },
+                { icon: <Link2 size={16} className="text-blue-400" />,   label: "Integrado", sub: "Processo Judicial Eletrônico - PJE" },
               ].map((f) => (
-                <div key={f.label} className="flex items-center gap-2 px-3 py-1.5 rounded-xl border border-white/8 bg-white/[0.03]">
+                <div key={f.label} className="flex items-center gap-3 px-4 py-3 rounded-xl border border-white/8 bg-white/[0.03]">
                   {f.icon}
                   <div>
-                    <p className="text-xs font-semibold text-white/80">{f.label}</p>
-                    <p className="text-[10px] text-white/35">{f.sub}</p>
+                    <p className="text-sm font-semibold text-white/80">{f.label}</p>
+                    <p className="text-xs text-white/40">{f.sub}</p>
                   </div>
                 </div>
               ))}
@@ -272,7 +266,7 @@ export default function LandingPage() {
         </div>
 
         {/* Product cards */}
-        <div className="max-w-6xl mx-auto mt-12 grid md:grid-cols-3 gap-5">
+        <div className="max-w-6xl mx-auto mt-0 grid md:grid-cols-3 gap-5">
 
           {/* JudiCore */}
           <motion.div custom={5} variants={fadeUp} initial="hidden" animate="visible">
@@ -464,19 +458,11 @@ export default function LandingPage() {
         </div>
       </motion.section>
 
-      {/* Footer — tribunal logos */}
-      <footer className="relative z-10 border-t border-white/[0.05] px-6 md:px-12 py-7">
-        <div className="max-w-6xl mx-auto">
-          <div className="flex flex-wrap items-center justify-center gap-8 md:gap-12 mb-4">
-            {COURT_LOGOS.map((logo) => (
-              <span key={logo} className="text-[10px] font-bold text-white/30 tracking-wider uppercase">
-                {logo}
-              </span>
-            ))}
-          </div>
-          <p className="text-center text-xs text-white/20">
-            Integração nativa com PJe, PJeOffice e os principais tribunais do país.
-          </p>
+      {/* Footer */}
+      <footer className="relative z-10 border-t border-white/[0.05] px-6 md:px-12 py-5">
+        <div className="max-w-6xl mx-auto flex items-center justify-between gap-4">
+          <Image src="/logo.png" alt="JudiCore" width={90} height={30} className="object-contain opacity-60" />
+          <p className="text-xs text-white/25">© {new Date().getFullYear()} JudiCore. Todos os direitos reservados.</p>
         </div>
       </footer>
 
