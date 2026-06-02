@@ -79,8 +79,8 @@ export default function LandingPage() {
                 <ul className="space-y-2 mb-8">
                   {[
                     "Busca semântica em mais de 1 milhão de acórdãos",
-                    "RAG com citações 100% auditáveis",
-                    "Export em DOCX com formatação ABNT",
+                    "RAG com apoio de IA e citações 100% auditáveis",
+                    "Minutas disponíveis para exportação",
                   ].map((item) => (
                     <li key={item} className="flex items-start gap-2.5 text-sm text-white/60">
                       <CheckCircle size={14} className="text-violet-400 mt-0.5 shrink-0" />
@@ -111,8 +111,8 @@ export default function LandingPage() {
                 </p>
                 <ul className="space-y-2 mb-8">
                   {[
-                    "Atualização automática de índices via BCB",
-                    "Integração SOAP com PJe para consulta de processos",
+                    "Atualização automática de índices",
+                    "Integração SOAP com PJe para consulta processos e inclusão de documentos",
                     "Exportação em PDF e Excel",
                   ].map((item) => (
                     <li key={item} className="flex items-start gap-2.5 text-sm text-white/60">
