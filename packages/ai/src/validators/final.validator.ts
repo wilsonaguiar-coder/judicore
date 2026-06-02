@@ -21,6 +21,7 @@ import { SentencaValidator } from "./sentenca.validator.js";
 import { CriminalSentenceValidator } from "./criminal-sentenca.validator.js";
 import { CivilValidator } from "./civil.validator.js";
 import { ConsumerValidator } from "./consumer.validator.js";
+import { ExecutionValidator } from "./execution.validator.js";
 
 export interface FinalValidationResult {
   valid: boolean;
@@ -82,6 +83,7 @@ export class FinalValidator {
   private criminalSentenca = new CriminalSentenceValidator();
   private civil = new CivilValidator();
   private consumer = new ConsumerValidator();
+  private execution = new ExecutionValidator();
 
   validate(
     draft: string,
@@ -111,6 +113,9 @@ export class FinalValidator {
 
     // 1e. Validação consumerista (CDC + inversão ônus + dano moral + repetição em dobro)
     allErrors.push(...this.consumer.validate(draft, classification).errors);
+
+    // 1f. Validação de execução/cumprimento (seções, CPC, modalidade, objeção, SISBAJUD)
+    allErrors.push(...this.execution.validate(draft, classification).errors);
 
     // 2. Validação de regras jurídicas (artigos, diplomas)
     const legalResult = this.legal.validateDraftArticles(draft, classification);

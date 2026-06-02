@@ -55,6 +55,7 @@ function emptyByValidator(): Record<ValidatorComponent, ValidatorStats> {
     RichnessValidator: emptyValidator(),
     CivilValidator: emptyValidator(),
     ConsumerValidator: emptyValidator(),
+    ExecutionValidator: emptyValidator(),
     Other: emptyValidator(),
   };
 }
@@ -81,7 +82,7 @@ function summarize(results: CaseResult[]): RunSummary {
     StructuralValidator: new Map(), FinalValidator: new Map(),
     JurisprudenceValidator: new Map(), GenericityValidator: new Map(),
     MatrixQualityValidator: new Map(), RichnessValidator: new Map(),
-    CivilValidator: new Map(), ConsumerValidator: new Map(), Other: new Map(),
+    CivilValidator: new Map(), ConsumerValidator: new Map(), ExecutionValidator: new Map(), Other: new Map(),
   };
 
   const areaScoreSum: Record<LegalArea, number> = { RPPS: 0, RGPS: 0, TRABALHISTA: 0, CRIMINAL: 0, CRIMINAL_MERITO: 0, CIVEL: 0, CIVEL_GERAL: 0, CONSUMIDOR: 0, FAZENDA_PUBLICA: 0, EXECUCAO_CUMPRIMENTO: 0 };

@@ -11,23 +11,23 @@ export type LegalArea =
   | "RPPS"
   | "RGPS"
   | "TRABALHISTA"
-  | "CRIMINAL"           // decisões incidentais: HC, liberdade provisória, preventiva, progressão
-  | "CRIMINAL_MERITO"    // ação penal de mérito: ABSOLVO/CONDENO com dosimetria
-  | "CIVEL"              // casos cíveis gerais (temas originais do QA)
-  | "CIVEL_GERAL"        // novos casos cíveis: obrigação de fazer, danos morais, cobrança, etc.
+  | "CRIMINAL"              // decisões incidentais: HC, liberdade provisória, preventiva, progressão
+  | "CRIMINAL_MERITO"       // ação penal de mérito: ABSOLVO/CONDENO com dosimetria
+  | "CIVEL"                 // casos cíveis gerais (temas originais do QA)
+  | "CIVEL_GERAL"           // novos casos cíveis: obrigação de fazer, danos morais, cobrança, etc.
   | "CONSUMIDOR"            // direito do consumidor: CDC, negativação, plano de saúde, banco
-  | "FAZENDA_PUBLICA"     // direito público: saúde, concursos, servidores, prescrição quinquenal
+  | "FAZENDA_PUBLICA"       // direito público: saúde, concursos, servidores, prescrição quinquenal
   | "EXECUCAO_CUMPRIMENTO"; // fase executiva: cumprimento de sentença, impugnação, penhora
 
 // Tipos de armadilhas jurídicas inseridas em ~30% dos casos
 export type TrapKind =
-  | "JURISPRUDENCIA_CONTRARIA"         // precedente contrário não distinguido
-  | "ARTIGO_INCOMPATIVEL"              // ex: RPPS com art. 201 CF, criminal com art. 85 CPC
-  | "RECURSO_INADEQUADO"               // ex: trabalhista com apelação, JEF com apelação
-  | "COMPETENCIA_INCORRETA"            // ex: STJ em matéria trabalhista
-  | "TESE_EQUIVOCADA"                  // tese juridicamente errada
-  | "PRECEDENTE_SUPERADO"              // súmula/precedente já revogado
-  | "FATO_INCOMPLETO"                  // descrição faltando elementos essenciais
+  | "JURISPRUDENCIA_CONTRARIA"   // precedente contrário não distinguido
+  | "ARTIGO_INCOMPATIVEL"        // ex: RPPS com art. 201 CF, criminal com art. 85 CPC
+  | "RECURSO_INADEQUADO"         // ex: trabalhista com apelação, JEF com apelação
+  | "COMPETENCIA_INCORRETA"      // ex: STJ em matéria trabalhista
+  | "TESE_EQUIVOCADA"            // tese juridicamente errada
+  | "PRECEDENTE_SUPERADO"        // súmula/precedente já revogado
+  | "FATO_INCOMPLETO"            // descrição faltando elementos essenciais
   | "LINGUAGEM_DECISORIA"              // despacho com "defiro/julgo"
   // Traps específicas de Fazenda Pública
   | "TEMA_STF_IGNORADO"                // tema repetitivo STF/STJ vinculante não aplicado
@@ -35,7 +35,7 @@ export type TrapKind =
   | "PRESCRICAO_QUINQUENAL_IGNORADA"   // DL 4.597/42 não aplicado — verbas funcionais
   | "LEGITIMIDADE_PASSIVA_INCORRETA"   // ente público errado no polo passivo
   | "SEPARACAO_PODERES_INCORRETA"      // separação de poderes usado para negar mínimo existencial
-  | "SOLIDARIEDADE_INCORRETA"           // responsabilidade solidária dos entes negada (Tema STF 793)
+  | "SOLIDARIEDADE_INCORRETA"          // responsabilidade solidária dos entes negada (Tema STF 793)
   // Traps específicas de Execução / Cumprimento de Sentença
   | "EXCESSO_EXECUCAO_IGNORADO"         // excesso de execução não arguido (art. 525 §1º III CPC)
   | "TITULO_INEXIGIVEL_IGNORADO"        // título inexigível não reconhecido (art. 525 §1º I CPC)
@@ -74,6 +74,7 @@ export type ValidatorComponent =
   | "RichnessValidator"
   | "CivilValidator"
   | "ConsumerValidator"
+  | "ExecutionValidator"
   | "Other";
 
 /** Mapeia uma rule de ValidationError para o validator que a emitiu. */
@@ -154,6 +155,14 @@ export function mapRuleToValidator(rule: string): ValidatorComponent {
     rule === "DANO_MORAL_SEM_ANALISE_CONCRETA" ||
     rule === "REPETICAO_DOBRO_SEM_MAE_FE"
   ) return "ConsumerValidator";
+  if (
+    rule === "EXECUTION_MISSING_SECTION" ||
+    rule === "EXECUTION_MISSING_CPC_BASIS" ||
+    rule === "EXECUTION_MISSING_MODALITY" ||
+    rule === "EXECUTION_MISSING_OBJECTION" ||
+    rule === "EXECUTION_SISBAJUD_MISSING"
+  ) return "ExecutionValidator";
+  if (rule === "STANCE_MISMATCH_PRE_GENERATION") return "EvidenceAnalyzer";
   return "Other";
 }
 

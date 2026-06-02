@@ -5,7 +5,7 @@ import { LegalDraftService } from "./drafter.js";
 import { LegalAuditService } from "./auditor.js";
 import { LegalValidator } from "./validator.js";
 import { EvidenceAnalyzerService } from "./evidence-analyzer.js";
-import { FinalValidator, MatrixQualityValidator, resolveDocumentStatus } from "../validators/index.js";
+import { FinalValidator, MatrixQualityValidator, StanceConsistencyValidator, resolveDocumentStatus } from "../validators/index.js";
 import type { FinalValidationResult } from "../validators/index.js";
 import type {
   PipelineInput,
@@ -153,6 +153,7 @@ export class LegalPipeline {
   private validator = new LegalValidator();
   private finalValidator = new FinalValidator();
   private evidenceAnalyzer = new EvidenceAnalyzerService();
+  private stanceConsistency = new StanceConsistencyValidator();
 
   async *run(
     input: PipelineInput,
@@ -272,6 +273,26 @@ export class LegalPipeline {
     const { mode, reason } = confirmGenerationMode(preliminaryMode, ctx.extraction!, ctx.matrix!);
     ctx.generationMode = mode;
     yield { event: "mode", data: { mode, reason } };
+
+    // ── STANCE CONSISTENCY CHECK — verificação pré-geração ───────────────────
+    // Detecta inversões de postura na matrix ANTES de gerar o rascunho,
+    // evitando EVIDENCE_STANCE_VIOLATION e inversões de papel processual.
+    const stanceErrors = this.stanceConsistency.validatePreGeneration(
+      ctx.matrix!,
+      ctx.classification!.tipo_peca,
+      ctx.caseDescription,
+      ctx.evidenceAnalysis ?? [],
+    );
+    if (stanceErrors.length > 0) {
+      yield { event: "validation_errors", data: stanceErrors };
+      if (stanceErrors.some((e) => e.fatal)) {
+        yield {
+          event: "done",
+          data: { generationId, aprovada: false, blocked: true, mode, status: "REPROVADA" },
+        };
+        return;
+      }
+    }
 
     // ── Fase 5: Geração da peça ────────────────────────────────────────────────
     yield { event: "phase", data: { phase: "drafting", generationId } };

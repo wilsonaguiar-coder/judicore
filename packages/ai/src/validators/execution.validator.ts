@@ -1,46 +1,53 @@
-// ExecutionValidator — Especificação técnica para Execução / Cumprimento de Sentença.
+// ExecutionValidator — validações específicas para Execução / Cumprimento de Sentença.
 //
-// STATUS: especificação — NÃO integrado ao pipeline ainda (Fase 3).
+// Integrado ao pipeline via FinalValidator (Fase 3.1).
+// Ativado automaticamente quando assunto_principal contém contexto de execução.
 //
-// Cobre os 10 tipos de regra mais críticos na fase executiva do CPC/2015:
-//   FATAL (bloqueantes):    7 regras
-//   NÃO-FATAL (ressalvas):  10 regras
-//
-// Integração futura: registrar em FinalValidator como mais um ValidatorComponent,
-// ativado quando classification.area === "EXECUCAO_CUMPRIMENTO" (Fase 4).
+// Regras fatais (7):   erros jurídicos graves que bloqueiam a peça
+// Regras não-fatais (10): ressalvas que reduzem o score
+// Regras de qualidade (PETICAO_INICIAL): seções obrigatórias, CPC, SISBAJUD
 
-import type { ValidationError, TipoPeca } from "../pipeline/types.js";
+import type { ValidationError, LegalClassification, TipoPeca } from "../pipeline/types.js";
 
-// ── Contexto de execução ─────────────────────────────────────────────────────
+// ── Contexto interno de execução ─────────────────────────────────────────────
 
-export interface ExecutionContext {
+interface ExecutionContext {
   tipo_peca: TipoPeca;
-  is_fazenda_publica?: boolean;   // executado é ente público
-  valor_exequendo?: number;       // valor total da execução
-  tem_impugnacao?: boolean;       // há impugnação pendente
+  is_fazenda_publica: boolean;
+  tem_impugnacao: boolean;
 }
 
-// ── Regras ───────────────────────────────────────────────────────────────────
+// ── Detector de contexto de execução ─────────────────────────────────────────
 
-// Regras fatais — erros jurídicos graves e objetivamente verificáveis
-const FATAL_RULES = [
+const EXECUTION_CONTEXT_RE =
+  /\b(execu[cç][aã]o|cumprimento\s+de\s+senten[cç]a|penhora|sisbajud|embargos?\s+(à|de)\s+execu[cç][aã]o|impugna[cç][aã]o\s+ao\s+cumprimento|t[íi]tulo\s+extrajudicial|execu[cç][aã]o\s+for[cç]ada|executado|exequente)\b/i;
+
+const FAZENDA_PUBLICA_RE =
+  /\b(fazenda\s+p[úu]blica|munic[íi]pio|estado\s+(?:de|do)|uni[aã]o\s+federal|ente\s+p[úu]blico)\b/i;
+
+// ── Regras fatais ─────────────────────────────────────────────────────────────
+
+const FATAL_RULES: Array<{
+  rule: string;
+  description: string;
+  detect: (draft: string, ctx: ExecutionContext) => boolean;
+}> = [
   {
     rule: "EC_RITO_FAZENDA_IGNORADO",
     description: "Cumprimento contra Fazenda Pública processado pelo rito comum (art. 523 CPC) em vez do rito especial (arts. 534/535 CPC + precatório/RPV — art. 100 CF/88).",
-    detect: (draft: string, ctx: ExecutionContext): boolean => {
+    detect: (draft, ctx) => {
       if (!ctx.is_fazenda_publica) return false;
-      const lower = draft.toLowerCase();
       const temRitoComum = /multa\s+de\s+10[%]|art\.\s*523|penhora\s+imedia/i.test(draft);
       const temRitoEspecial = /precat[oó]rio|rpv|requisi[cç][aã]o\s+de\s+pequeno\s+valor|art\.\s*534|art\.\s*535/i.test(draft);
-      return temRitoComum && !temRitoEspecial && lower.includes("fazenda");
+      return temRitoComum && !temRitoEspecial && /fazenda/i.test(draft);
     },
   },
   {
     rule: "EC_PENHORA_SALARIO_TOTAL",
     description: "Penhora de 100% de salário/aposentadoria do executado — viola impenhorabilidade do art. 833, IV, CPC. Limite jurisprudencial: até 30% em casos excepcionais (EREsp 1.518.169/DF).",
-    detect: (draft: string, _ctx: ExecutionContext): boolean => {
-      const lower = draft.toLowerCase();
-      const penhoraTotal = /penhora\s+(?:d[oe]s?|sobre|integral|total|de\s+100[%])/i.test(draft) &&
+    detect: (draft, _ctx) => {
+      const penhoraTotal =
+        /penhora\s+(?:d[oe]s?|sobre|integral|total|de\s+100[%])/i.test(draft) &&
         /sal[aá]rio|vencimento|remunera[cç][aã]o|aposentadoria|proventos/i.test(draft);
       const temProtecao = /art\.\s*833|impenhor[aá]vel|limite|30[%]|eresp\s*1\.?518/i.test(draft);
       return penhoraTotal && !temProtecao;
@@ -48,9 +55,10 @@ const FATAL_RULES = [
   },
   {
     rule: "EC_BEM_FAMILIA_PENHORADO",
-    description: "Penhora de imóvel residencial único do executado — bem de família (Lei 8.009/90) é impenhorável (art. 833, VIII, CPC), salvo exceções taxativas (dívida de IPTU, fiança, etc.).",
-    detect: (draft: string, _ctx: ExecutionContext): boolean => {
-      const penhoraImovel = /penhora[^.]{0,60}im[oó]vel/i.test(draft) ||
+    description: "Penhora de imóvel residencial único do executado — bem de família (Lei 8.009/90) é impenhorável (art. 833, VIII, CPC), salvo exceções taxativas.",
+    detect: (draft, _ctx) => {
+      const penhoraImovel =
+        /penhora[^.]{0,60}im[oó]vel/i.test(draft) ||
         /im[oó]vel[^.]{0,60}penhor/i.test(draft);
       const temProtecao = /bem\s+de\s+fam[ií]lia|lei\s+8\.009|impenhor[aá]vel|art\.\s*833/i.test(draft);
       return penhoraImovel && !temProtecao;
@@ -58,17 +66,17 @@ const FATAL_RULES = [
   },
   {
     rule: "EC_PRESCRICAO_INTERCORRENTE_IGNORADA",
-    description: "Processo paralisado há mais de 5 anos sem movimentação útil do exequente — prescrição intercorrente não declarada (art. 921 §4º CPC), apesar de configurada.",
-    detect: (draft: string, _ctx: ExecutionContext): boolean => {
+    description: "Processo paralisado há mais de 5 anos sem movimentação útil do exequente — prescrição intercorrente não declarada (art. 921 §4º CPC).",
+    detect: (draft, _ctx) => {
       const temParalisacao = /parali[sz]/i.test(draft) || /sem\s+movimenta[cç][aã]o/i.test(draft);
-      const temPrescricao = /prescri[cç][aã]o\s+intercorrente|art\.\s*921|art\.\s*924|tema\s+stj\s+1\.?062/i.test(draft);
+      const temPrescricao = /prescri[cç][aã]o\s+intercorrente|art\.\s*921|art\.\s*924/i.test(draft);
       return temParalisacao && !temPrescricao;
     },
   },
   {
     rule: "EC_EXCESSO_EXECUCAO_IGNORADO",
     description: "Impugnação por excesso de execução (art. 525 §1º, III, CPC) não analisada — penhora mantida pelo valor maior sem exame do cálculo correto.",
-    detect: (draft: string, ctx: ExecutionContext): boolean => {
+    detect: (draft, ctx) => {
       if (!ctx.tem_impugnacao) return false;
       const temExcesso = /excesso\s+de\s+execu[cç][aã]o|art\.\s*525/i.test(draft);
       const foiAnalisado = /an[aá]lis[eo]|examin[ao]|calcul[ao]|per[ií]cia\s+cont[aá]bil/i.test(draft);
@@ -77,20 +85,18 @@ const FATAL_RULES = [
   },
   {
     rule: "EC_JUROS_ILEGAIS",
-    description: "Juros moratórios calculados fora do padrão legal — taxa superior à SELIC (art. 406 CC) sem base legal expressa, ou aplicação de juros compostos em execução de sentença.",
-    detect: (draft: string, _ctx: ExecutionContext): boolean => {
-      const taxaAbusiva = /juros\s+de\s+(?:\d+(?:,\d+)?)\s*%\s*(?:ao|a\.?o\.?)\s*m[eê]s/i.exec(draft);
-      if (!taxaAbusiva) return false;
-      const match = taxaAbusiva[0].match(/(\d+(?:[.,]\d+)?)\s*%/);
+    description: "Juros moratórios calculados fora do padrão legal — taxa superior à SELIC (art. 406 CC) sem base legal expressa.",
+    detect: (draft, _ctx) => {
+      const match = /juros\s+de\s+(\d+(?:[.,]\d+)?)\s*%\s*(?:ao|a\.?o\.?)\s*m[eê]s/i.exec(draft);
       if (!match) return false;
       const taxa = parseFloat(match[1]!.replace(",", "."));
-      return taxa > 1.5; // acima de 1,5% ao mês é juridicamente suspeito sem base específica
+      return taxa > 1.5;
     },
   },
   {
     rule: "EC_TITULO_INEXIGIVEL_IGNORADO",
-    description: "Impugnação por inexigibilidade do título (art. 525 §1º, I, CPC) não analisada — citação nula ou incompetência absoluta não examinadas.",
-    detect: (draft: string, ctx: ExecutionContext): boolean => {
+    description: "Impugnação por inexigibilidade do título (art. 525 §1º, I, CPC) não analisada.",
+    detect: (draft, ctx) => {
       if (!ctx.tem_impugnacao) return false;
       const temInexigibilidade = /inexigibilidade|art\.\s*525[^,]{0,20}I\b|cite[^.]*nul/i.test(draft);
       const foiAnalisado = /examin[ao]|an[aá]lis[eo]|[ié]\s+[ée]xig[ií]vel|compet[eê]ncia/i.test(draft);
@@ -99,40 +105,45 @@ const FATAL_RULES = [
   },
 ];
 
-// Regras não-fatais — avisos e ressalvas
-const NON_FATAL_RULES = [
+// ── Regras não-fatais ─────────────────────────────────────────────────────────
+
+const NON_FATAL_RULES: Array<{
+  rule: string;
+  description: string;
+  detect: (draft: string, ctx: ExecutionContext) => boolean;
+}> = [
   {
     rule: "EC_SISBAJUD_SEM_GRADACAO",
-    description: "Penhora eletrônica deferida sem observar a ordem de preferência do art. 835 CPC — dinheiro/crédito bancário tem prioridade, mas deve ser mencionada a gradação.",
-    detect: (draft: string, _ctx: ExecutionContext): boolean =>
+    description: "Penhora eletrônica deferida sem observar a ordem de preferência do art. 835 CPC.",
+    detect: (draft, _ctx) =>
       /sisbajud|bacenjud|penhora\s+eletr[oô]nica/i.test(draft) &&
       !/art\.\s*835|ordem\s+de\s+prefer[eê]ncia|gradac[aã]o/i.test(draft),
   },
   {
     rule: "EC_RENAJUD_SEM_AVALIACAO",
-    description: "Restrição de veículo via RENAJUD deferida sem mencionar a necessidade de avaliação prévia (art. 870 CPC) antes da alienação.",
-    detect: (draft: string, _ctx: ExecutionContext): boolean =>
+    description: "Restrição de veículo via RENAJUD deferida sem mencionar a necessidade de avaliação prévia (art. 870 CPC).",
+    detect: (draft, _ctx) =>
       /renajud|restri[cç][aã]o\s+veicular/i.test(draft) &&
       !/avalia[cç][aã]o|art\.\s*870|art\.\s*879/i.test(draft),
   },
   {
     rule: "EC_CORRECAO_INDICE_INADEQUADO",
-    description: "Índice de correção monetária diferente do IPCA-E — padrão consolidado pelo STJ para condenações civis (Tema 905 / REsp 1.492.221). Índices como IGP-M geram revisão obrigatória.",
-    detect: (draft: string, _ctx: ExecutionContext): boolean =>
+    description: "Índice de correção monetária diferente do IPCA-E — padrão STJ para condenações civis (Tema 905).",
+    detect: (draft, _ctx) =>
       /igp-?m|inpc|tr\b|ufir/i.test(draft) &&
       !/ressalva|tese\s+defensiva|requer(?:id)?[ao]|alega/i.test(draft),
   },
   {
     rule: "EC_ASTREINTES_SEM_PARAMETRO",
-    description: "Fixação ou cobrança de astreintes sem indicar o parâmetro de razoabilidade (art. 537 §1º CPC) — ausência de análise sobre proporcionalidade da multa acumulada.",
-    detect: (draft: string, _ctx: ExecutionContext): boolean =>
+    description: "Fixação ou cobrança de astreintes sem indicar o parâmetro de razoabilidade (art. 537 §1º CPC).",
+    detect: (draft, _ctx) =>
       /astreinte|multa\s+(?:di[aá]ria|cominat[oó]ria|por\s+atraso)/i.test(draft) &&
       !/art\.\s*537|proporcionalidade|razoabilidade|reduz[ij]|modif/i.test(draft),
   },
   {
     rule: "EC_HONORARIOS_FASE_EXECUCAO",
-    description: "Honorários da fase de cumprimento não fixados ou fixados sem mencionar os 10% do art. 523 §1º CPC (multa) e os honorários adicionais do art. 85 CPC.",
-    detect: (draft: string, ctx: ExecutionContext): boolean => {
+    description: "Honorários da fase de cumprimento não fixados ou sem mencionar os 10% do art. 523 §1º CPC e honorários adicionais do art. 85 CPC.",
+    detect: (draft, ctx) => {
       if (ctx.tipo_peca !== "SENTENCA" && ctx.tipo_peca !== "DECISAO") return false;
       const temHonorarios = /honorar/i.test(draft);
       const temArt523 = /art\.\s*523|10\s*%\s*(?:de\s+)?multa/i.test(draft);
@@ -141,17 +152,16 @@ const NON_FATAL_RULES = [
   },
   {
     rule: "EC_REMESSA_NECESSARIA_FAZENDA",
-    description: "Sentença proferida contra Fazenda Pública sem verificar o cabimento de remessa necessária (art. 496 CPC) — obrigatória para condenações acima de 100/500/1000 salários mínimos conforme o ente.",
-    detect: (draft: string, ctx: ExecutionContext): boolean => {
-      if (!ctx.is_fazenda_publica) return false;
-      if (ctx.tipo_peca !== "SENTENCA") return false;
+    description: "Sentença contra Fazenda Pública sem verificar o cabimento de remessa necessária (art. 496 CPC).",
+    detect: (draft, ctx) => {
+      if (!ctx.is_fazenda_publica || ctx.tipo_peca !== "SENTENCA") return false;
       return !/remessa\s+necess[aá]ria|art\.\s*496|reexame\s+necess[aá]rio/i.test(draft);
     },
   },
   {
     rule: "EC_EXTINCAO_SEM_CANCELAMENTO",
-    description: "Extinção do cumprimento de sentença por satisfação sem determinar o cancelamento das restrições patrimoniais (SISBAJUD, RENAJUD, ARISP) — causar prejuízo ao executado.",
-    detect: (draft: string, ctx: ExecutionContext): boolean => {
+    description: "Extinção do cumprimento por satisfação sem determinar o cancelamento das restrições patrimoniais (SISBAJUD, RENAJUD).",
+    detect: (draft, ctx) => {
       if (ctx.tipo_peca !== "SENTENCA") return false;
       const extinto = /extingo|extint[ao]/i.test(draft);
       const temCancelamento = /cancel[ae]|libera[^r]|ofici[ao]|sisbajud|renajud/i.test(draft);
@@ -160,54 +170,173 @@ const NON_FATAL_RULES = [
   },
   {
     rule: "EC_PENHORA_FATURAMENTO_SEM_LIMITE",
-    description: "Penhora de faturamento (art. 866 CPC) deferida sem fixar percentual máximo — deve ser delimitado (geralmente 5% a 20%) para não inviabilizar a atividade empresarial.",
-    detect: (draft: string, _ctx: ExecutionContext): boolean =>
+    description: "Penhora de faturamento (art. 866 CPC) deferida sem fixar percentual máximo.",
+    detect: (draft, _ctx) =>
       /penhora\s+(?:de\s+)?faturamento|art\.\s*866/i.test(draft) &&
       !/[0-9]+\s*%|percentual|propor[cç][aã]o/i.test(draft),
   },
   {
     rule: "EC_PRAZO_FAZENDA_INCORRETO",
-    description: "Cumprimento contra Fazenda Pública com prazo de pagamento de 15 dias (rito comum) em vez de 60 dias (art. 535 §3º CPC — prazo especial da Fazenda).",
-    detect: (draft: string, ctx: ExecutionContext): boolean => {
+    description: "Cumprimento contra Fazenda Pública com prazo de 15 dias (rito comum) em vez de 60 dias (art. 535 §3º CPC).",
+    detect: (draft, ctx) => {
       if (!ctx.is_fazenda_publica) return false;
       return /15\s*(?:\(quinze\)\s*)?dias\s+(?:para|de)\s+pagamento/i.test(draft);
     },
   },
   {
     rule: "EC_IMPUGNACAO_SEM_EFEITO_SUSPENSIVO",
-    description: "Impugnação ao cumprimento de sentença sem análise do efeito suspensivo — o efeito suspensivo não é automático e exige demonstração de fumus e periculum (art. 525 §6º CPC).",
-    detect: (draft: string, ctx: ExecutionContext): boolean => {
+    description: "Impugnação ao cumprimento de sentença sem análise do efeito suspensivo (art. 525 §6º CPC).",
+    detect: (draft, ctx) => {
       if (!ctx.tem_impugnacao) return false;
-      return /impugna[cç][aã]o/i.test(draft) &&
-        !/efeito\s+suspensivo|art\.\s*525[^,]{0,15}§\s*6|suspens[aã]o\s+da\s+execu[cç][aã]o/i.test(draft);
+      return (
+        /impugna[cç][aã]o/i.test(draft) &&
+        !/efeito\s+suspensivo|art\.\s*525[^,]{0,15}§\s*6|suspens[aã]o\s+da\s+execu[cç][aã]o/i.test(draft)
+      );
     },
   },
 ];
 
+// ── Seções obrigatórias para PETICAO_INICIAL de execução ──────────────────────
+
+const EXECUTION_SECTIONS: Array<{ pattern: RegExp; label: string }> = [
+  { pattern: /\bdos?\s+fatos?\b/i, label: "I — DOS FATOS" },
+  { pattern: /\bdo\s+direito\b/i,  label: "II — DO DIREITO" },
+  {
+    pattern: /\b(dos?\s+requisitos?\s+(legais?|da\s+execu[cç][aã]o|processuais?)|dos?\s+pressupostos?\s+(legais?|da\s+execu[cç][aã]o))\b/i,
+    label: "III — DOS REQUISITOS LEGAIS",
+  },
+  {
+    pattern: /\b(da\s+aplica[cç][aã]o\s+ao\s+caso\s+concreto|da\s+an[aá]lise\s+do\s+caso\s+concreto|do\s+caso\s+concreto)\b/i,
+    label: "IV — DA APLICAÇÃO AO CASO CONCRETO",
+  },
+  { pattern: /\bdos?\s+pedidos?\b/i, label: "V — DOS PEDIDOS" },
+];
+
+const EXECUTION_CPC_RE =
+  /art\.\s*(?:523|524|525|526|527|783|784|785|829|854|855|914|915|917|139[\s,]*IV)\b/i;
+
+const EXECUTION_MODALITY_RE =
+  /\b(cumprimento\s+de\s+senten[cç]a|execu[cç][aã]o\s+de\s+t[íi]tulo\s+extrajudicial|embargos?\s+[aà]\s+execu[cç][aã]o|impugna[cç][aã]o\s+ao\s+cumprimento|penhora\s+on[\s-]?line|sisbajud|art\.\s*523|art\.\s*784)\b/i;
+
+const EXECUTION_OBJECTION_RE =
+  /\b(excesso\s+de\s+execu[cç][aã]o|prescri[cç][aã]o|impenhorabilidade|nulidade\s+do\s+t[íi]tulo|defesa\s+do\s+executado|contra[\s-]?argumento|obje[cç][aã]o|eventual\s+impugna[cç][aã]o|eventual.*embargos?|resist[eê]ncia)\b/i;
+
+const SISBAJUD_RE =
+  /\b(sisbajud|bacenjud|penhora\s+eletr[oô]nica|penhora\s+on[\s-]?line|art\.\s*854|bloqueio\s+eletr[oô]nico\s+de\s+ativos?)\b/i;
+
+const QUANTIA_CERTA_RE =
+  /\b(execu[cç][aã]o\s+de\s+quantia|cumprimento\s+de\s+senten[cç]a|cobran[cç]a\s+de\s+valor|cobran[cç]a\s+de\s+d[íi]vida|pagamento\s+de\s+quantia)\b/i;
+
 // ── ExecutionValidator ────────────────────────────────────────────────────────
 
 export class ExecutionValidator {
-  validate(draft: string, ctx: ExecutionContext): ValidationError[] {
+  /** Ponto de entrada público — chamado pelo FinalValidator. */
+  validate(
+    draft: string,
+    classification: LegalClassification,
+  ): { errors: ValidationError[] } {
+    if (!this.isExecutionContext(classification)) {
+      return { errors: [] };
+    }
+
+    const ctx: ExecutionContext = {
+      tipo_peca: classification.tipo_peca,
+      is_fazenda_publica: FAZENDA_PUBLICA_RE.test(classification.partes?.reu ?? "") ||
+        FAZENDA_PUBLICA_RE.test(classification.assunto_principal ?? ""),
+      tem_impugnacao: /impugna[cç][aã]o/i.test(classification.assunto_principal ?? ""),
+    };
+
     const errors: ValidationError[] = [];
 
+    // Regras fatais (estruturais + jurídicas)
     for (const rule of FATAL_RULES) {
       if (rule.detect(draft, ctx)) {
+        errors.push({ rule: rule.rule, message: rule.description, fatal: true });
+      }
+    }
+
+    // Regras não-fatais (ressalvas)
+    for (const rule of NON_FATAL_RULES) {
+      if (rule.detect(draft, ctx)) {
+        errors.push({ rule: rule.rule, message: rule.description, fatal: false });
+      }
+    }
+
+    // Qualidade de PETICAO_INICIAL
+    if (classification.tipo_peca === "PETICAO_INICIAL") {
+      errors.push(...this.validatePeticaoInicial(draft));
+    }
+
+    return { errors };
+  }
+
+  private isExecutionContext(classification: LegalClassification): boolean {
+    return EXECUTION_CONTEXT_RE.test(classification.assunto_principal ?? "");
+  }
+
+  private validatePeticaoInicial(draft: string): ValidationError[] {
+    const errors: ValidationError[] = [];
+
+    // 1. Seções obrigatórias I–V
+    for (const section of EXECUTION_SECTIONS) {
+      if (!section.pattern.test(draft)) {
         errors.push({
-          rule: rule.rule,
-          message: rule.description,
+          rule: "EXECUTION_MISSING_SECTION",
+          message:
+            `PETICAO_INICIAL de execução/cumprimento sem a seção obrigatória: ${section.label} ` +
+            `— estrutura exige DOS FATOS / DO DIREITO / DOS REQUISITOS LEGAIS / ` +
+            `DA APLICAÇÃO AO CASO CONCRETO / DOS PEDIDOS`,
           fatal: true,
         });
       }
     }
 
-    for (const rule of NON_FATAL_RULES) {
-      if (rule.detect(draft, ctx)) {
-        errors.push({
-          rule: rule.rule,
-          message: rule.description,
-          fatal: false,
-        });
-      }
+    // 2. Fundamentação CPC de execução
+    if (!EXECUTION_CPC_RE.test(draft)) {
+      errors.push({
+        rule: "EXECUTION_MISSING_CPC_BASIS",
+        message:
+          "Petição de execução sem referência a artigo do CPC aplicável — " +
+          "indicar art. 523 (cumprimento), art. 784 (título extrajudicial), " +
+          "art. 854 (SISBAJUD) ou equivalente",
+        fatal: false,
+      });
+    }
+
+    // 3. Modalidade executiva
+    if (!EXECUTION_MODALITY_RE.test(draft)) {
+      errors.push({
+        rule: "EXECUTION_MISSING_MODALITY",
+        message:
+          "Fundamentação da modalidade executiva ausente — especificar: " +
+          "cumprimento de sentença / execução de título extrajudicial / " +
+          "embargos / impugnação ao cumprimento",
+        fatal: false,
+      });
+    }
+
+    // 4. Enfrentamento de objeção previsível
+    if (!EXECUTION_OBJECTION_RE.test(draft)) {
+      errors.push({
+        rule: "EXECUTION_MISSING_OBJECTION",
+        message:
+          "Petição de execução sem enfrentamento de objeção previsível — " +
+          "antecipe excesso de execução, prescrição, impenhorabilidade " +
+          "ou outra defesa esperada do executado",
+        fatal: false,
+      });
+    }
+
+    // 5. SISBAJUD — sugestão em execuções de quantia (não-fatal, eleva score quando presente)
+    if (QUANTIA_CERTA_RE.test(draft) && !SISBAJUD_RE.test(draft)) {
+      errors.push({
+        rule: "EXECUTION_SISBAJUD_MISSING",
+        message:
+          "Execução de quantia sem pedido de SISBAJUD — considerar penhora " +
+          "eletrônica on-line (art. 854 CPC) e medidas executivas atípicas " +
+          "(art. 139, IV, CPC) como meios preferenciais de satisfação do crédito",
+        fatal: false,
+      });
     }
 
     return errors;

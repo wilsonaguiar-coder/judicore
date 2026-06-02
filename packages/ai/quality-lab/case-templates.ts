@@ -1258,6 +1258,71 @@ const tCsDespachoProvas = (i: number): ThemeNarrative => ({
   norma: "arts. 357 e 370 do CPC (especificação de provas — despacho de impulso processual)",
 });
 
+// ── EXECUÇÃO / CUMPRIMENTO ────────────────────────────────────────────────────
+//
+// 5 temas × 4 fases (ALL_PHASES) = 20 casos.
+// Cobertura:
+//   ec_cumprimento_sentenca — cumprimento de sentença (art. 523 CPC)
+//   ec_execucao_titulo       — execução de título extrajudicial (art. 784 CPC)
+//   ec_impugnacao            — impugnação ao cumprimento (art. 525 CPC)
+//   ec_embargos              — embargos à execução (art. 914 CPC)
+//   ec_sisbajud              — penhora eletrônica on-line via SISBAJUD (art. 854 CPC)
+
+const tEcCumprimentoSentenca: ThemeBuilder = (i) => ({
+  area: "EXECUCAO_CUMPRIMENTO",
+  themeLabel: "Cumprimento de sentença",
+  autor: pick(NOMES, i),
+  reu: pick(NOMES, i + 5),
+  comarca: pick(COMARCAS, i),
+  fatos: `Exequente (CPF ${cpf(i + 5000)}) obteve sentença favorável condenando ${pick(NOMES, i + 5)} ao pagamento de ${brl(55000 + i * 4000)} corrigidos pelo IPCA. Sentença transitou em julgado em ${dateBack(0, i)}. Intimado(a) para pagar no prazo legal de 15 dias (art. 523 CPC), o(a) executado(a) permaneceu inerte. Nenhum bem foi indicado voluntariamente. Exequente requer aplicação de multa, honorários e penhora.`,
+  pedido: "aplicação da multa de 10%, honorários advocatícios de 10% e expedição de ordem de penhora eletrônica via SISBAJUD (art. 854 CPC)",
+  norma: "arts. 523, 524, 525 e 854 do CPC/2015",
+});
+
+const tEcExecucaoTitulo: ThemeBuilder = (i) => ({
+  area: "EXECUCAO_CUMPRIMENTO",
+  themeLabel: "Execução de título extrajudicial",
+  autor: pick(NOMES, i + 1),
+  reu: pick(NOMES, i + 6),
+  comarca: pick(COMARCAS, i + 1),
+  fatos: `${pick(NOMES, i + 1)} (CPF ${cpf(i + 5100)}) é credor de ${pick(NOMES, i + 6)} (CPF ${cpf(i + 5200)}) por força de ${pick(["cheque", "nota promissória", "contrato de mútuo com garantia"], i)} no valor de ${brl(28000 + i * 3000)}, vencido em ${dateBack(1, i)}, protestado em ${dateBack(0, i)}. Devedor não pagou nem apresentou bens para penhora após notificação extrajudicial.`,
+  pedido: "execução do título extrajudicial com citação do executado para pagar em 3 dias ou nomear bens à penhora",
+  norma: "arts. 783, 784 e 829 do CPC/2015",
+});
+
+const tEcImpugnacao: ThemeBuilder = (i) => ({
+  area: "EXECUCAO_CUMPRIMENTO",
+  themeLabel: "Impugnação ao cumprimento de sentença",
+  autor: pick(NOMES, i + 2),
+  reu: pick(NOMES, i + 7),
+  comarca: pick(COMARCAS, i + 2),
+  fatos: `${pick(NOMES, i + 2)} (CPF ${cpf(i + 5300)}) é executado em cumprimento de sentença que o(a) condenou ao pagamento de ${brl(42000 + i * 2000)}. O(A) exequente apresentou memória de cálculo com valor divergente: ${brl(62000 + i * 2000)}. A diferença decorre de aplicação indevida de taxa SELIC em dobro no período de ${dateBack(1, i)} a ${dateBack(0, i)}. Executado impugna o excesso de execução nos termos do art. 525 §1º, V, CPC, requerendo efeito suspensivo.`,
+  pedido: "acolhimento da impugnação ao cumprimento de sentença por excesso de execução, com reconhecimento do valor correto de R$ 42.000,00 e efeito suspensivo",
+  norma: "arts. 525, §1º, V, e §6º do CPC/2015 (impugnação ao cumprimento — excesso de execução)",
+});
+
+const tEcEmbargos: ThemeBuilder = (i) => ({
+  area: "EXECUCAO_CUMPRIMENTO",
+  themeLabel: "Embargos à execução",
+  autor: pick(NOMES, i + 3),
+  reu: pick(NOMES, i + 8),
+  comarca: pick(COMARCAS, i + 3),
+  fatos: `${pick(NOMES, i + 3)} (CPF ${cpf(i + 5400)}) foi citado em execução de título extrajudicial (${pick(["cheque sem fundo", "contrato de mútuo", "nota promissória"], i)}) no valor de ${brl(35000 + i * 2500)}, protestado em ${dateBack(2, i)}. O executado opõe embargos alegando: (a) ${pick(["prescrição do título cambiário — emissão anterior a 3 anos", "pagamento parcial comprovado por recibos", "novação extintiva da obrigação original"], i)}; (b) nulidade formal do título por ausência de requisito essencial. Possui documentos comprobatórios da defesa.`,
+  pedido: "acolhimento dos embargos para extinção ou redução da execução com efeito suspensivo (art. 919 §1º CPC)",
+  norma: "arts. 914, 917 e 919 do CPC/2015 (embargos à execução de título extrajudicial)",
+});
+
+const tEcSisbajud: ThemeBuilder = (i) => ({
+  area: "EXECUCAO_CUMPRIMENTO",
+  themeLabel: "Penhora eletrônica — SISBAJUD",
+  autor: pick(NOMES, i + 4),
+  reu: pick(EMPRESAS, i).nome,
+  comarca: pick(COMARCAS, i + 4),
+  fatos: `${pick(NOMES, i + 4)} (CPF ${cpf(i + 5500)}) é exequente em cumprimento de sentença contra ${pick(EMPRESAS, i).nome} (CNPJ ${pick(EMPRESAS, i).cnpj}) pelo valor de ${brl(80000 + i * 5000)}. Executada não pagou no prazo legal de 15 dias nem indicou bens (art. 523 CPC). Nenhum patrimônio imóvel ou móvel localizado após busca. Exequente requer bloqueio eletrônico de ativos financeiros via SISBAJUD, com fulcro no art. 854 CPC, e, subsidiariamente, medidas executivas atípicas com base no poder geral de efetivação (art. 139, IV, CPC).`,
+  pedido: "expedição de ordem de bloqueio eletrônico via SISBAJUD (art. 854 CPC) e, subsidiariamente, medidas executivas atípicas (art. 139, IV, CPC)",
+  norma: "arts. 854 e 139, IV, do CPC/2015 (penhora on-line — SISBAJUD — poder geral de efetivação)",
+});
+
 // Adiciona os temas cíveis/consumeristas ao THEMES
 THEMES.push(
   // CÍVEL GERAL (10 temas — um tipo de peça cada)
@@ -1282,6 +1347,12 @@ THEMES.push(
   { id: "cs_banco_cobranca_sentenca",build: tCsBancoCobrancaSentenca,  compatibleTypes: ["SENTENCA"] },
   { id: "cs_apelacao_consumidor",    build: tCsApelacaoConsumidor,     compatibleTypes: ["RECURSO"] },
   { id: "cs_despacho_provas",        build: tCsDespachoProvas,         compatibleTypes: ["DESPACHO"] },
+  // EXECUÇÃO / CUMPRIMENTO (5 temas × ALL_PHASES = 20 casos)
+  { id: "ec_cumprimento_sentenca",   build: tEcCumprimentoSentenca },
+  { id: "ec_execucao_titulo",        build: tEcExecucaoTitulo },
+  { id: "ec_impugnacao",             build: tEcImpugnacao },
+  { id: "ec_embargos",               build: tEcEmbargos },
+  { id: "ec_sisbajud",               build: tEcSisbajud },
 );
 
 // ── FAZENDA PÚBLICA ───────────────────────────────────────────────────────────
