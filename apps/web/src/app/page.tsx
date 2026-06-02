@@ -55,8 +55,8 @@ export default function LandingPage() {
               </span>
             </h1>
             <p className="text-base md:text-xl text-white/50 max-w-2xl mx-auto">
-              Ferramentas inteligentes para magistrados, advogados e servidores do Judiciário.
-              Escolha o módulo que deseja acessar.
+              Ferramentas inteligentes para operadores do direito.
+              Escolha o módulo que deseja e deixe a IA te ajudar.
             </p>
           </motion.div>
 
