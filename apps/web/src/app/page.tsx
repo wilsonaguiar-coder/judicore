@@ -6,7 +6,8 @@ import Image from "next/image";
 import { ArrowRight, FileText, Calculator, CheckCircle } from "lucide-react";
 
 // URL do módulo de cálculos. Configurável via env para facilitar testes.
-const JUDICALC_URL = process.env["NEXT_PUBLIC_JUDICALC_URL"] ?? "https://calculos.judicore.com.br";
+// Ambos os módulos apontam direto para o login da respectiva plataforma
+const JUDICALC_URL = process.env["NEXT_PUBLIC_JUDICALC_URL"] ?? "https://calculos.judicore.com.br/login";
 
 const cardFade = {
   hidden: { opacity: 0, y: 20 },
