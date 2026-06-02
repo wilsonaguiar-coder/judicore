@@ -133,7 +133,7 @@ export const GENERIC_EXPRESSIONS: Array<{ pattern: RegExp; label: string }> = [
   // cumprimento de sentença, art. 536 CPC e variantes legítimas.
   { pattern: /\bdireito\s+material\s+postulado\b/i, label: '"direito material postulado" sem especificação' },
   { pattern: /\bmat[eé]ria\s+c[ií]vel\b/i, label: '"matéria cível" — verifique se o caso não é criminal ou trabalhista' },
-  { pattern: /\ba[cç][aã]o\s+declarat[oó]ria\b.*\b(flagrante|habeas|criminal|penal|pris[aã]o)/is, label: '"ação declaratória" em contexto criminal — tipo de ação incorreto' },
+  // "ação declaratória" removida: cível legítimo; criminal já coberto por CRIMINAL_BLOCKED_TERMS sem risco de falso positivo com /s
   { pattern: /\bpesquisa\s+livre\b/i, label: '"pesquisa livre" — descrição genérica, sem fatos reais' },
 ];
 
@@ -189,7 +189,7 @@ export const PIECE_TEMPLATES = {
     endereçamento_obrigatorio: true,
     min_pontos_impugnacao: 2,
     tom: "técnico e combativo",
-    proibicoes: ["aceitar premissas da decisão recorrida", "menos de 2 pontos autônomos de impugnação"],
+    proibicoes: ["aceitar premissas da decisão recorrida", "menos de 2 pontos autônomos de impugnação", "repetir argumentos da inicial sem enfrentar o fundamento específico da sentença recorrida"],
   },
   SENTENCA: {
     estrutura: [

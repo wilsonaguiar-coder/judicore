@@ -245,6 +245,8 @@ Resuma os fatos e aponte com precisão cirúrgica os erros da decisão recorrida
 IV — DAS RAZÕES RECURSAIS
 Identifique e desenvolva NO MÍNIMO 2 pontos autônomos de impugnação. Cada ponto deve atacar um erro distinto da decisão recorrida (ex: erro de subsunção legal, omissão de fundamentação, violação de princípio constitucional, equívoco na valoração de prova). Peça recursal com apenas 1 ponto é fraca e insuficiente.
 
+⚠ IMPUGNAÇÃO ESPECÍFICA OBRIGATÓRIA: cada PONTO deve (1) identificar o trecho ou razão concreta da sentença que se combate, (2) demonstrar o erro (fático, jurídico ou lógico) daquele fundamento e (3) apresentar a tese correta. Não é suficiente repetir os argumentos da petição inicial sem enfrentar diretamente o raciocínio do julgador.
+
 Para cada ponto impugnado, abra um subitem com a estrutura OBRIGATÓRIA:
 
    ► PONTO [número]: [erro específico da decisão]
@@ -434,6 +436,8 @@ III — DOS FATOS E DA DECISÃO RECORRIDA
 (síntese dos fatos dos documentos + erros específicos da decisão recorrida)
 
 IV — DAS RAZÕES RECURSAIS
+⚠ IMPUGNAÇÃO ESPECÍFICA OBRIGATÓRIA: cada PONTO deve (1) identificar o trecho ou razão concreta da sentença que se combate, (2) demonstrar o erro daquele fundamento e (3) apresentar a tese correta. Não é suficiente repetir os argumentos da inicial sem enfrentar o raciocínio do julgador.
+
 Para cada ponto impugnado, siga a estrutura OBRIGATÓRIA:
 
    ► PONTO [número]: [erro específico da decisão]

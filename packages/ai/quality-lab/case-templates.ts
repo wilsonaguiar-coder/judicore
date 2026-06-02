@@ -312,7 +312,7 @@ const tCivelDanosMorais: ThemeBuilder = (i) => ({
   comarca: pick(COMARCAS, i),
   fatos: `${pick(NOMES, i)} (CPF ${cpf(i + 1500)}) teve nome inscrito indevidamente em SPC/Serasa pela ${pick(EMPRESAS, i).nome} em ${dateBack(1, i)} por suposto débito de ${brl(800 + i * 50)} (contrato jamais celebrado). Inscrição perdurou por ${30 + (i % 90)} dias.`,
   pedido: `declaração de inexistência do débito e indenização por danos morais de ${brl(8000 + i * 500)}`,
-  norma: "art. 14 CDC e art. 186 CC/2002",
+  norma: "art. 14 CDC, art. 6º VIII CDC (inversão do ônus da prova) e art. 186 CC/2002",
   jurisprudencias: [JUR_FAVORAVEL_DANOS],
 });
 
