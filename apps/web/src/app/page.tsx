@@ -289,13 +289,18 @@ export default function LandingPage() {
                   Crie petições, decisões, sentenças e recursos com IA especializada,
                   fundamentadas em jurisprudência real do STJ, STF e TRFs.
                 </p>
-                <div className="flex flex-wrap gap-1.5 mb-4">
-                  {["+1M Acórdãos","Citações 100%","Exportação DOCX","Formato ABNT"].map((tag) => (
-                    <span key={tag} className="px-2 py-0.5 rounded bg-violet-900/30 border border-violet-500/20 text-[11px] text-violet-300">
-                      {tag}
-                    </span>
+                <ul className="space-y-1.5 mb-4">
+                  {[
+                    "Busca semântica em mais de 1 milhão de acórdãos",
+                    "RAG com apoio de IA e citações 100% auditáveis",
+                    "Minutas disponíveis para exportação",
+                  ].map((item) => (
+                    <li key={item} className="flex items-start gap-2 text-sm text-white/55">
+                      <CheckCircle size={13} className="text-violet-400 mt-0.5 shrink-0" />
+                      {item}
+                    </li>
                   ))}
-                </div>
+                </ul>
                 <span className="inline-flex items-center gap-1.5 text-sm font-semibold text-violet-400 group-hover:text-violet-300 transition-colors">
                   Acessar JudiCore
                   <ArrowRight size={13} className="group-hover:translate-x-1 transition-transform" />
@@ -329,13 +334,18 @@ export default function LandingPage() {
                   Cálculos previdenciários, trabalhistas e cíveis com índices oficiais
                   do Banco Central e correções monetárias automáticas.
                 </p>
-                <div className="flex flex-wrap gap-1.5 mb-4">
-                  {["IPCA, SELIC, INPC","Atualização via BCB","Relatórios PDF","Exportação Excel"].map((tag) => (
-                    <span key={tag} className="px-2 py-0.5 rounded bg-emerald-900/30 border border-emerald-500/20 text-[11px] text-emerald-300">
-                      {tag}
-                    </span>
+                <ul className="space-y-1.5 mb-4">
+                  {[
+                    "Atualização automática de índices",
+                    "Integração SOAP com PJe para consulta processos e inclusão de documentos",
+                    "Exportação em PDF e Excel",
+                  ].map((item) => (
+                    <li key={item} className="flex items-start gap-2 text-sm text-white/55">
+                      <CheckCircle size={13} className="text-emerald-400 mt-0.5 shrink-0" />
+                      {item}
+                    </li>
                   ))}
-                </div>
+                </ul>
                 <span className="inline-flex items-center gap-1.5 text-sm font-semibold text-emerald-400 group-hover:text-emerald-300 transition-colors">
                   Acessar JudiCalc
                   <ArrowRight size={13} className="group-hover:translate-x-1 transition-transform" />
