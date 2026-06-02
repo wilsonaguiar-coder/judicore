@@ -172,9 +172,7 @@ export default function LandingPage() {
           ))}
         </div>
 
-        <Link href="/login" className="text-sm font-semibold text-white bg-violet-600 hover:bg-violet-500 transition-colors px-4 py-1.5 rounded-lg">
-          Entrar
-        </Link>
+        <div />
       </motion.nav>
 
       {/* Hero */}
@@ -182,7 +180,7 @@ export default function LandingPage() {
         <div className="max-w-6xl mx-auto grid md:grid-cols-2 gap-8 items-end">
 
           {/* Left */}
-          <div>
+          <div className="pb-10">
             <motion.div
               custom={0} variants={fadeUp} initial="hidden" animate="visible"
               className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-violet-500/30 bg-violet-500/10 text-violet-300 text-xs font-medium mb-5"
@@ -212,7 +210,7 @@ export default function LandingPage() {
 
             <motion.div
               custom={3} variants={fadeUp} initial="hidden" animate="visible"
-              className="flex flex-wrap gap-3"
+              className="grid grid-cols-2 gap-3 max-w-md"
             >
               {[
                 { icon: <Shield size={16} className="text-violet-400" />, label: "Confiável", sub: "Baseado em jurisprudência real" },
@@ -253,7 +251,7 @@ export default function LandingPage() {
             <div className="absolute inset-0" style={{ zIndex: 1 }}>
               <Image src="/hero.png" alt="Themis" fill className="object-contain object-bottom" priority />
             </div>
-            <div className="absolute top-4 right-0 w-[190px] bg-[#10142a]/95 border border-violet-500/25 backdrop-blur-xl rounded-2xl px-4 py-3 shadow-2xl z-10">
+            <div className="absolute top-28 right-0 w-[190px] bg-[#10142a]/95 border border-violet-500/25 backdrop-blur-xl rounded-2xl px-4 py-3 shadow-2xl z-10">
               <div className="flex items-center gap-1.5 mb-1">
                 <Sparkles size={9} className="text-violet-400" />
                 <span className="text-[8px] text-violet-300 uppercase tracking-widest font-semibold">Base de Conhecimento</span>
@@ -460,8 +458,13 @@ export default function LandingPage() {
 
       {/* Footer */}
       <footer className="relative z-10 border-t border-white/[0.05] px-6 md:px-12 py-5">
-        <div className="max-w-6xl mx-auto flex items-center justify-between gap-4">
+        <div className="max-w-6xl mx-auto flex flex-col md:flex-row items-center justify-between gap-3">
           <Image src="/logo.png" alt="JudiCore" width={90} height={30} className="object-contain opacity-60" />
+          <nav className="flex items-center gap-5 text-xs text-white/30">
+            {["Sobre", "Privacidade", "Termos de Uso"].map((l) => (
+              <span key={l} className="hover:text-white/60 cursor-pointer transition-colors">{l}</span>
+            ))}
+          </nav>
           <p className="text-xs text-white/25">© {new Date().getFullYear()} JudiCore. Todos os direitos reservados.</p>
         </div>
       </footer>
