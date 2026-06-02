@@ -155,29 +155,17 @@ export default function LandingPage() {
         initial={{ y: -20, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ duration: 0.5 }}
-        className="relative z-20 flex items-center justify-between px-6 md:px-12 py-3.5 border-b border-white/[0.06] backdrop-blur-xl bg-[#07080f]/80"
+        className="relative z-20 flex flex-col items-center justify-center px-6 md:px-12 py-4 border-b border-white/[0.06] backdrop-blur-xl bg-[#07080f]/80"
       >
-        <div className="flex items-center gap-3">
-          <Image src="/logo.png" alt="JudiCore" width={110} height={36} className="object-contain" />
-          <span className="hidden sm:inline-flex text-[9px] font-semibold text-white/30 uppercase tracking-widest border border-white/10 rounded px-2 py-0.5">
-            Suíte de Inteligência Jurídica
-          </span>
-        </div>
-
-        <div className="hidden lg:flex items-center gap-6">
-          {NAV_LINKS.map((l) => (
-            <span key={l} className="text-sm text-white/45 hover:text-white/80 cursor-pointer transition-colors">
-              {l}
-            </span>
-          ))}
-        </div>
-
-        <div />
+        <Image src="/logo.png" alt="JudiCore" width={120} height={38} className="object-contain" />
+        <span className="text-[9px] font-semibold text-white/30 uppercase tracking-widest mt-1">
+          Suíte de Inteligência Jurídica
+        </span>
       </motion.nav>
 
       {/* Hero */}
       <section className="relative z-10 px-6 md:px-12 pt-14 md:pt-18">
-        <div className="max-w-6xl mx-auto grid md:grid-cols-2 gap-8 items-end">
+        <div className="max-w-6xl mx-auto grid md:grid-cols-[1fr_1fr_210px] gap-6 md:gap-8 items-end">
 
           {/* Left */}
           <div className="pb-10">
@@ -229,7 +217,7 @@ export default function LandingPage() {
             </motion.div>
           </div>
 
-          {/* Right — Themis + card */}
+          {/* Center — Themis */}
           <motion.div
             custom={4} variants={fadeUp} initial="hidden" animate="visible"
             className="relative hidden md:block"
@@ -251,7 +239,14 @@ export default function LandingPage() {
             <div className="absolute inset-0" style={{ zIndex: 1 }}>
               <Image src="/hero.png" alt="Themis" fill className="object-contain object-bottom" priority />
             </div>
-            <div className="absolute top-28 right-0 w-[190px] bg-[#10142a]/95 border border-violet-500/25 backdrop-blur-xl rounded-2xl px-4 py-3 shadow-2xl z-10">
+          </motion.div>
+
+          {/* Right — Knowledge card ao lado da Themis, sem sobreposição */}
+          <motion.div
+            custom={4} variants={fadeUp} initial="hidden" animate="visible"
+            className="hidden md:block self-start pt-8"
+          >
+            <div className="bg-[#10142a]/95 border border-violet-500/25 backdrop-blur-xl rounded-2xl px-4 py-3 shadow-2xl">
               <div className="flex items-center gap-1.5 mb-1">
                 <Sparkles size={9} className="text-violet-400" />
                 <span className="text-[8px] text-violet-300 uppercase tracking-widest font-semibold">Base de Conhecimento</span>
@@ -267,12 +262,12 @@ export default function LandingPage() {
         <div className="max-w-6xl mx-auto mt-0 grid md:grid-cols-3 gap-5">
 
           {/* JudiCore */}
-          <motion.div custom={5} variants={fadeUp} initial="hidden" animate="visible">
+          <motion.div custom={5} variants={fadeUp} initial="hidden" animate="visible" className="h-full">
             <Link
               href="/login"
               className="group flex items-stretch h-full p-6 rounded-2xl border border-white/8 bg-white/[0.025] hover:bg-white/[0.045] hover:border-violet-500/25 transition-all gap-4"
             >
-              <div className="flex-1 min-w-0">
+              <div className="flex-1 min-w-0 flex flex-col">
                 <div className="flex items-center gap-3 mb-3">
                   <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-violet-600/40 to-indigo-600/40 border border-violet-500/30 flex items-center justify-center shrink-0">
                     <FileText size={18} className="text-violet-300" />
@@ -299,7 +294,7 @@ export default function LandingPage() {
                     </li>
                   ))}
                 </ul>
-                <span className="inline-flex items-center gap-1.5 text-sm font-semibold text-white bg-violet-600 hover:bg-violet-500 transition-colors px-4 py-2 rounded-lg">
+                <span className="mt-auto inline-flex items-center gap-1.5 text-sm font-semibold text-white bg-violet-600 hover:bg-violet-500 transition-colors px-4 py-2 rounded-lg">
                   Gerar peça agora
                   <ArrowRight size={13} className="group-hover:translate-x-1 transition-transform" />
                 </span>
@@ -311,12 +306,12 @@ export default function LandingPage() {
           </motion.div>
 
           {/* JudiCalc */}
-          <motion.div custom={6} variants={fadeUp} initial="hidden" animate="visible">
+          <motion.div custom={6} variants={fadeUp} initial="hidden" animate="visible" className="h-full">
             <a
               href={JUDICALC_URL}
               className="group flex items-stretch h-full p-6 rounded-2xl border border-white/8 bg-white/[0.025] hover:bg-white/[0.045] hover:border-emerald-500/25 transition-all gap-4"
             >
-              <div className="flex-1 min-w-0">
+              <div className="flex-1 min-w-0 flex flex-col">
                 <div className="flex items-center gap-3 mb-3">
                   <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-600/40 to-teal-600/40 border border-emerald-500/30 flex items-center justify-center shrink-0">
                     <Database size={18} className="text-emerald-300" />
@@ -344,7 +339,7 @@ export default function LandingPage() {
                     </li>
                   ))}
                 </ul>
-                <span className="inline-flex items-center gap-1.5 text-sm font-semibold text-white bg-emerald-600 hover:bg-emerald-500 transition-colors px-4 py-2 rounded-lg">
+                <span className="mt-auto inline-flex items-center gap-1.5 text-sm font-semibold text-white bg-emerald-600 hover:bg-emerald-500 transition-colors px-4 py-2 rounded-lg">
                   Fazer cálculo agora
                   <ArrowRight size={13} className="group-hover:translate-x-1 transition-transform" />
                 </span>
@@ -356,12 +351,12 @@ export default function LandingPage() {
           </motion.div>
 
           {/* JudiAudit */}
-          <motion.div custom={7} variants={fadeUp} initial="hidden" animate="visible">
+          <motion.div custom={7} variants={fadeUp} initial="hidden" animate="visible" className="h-full">
             <Link
               href="/login"
               className="group flex items-stretch h-full p-6 rounded-2xl border border-white/8 bg-white/[0.025] hover:bg-white/[0.045] hover:border-amber-500/25 transition-all gap-4"
             >
-              <div className="flex-1 min-w-0">
+              <div className="flex-1 min-w-0 flex flex-col">
                 <div className="flex items-center gap-3 mb-3">
                   <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-amber-600/40 to-orange-600/40 border border-amber-500/30 flex items-center justify-center shrink-0">
                     <Search size={18} className="text-amber-300" />
@@ -389,7 +384,7 @@ export default function LandingPage() {
                     </li>
                   ))}
                 </ul>
-                <span className="inline-flex items-center gap-1.5 text-sm font-semibold text-white bg-amber-600 hover:bg-amber-500 transition-colors px-4 py-2 rounded-lg">
+                <span className="mt-auto inline-flex items-center gap-1.5 text-sm font-semibold text-white bg-amber-600 hover:bg-amber-500 transition-colors px-4 py-2 rounded-lg">
                   Auditar peça agora
                   <ArrowRight size={13} className="group-hover:translate-x-1 transition-transform" />
                 </span>
