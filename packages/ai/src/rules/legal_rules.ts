@@ -28,7 +28,13 @@ export const STRUCTURAL_REQUIREMENTS: Record<string, PieceStructuralRequirements
     required_text_patterns: [
       { pattern: /relat[oó]rio/i, label: "Seção de Relatório", fatal: true },
       { pattern: /fundament[aã]/i, label: "Seção de Fundamentação", fatal: true },
-      { pattern: /ante\s+o\s+exposto|julgo\s+(procedente|improcedente|extinto|parcialmente)|absolvo|condeno/i, label: "Dispositivo", fatal: true },
+      // Dispositivo de sentença: cobre mérito cível/trabalhista/previdenciário (julgo/absolvo/condeno),
+      // HC (concedo/denego a ordem) e decisões incidentais criminais (defiro/revogo/mantenho)
+      {
+        pattern: /ante\s+o\s+exposto|julgo\s+(procedente|improcedente|extinto|parcialmente)|absolvo|condeno|defiro|indefiro|revogo|mantenho|concedo\s+(parcialmente\s+)?a?\s*ordem|denego\s+a?\s*ordem|decreto\s+a\s+pris[aã]o|relaxo/i,
+        label: "Dispositivo (julgo/absolvo/condeno/defiro/indefiro/revogo/mantenho/concedo a ordem/denego a ordem)",
+        fatal: true,
+      },
     ],
     required_structural_patterns: [
       { pattern: /processo\s+n[°oº.]/i, label: "Número do processo no cabeçalho", fatal: false },
@@ -39,8 +45,21 @@ export const STRUCTURAL_REQUIREMENTS: Record<string, PieceStructuralRequirements
   },
   DECISAO: {
     required_text_patterns: [
-      { pattern: /[ée]\s+o\s+relat[oó]rio\.?\s*(decido|passo\s+a\s+decidir)/i, label: '"É o relatório. Decido."', fatal: true },
-      { pattern: /ante\s+o\s+exposto|defiro|indefiro|determino/i, label: "Dispositivo", fatal: true },
+      // "É o relatório. Decido." é fórmula do CPC — comum em interlocutórias civis/previdenciárias,
+      // mas não obrigatória em decisões criminais (HC, cautelares, execução penal). Non-fatal.
+      {
+        pattern: /[ée]\s+o\s+relat[oó]rio\.?\s*(decido|passo\s+a\s+decidir)/i,
+        label: '"É o relatório. Decido." (recomendado em interlocutórias civis)',
+        fatal: false,
+      },
+      // Dispositivo ampliado: cobre HC (concedo/denego a ordem), liberdade provisória e
+      // cautelares criminais (revogo/mantenho/substituo), execução penal (relaxo/decreto),
+      // interlocutórias civis (defiro/indefiro/determino), gerais (ante o exposto).
+      {
+        pattern: /ante\s+o\s+exposto|defiro|indefiro|determino|revogo|mantenho|substituo|relaxo|decreto\s+a|torno\s+sem\s+efeito|concedo\s+(parcialmente\s+)?a?\s*ordem|denego\s+a?\s*ordem/i,
+        label: 'Dispositivo (defiro/indefiro/determino/revogo/mantenho/concedo a ordem/denego a ordem/relaxo/substituo)',
+        fatal: true,
+      },
     ],
     required_structural_patterns: [
       { pattern: /processo\s+n[°oº.]/i, label: "Número do processo no cabeçalho", fatal: false },
