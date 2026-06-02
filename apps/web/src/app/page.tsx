@@ -387,7 +387,7 @@ export default function LandingPage() {
       <footer className="relative z-10 border-t border-white/[0.05] px-6 md:px-12 py-5">
         <div className="max-w-6xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
           <div className="flex items-center gap-2">
-            <Image src="/logo.png" alt="JudiCore" width={24} height={24} className="rounded opacity-50" />
+            <Image src="/logo.png" alt="JudiCore" width={80} height={28} className="object-contain opacity-70" />
             <span className="text-xs text-white/25">Tecnologia que impulsiona a justiça.</span>
           </div>
           <nav className="flex items-center gap-5 text-xs text-white/25">
