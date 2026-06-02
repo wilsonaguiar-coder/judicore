@@ -103,33 +103,27 @@ function JudiCalcMockup() {
 
 function JudiAuditMockup() {
   return (
-    <div className="flex gap-1.5 shrink-0">
-      <div className="w-[100px] h-[100px] rounded-xl bg-[#1a1208] border border-amber-500/20 overflow-hidden shadow-xl p-2 flex flex-col gap-1">
-        <div className="flex items-center justify-between">
-          <span className="text-[6px] text-amber-300/50 uppercase tracking-wide font-semibold">Score</span>
-          <span className="text-[13px] font-extrabold text-amber-400">97</span>
-        </div>
-        <div className="text-[6px] text-white/25">/100</div>
-        <div className="w-full h-1 rounded-full bg-white/8">
-          <div className="h-full rounded-full bg-gradient-to-r from-amber-500 to-amber-300" style={{ width: "97%" }} />
-        </div>
-        <div className="space-y-0.5 mt-0.5">
-          {[
-            { ok: true,  label: "Estrutura" },
-            { ok: false, label: "Fundament." },
-            { ok: true,  label: "Jurisprudência" },
-            { ok: true,  label: "Pedidos" },
-          ].map((r) => (
-            <div key={r.label} className="flex items-center gap-1">
-              <span className={`text-[6px] font-bold ${r.ok ? "text-emerald-400" : "text-amber-400"}`}>{r.ok ? "✓" : "⚠"}</span>
-              <span className="text-[6px] text-white/40">{r.label}</span>
-            </div>
-          ))}
-        </div>
+    <div className="w-[110px] h-[110px] rounded-xl bg-[#1a1208] border border-amber-500/20 overflow-hidden shadow-xl p-2.5 flex flex-col gap-1.5 shrink-0">
+      <div className="flex items-center justify-between">
+        <span className="text-[7px] text-amber-300/50 uppercase tracking-wide font-semibold">Score</span>
+        <span className="text-sm font-extrabold text-amber-400">97</span>
       </div>
-      <div className="w-[60px] h-[100px] rounded-xl bg-[#12100a] border border-amber-500/10 overflow-hidden shadow-xl flex flex-col items-center justify-center gap-1 text-center p-1.5">
-        <Upload size={14} className="text-amber-500/40" />
-        <p className="text-[5px] text-white/25 leading-tight">Arraste sua peça aqui ou clique para enviar</p>
+      <div className="text-[7px] text-white/25">/100</div>
+      <div className="w-full h-1 rounded-full bg-white/8">
+        <div className="h-full rounded-full bg-gradient-to-r from-amber-500 to-amber-300" style={{ width: "97%" }} />
+      </div>
+      <div className="space-y-0.5 mt-0.5">
+        {[
+          { ok: true,  label: "Estrutura" },
+          { ok: false, label: "Fundament." },
+          { ok: true,  label: "Jurisprudência" },
+          { ok: true,  label: "Pedidos" },
+        ].map((r) => (
+          <div key={r.label} className="flex items-center gap-1">
+            <span className={`text-[7px] font-bold ${r.ok ? "text-emerald-400" : "text-amber-400"}`}>{r.ok ? "✓" : "⚠"}</span>
+            <span className="text-[7px] text-white/40">{r.label}</span>
+          </div>
+        ))}
       </div>
     </div>
   );
@@ -155,7 +149,7 @@ export default function LandingPage() {
       >
         <div className="flex items-center gap-3">
           <Image src="/logo.png" alt="JudiCore" width={110} height={36} className="object-contain" />
-          <span className="hidden sm:inline-flex text-[9px] font-semibold text-white/30 uppercase tracking-widest border border-white/10 rounded px-2 py-0.5">
+          <span className="hidden sm:inline-flex text-[11px] font-semibold text-violet-400 uppercase tracking-widest border border-violet-500/30 rounded px-2.5 py-1">
             Suíte de Inteligência Jurídica
           </span>
         </div>
@@ -272,22 +266,25 @@ export default function LandingPage() {
 
           {/* JudiCore */}
           <motion.div custom={5} variants={fadeUp} initial="hidden" animate="visible" className="h-full">
-            <Link href="/login" className="group flex h-full p-5 rounded-2xl border border-white/8 bg-white/[0.025] hover:bg-white/[0.045] hover:border-violet-500/25 transition-all gap-4 overflow-hidden">
-              <div className="flex-1 min-w-0 flex flex-col">
-                <div className="flex items-center gap-2.5 mb-3">
-                  <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-violet-600/40 to-indigo-600/40 border border-violet-500/30 flex items-center justify-center shrink-0">
-                    <FileText size={16} className="text-violet-300" />
-                  </div>
-                  <div className="min-w-0">
-                    <h2 className="text-base font-bold leading-none">Judi<span className="text-violet-400">Core</span></h2>
-                    <p className="text-[10px] text-white/35 mt-0.5">Geração Inteligente de Peças</p>
-                  </div>
+            <Link href="/login" className="group flex flex-col h-full p-5 rounded-2xl border border-white/8 bg-white/[0.025] hover:bg-white/[0.045] hover:border-violet-500/25 transition-all overflow-hidden">
+              {/* Header */}
+              <div className="flex items-center gap-2.5 mb-3">
+                <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-violet-600/40 to-indigo-600/40 border border-violet-500/30 flex items-center justify-center shrink-0">
+                  <FileText size={16} className="text-violet-300" />
                 </div>
-                <p className="text-sm text-white/45 leading-relaxed mb-3 text-left">
-                  Gere petições, decisões, sentenças e recursos com IA especializada,
-                  fundamentadas em jurisprudência real do STJ, STF e TRFs.
-                </p>
-                <ul className="space-y-1 mb-4">
+                <div>
+                  <h2 className="text-base font-bold leading-none">Judi<span className="text-violet-400">Core</span></h2>
+                  <p className="text-[10px] text-white/35 mt-0.5">Geração Inteligente de Peças</p>
+                </div>
+              </div>
+              {/* Descrição — linha completa */}
+              <p className="text-sm text-white/45 leading-relaxed mb-4 text-left">
+                Gere petições, decisões, sentenças e recursos com IA especializada,
+                fundamentadas em jurisprudência real do STJ, STF e TRFs.
+              </p>
+              {/* 2 colunas: lista | mockup */}
+              <div className="flex gap-3 flex-1 mb-4">
+                <ul className="flex-1 space-y-1.5">
                   {["Mais de 1 milhão de acórdãos","Fundamentação automática","Teses e jurisprudência aplicáveis","Peças personalizadas ao seu caso"].map((item) => (
                     <li key={item} className="flex items-start gap-1.5 text-sm text-white/55">
                       <CheckCircle size={12} className="text-violet-400 mt-0.5 shrink-0" />
@@ -295,34 +292,38 @@ export default function LandingPage() {
                     </li>
                   ))}
                 </ul>
-                <span className="mt-auto flex items-center justify-center gap-1.5 text-sm font-semibold text-white bg-violet-600 hover:bg-violet-500 transition-colors px-4 py-2.5 rounded-lg w-full whitespace-nowrap">
-                  Gerar peça agora <ArrowRight size={13} className="group-hover:translate-x-1 transition-transform shrink-0" />
-                </span>
+                <div className="hidden lg:flex items-center">
+                  <JudiCoreMockup />
+                </div>
               </div>
-              <div className="hidden xl:flex items-center shrink-0">
-                <JudiCoreMockup />
-              </div>
+              {/* Botão — linha completa */}
+              <span className="flex items-center justify-center gap-1.5 text-sm font-semibold text-white bg-violet-600 hover:bg-violet-500 transition-colors px-4 py-2.5 rounded-lg w-full whitespace-nowrap">
+                Gerar peça agora <ArrowRight size={13} className="group-hover:translate-x-1 transition-transform shrink-0" />
+              </span>
             </Link>
           </motion.div>
 
           {/* JudiCalc */}
           <motion.div custom={6} variants={fadeUp} initial="hidden" animate="visible" className="h-full">
-            <a href={JUDICALC_URL} className="group flex h-full p-5 rounded-2xl border border-white/8 bg-white/[0.025] hover:bg-white/[0.045] hover:border-emerald-500/25 transition-all gap-4 overflow-hidden">
-              <div className="flex-1 min-w-0 flex flex-col">
-                <div className="flex items-center gap-2.5 mb-3">
-                  <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-emerald-600/40 to-teal-600/40 border border-emerald-500/30 flex items-center justify-center shrink-0">
-                    <Database size={16} className="text-emerald-300" />
-                  </div>
-                  <div className="min-w-0">
-                    <h2 className="text-base font-bold leading-none">Judi<span className="text-emerald-400">Calc</span></h2>
-                    <p className="text-[10px] text-white/35 mt-0.5">Automação Completa de Cálculos</p>
-                  </div>
+            <a href={JUDICALC_URL} className="group flex flex-col h-full p-5 rounded-2xl border border-white/8 bg-white/[0.025] hover:bg-white/[0.045] hover:border-emerald-500/25 transition-all overflow-hidden">
+              {/* Header */}
+              <div className="flex items-center gap-2.5 mb-3">
+                <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-emerald-600/40 to-teal-600/40 border border-emerald-500/30 flex items-center justify-center shrink-0">
+                  <Database size={16} className="text-emerald-300" />
                 </div>
-                <p className="text-sm text-white/45 leading-relaxed mb-3 text-left">
-                  Conecte-se ao PJe, gere cálculos previdenciários, trabalhistas e cíveis,
-                  assine e protocole diretamente no processo em poucos cliques.
-                </p>
-                <ul className="space-y-1 mb-4">
+                <div>
+                  <h2 className="text-base font-bold leading-none">Judi<span className="text-emerald-400">Calc</span></h2>
+                  <p className="text-[10px] text-white/35 mt-0.5">Automação Completa de Cálculos</p>
+                </div>
+              </div>
+              {/* Descrição */}
+              <p className="text-sm text-white/45 leading-relaxed mb-4 text-left">
+                Conecte-se ao PJe, gere cálculos previdenciários, trabalhistas e cíveis,
+                assine e protocole diretamente no processo em poucos cliques.
+              </p>
+              {/* 2 colunas: lista | mockup */}
+              <div className="flex gap-3 flex-1 mb-4">
+                <ul className="flex-1 space-y-1.5">
                   {["Acesso via SOAP ao PJe","Cálculos automáticos precisos","Geração de memória e PDF","Assinatura com PJeOffice","Envio automático ao processo"].map((item) => (
                     <li key={item} className="flex items-start gap-1.5 text-sm text-white/55">
                       <CheckCircle size={12} className="text-emerald-400 mt-0.5 shrink-0" />
@@ -330,34 +331,38 @@ export default function LandingPage() {
                     </li>
                   ))}
                 </ul>
-                <span className="mt-auto flex items-center justify-center gap-1.5 text-sm font-semibold text-white bg-emerald-600 hover:bg-emerald-500 transition-colors px-4 py-2.5 rounded-lg w-full whitespace-nowrap">
-                  Fazer cálculo agora <ArrowRight size={13} className="group-hover:translate-x-1 transition-transform shrink-0" />
-                </span>
+                <div className="hidden lg:flex items-center">
+                  <JudiCalcMockup />
+                </div>
               </div>
-              <div className="hidden xl:flex items-center shrink-0">
-                <JudiCalcMockup />
-              </div>
+              {/* Botão */}
+              <span className="flex items-center justify-center gap-1.5 text-sm font-semibold text-white bg-emerald-600 hover:bg-emerald-500 transition-colors px-4 py-2.5 rounded-lg w-full whitespace-nowrap">
+                Fazer cálculo agora <ArrowRight size={13} className="group-hover:translate-x-1 transition-transform shrink-0" />
+              </span>
             </a>
           </motion.div>
 
           {/* JudiAudit */}
           <motion.div custom={7} variants={fadeUp} initial="hidden" animate="visible" className="h-full">
-            <Link href="/login" className="group flex h-full p-5 rounded-2xl border border-white/8 bg-white/[0.025] hover:bg-white/[0.045] hover:border-amber-500/25 transition-all gap-4 overflow-hidden">
-              <div className="flex-1 min-w-0 flex flex-col">
-                <div className="flex items-center gap-2.5 mb-3">
-                  <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-amber-600/40 to-orange-600/40 border border-amber-500/30 flex items-center justify-center shrink-0">
-                    <Search size={16} className="text-amber-300" />
-                  </div>
-                  <div className="min-w-0">
-                    <h2 className="text-base font-bold leading-none">Judi<span className="text-amber-400">Audit</span></h2>
-                    <p className="text-[10px] text-white/35 mt-0.5">Auditoria Inteligente de Peças</p>
-                  </div>
+            <Link href="/login" className="group flex flex-col h-full p-5 rounded-2xl border border-white/8 bg-white/[0.025] hover:bg-white/[0.045] hover:border-amber-500/25 transition-all overflow-hidden">
+              {/* Header */}
+              <div className="flex items-center gap-2.5 mb-3">
+                <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-amber-600/40 to-orange-600/40 border border-amber-500/30 flex items-center justify-center shrink-0">
+                  <Search size={16} className="text-amber-300" />
                 </div>
-                <p className="text-sm text-white/45 leading-relaxed mb-3 text-left">
-                  Envie sua peça e receba uma análise completa com score de qualidade,
-                  pontos de melhoria e sugestões fundamentadas.
-                </p>
-                <ul className="space-y-1 mb-4">
+                <div>
+                  <h2 className="text-base font-bold leading-none">Judi<span className="text-amber-400">Audit</span></h2>
+                  <p className="text-[10px] text-white/35 mt-0.5">Auditoria Inteligente de Peças</p>
+                </div>
+              </div>
+              {/* Descrição */}
+              <p className="text-sm text-white/45 leading-relaxed mb-4 text-left">
+                Envie sua peça e receba uma análise completa com score de qualidade,
+                pontos de melhoria e sugestões fundamentadas.
+              </p>
+              {/* 2 colunas: lista | mockup (só painel esquerdo) */}
+              <div className="flex gap-3 flex-1 mb-4">
+                <ul className="flex-1 space-y-1.5">
                   {["Score de qualidade (0–100)","Análise de estrutura e conteúdo","Fundamentação e jurisprudência","Detecta riscos e inconsistências","Sugestões de melhoria"].map((item) => (
                     <li key={item} className="flex items-start gap-1.5 text-sm text-white/55">
                       <CheckCircle size={12} className="text-amber-400 mt-0.5 shrink-0" />
@@ -365,13 +370,14 @@ export default function LandingPage() {
                     </li>
                   ))}
                 </ul>
-                <span className="mt-auto flex items-center justify-center gap-1.5 text-sm font-semibold text-white bg-amber-600 hover:bg-amber-500 transition-colors px-4 py-2.5 rounded-lg w-full whitespace-nowrap">
-                  Auditar peça agora <ArrowRight size={13} className="group-hover:translate-x-1 transition-transform shrink-0" />
-                </span>
+                <div className="hidden lg:flex items-center">
+                  <JudiAuditMockup />
+                </div>
               </div>
-              <div className="hidden xl:flex items-center shrink-0">
-                <JudiAuditMockup />
-              </div>
+              {/* Botão */}
+              <span className="flex items-center justify-center gap-1.5 text-sm font-semibold text-white bg-amber-600 hover:bg-amber-500 transition-colors px-4 py-2.5 rounded-lg w-full whitespace-nowrap">
+                Auditar peça agora <ArrowRight size={13} className="group-hover:translate-x-1 transition-transform shrink-0" />
+              </span>
             </Link>
           </motion.div>
 
