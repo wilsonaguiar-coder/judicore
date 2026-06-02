@@ -47,17 +47,7 @@ export default function LandingPage() {
         className="relative z-20 flex items-center justify-between px-6 md:px-14 py-4 border-b border-white/[0.06] backdrop-blur-xl bg-[#07080f]/80"
       >
         {/* Logo */}
-        <div className="flex items-center gap-3">
-          <Image src="/logo.png" alt="JudiCore" width={38} height={38} className="rounded-lg" />
-          <div>
-            <span className="text-base font-bold tracking-tight">
-              judi<span className="text-violet-400">C</span>re
-            </span>
-            <p className="text-[9px] text-white/25 uppercase tracking-widest leading-none">
-              Suíte de Ferramentas Jurídicas Inteligentes
-            </p>
-          </div>
-        </div>
+        <Image src="/logo.png" alt="JudiCore" width={120} height={40} className="object-contain" />
 
         {/* Nav links */}
         <div className="hidden md:flex items-center gap-7">
@@ -141,14 +131,14 @@ export default function LandingPage() {
             <div className="absolute w-[360px] h-[360px] rounded-full border border-violet-500/10 bg-violet-600/5 blur-sm" />
             <div className="absolute w-[260px] h-[260px] rounded-full border border-violet-500/15 bg-violet-700/8" />
 
-            {/* Hero image */}
-            <div className="relative w-[300px] h-[380px]">
+            {/* Hero image — mix-blend-mode:screen dissolve o fundo escuro */}
+            <div className="relative w-[340px] h-[400px]">
               <Image
                 src="/hero.png"
                 alt="Justiça"
                 fill
-                className="object-contain object-bottom drop-shadow-2xl"
-                style={{ filter: "drop-shadow(0 0 40px rgba(139,92,246,0.3))" }}
+                className="object-contain object-bottom"
+                style={{ mixBlendMode: "screen" }}
                 priority
               />
             </div>
