@@ -141,17 +141,7 @@ export default function LandingPage() {
         className="relative z-20 flex items-center justify-between px-6 md:px-12 py-3.5 border-b border-white/[0.06] backdrop-blur-xl bg-[#07080f]/80"
       >
         {/* Logo */}
-        <div className="flex items-center gap-2.5">
-          <Image src="/logo.png" alt="JudiCore" width={32} height={32} className="rounded-lg" />
-          <div className="leading-none">
-            <p className="text-sm font-bold tracking-tight">
-              judi<span className="text-violet-400">C</span>re
-            </p>
-            <p className="text-[8px] text-white/25 uppercase tracking-widest mt-0.5">
-              Suíte de Ferramentas Jurídicas Inteligentes
-            </p>
-          </div>
-        </div>
+        <Image src="/logo.png" alt="JudiCore" width={110} height={36} className="object-contain" />
 
         {/* Nav links */}
         <div className="hidden md:flex items-center gap-6">
@@ -232,14 +222,27 @@ export default function LandingPage() {
             className="relative hidden md:block"
             style={{ minHeight: 440 }}
           >
-            {/* Círculo luminoso atrás */}
-            <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-              <div className="w-[320px] h-[320px] rounded-full border border-violet-500/20 bg-violet-700/15 blur-[2px]" />
-              <div className="absolute w-[240px] h-[240px] rounded-full bg-violet-800/20 blur-[40px]" />
+            {/* Glow atrás da Themis — posição central fixa */}
+            <div className="absolute inset-0 flex items-center justify-center pointer-events-none" style={{ zIndex: 0 }}>
+              {/* anel externo visível */}
+              <div style={{
+                width: 340, height: 340,
+                borderRadius: "50%",
+                border: "1px solid rgba(139,92,246,0.35)",
+                boxShadow: "0 0 60px 12px rgba(109,40,217,0.25), inset 0 0 40px 8px rgba(109,40,217,0.12)",
+                position: "absolute",
+              }} />
+              {/* blob de luz central */}
+              <div style={{
+                width: 220, height: 220,
+                borderRadius: "50%",
+                background: "radial-gradient(circle, rgba(109,40,217,0.30) 0%, rgba(109,40,217,0.08) 60%, transparent 100%)",
+                position: "absolute",
+              }} />
             </div>
 
             {/* Themis PNG */}
-            <div className="absolute inset-0">
+            <div className="absolute inset-0" style={{ zIndex: 1 }}>
               <Image
                 src="/hero.png"
                 alt="Themis"
