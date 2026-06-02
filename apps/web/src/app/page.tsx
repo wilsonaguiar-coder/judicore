@@ -170,8 +170,8 @@ export default function LandingPage() {
       <section className="relative z-10 px-6 md:px-12 pt-14 md:pt-18">
         <div className="max-w-6xl mx-auto grid md:grid-cols-2 gap-8 items-end">
 
-          {/* Coluna esquerda */}
-          <div>
+          {/* Coluna esquerda — pb-10 cria respiro acima dos cards; Themis (sem padding) fica colada */}
+          <div className="pb-10">
             <motion.div
               custom={0} variants={fadeUp} initial="hidden" animate="visible"
               className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-violet-500/30 bg-violet-500/10 text-violet-300 text-xs font-medium mb-5"
@@ -295,8 +295,8 @@ export default function LandingPage() {
                     </li>
                   ))}
                 </ul>
-                <span className="mt-auto flex items-center justify-center gap-1.5 text-sm font-semibold text-white bg-violet-600 hover:bg-violet-500 transition-colors px-4 py-2.5 rounded-lg w-full">
-                  Gerar peça agora <ArrowRight size={13} className="group-hover:translate-x-1 transition-transform" />
+                <span className="mt-auto flex items-center justify-center gap-1.5 text-sm font-semibold text-white bg-violet-600 hover:bg-violet-500 transition-colors px-4 py-2.5 rounded-lg w-full whitespace-nowrap">
+                  Gerar peça agora <ArrowRight size={13} className="group-hover:translate-x-1 transition-transform shrink-0" />
                 </span>
               </div>
               <div className="hidden xl:flex items-center shrink-0">
@@ -330,8 +330,8 @@ export default function LandingPage() {
                     </li>
                   ))}
                 </ul>
-                <span className="mt-auto flex items-center justify-center gap-1.5 text-sm font-semibold text-white bg-emerald-600 hover:bg-emerald-500 transition-colors px-4 py-2.5 rounded-lg w-full">
-                  Fazer cálculo agora <ArrowRight size={13} className="group-hover:translate-x-1 transition-transform" />
+                <span className="mt-auto flex items-center justify-center gap-1.5 text-sm font-semibold text-white bg-emerald-600 hover:bg-emerald-500 transition-colors px-4 py-2.5 rounded-lg w-full whitespace-nowrap">
+                  Fazer cálculo agora <ArrowRight size={13} className="group-hover:translate-x-1 transition-transform shrink-0" />
                 </span>
               </div>
               <div className="hidden xl:flex items-center shrink-0">
@@ -365,8 +365,8 @@ export default function LandingPage() {
                     </li>
                   ))}
                 </ul>
-                <span className="mt-auto flex items-center justify-center gap-1.5 text-sm font-semibold text-white bg-amber-600 hover:bg-amber-500 transition-colors px-4 py-2.5 rounded-lg w-full">
-                  Auditar peça agora <ArrowRight size={13} className="group-hover:translate-x-1 transition-transform" />
+                <span className="mt-auto flex items-center justify-center gap-1.5 text-sm font-semibold text-white bg-amber-600 hover:bg-amber-500 transition-colors px-4 py-2.5 rounded-lg w-full whitespace-nowrap">
+                  Auditar peça agora <ArrowRight size={13} className="group-hover:translate-x-1 transition-transform shrink-0" />
                 </span>
               </div>
               <div className="hidden xl:flex items-center shrink-0">
