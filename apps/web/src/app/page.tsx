@@ -125,26 +125,30 @@ export default function LandingPage() {
           {/* Right — visual */}
           <motion.div
             custom={4} variants={fadeUp} initial="hidden" animate="visible"
-            className="relative hidden md:flex items-center justify-center"
+            className="relative hidden md:block"
+            style={{ minHeight: 460 }}
           >
-            {/* Glow rings */}
-            <div className="absolute w-[360px] h-[360px] rounded-full border border-violet-500/10 bg-violet-600/5 blur-sm" />
-            <div className="absolute w-[260px] h-[260px] rounded-full border border-violet-500/15 bg-violet-700/8" />
-
-            {/* Hero image — mix-blend-mode:screen dissolve o fundo escuro */}
-            <div className="relative w-[340px] h-[400px]">
-              <Image
-                src="/hero.png"
-                alt="Justiça"
-                fill
-                className="object-contain object-bottom"
-                style={{ mixBlendMode: "screen" }}
-                priority
-              />
+            {/* Glow aura atrás da Themis */}
+            <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+              <div className="w-[340px] h-[340px] rounded-full bg-violet-700/20 blur-[80px]" />
             </div>
 
-            {/* Floating stat card */}
-            <div className="absolute top-4 right-0 bg-[#12162a]/90 border border-violet-500/20 backdrop-blur-xl rounded-2xl px-4 py-3 shadow-xl">
+            {/* Themis — PNG transparente, centralizado, ocupa toda a altura */}
+            <div className="absolute inset-0 flex items-end justify-center pb-0">
+              <div className="relative w-full h-full">
+                <Image
+                  src="/hero.png"
+                  alt="Themis"
+                  fill
+                  className="object-contain object-bottom"
+                  style={{ opacity: 0.92 }}
+                  priority
+                />
+              </div>
+            </div>
+
+            {/* Floating stat card — topo direito */}
+            <div className="absolute top-6 right-0 bg-[#12162a]/90 border border-violet-500/20 backdrop-blur-xl rounded-2xl px-4 py-3 shadow-xl z-10">
               <div className="flex items-center gap-1.5 mb-1">
                 <Sparkles size={10} className="text-violet-400" />
                 <span className="text-[9px] text-violet-300 uppercase tracking-widest font-semibold">Base de Conhecimento</span>
