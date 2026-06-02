@@ -10,10 +10,14 @@
 
 import type { LegalClassification, ValidationError, ValidationResult } from "../pipeline/types.js";
 
-const CDC_CONTEXT_RE = /c\.?\s*d\.?\s*c\.|lei\s+8\.078|código\s+de\s+defesa\s+do\s+consumidor|rela[cç][aã]o\s+de\s+consumo|consumidor\s+(vulnerável|hipossuficiente)/i;
-const CDC_JUSTIFICATION_RE = /rela[cç][aã]o\s+de\s+consumo|lei\s+8\.078|art\.?\s*\d+[^.]{0,30}cdc|aplicac[aã]o\s+(do\s+)?cdc|incid[eê]ncia\s+(do\s+)?cdc/i;
+const CDC_CONTEXT_RE = /c\.?\s*d\.?\s*c\.|lei\s+n?[°º.]?\s*8\.078|código\s+de\s+defesa\s+do\s+consumidor|rela[cç][aã]o\s+de\s+consumo|rela[cç][aã]o\s+consumerista|consumidor\s+(vulnerável|hipossuficiente)/i;
+const CDC_JUSTIFICATION_RE = /rela[cç][aã]o\s+de\s+consumo|rela[cç][aã]o\s+consumerista|lei\s+n?[°º.]?\s*8\.078|c[oó]digo\s+de\s+defesa\s+do\s+consumidor|art\.?\s*\d+[^.]{0,30}cdc|aplica[cç][aã]o\s+(do\s+)?cdc|aplica[\s-]se[^.\n]{0,60}cdc|incid[eê]ncia\s+(do\s+)?cdc|incide\s+(o\s+)?cdc/i;
 const INVERSAO_ONUS_RE = /invers[aã]o\s+(do\s+)?[oô]nus\s+da\s+prova|[oô]nus\s+da\s+prova.*inver/i;
-const ART6_VIII_RE = /art\.?\s*6[°º,.]\s*(inc\.?\s*|inciso\s*)?viii|art\.?\s*6[°º,.]\s*8\b/i;
+// Aceita: "art. 6º, VIII", "art. 6°, VIII", "art. 6, VIII", "art. 6º inciso VIII",
+//         "art. 6º, inc. VIII", "art. 6º, VIII, do CDC" — [°º]? consome o ordinal,
+//         [,.]? consome a vírgula separadora (fix: padrão antigo falhava em "6º, VIII").
+const ART6_VIII_RE =
+  /art\.?\s*6[°º]?\s*[,.]?\s*(inc\.?\s*|inciso\s+)?viii\b|art\.?\s*6[°º]?\s*[,.]?\s*8\b/i;
 const VEROSSIMILHANCA_RE = /verossimilhan[cç]a|hipossufici[eê]ncia|vulnerabilidade|dificuldade\s+(do\s+)?consumidor\s+de\s+obter\s+prova/i;
 
 const DANO_MORAL_RE = /dano\s+moral/i;

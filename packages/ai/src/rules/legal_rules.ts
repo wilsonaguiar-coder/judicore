@@ -128,7 +128,9 @@ export const GENERIC_EXPRESSIONS: Array<{ pattern: RegExp; label: string }> = [
   { pattern: /\bo\s+direito\s+alegado\b/i, label: '"o direito alegado" sem especificação do direito concreto' },
   { pattern: /\breconhecimento\s+do\s+direito\s+alegado\b/i, label: '"reconhecimento do direito alegado" — genérico demais' },
   { pattern: /\bpretens[aã]o\s+da\s+parte\s+(recorrente|autora|r[eé])\b/i, label: '"pretensão da parte" sem identificar o pedido concreto' },
-  { pattern: /\bcumprimento\s+d[ao]\s+obriga[cç][aã]o\b/i, label: '"cumprimento da obrigação" sem identificar qual obrigação' },
+  // "cumprimento da obrigação" removido do array estático — verificação contextual
+  // em GenericityValidator.detect() para não disparar em ação de obrigação de fazer,
+  // cumprimento de sentença, art. 536 CPC e variantes legítimas.
   { pattern: /\bdireito\s+material\s+postulado\b/i, label: '"direito material postulado" sem especificação' },
   { pattern: /\bmat[eé]ria\s+c[ií]vel\b/i, label: '"matéria cível" — verifique se o caso não é criminal ou trabalhista' },
   { pattern: /\ba[cç][aã]o\s+declarat[oó]ria\b.*\b(flagrante|habeas|criminal|penal|pris[aã]o)/is, label: '"ação declaratória" em contexto criminal — tipo de ação incorreto' },
