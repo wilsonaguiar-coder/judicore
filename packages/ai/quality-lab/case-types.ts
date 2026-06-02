@@ -13,7 +13,9 @@ export type LegalArea =
   | "TRABALHISTA"
   | "CRIMINAL"          // decisões incidentais: HC, liberdade provisória, preventiva, progressão
   | "CRIMINAL_MERITO"   // ação penal de mérito: ABSOLVO/CONDENO com dosimetria
-  | "CIVEL";
+  | "CIVEL"             // casos cíveis gerais (temas originais do QA)
+  | "CIVEL_GERAL"       // novos casos cíveis: obrigação de fazer, danos morais, cobrança, etc.
+  | "CONSUMIDOR";       // direito do consumidor: CDC, negativação, plano de saúde, banco
 
 // Tipos de armadilhas jurídicas inseridas em ~30% dos casos
 export type TrapKind =
@@ -50,6 +52,8 @@ export type ValidatorComponent =
   | "GenericityValidator"
   | "MatrixQualityValidator"
   | "RichnessValidator"
+  | "CivilValidator"
+  | "ConsumerValidator"
   | "Other";
 
 /** Mapeia uma rule de ValidationError para o validator que a emitiu. */
@@ -61,6 +65,8 @@ export const AREA_LABELS: Record<LegalArea, string> = {
   CRIMINAL: "Criminal (cautelar)",
   CRIMINAL_MERITO: "Criminal (mérito)",
   CIVEL: "Cível",
+  CIVEL_GERAL: "Cível Geral",
+  CONSUMIDOR: "Consumidor (CDC)",
 };
 
 export function mapRuleToValidator(rule: string): ValidatorComponent {
@@ -114,6 +120,18 @@ export function mapRuleToValidator(rule: string): ValidatorComponent {
     rule === "CRIMINAL_PRESCRICAO_MISSING_ART" ||
     rule === "CRIMINAL_DESCLASSIFICACAO_MISSING_TIPO"
   ) return "LegalValidator";
+  if (
+    rule === "TUTELA_MISSING_ART300" ||
+    rule === "TUTELA_MISSING_PERICULUM_MORA" ||
+    rule === "SENTENCA_MISSING_HONORARIOS" ||
+    rule === "SENTENCA_MISSING_CUSTAS"
+  ) return "CivilValidator";
+  if (
+    rule === "CDC_APPLICATION_MISSING" ||
+    rule === "INVERSAO_ONUS_SEM_FUNDAMENTO" ||
+    rule === "DANO_MORAL_SEM_ANALISE_CONCRETA" ||
+    rule === "REPETICAO_DOBRO_SEM_MAE_FE"
+  ) return "ConsumerValidator";
   return "Other";
 }
 

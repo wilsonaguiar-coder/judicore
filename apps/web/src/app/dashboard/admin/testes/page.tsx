@@ -359,7 +359,9 @@ export default function TestesPage() {
                 <option value="TRABALHISTA">Trabalhista</option>
                 <option value="CRIMINAL">Criminal (cautelar)</option>
                 <option value="CRIMINAL_MERITO">Criminal (mérito)</option>
-                <option value="CIVEL">Cível</option>
+                <option value="CIVEL">Cível (todas as sub-áreas)</option>
+                <option value="CIVEL_GERAL">Cível Geral</option>
+                <option value="CONSUMIDOR">Consumidor (CDC)</option>
               </select>
             </div>
             <div>

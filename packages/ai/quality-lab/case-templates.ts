@@ -425,6 +425,20 @@ function applyTrap(
           expectedRulesIfTrap: ["CRIMINAL_ARTICLE_85_CPC"],
         };
       }
+      if (area === "CIVEL_GERAL" || area === "CIVEL") {
+        return {
+          description: base.description,
+          instruction: "Deferir a tutela de urgência analisando APENAS a probabilidade do direito (fumus boni iuris), sem examinar o periculum in mora (perigo de dano irreparável ou urgência).",
+          expectedRulesIfTrap: ["TUTELA_MISSING_PERICULUM_MORA"],
+        };
+      }
+      if (area === "CONSUMIDOR") {
+        return {
+          description: base.description,
+          instruction: "Inverter o ônus da prova automaticamente, sem citar o art. 6º, VIII, do CDC e sem demonstrar a verossimilhança das alegações ou hipossuficiência do consumidor.",
+          expectedRulesIfTrap: ["INVERSAO_ONUS_SEM_FUNDAMENTO"],
+        };
+      }
       return { description: base.description, instruction: base.instruction ?? "", expectedRulesIfTrap: [] };
     case "RECURSO_INADEQUADO":
       if (area === "TRABALHISTA" && documentType === "RECURSO") {
@@ -439,6 +453,13 @@ function applyTrap(
           description: base.description,
           instruction: "Interpor APELAÇÃO CÍVEL (art. 1.009 CPC) contra a sentença penal, não Apelação Criminal.",
           expectedRulesIfTrap: ["CRIMINAL_WRONG_APPEAL"],
+        };
+      }
+      if ((area === "CIVEL_GERAL" || area === "CIVEL") && documentType === "RECURSO") {
+        return {
+          description: base.description,
+          instruction: "Interpor APELAÇÃO (art. 1.009 CPC) contra a decisão interlocutória que negou a tutela de urgência, em vez de AGRAVO DE INSTRUMENTO (art. 1.015, I, CPC).",
+          expectedRulesIfTrap: ["INCOMPATIBLE_APPEAL"],
         };
       }
       return { description: base.description, instruction: base.instruction ?? "", expectedRulesIfTrap: [] };
@@ -583,14 +604,36 @@ function buildSentenca(n: ThemeNarrative, i: number, trap?: TrapKind): Synthetic
   return result;
 }
 
+function buildDespachoFromTheme(n: ThemeNarrative, i: number, trap?: TrapKind): SyntheticCase {
+  const desc = `Juiz deve emitir despacho de impulso processual nos autos de ação ajuizada por ${n.autor} em face de ${n.reu} (${n.comarca}). Objeto: ${n.pedido}. Contexto: ${n.fatos} O despacho deve determinar providências processuais sem decidir o mérito da causa.`;
+  const result: SyntheticCase = {
+    id: `${n.themeLabel.toLowerCase().replace(/\W+/g, "_")}_despacho_${i}`,
+    area: n.area,
+    documentType: "DESPACHO",
+    theme: n.themeLabel,
+    themeLabel: n.themeLabel,
+    title: `${n.themeLabel} — Despacho`,
+    caseDescription: desc,
+  };
+  if (trap) {
+    const t = applyTrap({ description: desc, expectedRulesIfTrap: [] }, trap, n.area, "DESPACHO");
+    result.caseDescription = t.description;
+    result.instruction = t.instruction;
+    result.trap = trap;
+    result.expectedRulesIfTrap = t.expectedRulesIfTrap;
+  }
+  return result;
+}
+
 export const PHASE_BUILDERS: Record<
-  "PETICAO_INICIAL" | "RECURSO" | "DECISAO" | "SENTENCA",
+  "PETICAO_INICIAL" | "RECURSO" | "DECISAO" | "SENTENCA" | "DESPACHO",
   (n: ThemeNarrative, i: number, trap?: TrapKind) => SyntheticCase
 > = {
   PETICAO_INICIAL: buildInicial,
   RECURSO: buildRecurso,
   DECISAO: buildDecisao,
   SENTENCA: buildSentenca,
+  DESPACHO: buildDespachoFromTheme,
 };
 
 // ── Templates de despacho ─────────────────────────────────────────────────────
@@ -877,4 +920,268 @@ THEMES.push(
   { id: "cm_lesao_vd",            build: tCmLesaoVD },
   { id: "cm_estelionato",         build: tCmEstelionato },
   { id: "cm_porte_arma",          build: tCmPorteArma },
+);
+
+// ── CÍVEL GERAL e CONSUMIDOR ──────────────────────────────────────────────────
+//
+// 20 temas: 10 cível geral + 10 consumidor.
+// Cada tema tem compatibleTypes com UM único tipo de peça (mapeamento direto).
+// Traps em ~30% dos casos (6 traps):
+//   Casos 1,4 (CIVEL_GERAL): ARTIGO_INCOMPATIVEL (tutela sem periculum) + TESE_EQUIVOCADA (dano moral presumido)
+//   Caso 9   (CIVEL_GERAL): RECURSO_INADEQUADO (apelação em vez de agravo)
+//   Caso 12  (CONSUMIDOR):  ARTIGO_INCOMPATIVEL (inversão ônus sem fundamento)
+//   Caso 16  (CONSUMIDOR):  ARTIGO_INCOMPATIVEL (tutela sem art. 300 + periculum)
+//   Caso 18  (CONSUMIDOR):  TESE_EQUIVOCADA (repetição em dobro sem má-fé)
+
+// ── CÍVEL GERAL ───────────────────────────────────────────────────────────────
+
+const tCgObrFazerInicial = (i: number): ThemeNarrative => ({
+  area: "CIVEL_GERAL",
+  themeLabel: "Obrigação de fazer — tutela de urgência (inicial)",
+  autor: pick(NOMES, i),
+  reu: pick(EMPRESAS, i).nome,
+  comarca: pick(COMARCAS, i),
+  fatos: `${pick(NOMES, i)} (CPF ${cpf(i + 3000)}) contratou em ${dateBack(1, i)} com ${pick(EMPRESAS, i).nome} (CNPJ ${pick(EMPRESAS, i).cnpj}) a execução de ${pick(["reforma de imóvel", "instalação de sistema de segurança", "desenvolvimento de software sob medida"], i)} pelo valor de ${brl(25000 + i * 2000)}, com prazo de ${60 + (i % 60)} dias. A empresa recebeu 70% do valor (${brl(17500 + i * 1400)}) adiantado e não cumpriu a obrigação. Requerente sofre prejuízo diário com o atraso. Há risco de perecimento do objeto do contrato.`,
+  pedido: "tutela de urgência para compelir a ré a cumprir a obrigação de fazer no prazo de 15 dias, sob pena de multa diária",
+  norma: "arts. 300, 497 e 498 do CPC; art. 389 do CC/2002",
+});
+
+const tCgObrFazerDecisao = (i: number): ThemeNarrative => ({
+  area: "CIVEL_GERAL",
+  themeLabel: "Obrigação de fazer — tutela deferida (decisão)",
+  autor: pick(NOMES, i + 1),
+  reu: pick(EMPRESAS, i + 1).nome,
+  comarca: pick(COMARCAS, i + 1),
+  fatos: `Juiz deve decidir sobre pedido de tutela de urgência em ação de obrigação de fazer. ${pick(NOMES, i + 1)} ajuizou ação após ${pick(EMPRESAS, i + 1).nome} deixar de entregar ${pick(["obra contratada", "equipamento médico essencial", "serviço de TI crítico"], i)}. Há prova documental do contrato, do pagamento e do inadimplemento. Risco de dano irreparável comprovado por laudo técnico.`,
+  pedido: "deferimento da tutela de urgência para compelir a ré a cumprir a obrigação",
+  norma: "art. 300 do CPC (tutela de urgência — probabilidade do direito e perigo de dano)",
+});
+
+const tCgObrFazerSentenca = (i: number): ThemeNarrative => ({
+  area: "CIVEL_GERAL",
+  themeLabel: "Obrigação de fazer — sentença",
+  autor: pick(NOMES, i + 2),
+  reu: pick(EMPRESAS, i + 2).nome,
+  comarca: pick(COMARCAS, i + 2),
+  fatos: `Ação de obrigação de fazer ajuizada por ${pick(NOMES, i + 2)} em face de ${pick(EMPRESAS, i + 2).nome}. Instrução encerrada. Prova documental robusta: contrato assinado, comprovante de pagamento de ${brl(35000 + i * 1500)} e notificação extrajudicial sem resposta. Réu não comprovou execução da obrigação nem apresentou justificativa válida para o inadimplemento.`,
+  pedido: "condenação ao cumprimento da obrigação de fazer, em tutela específica, sob pena de conversão em perdas e danos",
+  norma: "arts. 497 e 498 do CPC; art. 389 do CC/2002",
+});
+
+const tCgDanosMoraisProcedente = (i: number): ThemeNarrative => ({
+  area: "CIVEL_GERAL",
+  themeLabel: "Danos morais — sentença procedente",
+  autor: pick(NOMES, i + 3),
+  reu: pick(EMPRESAS, i + 3).nome,
+  comarca: pick(COMARCAS, i + 3),
+  fatos: `${pick(NOMES, i + 3)} (CPF ${cpf(i + 3300)}) teve nome inscrito indevidamente em SPC/Serasa pela ${pick(EMPRESAS, i + 3).nome} em ${dateBack(1, i)} por débito inexistente de ${brl(800 + i * 50)}. A inscrição perdurou por ${45 + (i % 60)} dias, impedindo acesso a crédito. Não havia relação contratual entre as partes. Réu confirmou o erro e excluiu a inscrição, mas não indenizou o autor.`,
+  pedido: "indenização por danos morais em valor não inferior a R$ 10.000,00",
+  norma: "art. 186 e art. 927 do CC/2002; Súmula 385 do STJ",
+  jurisprudencias: [JUR_FAVORAVEL_DANOS],
+});
+
+const tCgDanosMoraisImprocedente = (i: number): ThemeNarrative => ({
+  area: "CIVEL_GERAL",
+  themeLabel: "Danos morais — sentença improcedente",
+  autor: pick(NOMES, i + 4),
+  reu: pick(EMPRESAS, i + 4 > 3 ? 0 : i + 4).nome,
+  comarca: pick(COMARCAS, i + 4),
+  fatos: `${pick(NOMES, i + 4)} requer indenização por danos morais alegando que foi negativado pelo débito de ${brl(2000 + i * 100)} com ${pick(EMPRESAS, i % 4).nome}. Contudo: (a) o débito existe — contratos juntados pela ré comprovam a inadimplência; (b) autor já possuía outras negativações anteriores (Súmula 385 STJ); (c) não há prova de abalo à honra além do ordinário.`,
+  pedido: "indenização por danos morais",
+  norma: "art. 186 do CC/2002 — autor ônus de provar dano efetivo",
+});
+
+const tCgCobrancaInicial = (i: number): ThemeNarrative => ({
+  area: "CIVEL_GERAL",
+  themeLabel: "Cobrança contratual — petição inicial",
+  autor: pick(NOMES, i + 5),
+  reu: pick(NOMES, i + 10),
+  comarca: pick(COMARCAS, i + 5),
+  fatos: `${pick(NOMES, i + 5)} (CPF ${cpf(i + 3500)}) emprestou em ${dateBack(2, i)} a ${pick(NOMES, i + 10)} (CPF ${cpf(i + 3600)}) o valor de ${brl(30000 + i * 2000)} mediante contrato escrito com testemunhas, com vencimento em ${dateBack(1, i)}. Após vencimento, devedor não pagou mesmo após notificação extrajudicial. Credor busca receber principal + juros legais (art. 406 CC) + honorários.`,
+  pedido: "pagamento do principal corrigido pelo IPCA, juros de mora de 1% ao mês desde a citação e honorários advocatícios",
+  norma: "arts. 394, 397, 406 e 421 do CC/2002; art. 85 CPC",
+});
+
+const tCgCobrancaSentenca = (i: number): ThemeNarrative => ({
+  area: "CIVEL_GERAL",
+  themeLabel: "Cobrança contratual — sentença",
+  autor: pick(NOMES, i + 6),
+  reu: pick(NOMES, i + 11),
+  comarca: pick(COMARCAS, i + 6),
+  fatos: `Ação de cobrança. Instrução encerrada. Contrato juntado comprovando obrigação de ${brl(40000 + i * 3000)}. Réu apresentou defesa alegando pagamento, mas não trouxe comprovante. Prova testemunhal favorável ao autor. Devedor notificado e não pagou.`,
+  pedido: "condenação ao pagamento do débito principal com correção e juros",
+  norma: "arts. 394, 397 e 406 do CC/2002",
+});
+
+const tCgCumprimentoDecisao = (i: number): ThemeNarrative => ({
+  area: "CIVEL_GERAL",
+  themeLabel: "Cumprimento de sentença — decisão (multa e penhora)",
+  autor: pick(NOMES, i + 7),
+  reu: pick(NOMES, i + 12),
+  comarca: pick(COMARCAS, i + 7),
+  fatos: `Fase de cumprimento de sentença. Sentença condenou réu ao pagamento de ${brl(45000 + i * 2500)} + correção. Prazo de 15 dias para pagamento voluntário (art. 523 CPC) transcorreu sem pagamento. Exequente requer multa de 10% (art. 523 §1º CPC), honorários advocatícios de 10% e penhora on-line via BACENJUD.`,
+  pedido: "aplicação da multa de 10%, honorários de 10% e expedição de ordem de penhora eletrônica",
+  norma: "arts. 523, 524 e 854 do CPC",
+});
+
+const tCgAgravoRecurso = (i: number): ThemeNarrative => ({
+  area: "CIVEL_GERAL",
+  themeLabel: "Agravo de instrumento — recurso contra negativa de tutela",
+  autor: pick(NOMES, i + 8),
+  reu: pick(EMPRESAS, i + 2).nome,
+  comarca: pick(COMARCAS, i + 8),
+  fatos: `Juiz de 1º grau indeferiu pedido de tutela de urgência por insuficiência de prova do periculum in mora. Parte agravante (${pick(NOMES, i + 8)}) pretende reformar a decisão interlocutória. A decisão é do tipo que comporta agravo de instrumento nos termos do art. 1.015, I, do CPC. Prazo de 15 dias para interposição. Há urgência comprovada por documentos adicionais.`,
+  pedido: "reforma da decisão interlocutória que indeferiu a tutela de urgência",
+  norma: "art. 1.015, I, do CPC (agravo de instrumento contra tutela de urgência)",
+});
+
+const tCgDespachoEmenda = (i: number): ThemeNarrative => ({
+  area: "CIVEL_GERAL",
+  themeLabel: "Despacho — emenda à inicial",
+  autor: pick(NOMES, i + 9),
+  reu: pick(EMPRESAS, i + 3).nome,
+  comarca: pick(COMARCAS, i + 9),
+  fatos: `Petição inicial protocolada apresenta vícios formais: (a) endereço completo do réu não indicado; (b) valor da causa calculado incorretamente; (c) documentos essenciais não juntados. Juiz deve emitir despacho determinando emenda no prazo de 15 dias (art. 321 CPC), sem antecipar análise do mérito. A inicial não deve ser indeferida de plano.`,
+  pedido: "emenda à petição inicial para sanar vícios formais",
+  norma: "art. 321 do CPC (emenda à petição inicial — prazo 15 dias)",
+});
+
+// ── CONSUMIDOR ────────────────────────────────────────────────────────────────
+
+const tCsNegativacaoInicial = (i: number): ThemeNarrative => ({
+  area: "CONSUMIDOR",
+  themeLabel: "Negativação indevida — petição inicial (CDC)",
+  autor: pick(NOMES, i),
+  reu: pick(EMPRESAS, i).nome,
+  comarca: pick(COMARCAS, i),
+  fatos: `${pick(NOMES, i)} (CPF ${cpf(i + 4000)}) teve nome inscrito indevidamente em SPC/Serasa por ${pick(EMPRESAS, i).nome} (CNPJ ${pick(EMPRESAS, i).cnpj}) em ${dateBack(0, i)}, por suposto débito de ${brl(500 + i * 30)} (contrato jamais celebrado). Autor é consumidor, ré é fornecedora. CDC é aplicável. Houve dano moral pela restrição de crédito.`,
+  pedido: "declaração de inexistência do débito, exclusão da negativação e indenização por danos morais",
+  norma: "art. 6º, VI, e art. 43 do CDC; arts. 186 e 927 do CC/2002",
+  jurisprudencias: [JUR_FAVORAVEL_DANOS],
+});
+
+const tCsNegativacaoSentencaProc = (i: number): ThemeNarrative => ({
+  area: "CONSUMIDOR",
+  themeLabel: "Negativação indevida — sentença procedente",
+  autor: pick(NOMES, i + 1),
+  reu: pick(EMPRESAS, i + 1).nome,
+  comarca: pick(COMARCAS, i + 1),
+  fatos: `Ação consumerista de indenização. Negativação indevida comprovada: ré reconheceu erro e excluiu o apontamento durante o processo. Relação de consumo demonstrada. Autor sem outras negativações (Súmula 385 STJ). Dano moral decorre do abalo ao crédito e ao nome. Réu não trouxe prova de eventual exclusão tempestiva ou de inexistência do dano.`,
+  pedido: "condenação em danos morais e declaração de inexistência do débito",
+  norma: "arts. 6º, VI, e 14 do CDC; arts. 186 e 927 do CC/2002",
+  jurisprudencias: [JUR_FAVORAVEL_DANOS],
+});
+
+const tCsNegativacaoSentencaImproc = (i: number): ThemeNarrative => ({
+  area: "CONSUMIDOR",
+  themeLabel: "Negativação regular — sentença improcedente",
+  autor: pick(NOMES, i + 2),
+  reu: pick(EMPRESAS, i + 2).nome,
+  comarca: pick(COMARCAS, i + 2),
+  fatos: `Autor requer indenização por danos morais alegando negativação indevida. Porém: (a) o débito de ${brl(1200 + i * 100)} é regular — contrato comprovado; (b) inadimplência do autor demonstrada; (c) autor possui outras negativações anteriores ao ato da ré (Súmula 385 STJ). Negativação regular não gera dano moral indenizável.`,
+  pedido: "indenização por danos morais por negativação tida como indevida",
+  norma: "Súmula 385 STJ — outras negativações afastam o dano moral",
+});
+
+const tCsProdutoVicioInicial = (i: number): ThemeNarrative => ({
+  area: "CONSUMIDOR",
+  themeLabel: "Produto com vício — petição inicial (CDC art. 18)",
+  autor: pick(NOMES, i + 3),
+  reu: pick(EMPRESAS, i + 3).nome,
+  comarca: pick(COMARCAS, i + 3),
+  fatos: `${pick(NOMES, i + 3)} adquiriu em ${dateBack(1, i)} produto da ${pick(EMPRESAS, i + 3).nome} pelo valor de ${brl(3500 + i * 500)} (nota fiscal juntada). O produto apresentou vício de fabricação em ${dateBack(0, i)}, dentro do prazo de garantia legal. Ré foi notificada mas não sanou o vício no prazo de 30 dias do art. 18 §1º do CDC. Autor tem direito à substituição, restituição ou abatimento.`,
+  pedido: "restituição integral do valor pago ou substituição do produto sem vício",
+  norma: "art. 18 e art. 26 do CDC (garantia legal de produto)",
+});
+
+const tCsProdutoVicioSentenca = (i: number): ThemeNarrative => ({
+  area: "CONSUMIDOR",
+  themeLabel: "Produto com vício — sentença",
+  autor: pick(NOMES, i + 4),
+  reu: pick(EMPRESAS, i % 4).nome,
+  comarca: pick(COMARCAS, i + 4),
+  fatos: `Ação consumerista por vício de produto. Instrução encerrada. Laudo pericial confirmou o vício de fabricação. Ré não sanou o vício no prazo legal de 30 dias (art. 18 §1º CDC). Relação de consumo evidente. Autor tem direito à escolha entre substituição do produto, restituição do valor ou abatimento proporcional do preço.`,
+  pedido: "condenação à restituição do valor pago pelo produto viciado",
+  norma: "arts. 18 e 20 do CDC",
+});
+
+const tCsPlanoSaudeTutela = (i: number): ThemeNarrative => ({
+  area: "CONSUMIDOR",
+  themeLabel: "Plano de saúde negando tratamento — tutela de urgência (decisão)",
+  autor: pick(NOMES, i + 5),
+  reu: "Operadora de Plano de Saúde",
+  comarca: pick(COMARCAS, i + 5),
+  fatos: `Juiz deve decidir sobre tutela de urgência. ${pick(NOMES, i + 5)} é beneficiário de plano de saúde e necessita de ${pick(["cirurgia oncológica urgente", "tratamento de quimioterapia prescrito por oncologista", "procedimento cirúrgico cardíaco de urgência"], i)} prescrito por médico credenciado. O plano negou cobertura alegando cláusula de exclusão. Laudo médico atesta urgência e risco à vida em ${7 + i % 14} dias. Há verossimilhança e urgência comprovadas.`,
+  pedido: "tutela de urgência para custeio imediato do procedimento médico negado",
+  norma: "art. 300 CPC; arts. 47 e 51 do CDC; Resolução ANS n. 465/2021",
+});
+
+const tCsBancoCobrancaInicial = (i: number): ThemeNarrative => ({
+  area: "CONSUMIDOR",
+  themeLabel: "Banco — cobrança indevida — petição inicial",
+  autor: pick(NOMES, i + 6),
+  reu: pick(["Banco do Brasil S.A.", "Itaú Unibanco S.A.", "Caixa Econômica Federal", "Santander Brasil S.A."], i),
+  comarca: pick(COMARCAS, i + 6),
+  fatos: `${pick(NOMES, i + 6)} (CPF ${cpf(i + 4600)}) teve cobrados indevidamente ${brl(800 + i * 50)}/mês durante ${3 + i % 9} meses a título de ${pick(["tarifa de manutenção de conta cancelada", "seguro não contratado", "taxa de serviço não solicitado"], i)}, totalizando ${brl((800 + i * 50) * (3 + i % 9))}. Extrato bancário comprova as cobranças indevidas. Consumidor não autorizou os descontos.`,
+  pedido: "devolução em dobro dos valores cobrados indevidamente e indenização por danos morais",
+  norma: "art. 42, parágrafo único, do CDC; arts. 186 e 927 do CC/2002",
+});
+
+const tCsBancoCobrancaSentenca = (i: number): ThemeNarrative => ({
+  area: "CONSUMIDOR",
+  themeLabel: "Banco — cobrança indevida — sentença",
+  autor: pick(NOMES, i + 7),
+  reu: pick(["Banco Bradesco S.A.", "Nubank S.A.", "Banco Inter S.A."], i),
+  comarca: pick(COMARCAS, i + 7),
+  fatos: `Ação consumerista contra banco. Instrução encerrada. Prova documental comprova cobranças indevidas de ${brl(1200 + i * 100)}/mês por ${2 + i % 6} meses (total: ${brl((1200 + i * 100) * (2 + i % 6))}). Banco não comprovou autorização ou base contratual para as cobranças. Relação de consumo incontroversa.`,
+  pedido: "devolução em dobro dos valores indevidamente cobrados",
+  norma: "art. 42, parágrafo único, do CDC (devolução em dobro por cobrança indevida)",
+});
+
+const tCsApelacaoConsumidor = (i: number): ThemeNarrative => ({
+  area: "CONSUMIDOR",
+  themeLabel: "Apelação consumerista — recurso contra improcedência",
+  autor: pick(NOMES, i + 8),
+  reu: pick(EMPRESAS, i + 1).nome,
+  comarca: pick(COMARCAS, i + 8),
+  fatos: `Sentença julgou improcedente a ação consumerista de ${pick(NOMES, i + 8)} contra ${pick(EMPRESAS, i + 1).nome}. Apelante entende que: (a) o CDC era aplicável e não foi reconhecido; (b) a inversão do ônus da prova deveria ter sido aplicada; (c) a sentença não analisou o vício do produto/serviço devidamente. Prazo de apelação: 15 dias úteis (art. 1.003, §5º CPC).`,
+  pedido: "reforma da sentença para julgamento procedente dos pedidos da inicial",
+  norma: "art. 1.009 do CPC (apelação contra sentença); art. 6º, VIII, do CDC (inversão do ônus)",
+});
+
+const tCsDespachoProvas = (i: number): ThemeNarrative => ({
+  area: "CONSUMIDOR",
+  themeLabel: "Despacho — especificação de provas (ação consumerista)",
+  autor: pick(NOMES, i + 9),
+  reu: pick(EMPRESAS, i + 2).nome,
+  comarca: pick(COMARCAS, i + 9),
+  fatos: `Ação consumerista em fase de especificação de provas. Juiz deve emitir despacho ordenando que as partes especifiquem as provas que pretendem produzir, indicando rol de testemunhas (art. 357 CPC), prazos para juntada de documentos e eventuais pedidos de perícia. Despacho deve ser conciso e sem antecipar análise do mérito.`,
+  pedido: "especificação de provas para instrução do feito",
+  norma: "arts. 357 e 370 do CPC (especificação de provas — despacho de impulso processual)",
+});
+
+// Adiciona os temas cíveis/consumeristas ao THEMES
+THEMES.push(
+  // CÍVEL GERAL (10 temas — um tipo de peça cada)
+  { id: "cg_obr_fazer_inicial",   build: tCgObrFazerInicial,   compatibleTypes: ["PETICAO_INICIAL"] },
+  { id: "cg_obr_fazer_decisao",   build: tCgObrFazerDecisao,   compatibleTypes: ["DECISAO"] },
+  { id: "cg_obr_fazer_sentenca",  build: tCgObrFazerSentenca,  compatibleTypes: ["SENTENCA"] },
+  { id: "cg_danos_morais_proc",   build: tCgDanosMoraisProcedente,  compatibleTypes: ["SENTENCA"] },
+  { id: "cg_danos_morais_improc", build: tCgDanosMoraisImprocedente, compatibleTypes: ["SENTENCA"] },
+  { id: "cg_cobranca_inicial",    build: tCgCobrancaInicial,   compatibleTypes: ["PETICAO_INICIAL"] },
+  { id: "cg_cobranca_sentenca",   build: tCgCobrancaSentenca,  compatibleTypes: ["SENTENCA"] },
+  { id: "cg_cumprimento_decisao", build: tCgCumprimentoDecisao, compatibleTypes: ["DECISAO"] },
+  { id: "cg_agravo_recurso",      build: tCgAgravoRecurso,     compatibleTypes: ["RECURSO"] },
+  { id: "cg_despacho_emenda",     build: tCgDespachoEmenda,    compatibleTypes: ["DESPACHO"] },
+  // CONSUMIDOR (10 temas — um tipo de peça cada)
+  { id: "cs_negativacao_inicial",    build: tCsNegativacaoInicial,     compatibleTypes: ["PETICAO_INICIAL"] },
+  { id: "cs_negativacao_sentenca_p", build: tCsNegativacaoSentencaProc, compatibleTypes: ["SENTENCA"] },
+  { id: "cs_negativacao_sentenca_i", build: tCsNegativacaoSentencaImproc, compatibleTypes: ["SENTENCA"] },
+  { id: "cs_produto_vicio_inicial",  build: tCsProdutoVicioInicial,    compatibleTypes: ["PETICAO_INICIAL"] },
+  { id: "cs_produto_vicio_sentenca", build: tCsProdutoVicioSentenca,   compatibleTypes: ["SENTENCA"] },
+  { id: "cs_plano_saude_tutela",     build: tCsPlanoSaudeTutela,       compatibleTypes: ["DECISAO"] },
+  { id: "cs_banco_cobranca_inicial", build: tCsBancoCobrancaInicial,   compatibleTypes: ["PETICAO_INICIAL"] },
+  { id: "cs_banco_cobranca_sentenca",build: tCsBancoCobrancaSentenca,  compatibleTypes: ["SENTENCA"] },
+  { id: "cs_apelacao_consumidor",    build: tCsApelacaoConsumidor,     compatibleTypes: ["RECURSO"] },
+  { id: "cs_despacho_provas",        build: tCsDespachoProvas,         compatibleTypes: ["DESPACHO"] },
 );

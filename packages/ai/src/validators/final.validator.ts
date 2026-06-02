@@ -19,6 +19,8 @@ import { RichnessValidator } from "./richness.validator.js";
 import { EvidenceStanceValidator } from "./evidence-stance.validator.js";
 import { SentencaValidator } from "./sentenca.validator.js";
 import { CriminalSentenceValidator } from "./criminal-sentenca.validator.js";
+import { CivilValidator } from "./civil.validator.js";
+import { ConsumerValidator } from "./consumer.validator.js";
 
 export interface FinalValidationResult {
   valid: boolean;
@@ -78,6 +80,8 @@ export class FinalValidator {
   private evidenceStance = new EvidenceStanceValidator();
   private sentenca = new SentencaValidator();
   private criminalSentenca = new CriminalSentenceValidator();
+  private civil = new CivilValidator();
+  private consumer = new ConsumerValidator();
 
   validate(
     draft: string,
@@ -101,6 +105,12 @@ export class FinalValidator {
       // 1c. Validação específica de SENTENCA criminal
       allErrors.push(...this.criminalSentenca.validate(draft, classification).errors);
     }
+
+    // 1d. Validação cível (tutela + honorários/custas em sentença)
+    allErrors.push(...this.civil.validate(draft, classification).errors);
+
+    // 1e. Validação consumerista (CDC + inversão ônus + dano moral + repetição em dobro)
+    allErrors.push(...this.consumer.validate(draft, classification).errors);
 
     // 2. Validação de regras jurídicas (artigos, diplomas)
     const legalResult = this.legal.validateDraftArticles(draft, classification);

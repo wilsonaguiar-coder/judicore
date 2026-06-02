@@ -32,7 +32,8 @@ function emptyArea(): AreaStats {
 function emptyByArea(): Record<LegalArea, AreaStats> {
   return {
     RPPS: emptyArea(), RGPS: emptyArea(), TRABALHISTA: emptyArea(),
-    CRIMINAL: emptyArea(), CRIMINAL_MERITO: emptyArea(), CIVEL: emptyArea(),
+    CRIMINAL: emptyArea(), CRIMINAL_MERITO: emptyArea(),
+    CIVEL: emptyArea(), CIVEL_GERAL: emptyArea(), CONSUMIDOR: emptyArea(),
   };
 }
 
@@ -51,6 +52,8 @@ function emptyByValidator(): Record<ValidatorComponent, ValidatorStats> {
     GenericityValidator: emptyValidator(),
     MatrixQualityValidator: emptyValidator(),
     RichnessValidator: emptyValidator(),
+    CivilValidator: emptyValidator(),
+    ConsumerValidator: emptyValidator(),
     Other: emptyValidator(),
   };
 }
@@ -79,8 +82,8 @@ function summarize(results: CaseResult[]): RunSummary {
     MatrixQualityValidator: new Map(), RichnessValidator: new Map(), Other: new Map(),
   };
 
-  const areaScoreSum: Record<LegalArea, number> = { RPPS: 0, RGPS: 0, TRABALHISTA: 0, CRIMINAL: 0, CRIMINAL_MERITO: 0, CIVEL: 0 };
-  const areaScoreN: Record<LegalArea, number> = { RPPS: 0, RGPS: 0, TRABALHISTA: 0, CRIMINAL: 0, CRIMINAL_MERITO: 0, CIVEL: 0 };
+  const areaScoreSum: Record<LegalArea, number> = { RPPS: 0, RGPS: 0, TRABALHISTA: 0, CRIMINAL: 0, CRIMINAL_MERITO: 0, CIVEL: 0, CIVEL_GERAL: 0, CONSUMIDOR: 0 };
+  const areaScoreN: Record<LegalArea, number> = { RPPS: 0, RGPS: 0, TRABALHISTA: 0, CRIMINAL: 0, CRIMINAL_MERITO: 0, CIVEL: 0, CIVEL_GERAL: 0, CONSUMIDOR: 0 };
   const docScoreSum: Record<string, number> = {};
   const docScoreN: Record<string, number> = {};
   const themeScoreSum: Record<string, number> = {};

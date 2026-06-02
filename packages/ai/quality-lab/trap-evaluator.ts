@@ -53,18 +53,33 @@ export function evaluateTrap(trap: TrapKind, result: CaseResult): TrapOutcome {
           "WRONG_HONORARIOS_CRIMINAL",
           "WRONG_HONORARIOS",
           "CRIMINAL_ARTICLE_85_CPC",
+          "TUTELA_MISSING_PERICULUM_MORA",
+          "INVERSAO_ONUS_SEM_FUNDAMENTO",
         )
       ) return "DETECTED";
 
       // MISSED: padrões diretos no draft
       if (result.area === "RPPS" && /art\.?\s*201\s*(da\s*)?(cf|constitui)/i.test(draft)) return "MISSED";
       if (result.area === "RGPS" && /art\.?\s*40\s*(da\s*)?(cf|constitui)/i.test(draft)) return "MISSED";
-      if (result.area === "CRIMINAL" || result.area === "CRIMINAL_MERITO" && /art\.?\s*85\s*(do\s+)?cpc/i.test(draft)) return "MISSED";
+      if ((result.area === "CRIMINAL" || result.area === "CRIMINAL_MERITO") && /art\.?\s*85\s*(do\s+)?cpc/i.test(draft)) return "MISSED";
       // Trabalhista com art. 85 CPC em vez de art. 791-A CLT
       if (
         result.area === "TRABALHISTA" &&
         /art\.?\s*85\s*(do\s+)?cpc/i.test(draft) &&
         !/art\.?\s*791[-\s]?[aA]/i.test(draft)
+      ) return "MISSED";
+      // Cível: tutela deferida sem periculum in mora
+      if (
+        (result.area === "CIVEL_GERAL" || result.area === "CIVEL") &&
+        result.documentType === "DECISAO" &&
+        /defiro|concedo\s+(a\s+)?liminar|defiro\s+a\s+tutela/i.test(draft) &&
+        !/periculum\s+in\s+mora|perigo\s+de\s+dano|urg[eê]ncia\s+da\s+medida/i.test(draft)
+      ) return "MISSED";
+      // Consumidor: inversão do ônus sem art. 6, VIII, CDC
+      if (
+        result.area === "CONSUMIDOR" &&
+        /invers[aã]o.*[oô]nus/i.test(draft) &&
+        !/art\.?\s*6[°º,.]?\s*(inc\.?\s*|inciso\s*)?viii/i.test(draft)
       ) return "MISSED";
 
       return "AVOIDED";

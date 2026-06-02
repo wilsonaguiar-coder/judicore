@@ -25,7 +25,7 @@ import { PieceCompatibilityValidator } from "./piece-compatibility.js";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
-const PHASES = ["PETICAO_INICIAL", "RECURSO", "DECISAO", "SENTENCA"] as const;
+const PHASES = ["PETICAO_INICIAL", "RECURSO", "DECISAO", "SENTENCA", "DESPACHO"] as const;
 type Phase = typeof PHASES[number];
 
 // Distribuição determinística de traps. ~30% dos casos.
@@ -54,15 +54,23 @@ function decideTrap(slotIndex: number, area: LegalArea, phase: Phase | "DESPACHO
   if (kind === "COMPETENCIA_INCORRETA" && phase !== "RECURSO") kind = "JURISPRUDENCIA_CONTRARIA";
   if (kind === "LINGUAGEM_DECISORIA" && phase !== "DESPACHO") kind = "ARTIGO_INCOMPATIVEL";
   const criminalAreas = ["CRIMINAL", "CRIMINAL_MERITO"] as const;
-  if (kind === "ARTIGO_INCOMPATIVEL" && !["RPPS", "RGPS", ...criminalAreas].includes(area as "RPPS" | "RGPS" | "CRIMINAL" | "CRIMINAL_MERITO")) {
+  const civelAreas = ["CIVEL", "CIVEL_GERAL", "CONSUMIDOR"] as const;
+  const isCivel = (civelAreas as readonly string[]).includes(area);
+
+  if (kind === "ARTIGO_INCOMPATIVEL" && !["RPPS", "RGPS", ...criminalAreas, ...civelAreas].includes(area as never)) {
     kind = "JURISPRUDENCIA_CONTRARIA";
   }
-  // RECURSO_INADEQUADO: válido para TRABALHISTA e criminal (apelação cível em sentença penal)
-  if (kind === "RECURSO_INADEQUADO" && area !== "TRABALHISTA" && !criminalAreas.includes(area as "CRIMINAL" | "CRIMINAL_MERITO")) {
+  // RECURSO_INADEQUADO: válido para TRABALHISTA, criminal e cível (apelação vs agravo)
+  if (kind === "RECURSO_INADEQUADO" &&
+      area !== "TRABALHISTA" &&
+      !criminalAreas.includes(area as "CRIMINAL" | "CRIMINAL_MERITO") &&
+      !isCivel) {
     kind = "JURISPRUDENCIA_CONTRARIA";
   }
-  // COMPETENCIA_INCORRETA: válido para TRABALHISTA e criminal (STJ em matéria penal)
-  if (kind === "COMPETENCIA_INCORRETA" && area !== "TRABALHISTA" && !criminalAreas.includes(area as "CRIMINAL" | "CRIMINAL_MERITO")) {
+  // COMPETENCIA_INCORRETA: válido para TRABALHISTA e criminal
+  if (kind === "COMPETENCIA_INCORRETA" &&
+      area !== "TRABALHISTA" &&
+      !criminalAreas.includes(area as "CRIMINAL" | "CRIMINAL_MERITO")) {
     kind = "JURISPRUDENCIA_CONTRARIA";
   }
 
@@ -76,9 +84,16 @@ export function generateSyntheticCases(
 ): SyntheticCase[] {
   const cases: SyntheticCase[] = [];
 
-  // 80 casos: 20 temas × 4 fases
+  // "CIVEL" como alias para todas as sub-áreas cíveis (CIVEL + CIVEL_GERAL + CONSUMIDOR)
+  const CIVEL_ALIAS: Set<string> = new Set(["CIVEL", "CIVEL_GERAL", "CONSUMIDOR"]);
+
+  // 80 casos base: 20 temas × 4 fases (mais os temas com compatibleTypes restrito)
   const themesToUse = areaFilter
-    ? THEMES.filter((t) => t.build(0).area === areaFilter)
+    ? THEMES.filter((t) => {
+        const area = t.build(0).area;
+        if (areaFilter === "CIVEL") return CIVEL_ALIAS.has(area);
+        return area === areaFilter;
+      })
     : THEMES;
 
   let slot = 0;

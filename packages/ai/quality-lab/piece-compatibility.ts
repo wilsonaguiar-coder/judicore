@@ -44,10 +44,34 @@ export const PHASES_NO_SENTENCA: readonly TipoPeca[] = [
 
 export const PIECE_COMPATIBILITY: Readonly<Record<string, readonly TipoPeca[]>> = {
   // ── Criminal — procedimentos incidentais (sem SENTENÇA) ──────────────────
-  crim_hc_liberatorio:       PHASES_NO_SENTENCA,  // HC resulta em concessão/denegação da ordem (DECISÃO)
-  crim_liberdade_provisoria: PHASES_NO_SENTENCA,  // DEFIRO/INDEFIRO a liberdade provisória (DECISÃO)
-  crim_preventiva:           PHASES_NO_SENTENCA,  // REVOGO/MANTENHO a preventiva (DECISÃO)
-  crim_progressao:           PHASES_NO_SENTENCA,  // DEFIRO/INDEFIRO progressão de regime (DECISÃO)
+  crim_hc_liberatorio:       PHASES_NO_SENTENCA,
+  crim_liberdade_provisoria: PHASES_NO_SENTENCA,
+  crim_preventiva:           PHASES_NO_SENTENCA,
+  crim_progressao:           PHASES_NO_SENTENCA,
+
+  // ── Cível Geral — cada tema tem um único tipo de peça compatível ──────────
+  cg_obr_fazer_inicial:   ["PETICAO_INICIAL"],
+  cg_obr_fazer_decisao:   ["DECISAO"],
+  cg_obr_fazer_sentenca:  ["SENTENCA"],
+  cg_danos_morais_proc:   ["SENTENCA"],
+  cg_danos_morais_improc: ["SENTENCA"],
+  cg_cobranca_inicial:    ["PETICAO_INICIAL"],
+  cg_cobranca_sentenca:   ["SENTENCA"],
+  cg_cumprimento_decisao: ["DECISAO"],
+  cg_agravo_recurso:      ["RECURSO"],
+  cg_despacho_emenda:     ["DESPACHO"],
+
+  // ── Consumidor — cada tema tem um único tipo de peça compatível ───────────
+  cs_negativacao_inicial:     ["PETICAO_INICIAL"],
+  cs_negativacao_sentenca_p:  ["SENTENCA"],
+  cs_negativacao_sentenca_i:  ["SENTENCA"],
+  cs_produto_vicio_inicial:   ["PETICAO_INICIAL"],
+  cs_produto_vicio_sentenca:  ["SENTENCA"],
+  cs_plano_saude_tutela:      ["DECISAO"],
+  cs_banco_cobranca_inicial:  ["PETICAO_INICIAL"],
+  cs_banco_cobranca_sentenca: ["SENTENCA"],
+  cs_apelacao_consumidor:     ["RECURSO"],
+  cs_despacho_provas:         ["DESPACHO"],
 };
 
 // ── PieceCompatibilityValidator ──────────────────────────────────────────────
