@@ -64,6 +64,19 @@ ATENÇÃO — NÃO CLASSIFIQUE COMO CRITICO NEM IMPORTANTE:
 - Qualquer preferência sobre estilo, tamanho ou completude → SUGESTAO
 - "Poderia individualizar melhor" → SUGESTAO
 
+REGRA CRÍTICA — SENTENÇA IMPROCEDENTE (evitar falso positivo de TESE_AUSENTE):
+Quando tipo_peca for SENTENÇA e o DISPOSITIVO contiver "julgo improcedente" ou "julgo parcialmente improcedente":
+- NÃO marque como TESE_AUSENTE uma tese que foi discutida na fundamentação e REJEITADA fundamentadamente.
+- A tese pode aparecer como "O autor alega X... Contudo, tal argumento não procede porque..." — isso é análise e rejeição, não ausência.
+- TESE_AUSENTE deve ser usado APENAS quando a tese da matriz não aparece em nenhuma parte da fundamentação.
+- Diferencie: (A) tese ausente = não há análise alguma; (B) tese analisada e rejeitada = há análise com conclusão contrária. Somente (A) justifica TESE_AUSENTE.
+
+REGRA CRÍTICA — VERIFICAÇÃO DE ARTIGOS LEGAIS (evitar falso positivo de TESE_AUSENTE):
+Ao verificar se um artigo legal está presente (ex: art. 85 CPC, art. 23 CF, art. 300 CPC):
+- Busque em TODO o documento: RELATÓRIO, FUNDAMENTAÇÃO e DISPOSITIVO.
+- O artigo pode aparecer no DISPOSITIVO como "nos termos do art. 85, §2º, do CPC" — isso conta.
+- Só marque ausência se o artigo não constar em nenhuma seção da peça.
+
 VERIFICAÇÕES ESPECÍFICAS OBRIGATÓRIAS:
 
 1. SENTENÇA com linguagem de habeas corpus:

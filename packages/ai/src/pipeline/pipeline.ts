@@ -305,11 +305,8 @@ export class LegalPipeline {
       yield { event: "validation_errors", data: draftRuleValidation.errors };
     }
 
-    // Validação estrutural
-    const structValidation = this.validator.validateStructure(ctx.draft!, ctx.classification!.tipo_peca);
-    if (structValidation.errors.length > 0) {
-      yield { event: "validation_errors", data: structValidation.errors };
-    }
+    // Validação estrutural é executada via FinalValidator (StructuralValidator interno) —
+    // não duplicar aqui para evitar MISSING_STRUCTURE reportado duas vezes.
 
     // Detector de conteúdo genérico
     const genericErrors = this.validator.detectGenericContent(ctx.draft!);

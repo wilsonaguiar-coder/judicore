@@ -1295,16 +1295,27 @@ const tFpConcursoNomeacaoInicial = (i: number): ThemeNarrative => ({
   jurisprudencias: [JUR_STF_TEMA784],
 });
 
-const tFpServidorProgressaoInicial = (i: number): ThemeNarrative => ({
-  area: "FAZENDA_PUBLICA",
-  themeLabel: "Servidor — progressão funcional",
-  autor: pick(NOMES, i + 3),
-  reu: pick(FP_ENTES, i + 3),
-  comarca: pick(COMARCAS, i + 3),
-  fatos: `${pick(NOMES, i + 3)} (CPF ${cpf(i + 5300)}), servidor(a) ${pick(["estadual", "municipal", "federal"], i)} ocupante do cargo de ${pick(["Analista Técnico", "Agente de Saúde", "Fiscal Municipal", "Técnico Administrativo"], i)}, preencheu todos os requisitos legais para progressão em ${dateBack(1, i)}: avaliação de desempenho SATISFATÓRIA (nota ${70 + (i % 25)}/100) e interstício de ${2 + (i % 2)} anos cumprido. A Administração negou a progressão sem fundamentação suficiente.`,
-  pedido: "progressão funcional e pagamento das diferenças de vencimentos desde a data em que o direito surgiu",
-  norma: "estatuto dos servidores — arts. 67 e 68 Lei 8.112/90 (ou lei estadual equivalente); art. 37 caput CF/88",
-});
+// Réus para servidor estadual/municipal — exclui União Federal (Lei 8.112/90 não se aplica)
+const FP_ENTES_ESTADUAIS_MUNICIPAIS = FP_ENTES.filter((e) => e !== "União Federal");
+
+const tFpServidorProgressaoInicial = (i: number): ThemeNarrative => {
+  const ente = pick(FP_ENTES_ESTADUAIS_MUNICIPAIS, i + 3);
+  const isEstadual = ente.startsWith("Estado");
+  const tipoServidor = isEstadual ? "estadual" : "municipal";
+  const estatuto = isEstadual
+    ? "Estatuto dos Servidores do Estado (lei estadual aplicável)"
+    : "Estatuto dos Servidores do Município (lei municipal aplicável)";
+  return {
+    area: "FAZENDA_PUBLICA",
+    themeLabel: "Servidor — progressão funcional",
+    autor: pick(NOMES, i + 3),
+    reu: ente,
+    comarca: pick(COMARCAS, i + 3),
+    fatos: `${pick(NOMES, i + 3)} (CPF ${cpf(i + 5300)}), servidor(a) público(a) ${tipoServidor} ocupante do cargo de ${pick(["Analista Técnico", "Agente de Saúde", "Fiscal Municipal", "Técnico Administrativo"], i)}, preencheu todos os requisitos legais para progressão em ${dateBack(1, i)}: avaliação de desempenho SATISFATÓRIA (nota ${70 + (i % 25)}/100) e interstício de ${2 + (i % 2)} anos cumprido. A Administração negou a progressão sem fundamentação suficiente.`,
+    pedido: "progressão funcional e pagamento das diferenças de vencimentos desde a data em que o direito surgiu",
+    norma: `${estatuto}; art. 37 caput CF/88 (legalidade, impessoalidade); art. 5º, LV, CF/88`,
+  };
+};
 
 const tFpServidorVerbaInicial = (i: number): ThemeNarrative => ({
   area: "FAZENDA_PUBLICA",

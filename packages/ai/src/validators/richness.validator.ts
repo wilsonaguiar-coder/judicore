@@ -32,8 +32,21 @@ export class RichnessValidator {
     const errors: ValidationError[] = [];
     const lower = draft.toLowerCase();
 
+    // Em SENTENÇA, "reconhecimento do direito" é fórmula canônica do RELATÓRIO
+    // (descreve o pedido do autor) — não indica fraqueza argumentativa.
+    // Verificar a expressão apenas no texto pós-FUNDAMENTAÇÃO, não no relatório.
+    const isSentenca = ctx?.tipo_peca === "SENTENCA";
+    const fundamentacaoStart = isSentenca
+      ? (() => {
+          const idx = lower.search(/fundamenta[cç][aã]o|motiva[cç][aã]o|an[aá]lise\s+do\s+m[eé]rito|\bfundamento\b/i);
+          return idx >= 0 ? idx : lower.length;
+        })()
+      : 0;
+    const textToCheck = lower.slice(fundamentacaoStart);
+
     for (const expr of BANNED_EXPRESSIONS) {
-      if (lower.includes(expr)) {
+      const checkIn = (expr === "reconhecimento do direito" && isSentenca) ? textToCheck : lower;
+      if (checkIn.includes(expr)) {
         errors.push({
           rule: "FINAL_DRAFT_WEAK_ARGUMENTATION",
           message: `Expressão genérica proibida em FINAL_DRAFT: "${expr}"`,
