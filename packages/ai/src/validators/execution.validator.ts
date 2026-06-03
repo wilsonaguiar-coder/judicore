@@ -241,7 +241,7 @@ const EXECUTION_SECTIONS: Array<{ pattern: RegExp; label: string }> = [
     // DA ANÁLISE DO CASO CONCRETO / DO CASO CONCRETO / SUBSUNÇÃO DOS FATOS À NORMA /
     // ENQUADRAMENTO JURÍDICO DO CASO / APLICAÇÃO À SITUAÇÃO DOS AUTOS (título extrajudicial)
     pattern:
-      /\b(da\s+)?(aplica[cç][aã]o\s+(ao|à)\s+(caso|quadro|situa[cç][aã]o)|aplica[cç][aã]o\s+à\s+esp[eé]cie|subsun[cç][aã]o\s+dos?\s+fatos?|enquadramento\s+jur[íi]dico|an[aá]lise\s+do\s+caso\s+concreto|do\s+caso\s+concreto)\b|aplica[cç][aã]o.{0,60}(?:concreto|autos?)\b/i,
+      /\b(da\s+)?(aplica[cç][aã]o\s+(ao|à)\s+(caso|quadro|situa[cç][aã]o|execu[cç][aã]o)|aplica[cç][aã]o\s+à\s+esp[eé]cie|subsun[cç][aã]o\s+dos?\s+fatos?|enquadramento\s+jur[íi]dico|an[aá]lise\s+do\s+caso\s+concreto|do\s+caso\s+concreto)\b|aplica[cç][aã]o.{0,60}(?:concreto|autos?)\b/i,
     label: "IV — DA APLICAÇÃO AO CASO CONCRETO",
   },
   {
