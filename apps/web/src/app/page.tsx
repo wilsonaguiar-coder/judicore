@@ -148,10 +148,11 @@ export default function LandingPage() {
             <aside className="hidden md:flex items-center justify-center">
               <motion.div
                 initial={{ scale: 0.95, opacity: 0 }} animate={{ scale: 1, opacity: 1 }}
-                transition={{ duration: 0.6, delay: 0.2 }}
-                className="w-full max-w-sm"
+                whileHover={{ scale: 1.02, y: -6 }} transition={{ duration: 0.5, delay: 0.2 }}
+                className="w-full max-w-sm relative"
               >
-                <div className="rounded-3xl p-8 bg-gradient-to-br from-white to-slate-50 border border-slate-100 shadow-xl">
+                <div className="absolute -left-6 top-8 w-1.5 h-16 rounded-md bg-gradient-to-b from-indigo-500 to-sky-400 shadow-lg" />
+                <div className="rounded-3xl p-8 glass-card glass-hover ring-1 ring-slate-100/30">
                   <div className="flex items-center gap-3 mb-5">
                     <div className="w-10 h-10 rounded-xl bg-indigo-50 flex items-center justify-center">
                       <Sparkles size={18} className="text-indigo-600" />
@@ -161,17 +162,17 @@ export default function LandingPage() {
                       <div className="text-xs text-slate-400">Atualizada diariamente</div>
                     </div>
                   </div>
-                  <div className="text-3xl font-extrabold text-slate-800 mb-1">1M+</div>
-                  <div className="text-sm text-slate-500 mb-6">acórdãos e decisões do STJ, STF e TRFs</div>
+                  <div className="text-3xl font-extrabold text-slate-900 mb-1">1M+</div>
+                  <div className="text-sm text-slate-600 mb-6">acórdãos e decisões do STJ, STF e TRFs</div>
                   <div className="space-y-2">
                     {[
                       { label: "Precisão média", value: "98%" },
                       { label: "Tempo economizado", value: "−70%" },
                       { label: "Usuários ativos", value: "+10.000" },
                     ].map((s) => (
-                      <div key={s.label} className="flex items-center justify-between py-1.5 border-b border-slate-100 last:border-0">
+                      <div key={s.label} className="flex items-center justify-between py-1.5 border-b border-slate-100/40 last:border-0">
                         <span className="text-xs text-slate-500">{s.label}</span>
-                        <span className="text-sm font-bold text-slate-700">{s.value}</span>
+                        <span className="text-sm font-bold text-slate-800">{s.value}</span>
                       </div>
                     ))}
                   </div>
