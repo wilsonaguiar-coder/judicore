@@ -161,6 +161,77 @@ export function evaluateTrap(trap: TrapKind, result: CaseResult): TrapOutcome {
       return "AVOIDED";
     }
 
+    // ── JEF Cível ─────────────────────────────────────────────────────────────
+
+    case "JEF_PERICIA_COMPLEXA": {
+      // DETECTED: validator JEF emitiu a regra
+      if (hasRule("JEF_PERICIA_COMPLEXA")) return "DETECTED";
+      // MISSED: peça solicita perícia complexa sem reconhecer incompatibilidade com JEF
+      if (
+        /per[íi]cia\s+(m[eé]dica|cont[aá]bil|de\s+engenharia|complex|forense|multidisciplinar|t[eé]cnica)/i.test(draft) &&
+        !/incompetência|declino\s+da\s+competência|incompatível\s+com\s+o\s+juizado|supera\s+o\s+rito/i.test(draft)
+      ) return "MISSED";
+      return "AVOIDED";
+    }
+
+    case "JEF_VALOR_EXCEDENTE": {
+      // DETECTED: validator JEF emitiu a regra
+      if (hasRule("JEF_VALOR_EXCEDENTE")) return "DETECTED";
+      // MISSED: valor acima de 40 SM sem renúncia expressa
+      const temValorAlto =
+        /r\$\s*(?:\d{1,3}\.)*[5-9]\d{4}|\b(?:4[1-9]|[5-9]\d|\d{3,})\s+sal[aá]rios?\s+m[íi]nimos?\b/i.test(draft);
+      const temRenuncia =
+        /renunci[ao]\s+ao\s+excedente|renúncia\s+ao\s+valor\s+excedente|renuncia\s+expressamente/i.test(draft);
+      if (temValorAlto && !temRenuncia) return "MISSED";
+      return "AVOIDED";
+    }
+
+    case "JEF_RECURSO_ERRADO": {
+      // DETECTED: validator JEF emitiu a regra
+      if (hasRule("JEF_RECURSO_ERRADO", "JEF_JEC_WRONG_APPEAL")) return "DETECTED";
+      // MISSED: apelação usada em vez de recurso inominado
+      if (
+        result.documentType === "RECURSO" &&
+        /\bapela[cç][aã]o\b/i.test(draft) &&
+        !/recurso\s+inominado/i.test(draft)
+      ) return "MISSED";
+      return "AVOIDED";
+    }
+
+    case "JEF_LEGITIMIDADE_PASSIVA": {
+      // DETECTED: audit menciona ilegitimidade ou parte errada
+      if (/parte\s+errada|ilegitimidade\s+passiva|polo\s+passivo\s+incorret|ilegítim[ao]/i.test(auditText)) return "DETECTED";
+      // MISSED: score muito baixo indica erro na identificação da parte
+      if (score < 72) return "MISSED";
+      return "AVOIDED";
+    }
+
+    case "JEF_TUTELA_SEM_PERICULUM": {
+      // DETECTED: validator JEF emitiu a regra
+      if (hasRule("JEF_TUTELA_SEM_PERICULUM", "TUTELA_MISSING_PERICULUM_MORA")) return "DETECTED";
+      // MISSED: tutela concedida em DECISAO sem mencionar periculum
+      if (
+        result.documentType === "DECISAO" &&
+        /defiro|concedo\s+(?:a\s+)?(?:tutela|liminar)/i.test(draft) &&
+        !/periculum|perigo\s+de\s+dano|urg[eê]ncia\s+(?:comprova|demonstra)|dano\s+irrepará/i.test(draft)
+      ) return "MISSED";
+      return "AVOIDED";
+    }
+
+    case "JEF_TUTELA_SEM_FUMUS": {
+      // DETECTED: validator JEF emitiu a regra
+      if (hasRule("JEF_TUTELA_SEM_FUMUS", "TUTELA_MISSING_ART300")) return "DETECTED";
+      // MISSED: tutela concedida em DECISAO sem mencionar fumus/probabilidade
+      if (
+        result.documentType === "DECISAO" &&
+        /defiro|concedo\s+(?:a\s+)?(?:tutela|liminar)/i.test(draft) &&
+        !/fumus\s+boni\s+iuris|probabilidade\s+do\s+direito|verossimilhan[cç]a|art\.\s*300/i.test(draft)
+      ) return "MISSED";
+      return "AVOIDED";
+    }
+
+    // ── Precedente superado ────────────────────────────────────────────────────
+
     case "PRECEDENTE_SUPERADO": {
       // DETECTED: audit menciona superação
       if (/superad|revoga|cancelad|atualiz|superven|entendimento\s+anterior/i.test(auditText)) return "DETECTED";

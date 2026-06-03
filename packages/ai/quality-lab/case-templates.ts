@@ -2050,3 +2050,147 @@ THEMES.push(
   { id: "ec_agravo_impugnacao_recurso",         build: tEcAgravoImpugnacaoRecurso,     compatibleTypes: ["RECURSO"] },
   { id: "ec_embargos_declaracao_ec_recurso",    build: tEcEmbargosDeclaracaoRecurso,   compatibleTypes: ["RECURSO"] },
 );
+
+// ── JEF CÍVEL (Lei 9.099/95) ──────────────────────────────────────────────────
+//
+// 10 temas × 4 fases (ALL_PHASES) = 40 casos.
+// Cobertura:
+//   1. Negativação indevida        6. Cancelamento de serviço
+//   2. Cobrança indevida           7. Produto com vício
+//   3. Falha bancária              8. Falha de entrega
+//   4. PIX fraudulento             9. Tutela de urgência
+//   5. Telefonia                  10. Competência do JEF
+
+const JEF_OPERADORAS = ["Claro S.A.", "TIM S.A.", "Vivo — Telefônica Brasil S.A.", "Oi Móvel S.A."];
+const JEF_BANCOS = ["Banco Bradesco S.A.", "Nubank S.A.", "Banco do Brasil S.A.", "Itaú Unibanco S.A."];
+const JEF_LOJAS = [
+  { nome: "Magazine Luiza S.A.", cnpj: "47.960.950/0001-21" },
+  { nome: "Casas Bahia Comércio Ltda.", cnpj: "33.041.260/0001-70" },
+  { nome: "Americanas S.A.", cnpj: "00.776.574/0001-56" },
+  { nome: "Via Varejo S.A.", cnpj: "33.041.260/0652-90" },
+];
+
+const tJefNegativacao: ThemeBuilder = (i) => ({
+  area: "JEF_CIVEL",
+  themeLabel: "Negativação indevida — JEF Cível",
+  autor: pick(NOMES, i),
+  reu: pick(JEF_LOJAS, i).nome,
+  comarca: pick(COMARCAS, i),
+  fatos: `${pick(NOMES, i)} (CPF ${cpf(i + 6000)}) teve o nome inscrito indevidamente em SPC/Serasa pela ${pick(JEF_LOJAS, i).nome} (CNPJ ${pick(JEF_LOJAS, i).cnpj}) em ${dateBack(0, i)}, por suposto débito de ${brl(800 + i * 60)} (compra jamais realizada — contrato inexistente). Autor nunca celebrou qualquer negócio com a ré. Houve abalo ao crédito e dano moral. Valor total pleiteado: ${brl(5000 + i * 200)}. Causa de competência do Juizado Especial Cível (Lei 9.099/95) — valor não excede 40 salários mínimos.`,
+  pedido: "declaração de inexistência do débito, exclusão da negativação e indenização por danos morais",
+  norma: "art. 6º, VI, e art. 43 do CDC; arts. 186 e 927 do CC/2002; art. 3º da Lei 9.099/95",
+  jurisprudencias: [JUR_FAVORAVEL_DANOS],
+});
+
+const tJefCobrancaIndevida: ThemeBuilder = (i) => ({
+  area: "JEF_CIVEL",
+  themeLabel: "Cobrança indevida — JEF Cível",
+  autor: pick(NOMES, i + 1),
+  reu: pick(JEF_BANCOS, i),
+  comarca: pick(COMARCAS, i + 1),
+  fatos: `${pick(NOMES, i + 1)} (CPF ${cpf(i + 6100)}) verificou em seu extrato bancário a cobrança indevida de ${brl(120 + i * 30)}/mês por ${3 + i % 6} meses consecutivos pelo ${pick(JEF_BANCOS, i)} a título de "${pick(["seguro não contratado", "tarifa de manutenção cancelada", "pacote de serviços não autorizado"], i)}". Total cobrado indevidamente: ${brl((120 + i * 30) * (3 + i % 6))}. Consumidor notificou o banco extrajudicialmente sem solução. Valor pleiteado: ${brl(3000 + i * 300)}. Competência do Juizado Especial Cível (Lei 9.099/95).`,
+  pedido: "devolução em dobro dos valores cobrados indevidamente (art. 42 §único CDC) e indenização por danos morais",
+  norma: "art. 42, parágrafo único, do CDC; art. 6º, VI, CDC; art. 3º da Lei 9.099/95",
+});
+
+const tJefFalhaBancaria: ThemeBuilder = (i) => ({
+  area: "JEF_CIVEL",
+  themeLabel: "Falha bancária — JEF Cível",
+  autor: pick(NOMES, i + 2),
+  reu: pick(JEF_BANCOS, i + 1),
+  comarca: pick(COMARCAS, i + 2),
+  fatos: `${pick(NOMES, i + 2)} (CPF ${cpf(i + 6200)}) sofreu falha do sistema do ${pick(JEF_BANCOS, i + 1)} em ${dateBack(0, i)}: transferência de ${brl(2500 + i * 200)} foi debitada da conta do autor mas não creditada no destino, causando inadimplemento de obrigação e danos financeiros. O banco reconheceu a falha internamente mas não efetuou o estorno no prazo. Autor ficou negativado por consequência. Valor total pleiteado: ${brl(6000 + i * 300)}.`,
+  pedido: "restituição do valor debitado indevidamente, exclusão de eventual negativação e indenização por danos morais e materiais",
+  norma: "arts. 14 e 43 do CDC; art. 186 do CC/2002; Súmula 297 STJ (CDC aplicável às instituições financeiras); art. 3º da Lei 9.099/95",
+});
+
+const tJefPixFraude: ThemeBuilder = (i) => ({
+  area: "JEF_CIVEL",
+  themeLabel: "PIX fraudulento — JEF Cível",
+  autor: pick(NOMES, i + 3),
+  reu: pick(JEF_BANCOS, i + 2),
+  comarca: pick(COMARCAS, i + 3),
+  fatos: `${pick(NOMES, i + 3)} (CPF ${cpf(i + 6300)}) foi vítima de golpe do PIX em ${dateBack(0, i)}: foi induzido(a) a realizar transferência via PIX de ${brl(3000 + i * 400)} para conta fraudulenta após contato de estelionatário que se passou por atendente do ${pick(JEF_BANCOS, i + 2)}. O banco foi imediatamente notificado (BO ${200000 + i * 137}) mas não bloqueou a conta receptora nem ressarciu o autor. Falha na segurança do sistema bancário configurada. Valor total pleiteado: ${brl(6500 + i * 300)}.`,
+  pedido: "ressarcimento integral do valor transferido fraudulentamente e indenização por danos morais pela falha na segurança",
+  norma: "arts. 14 e 22 do CDC; Resolução BCB n. 93/2021 (MED — Mecanismo Especial de Devolução); art. 3º Lei 9.099/95",
+});
+
+const tJefTelefonia: ThemeBuilder = (i) => ({
+  area: "JEF_CIVEL",
+  themeLabel: "Telefonia — cobrança abusiva — JEF Cível",
+  autor: pick(NOMES, i + 4),
+  reu: pick(JEF_OPERADORAS, i),
+  comarca: pick(COMARCAS, i + 4),
+  fatos: `${pick(NOMES, i + 4)} (CPF ${cpf(i + 6400)}) possui contrato com a ${pick(JEF_OPERADORAS, i)} pelo plano de ${brl(80 + i * 5)}/mês. A operadora cobrou, nas últimas ${3 + i % 4} faturas, valores de ${brl(180 + i * 20)}/mês por "serviços adicionais não contratados" (roaming, conteúdos digitais), recusando-se a cancelar os débitos. Total cobrado indevidamente: ${brl((100 + i * 15) * (3 + i % 4))}. Serviço foi interrompido indevidamente por suposta inadimplência dos valores contestados. Valor pleiteado: ${brl(4500 + i * 200)}.`,
+  pedido: "inexigibilidade dos débitos contestados, restabelecimento do serviço, devolução em dobro e indenização por danos morais",
+  norma: "arts. 6º, VI, 22 e 42 §único do CDC; Resolução Anatel n. 623/2013; art. 3º Lei 9.099/95",
+});
+
+const tJefCancelamentoServico: ThemeBuilder = (i) => ({
+  area: "JEF_CIVEL",
+  themeLabel: "Cancelamento de serviço — recusa abusiva — JEF Cível",
+  autor: pick(NOMES, i + 5),
+  reu: pick(JEF_LOJAS, i + 1).nome,
+  comarca: pick(COMARCAS, i + 5),
+  fatos: `${pick(NOMES, i + 5)} (CPF ${cpf(i + 6500)}) contratou serviço de ${pick(["assinatura anual de streaming", "plano de internet residencial", "assinatura de software"], i)} com a ${pick(JEF_LOJAS, i + 1).nome} por ${brl(350 + i * 30)}/mês. Após ${1 + i % 3} meses, solicitou o cancelamento dentro do prazo de arrependimento (art. 49 CDC), mas a empresa recusou-se a cancelar e continuou cobrando o plano. Autor teve que bloquear o cartão e foi negativado pela ré. Valor pleiteado: ${brl(3500 + i * 200)}.`,
+  pedido: "cancelamento do contrato, devolução dos valores pagos após a solicitação e indenização por danos morais",
+  norma: "art. 49 do CDC (direito de arrependimento); arts. 42 e 43 do CDC; art. 3º Lei 9.099/95",
+});
+
+const tJefProdutoVicio: ThemeBuilder = (i) => ({
+  area: "JEF_CIVEL",
+  themeLabel: "Produto com vício — JEF Cível",
+  autor: pick(NOMES, i + 6),
+  reu: pick(JEF_LOJAS, i + 2).nome,
+  comarca: pick(COMARCAS, i + 6),
+  fatos: `${pick(NOMES, i + 6)} (CPF ${cpf(i + 6600)}) adquiriu em ${dateBack(0, i)} produto da ${pick(JEF_LOJAS, i + 2).nome} pelo valor de ${brl(1200 + i * 200)} (nota fiscal em anexo). O produto — ${pick(["smartphone", "notebook", "TV 55 polegadas", "máquina de lavar"], i)} — apresentou vício de fabricação em ${dateBack(0, i)} (${20 + i * 5} dias após a compra), dentro da garantia legal de 90 dias. A ré foi notificada mas não sanou o vício no prazo de 30 dias do art. 18 §1º CDC. Valor pleiteado: ${brl(2000 + i * 300)} (restituição + danos morais).`,
+  pedido: "substituição do produto ou restituição integral do valor pago, mais indenização por danos morais",
+  norma: "arts. 18, 19 e 26 do CDC (garantia legal de produto — vício oculto e aparente); art. 3º Lei 9.099/95",
+});
+
+const tJefFalhaEntrega: ThemeBuilder = (i) => ({
+  area: "JEF_CIVEL",
+  themeLabel: "Falha de entrega — e-commerce — JEF Cível",
+  autor: pick(NOMES, i + 7),
+  reu: pick(JEF_LOJAS, i + 3).nome,
+  comarca: pick(COMARCAS, i + 7),
+  fatos: `${pick(NOMES, i + 7)} (CPF ${cpf(i + 6700)}) realizou compra online no site da ${pick(JEF_LOJAS, i + 3).nome} pelo valor de ${brl(900 + i * 150)} em ${dateBack(0, i)}, com prazo de entrega de ${5 + i % 7} dias úteis. O produto não foi entregue nem no prazo contratado nem nos ${15 + i % 15} dias subsequentes. Tentativas de contato com SAC resultaram em respostas automáticas sem solução. O produto era ${pick(["presente de aniversário", "material escolar urgente", "equipamento de trabalho"], i)}. Valor pleiteado: ${brl(3000 + i * 200)}.`,
+  pedido: "entrega forçada do produto ou devolução do valor pago, mais indenização por danos morais",
+  norma: "arts. 35 e 43 do CDC; art. 49 CDC (compra à distância); art. 3º Lei 9.099/95; Decreto 7.962/2013",
+});
+
+const tJefTutelaUrgencia: ThemeBuilder = (i) => ({
+  area: "JEF_CIVEL",
+  themeLabel: "Tutela de urgência — JEF Cível",
+  autor: pick(NOMES, i + 8),
+  reu: pick(JEF_OPERADORAS, i + 1),
+  comarca: pick(COMARCAS, i + 8),
+  fatos: `${pick(NOMES, i + 8)} (CPF ${cpf(i + 6800)}) tem linhas telefônicas utilizadas exclusivamente para sua atividade profissional (${pick(["médico de plantão", "advogado de plantão", "MEI com atendimento ao cliente"], i)}) suspentas indevidamente pela ${pick(JEF_OPERADORAS, i + 1)} desde ${dateBack(0, i)} por suposto débito de ${brl(200 + i * 30)} já pago (comprovante em anexo). A suspensão causa prejuízo diário de ${brl(500 + i * 50)}. Há fumus boni iuris (comprovante de pagamento) e periculum in mora (prejuízo profissional diário). Ação de competência do Juizado Especial Cível (Lei 9.099/95).`,
+  pedido: "tutela de urgência para restabelecimento imediato das linhas telefônicas e indenização por danos materiais e morais",
+  norma: "art. 300 CPC; art. 4º Lei 9.099/95; arts. 14 e 22 CDC; art. 3º Lei 9.099/95",
+});
+
+const tJefCompetencia: ThemeBuilder = (i) => ({
+  area: "JEF_CIVEL",
+  themeLabel: "Competência do JEF — reconhecimento — JEF Cível",
+  autor: pick(NOMES, i + 9),
+  reu: pick(JEF_BANCOS, i + 3),
+  comarca: pick(COMARCAS, i + 9),
+  fatos: `${pick(NOMES, i + 9)} (CPF ${cpf(i + 6900)}) ajuizou ação no Juizado Especial Cível contra o ${pick(JEF_BANCOS, i + 3)} pleiteando indenização por danos morais no valor de ${brl(4000 + i * 300)} em razão de inscrição indevida. O réu arguiu preliminar de incompetência do JEF alegando complexidade da causa. Questão: verificar se o valor da causa (inferior a 40 SM) e a natureza da causa (cobrança indevida simples) permitem o rito sumaríssimo, ou se há elementos de complexidade que justifiquem a remessa à justiça comum (art. 3º §3º Lei 9.099/95).`,
+  pedido: "julgamento de competência do Juizado Especial Cível e, no mérito, indenização por danos morais",
+  norma: "art. 3º Lei 9.099/95 (competência material e valor); art. 3º §3º Lei 9.099/95 (questão complexa); CDC",
+});
+
+// Adiciona os 10 temas de JEF Cível ao THEMES (ALL_PHASES — 10 × 4 = 40 casos)
+THEMES.push(
+  { id: "jef_negativacao",          build: tJefNegativacao },
+  { id: "jef_cobranca_indevida",    build: tJefCobrancaIndevida },
+  { id: "jef_falha_bancaria",       build: tJefFalhaBancaria },
+  { id: "jef_pix_fraude",           build: tJefPixFraude },
+  { id: "jef_telefonia",            build: tJefTelefonia },
+  { id: "jef_cancelamento_servico", build: tJefCancelamentoServico },
+  { id: "jef_produto_vicio",        build: tJefProdutoVicio },
+  { id: "jef_falha_entrega",        build: tJefFalhaEntrega },
+  { id: "jef_tutela_urgencia",      build: tJefTutelaUrgencia },
+  { id: "jef_competencia",          build: tJefCompetencia },
+);

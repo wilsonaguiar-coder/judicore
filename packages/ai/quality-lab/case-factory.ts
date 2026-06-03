@@ -97,6 +97,25 @@ function decideTrap(slotIndex: number, area: LegalArea, phase: Phase | "DESPACHO
     return kind;
   }
 
+  // JEF_CIVEL: rotação com traps específicas do Juizado Especial Cível
+  if (area === "JEF_CIVEL") {
+    const jefTrapTable: TrapKind[] = [
+      "JEF_PERICIA_COMPLEXA",
+      "JEF_VALOR_EXCEDENTE",
+      "JEF_RECURSO_ERRADO",
+      "JEF_LEGITIMIDADE_PASSIVA",
+      "JEF_TUTELA_SEM_PERICULUM",
+      "JEF_TUTELA_SEM_FUMUS",
+    ];
+    kind = jefTrapTable[cycleIdx % jefTrapTable.length]!;
+    // Ajuste de fase: recurso errado só faz sentido em RECURSO
+    if (kind === "JEF_RECURSO_ERRADO" && phase !== "RECURSO") kind = "JEF_VALOR_EXCEDENTE";
+    // Tutela sem periculum/fumus só faz sentido em DECISAO
+    if (kind === "JEF_TUTELA_SEM_PERICULUM" && phase !== "DECISAO") kind = "JEF_PERICIA_COMPLEXA";
+    if (kind === "JEF_TUTELA_SEM_FUMUS" && phase !== "DECISAO") kind = "JEF_PERICIA_COMPLEXA";
+    return kind;
+  }
+
   // FAZENDA_PUBLICA: rotação com traps específicas de direito público
   if (area === "FAZENDA_PUBLICA") {
     const fpTrapTable: TrapKind[] = [

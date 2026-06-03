@@ -22,6 +22,7 @@ import { CriminalSentenceValidator } from "./criminal-sentenca.validator.js";
 import { CivilValidator } from "./civil.validator.js";
 import { ConsumerValidator } from "./consumer.validator.js";
 import { ExecutionValidator } from "./execution.validator.js";
+import { JefCivelValidator } from "./jef-civel.validator.js";
 
 export interface FinalValidationResult {
   valid: boolean;
@@ -84,6 +85,7 @@ export class FinalValidator {
   private civil = new CivilValidator();
   private consumer = new ConsumerValidator();
   private execution = new ExecutionValidator();
+  private jefCivel = new JefCivelValidator();
 
   validate(
     draft: string,
@@ -116,6 +118,9 @@ export class FinalValidator {
 
     // 1f. Validação de execução/cumprimento (seções, CPC, modalidade, objeção, SISBAJUD)
     allErrors.push(...this.execution.validate(draft, classification).errors);
+
+    // 1g. Validação de JEF Cível (competência, valor, recurso, perícia, tutela)
+    allErrors.push(...this.jefCivel.validate(draft, classification).errors);
 
     // 2. Validação de regras jurídicas (artigos, diplomas)
     const legalResult = this.legal.validateDraftArticles(draft, classification);

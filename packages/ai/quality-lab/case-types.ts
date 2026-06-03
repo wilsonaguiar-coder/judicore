@@ -17,7 +17,8 @@ export type LegalArea =
   | "CIVEL_GERAL"           // novos casos cíveis: obrigação de fazer, danos morais, cobrança, etc.
   | "CONSUMIDOR"            // direito do consumidor: CDC, negativação, plano de saúde, banco
   | "FAZENDA_PUBLICA"       // direito público: saúde, concursos, servidores, prescrição quinquenal
-  | "EXECUCAO_CUMPRIMENTO"; // fase executiva: cumprimento de sentença, impugnação, penhora
+  | "EXECUCAO_CUMPRIMENTO"  // fase executiva: cumprimento de sentença, impugnação, penhora
+  | "JEF_CIVEL";            // Juizado Especial Cível (Lei 9.099/95) — causas até 40 SM
 
 // Tipos de armadilhas jurídicas inseridas em ~30% dos casos
 export type TrapKind =
@@ -46,7 +47,14 @@ export type TrapKind =
   | "RITO_FAZENDA_CONFUNDIDO"           // cumprimento contra Fazenda tratado como rito comum (RPV/precatório omitido)
   | "JUROS_INCORRETOS"                  // juros moratórios fora do padrão legal (não SELIC — art. 406 CC)
   | "CORRECAO_MONETARIA_INCORRETA"      // índice de correção monetária errado (não IPCA-E)
-  | "LEGITIMIDADE_EC_INCORRETA";        // ente/pessoa ilegítima no polo passivo do cumprimento
+  | "LEGITIMIDADE_EC_INCORRETA"         // ente/pessoa ilegítima no polo passivo do cumprimento
+  // Traps específicas de JEF Cível (Lei 9.099/95)
+  | "JEF_PERICIA_COMPLEXA"             // perícia incompatível com rito sumaríssimo — possível incompetência
+  | "JEF_VALOR_EXCEDENTE"              // valor acima de 40 SM sem renúncia ao excedente
+  | "JEF_RECURSO_ERRADO"               // apelação em vez de recurso inominado (art. 41 Lei 9.099/95)
+  | "JEF_LEGITIMIDADE_PASSIVA"         // parte errada no polo passivo (banco/empresa/operadora)
+  | "JEF_TUTELA_SEM_PERICULUM"         // tutela deferida sem periculum in mora
+  | "JEF_TUTELA_SEM_FUMUS";            // tutela deferida sem fumus boni iuris / probabilidade do direito
 
 export interface SyntheticCase {
   id: string;
@@ -75,6 +83,7 @@ export type ValidatorComponent =
   | "CivilValidator"
   | "ConsumerValidator"
   | "ExecutionValidator"
+  | "JefCivelValidator"
   | "Other";
 
 /** Mapeia uma rule de ValidationError para o validator que a emitiu. */
@@ -90,6 +99,7 @@ export const AREA_LABELS: Record<LegalArea, string> = {
   CONSUMIDOR: "Consumidor (CDC)",
   FAZENDA_PUBLICA: "Fazenda Pública",
   EXECUCAO_CUMPRIMENTO: "Execução / Cumprimento",
+  JEF_CIVEL: "JEF Cível (Lei 9.099/95)",
 };
 
 export function mapRuleToValidator(rule: string): ValidatorComponent {
@@ -163,6 +173,7 @@ export function mapRuleToValidator(rule: string): ValidatorComponent {
     rule === "EXECUTION_SISBAJUD_MISSING"
   ) return "ExecutionValidator";
   if (rule === "STANCE_MISMATCH_PRE_GENERATION") return "EvidenceAnalyzer";
+  if (rule.startsWith("JEF_")) return "JefCivelValidator";
   return "Other";
 }
 
