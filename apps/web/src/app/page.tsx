@@ -19,17 +19,19 @@ const fadeUp = {
 
 export default function LandingPage() {
   return (
-    <div className="min-h-screen bg-gradient-to-b from-white via-slate-50 to-white text-slate-900 flex flex-col">
+    <div className="min-h-screen relative bg-gradient-to-b from-white via-slate-50 to-white text-slate-900 flex flex-col">
 
-      <header className="z-20 w-full px-6 md:px-12 py-4 flex items-center justify-between border-b border-slate-100/60 backdrop-blur-md bg-white/70">
+      <div className="dynamic-bg" />
+
+      <header className="z-30 w-full px-6 md:px-12 py-4 flex items-center justify-between band-dark shadow-sm">
         <div className="flex items-center gap-4">
           <Image src="/logo.png" alt="JudiCore" width={120} height={40} className="object-contain" />
-          <span className="hidden sm:inline text-sm text-slate-500 border-l border-slate-200 pl-4">Suíte de Inteligência Jurídica</span>
+          <span className="hidden sm:inline text-sm text-white/90 border-l border-slate-800 pl-4">Suíte de Inteligência Jurídica</span>
         </div>
-        <nav className="hidden md:flex items-center gap-5 text-sm text-slate-500">
-          <Link href="/sobre" className="hover:text-slate-800 transition-colors">Sobre</Link>
-          <Link href="/privacidade" className="hover:text-slate-800 transition-colors">Privacidade</Link>
-          <Link href="/termos" className="hover:text-slate-800 transition-colors">Termos de Uso</Link>
+        <nav className="hidden md:flex items-center gap-5 text-sm text-white/80">
+          <Link href="/sobre" className="hover:text-white transition-colors">Sobre</Link>
+          <Link href="/privacidade" className="hover:text-white transition-colors">Privacidade</Link>
+          <Link href="/termos" className="hover:text-white transition-colors">Termos de Uso</Link>
         </nav>
       </header>
 
@@ -181,9 +183,9 @@ export default function LandingPage() {
         </div>
       </main>
 
-      <footer className="py-5 px-6 md:px-12 border-t border-slate-100 flex items-center justify-between">
-        <Image src="/logo.png" alt="JudiCore" width={90} height={30} className="object-contain opacity-50" />
-        <p className="text-xs text-slate-400">© {new Date().getFullYear()} JudiCore. Todos os direitos reservados.</p>
+      <footer className="py-5 px-6 md:px-12 band-strong border-t border-slate-800 flex items-center justify-between z-20">
+        <Image src="/logo.png" alt="JudiCore" width={90} height={30} className="object-contain opacity-100" />
+        <p className="text-xs text-white/80">© {new Date().getFullYear()} JudiCore. Todos os direitos reservados.</p>
       </footer>
 
     </div>
