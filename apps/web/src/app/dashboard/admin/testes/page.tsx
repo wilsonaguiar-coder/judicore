@@ -55,6 +55,8 @@ export default function TestesPage() {
   const [maxCostUsd, setMaxCostUsd] = useState(5);
   const [area, setArea] = useState<string>("");
   const [documentType, setDocumentType] = useState<string>("");
+  const [trap, setTrap] = useState<string>("");
+  const [offset, setOffset] = useState(0);
 
   // Auth gate
   useEffect(() => {
@@ -157,8 +159,10 @@ export default function TestesPage() {
     setQualityExit(null);
     setQualityRunning(true);
     const body: Record<string, unknown> = { count, maxCostUsd };
-    if (area) body.area = area;
+    if (area)         body.area = area;
     if (documentType) body.documentType = documentType;
+    if (trap)         body.trap = trap;
+    if (offset > 0)   body.offset = offset;
     await runSSE(
       "/admin/testes/run-quality",
       body,
@@ -306,8 +310,8 @@ export default function TestesPage() {
             </button>
           </div>
 
-          {/* Form */}
-          <div className="grid grid-cols-4 gap-4 mb-4">
+          {/* Form — linha 1 */}
+          <div className="grid grid-cols-4 gap-4 mb-3">
             <div>
               <label className="block text-xs font-medium text-slate-700 mb-1">
                 Nº de casos (1–100)
@@ -322,7 +326,7 @@ export default function TestesPage() {
                 className="w-full px-3 py-2 text-sm border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-amber-500"
               />
               <p className="text-[11px] text-slate-500 mt-1">
-                Custo estimado: ~${(count * 0.07).toFixed(2)}–${(count * 0.10).toFixed(2)}
+                ~${(count * 0.07).toFixed(2)}–${(count * 0.10).toFixed(2)} estimado
               </p>
             </div>
             <div>
@@ -339,9 +343,7 @@ export default function TestesPage() {
                 disabled={qualityRunning}
                 className="w-full px-3 py-2 text-sm border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-amber-500"
               />
-              <p className="text-[11px] text-slate-500 mt-1">
-                Aborta a execução se o custo passar deste valor.
-              </p>
+              <p className="text-[11px] text-slate-500 mt-1">Aborta se ultrapassar.</p>
             </div>
             <div>
               <label className="block text-xs font-medium text-slate-700 mb-1">
@@ -384,6 +386,68 @@ export default function TestesPage() {
                 <option value="PETICAO_INICIAL">Petição Inicial</option>
                 <option value="DESPACHO">Despacho</option>
               </select>
+            </div>
+          </div>
+
+          {/* Form — linha 2: trap + offset */}
+          <div className="grid grid-cols-4 gap-4 mb-4">
+            <div className="col-span-3">
+              <label className="block text-xs font-medium text-slate-700 mb-1">
+                Trap forçada — 100% dos casos receberão esta armadilha (opcional)
+              </label>
+              <select
+                value={trap}
+                onChange={(e) => setTrap(e.target.value)}
+                disabled={qualityRunning}
+                className="w-full px-3 py-2 text-sm border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-amber-500"
+              >
+                <option value="">Distribuição normal (~30%)</option>
+                <optgroup label="JEF Cível — Tutelas (FASE 4.2)">
+                  <option value="JEF_TUTELA_SEM_FUMUS">JEF_TUTELA_SEM_FUMUS — tutela sem fumus boni iuris</option>
+                  <option value="JEF_TUTELA_SEM_PERICULUM">JEF_TUTELA_SEM_PERICULUM — tutela sem periculum in mora</option>
+                  <option value="JEF_TUTELA_DESPROPORCIONAL">JEF_TUTELA_DESPROPORCIONAL — medida desproporcional</option>
+                  <option value="JEF_TUTELA_ARTIFICIAL">JEF_TUTELA_ARTIFICIAL — urgência artificial / mora própria</option>
+                </optgroup>
+                <optgroup label="JEF Cível — Outras (FASE 4.1)">
+                  <option value="JEF_PERICIA_COMPLEXA">JEF_PERICIA_COMPLEXA — perícia incompatível com rito</option>
+                  <option value="JEF_VALOR_EXCEDENTE">JEF_VALOR_EXCEDENTE — valor acima de 40 SM sem renúncia</option>
+                  <option value="JEF_RECURSO_ERRADO">JEF_RECURSO_ERRADO — apelação em vez de recurso inominado</option>
+                  <option value="JEF_LEGITIMIDADE_PASSIVA">JEF_LEGITIMIDADE_PASSIVA — polo passivo errado</option>
+                </optgroup>
+                <optgroup label="Execução / Cumprimento">
+                  <option value="EXCESSO_EXECUCAO_IGNORADO">EXCESSO_EXECUCAO_IGNORADO</option>
+                  <option value="TITULO_INEXIGIVEL_IGNORADO">TITULO_INEXIGIVEL_IGNORADO</option>
+                  <option value="PENHORA_VERBA_ALIMENTAR">PENHORA_VERBA_ALIMENTAR</option>
+                  <option value="JUROS_INCORRETOS">JUROS_INCORRETOS</option>
+                  <option value="CORRECAO_MONETARIA_INCORRETA">CORRECAO_MONETARIA_INCORRETA</option>
+                </optgroup>
+                <optgroup label="Genéricas">
+                  <option value="JURISPRUDENCIA_CONTRARIA">JURISPRUDENCIA_CONTRARIA</option>
+                  <option value="ARTIGO_INCOMPATIVEL">ARTIGO_INCOMPATIVEL</option>
+                  <option value="RECURSO_INADEQUADO">RECURSO_INADEQUADO</option>
+                  <option value="TESE_EQUIVOCADA">TESE_EQUIVOCADA</option>
+                  <option value="PRECEDENTE_SUPERADO">PRECEDENTE_SUPERADO</option>
+                  <option value="LINGUAGEM_DECISORIA">LINGUAGEM_DECISORIA</option>
+                </optgroup>
+              </select>
+            </div>
+            <div>
+              <label className="block text-xs font-medium text-slate-700 mb-1">
+                Offset (pular N casos)
+              </label>
+              <input
+                type="number"
+                min={0}
+                max={500}
+                step={10}
+                value={offset}
+                onChange={(e) => setOffset(Math.max(0, Math.min(500, Number(e.target.value) || 0)))}
+                disabled={qualityRunning}
+                className="w-full px-3 py-2 text-sm border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-amber-500"
+              />
+              <p className="text-[11px] text-slate-500 mt-1">
+                JEF pericias (FASE 4.1): offset 40
+              </p>
             </div>
           </div>
 

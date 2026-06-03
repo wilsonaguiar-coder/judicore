@@ -150,18 +150,35 @@ export async function testesRoutes(app: FastifyInstance) {
         maxTokens?: number;
         area?: string;
         documentType?: string;
+        trap?: string;
+        offset?: number;
       };
       const count = Math.max(1, Math.min(100, Number.parseInt(String(body.count ?? 10), 10)));
       const maxCostUsd = Math.max(0.5, Math.min(50, Number.parseFloat(String(body.maxCostUsd ?? 5))));
       const maxTokens = Math.max(10_000, Math.min(2_000_000, Number.parseInt(String(body.maxTokens ?? 500_000), 10)));
+      const offset = Math.max(0, Math.min(500, Number.parseInt(String(body.offset ?? 0), 10)));
       const validAreas = ["RPPS", "RGPS", "TRABALHISTA", "CRIMINAL", "CRIMINAL_MERITO", "CIVEL", "CIVEL_GERAL", "CONSUMIDOR", "FAZENDA_PUBLICA", "EXECUCAO_CUMPRIMENTO", "JEF_CIVEL"];
       const area = body.area && validAreas.includes(body.area) ? body.area : undefined;
       const validTypes = ["PETICAO_INICIAL", "RECURSO", "SENTENCA", "DECISAO", "DESPACHO"];
       const documentType = body.documentType && validTypes.includes(body.documentType) ? body.documentType : undefined;
+      const validTraps = [
+        "JURISPRUDENCIA_CONTRARIA","ARTIGO_INCOMPATIVEL","RECURSO_INADEQUADO","COMPETENCIA_INCORRETA",
+        "TESE_EQUIVOCADA","PRECEDENTE_SUPERADO","FATO_INCOMPLETO","LINGUAGEM_DECISORIA",
+        "TEMA_STF_IGNORADO","RESERVA_POSSIVEL_SEM_MIN_EXIST","PRESCRICAO_QUINQUENAL_IGNORADA",
+        "LEGITIMIDADE_PASSIVA_INCORRETA","SEPARACAO_PODERES_INCORRETA","SOLIDARIEDADE_INCORRETA",
+        "EXCESSO_EXECUCAO_IGNORADO","TITULO_INEXIGIVEL_IGNORADO","ERRO_CALCULO_IGNORADO",
+        "PRESCRICAO_INTERCORRENTE_IGNORADA","PENHORA_VERBA_ALIMENTAR","IMPENHORABILIDADE_IGNORADA",
+        "RITO_FAZENDA_CONFUNDIDO","JUROS_INCORRETOS","CORRECAO_MONETARIA_INCORRETA","LEGITIMIDADE_EC_INCORRETA",
+        "JEF_PERICIA_COMPLEXA","JEF_VALOR_EXCEDENTE","JEF_RECURSO_ERRADO","JEF_LEGITIMIDADE_PASSIVA",
+        "JEF_TUTELA_SEM_PERICULUM","JEF_TUTELA_SEM_FUMUS","JEF_TUTELA_DESPROPORCIONAL","JEF_TUTELA_ARTIFICIAL",
+      ];
+      const trap = body.trap && validTraps.includes(body.trap) ? body.trap : undefined;
 
       const args = ["quality:run", "--", `--count=${count}`];
-      if (area) args.push(`--area=${area}`);
+      if (area)         args.push(`--area=${area}`);
       if (documentType) args.push(`--type=${documentType}`);
+      if (trap)         args.push(`--trap=${trap}`);
+      if (offset > 0)   args.push(`--offset=${offset}`);
 
       streamCommand(reply, "quality", "pnpm", args, {
         JUDICORE_QUALITY_MAX_CASES: String(count),
