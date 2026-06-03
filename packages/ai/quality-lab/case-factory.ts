@@ -97,8 +97,8 @@ function decideTrap(slotIndex: number, area: LegalArea, phase: Phase | "DESPACHO
     return kind;
   }
 
-  // JEF_CIVEL: rotação com traps específicas do Juizado Especial Cível
-  if (area === "JEF_CIVEL") {
+  // JEF_CIVEL / JEF_ESTADUAL / JEF_FEDERAL: mesma rotação de traps
+  if (area === "JEF_CIVEL" || area === "JEF_ESTADUAL" || area === "JEF_FEDERAL") {
     const jefTrapTable: TrapKind[] = [
       "JEF_PERICIA_COMPLEXA",
       "JEF_VALOR_EXCEDENTE",
@@ -149,12 +149,16 @@ export function generateSyntheticCases(
 
   // "CIVEL" como alias para todas as sub-áreas cíveis (CIVEL + CIVEL_GERAL + CONSUMIDOR)
   const CIVEL_ALIAS: Set<string> = new Set(["CIVEL", "CIVEL_GERAL", "CONSUMIDOR"]);
+  // "JEF_CIVEL" (legacy) cobre JEF_ESTADUAL, JEF_FEDERAL e JEF_CIVEL
+  const JEF_ALIAS: Set<string> = new Set(["JEF_CIVEL", "JEF_ESTADUAL", "JEF_FEDERAL"]);
 
   // 80 casos base: 20 temas × 4 fases (mais os temas com compatibleTypes restrito)
   const themesToUse = areaFilter
     ? THEMES.filter((t) => {
         const area = t.build(0).area;
         if (areaFilter === "CIVEL") return CIVEL_ALIAS.has(area);
+        // JEF_CIVEL legacy filtra todos os temas JEF; JEF_ESTADUAL e JEF_FEDERAL filtram apenas o respectivo
+        if (areaFilter === "JEF_CIVEL") return JEF_ALIAS.has(area);
         return area === areaFilter;
       })
     : THEMES;

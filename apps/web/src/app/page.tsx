@@ -202,51 +202,61 @@ export default function LandingPage() {
       </header>
 
       {/* ── Hero ─────────────────────────────────────────────────────────── */}
-      <main className="relative z-10 flex-1 flex flex-col items-center px-6 md:px-14 pt-24 pb-20">
+      <main className="relative z-10 flex-1 flex flex-col items-center px-6 md:px-14 pt-6 pb-20">
 
-        {/* Badge */}
-        <motion.div
-          initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4 }}
-          className="mb-7"
-        >
-          <span className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-indigo-500/20 bg-indigo-500/[0.08] text-indigo-300 text-[11px] font-medium tracking-widest uppercase">
-            <Sparkles size={10} />
-            IA Jurídica Avançada
-          </span>
-        </motion.div>
+        {/* Hero row: texto esquerda + Themis direita */}
+        <div className="w-full max-w-5xl flex items-center gap-8 mb-0">
 
-        {/* Headline */}
-        <motion.h1
-          initial={{ opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.55, delay: 0.06 }}
-          className="text-center text-5xl md:text-6xl lg:text-[68px] font-bold leading-[1.07] tracking-tight max-w-3xl mb-6"
-        >
-          <span className="text-white">Inteligência que</span>
-          <br />
-          <span className="bg-gradient-to-r from-indigo-400 via-sky-400 to-cyan-400 bg-clip-text text-transparent">
-            transforma o Direito.
-          </span>
-        </motion.h1>
+          {/* Coluna esquerda */}
+          <div className="flex-1 flex flex-col items-start pb-12">
 
-        {/* Subtext */}
-        <motion.p
-          initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, delay: 0.12 }}
-          className="text-center text-white/45 text-[15px] md:text-base leading-relaxed max-w-lg mb-16"
-        >
-          Gere peças, calcule valores e audite documentos com base na legislação e jurisprudência atualizada dos principais tribunais brasileiros.
-        </motion.p>
+            {/* Badge */}
+            <motion.div
+              initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4 }}
+              className="mb-7"
+            >
+              <span className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-indigo-500/20 bg-indigo-500/[0.08] text-indigo-300 text-[11px] font-medium tracking-widest uppercase">
+                <Sparkles size={10} />
+                IA Jurídica Avançada
+              </span>
+            </motion.div>
 
-        {/* Stats strip */}
-        <motion.div
-          initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.18, duration: 0.5 }}
-          className="w-full max-w-3xl flex flex-wrap justify-center gap-x-12 gap-y-5 pb-16 mb-16 border-b border-white/[0.06]"
-        >
-          {STATS.map((s) => (
-            <div key={s.label} className="flex flex-col items-center gap-1">
-              <span className="text-2xl font-bold text-white tracking-tight">{s.value}</span>
-              <span className="text-xs text-white/35 tracking-wide">{s.label}</span>
-            </div>
-          ))}
-        </motion.div>
+            {/* Headline */}
+            <motion.h1
+              initial={{ opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.55, delay: 0.06 }}
+              className="text-5xl md:text-6xl lg:text-[68px] font-bold leading-[1.07] tracking-tight max-w-xl mb-6"
+            >
+              <span className="text-white">Inteligência que</span>
+              <br />
+              <span className="bg-gradient-to-r from-indigo-400 via-sky-400 to-cyan-400 bg-clip-text text-transparent">
+                transforma o Direito.
+              </span>
+            </motion.h1>
+
+            {/* Subtext */}
+            <motion.p
+              initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, delay: 0.12 }}
+              className="text-white/45 text-[15px] md:text-base leading-relaxed max-w-md"
+            >
+              Gere peças, calcule valores e audite documentos com base na legislação e jurisprudência atualizada dos principais tribunais brasileiros.
+            </motion.p>
+          </div>
+
+          {/* Coluna direita: Themis */}
+          <motion.div
+            initial={{ opacity: 0, x: 24 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.7, delay: 0.08 }}
+            className="hidden md:block relative w-[480px] h-[640px] shrink-0"
+          >
+            <Image
+              src="/hero.png"
+              alt="Themis"
+              fill
+              sizes="400px"
+              className="object-contain object-bottom drop-shadow-2xl"
+              priority
+            />
+          </motion.div>
+        </div>
 
         {/* Product cards */}
         <div className="w-full max-w-5xl">
@@ -293,6 +303,19 @@ export default function LandingPage() {
             ))}
           </div>
         </div>
+
+        {/* Stats strip */}
+        <motion.div
+          initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.18, duration: 0.5 }}
+          className="w-full max-w-3xl flex flex-wrap justify-center gap-x-12 gap-y-5 pt-16 mt-16 border-t border-white/[0.06]"
+        >
+          {STATS.map((s) => (
+            <div key={s.label} className="flex flex-col items-center gap-1">
+              <span className="text-2xl font-bold text-white tracking-tight">{s.value}</span>
+              <span className="text-xs text-white/35 tracking-wide">{s.label}</span>
+            </div>
+          ))}
+        </motion.div>
 
       </main>
 

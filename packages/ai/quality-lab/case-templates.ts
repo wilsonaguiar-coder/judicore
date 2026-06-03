@@ -2203,7 +2203,7 @@ const JEF_LOJAS = [
 ];
 
 const tJefNegativacao: ThemeBuilder = (i) => ({
-  area: "JEF_CIVEL",
+  area: "JEF_ESTADUAL",
   themeLabel: "Negativação indevida — JEF Cível",
   autor: pick(NOMES, i),
   reu: pick(JEF_LOJAS, i).nome,
@@ -2215,7 +2215,7 @@ const tJefNegativacao: ThemeBuilder = (i) => ({
 });
 
 const tJefCobrancaIndevida: ThemeBuilder = (i) => ({
-  area: "JEF_CIVEL",
+  area: "JEF_ESTADUAL",
   themeLabel: "Cobrança indevida — JEF Cível",
   autor: pick(NOMES, i + 1),
   reu: pick(JEF_BANCOS, i),
@@ -2226,7 +2226,7 @@ const tJefCobrancaIndevida: ThemeBuilder = (i) => ({
 });
 
 const tJefFalhaBancaria: ThemeBuilder = (i) => ({
-  area: "JEF_CIVEL",
+  area: "JEF_ESTADUAL",
   themeLabel: "Falha bancária — JEF Cível",
   autor: pick(NOMES, i + 2),
   reu: pick(JEF_BANCOS, i + 1),
@@ -2237,7 +2237,7 @@ const tJefFalhaBancaria: ThemeBuilder = (i) => ({
 });
 
 const tJefPixFraude: ThemeBuilder = (i) => ({
-  area: "JEF_CIVEL",
+  area: "JEF_ESTADUAL",
   themeLabel: "PIX fraudulento — JEF Cível",
   autor: pick(NOMES, i + 3),
   reu: pick(JEF_BANCOS, i + 2),
@@ -2248,7 +2248,7 @@ const tJefPixFraude: ThemeBuilder = (i) => ({
 });
 
 const tJefTelefonia: ThemeBuilder = (i) => ({
-  area: "JEF_CIVEL",
+  area: "JEF_ESTADUAL",
   themeLabel: "Telefonia — cobrança abusiva — JEF Cível",
   autor: pick(NOMES, i + 4),
   reu: pick(JEF_OPERADORAS, i),
@@ -2259,7 +2259,7 @@ const tJefTelefonia: ThemeBuilder = (i) => ({
 });
 
 const tJefCancelamentoServico: ThemeBuilder = (i) => ({
-  area: "JEF_CIVEL",
+  area: "JEF_ESTADUAL",
   themeLabel: "Cancelamento de serviço — recusa abusiva — JEF Cível",
   autor: pick(NOMES, i + 5),
   reu: pick(JEF_LOJAS, i + 1).nome,
@@ -2270,7 +2270,7 @@ const tJefCancelamentoServico: ThemeBuilder = (i) => ({
 });
 
 const tJefProdutoVicio: ThemeBuilder = (i) => ({
-  area: "JEF_CIVEL",
+  area: "JEF_ESTADUAL",
   themeLabel: "Produto com vício — JEF Cível",
   autor: pick(NOMES, i + 6),
   reu: pick(JEF_LOJAS, i + 2).nome,
@@ -2281,7 +2281,7 @@ const tJefProdutoVicio: ThemeBuilder = (i) => ({
 });
 
 const tJefFalhaEntrega: ThemeBuilder = (i) => ({
-  area: "JEF_CIVEL",
+  area: "JEF_ESTADUAL",
   themeLabel: "Falha de entrega — e-commerce — JEF Cível",
   autor: pick(NOMES, i + 7),
   reu: pick(JEF_LOJAS, i + 3).nome,
@@ -2292,7 +2292,7 @@ const tJefFalhaEntrega: ThemeBuilder = (i) => ({
 });
 
 const tJefTutelaUrgencia: ThemeBuilder = (i) => ({
-  area: "JEF_CIVEL",
+  area: "JEF_ESTADUAL",
   themeLabel: "Tutela de urgência — JEF Cível",
   autor: pick(NOMES, i + 8),
   reu: pick(JEF_OPERADORAS, i + 1),
@@ -2303,7 +2303,7 @@ const tJefTutelaUrgencia: ThemeBuilder = (i) => ({
 });
 
 const tJefCompetencia: ThemeBuilder = (i) => ({
-  area: "JEF_CIVEL",
+  area: "JEF_ESTADUAL",
   themeLabel: "Competência do JEF — reconhecimento — JEF Cível",
   autor: pick(NOMES, i + 9),
   reu: pick(JEF_BANCOS, i + 3),
@@ -2343,7 +2343,7 @@ const JEF_FINTECHS = [
 
 // Tutela 1 — Negativação indevida com urgência de exclusão
 const tJefTutelaNegativacao: ThemeBuilder = (i) => ({
-  area: "JEF_CIVEL",
+  area: "JEF_ESTADUAL",
   themeLabel: "Negativação indevida — tutela urgente — JEF Cível",
   autor: pick(NOMES, i),
   reu: pick(JEF_LOJAS, i).nome,
@@ -2355,7 +2355,7 @@ const tJefTutelaNegativacao: ThemeBuilder = (i) => ({
 
 // Tutela 2 — PIX fraudulento com pedido de bloqueio urgente
 const tJefTutelaPixFraudulento: ThemeBuilder = (i) => ({
-  area: "JEF_CIVEL",
+  area: "JEF_ESTADUAL",
   themeLabel: "PIX fraudulento — tutela de bloqueio — JEF Cível",
   autor: pick(NOMES, i + 1),
   reu: pick(JEF_FINTECHS, i),
@@ -2367,7 +2367,7 @@ const tJefTutelaPixFraudulento: ThemeBuilder = (i) => ({
 
 // Tutela 3 — Bloqueio indevido de conta corrente
 const tJefTutelaBloqueioContaIndevida: ThemeBuilder = (i) => ({
-  area: "JEF_CIVEL",
+  area: "JEF_ESTADUAL",
   themeLabel: "Bloqueio indevido de conta — tutela urgente — JEF Cível",
   autor: pick(NOMES, i + 2),
   reu: pick(JEF_BANCOS, i),
@@ -2379,7 +2379,7 @@ const tJefTutelaBloqueioContaIndevida: ThemeBuilder = (i) => ({
 
 // Tutela 4 — Suspensão de energia elétrica
 const tJefTutelaSuspensaoEnergia: ThemeBuilder = (i) => ({
-  area: "JEF_CIVEL",
+  area: "JEF_ESTADUAL",
   themeLabel: "Suspensão de energia elétrica — tutela urgente — JEF Cível",
   autor: pick(NOMES, i + 3),
   reu: pick(JEF_DISTRIBUIDORAS, i),
@@ -2391,7 +2391,7 @@ const tJefTutelaSuspensaoEnergia: ThemeBuilder = (i) => ({
 
 // Tutela 5 — Suspensão de internet (home office / trabalho remoto)
 const tJefTutelaSuspensaoInternet: ThemeBuilder = (i) => ({
-  area: "JEF_CIVEL",
+  area: "JEF_ESTADUAL",
   themeLabel: "Suspensão de internet — tutela urgente — JEF Cível",
   autor: pick(NOMES, i + 4),
   reu: pick(JEF_INTERNET, i),
@@ -2403,7 +2403,7 @@ const tJefTutelaSuspensaoInternet: ThemeBuilder = (i) => ({
 
 // Tutela 6 — Cancelamento indevido de plano de saúde
 const tJefTutelaPlanoSaude: ThemeBuilder = (i) => ({
-  area: "JEF_CIVEL",
+  area: "JEF_ESTADUAL",
   themeLabel: "Cancelamento de plano de saúde — tutela urgente — JEF Cível",
   autor: pick(NOMES, i + 5),
   reu: pick(JEF_PLANOS_SAUDE, i),
@@ -2415,7 +2415,7 @@ const tJefTutelaPlanoSaude: ThemeBuilder = (i) => ({
 
 // Tutela 7 — Negativa de fornecimento de medicamento
 const tJefTutelaMedicamento: ThemeBuilder = (i) => ({
-  area: "JEF_CIVEL",
+  area: "JEF_ESTADUAL",
   themeLabel: "Fornecimento de medicamento — tutela urgente — JEF Cível",
   autor: pick(NOMES, i + 6),
   reu: pick(JEF_PLANOS_SAUDE, i + 1),
@@ -2427,7 +2427,7 @@ const tJefTutelaMedicamento: ThemeBuilder = (i) => ({
 
 // Tutela 8 — Exclusão indevida de cadastro de plataforma
 const tJefTutelaExclusaoCadastro: ThemeBuilder = (i) => ({
-  area: "JEF_CIVEL",
+  area: "JEF_ESTADUAL",
   themeLabel: "Exclusão indevida de cadastro — tutela urgente — JEF Cível",
   autor: pick(NOMES, i + 7),
   reu: pick(JEF_LOJAS, i + 2).nome,
@@ -2439,7 +2439,7 @@ const tJefTutelaExclusaoCadastro: ThemeBuilder = (i) => ({
 
 // Tutela 9 — Falha bancária urgente (transferência não creditada + vencimento iminente)
 const tJefTutelaFalhaBancariaUrgente: ThemeBuilder = (i) => ({
-  area: "JEF_CIVEL",
+  area: "JEF_ESTADUAL",
   themeLabel: "Falha bancária urgente — tutela de estorno — JEF Cível",
   autor: pick(NOMES, i + 8),
   reu: pick(JEF_BANCOS, i + 1),
@@ -2451,7 +2451,7 @@ const tJefTutelaFalhaBancariaUrgente: ThemeBuilder = (i) => ({
 
 // Tutela 10 — Interrupção de serviço essencial (gás canalizado / água)
 const tJefTutelaServicoEssencial: ThemeBuilder = (i) => ({
-  area: "JEF_CIVEL",
+  area: "JEF_ESTADUAL",
   themeLabel: "Interrupção de serviço essencial — tutela urgente — JEF Cível",
   autor: pick(NOMES, i + 9),
   reu: pick(["Comgás — Companhia de Gás de São Paulo S.A.", "Sabesp — Cia. de Saneamento Básico do Estado de SP", "Copasa — Cia. de Saneamento de Minas Gerais S.A.", "Embasa — Empresa Baiana de Águas e Saneamento S.A."], i),
@@ -2478,8 +2478,8 @@ const JEF_CONSTRUTORAS = [
 
 // Medicina 1 — Erro médico com néxo causal disputado
 const tJefPericiaErroMedico: ThemeBuilder = (i) => ({
-  area: "JEF_CIVEL",
-  themeLabel: "Erro médico — perícia especializada — JEF Cível",
+  area: "JEF_FEDERAL",
+  themeLabel: "Erro médico — perícia especializada — JEF Federal",
   autor: pick(NOMES, i),
   reu: pick(JEF_CLINICAS, i),
   comarca: pick(COMARCAS, i),
@@ -2490,8 +2490,8 @@ const tJefPericiaErroMedico: ThemeBuilder = (i) => ({
 
 // Medicina 2 — Invalidez parcial com avaliação multiprofissional
 const tJefPericiaInvalidez: ThemeBuilder = (i) => ({
-  area: "JEF_CIVEL",
-  themeLabel: "Invalidez parcial — avaliação multiprofissional — JEF Cível",
+  area: "JEF_FEDERAL",
+  themeLabel: "Invalidez parcial — avaliação multiprofissional — JEF Federal",
   autor: pick(NOMES, i + 1),
   reu: pick(JEF_CLINICAS, i + 1),
   comarca: pick(COMARCAS, i + 1),
@@ -2502,8 +2502,8 @@ const tJefPericiaInvalidez: ThemeBuilder = (i) => ({
 
 // Medicina 3 — Nexo causal complexo em exame de imagem
 const tJefPericiaNexoCausal: ThemeBuilder = (i) => ({
-  area: "JEF_CIVEL",
-  themeLabel: "Nexo causal médico complexo — JEF Cível",
+  area: "JEF_FEDERAL",
+  themeLabel: "Nexo causal médico complexo — JEF Federal",
   autor: pick(NOMES, i + 2),
   reu: pick(JEF_CLINICAS, i + 2),
   comarca: pick(COMARCAS, i + 2),
@@ -2514,8 +2514,8 @@ const tJefPericiaNexoCausal: ThemeBuilder = (i) => ({
 
 // Medicina 4 — Dano estético grave
 const tJefPericiaDanoEstetico: ThemeBuilder = (i) => ({
-  area: "JEF_CIVEL",
-  themeLabel: "Dano estético — avaliação pericial médica — JEF Cível",
+  area: "JEF_FEDERAL",
+  themeLabel: "Dano estético — avaliação pericial médica — JEF Federal",
   autor: pick(NOMES, i + 3),
   reu: pick(JEF_CLINICAS, i + 3),
   comarca: pick(COMARCAS, i + 3),
@@ -2526,8 +2526,8 @@ const tJefPericiaDanoEstetico: ThemeBuilder = (i) => ({
 
 // Engenharia 1 — Vício estrutural em imóvel
 const tJefPericiaVicioEstrutural: ThemeBuilder = (i) => ({
-  area: "JEF_CIVEL",
-  themeLabel: "Vício estrutural em imóvel — JEF Cível",
+  area: "JEF_FEDERAL",
+  themeLabel: "Vício estrutural em imóvel — JEF Federal",
   autor: pick(NOMES, i + 4),
   reu: pick(JEF_CONSTRUTORAS, i),
   comarca: pick(COMARCAS, i + 4),
@@ -2538,8 +2538,8 @@ const tJefPericiaVicioEstrutural: ThemeBuilder = (i) => ({
 
 // Engenharia 2 — Recalque de fundação
 const tJefPericiaRecalque: ThemeBuilder = (i) => ({
-  area: "JEF_CIVEL",
-  themeLabel: "Recalque de fundação — perícia geotécnica — JEF Cível",
+  area: "JEF_FEDERAL",
+  themeLabel: "Recalque de fundação — perícia geotécnica — JEF Federal",
   autor: pick(NOMES, i + 5),
   reu: pick(JEF_CONSTRUTORAS, i + 1),
   comarca: pick(COMARCAS, i + 5),
@@ -2550,8 +2550,8 @@ const tJefPericiaRecalque: ThemeBuilder = (i) => ({
 
 // Engenharia 3 — Infiltrações complexas
 const tJefPericiaInfiltracoes: ThemeBuilder = (i) => ({
-  area: "JEF_CIVEL",
-  themeLabel: "Infiltrações complexas — perícia de engenharia — JEF Cível",
+  area: "JEF_FEDERAL",
+  themeLabel: "Infiltrações complexas — perícia de engenharia — JEF Federal",
   autor: pick(NOMES, i + 6),
   reu: pick(JEF_CONSTRUTORAS, i + 2),
   comarca: pick(COMARCAS, i + 6),
@@ -2562,8 +2562,8 @@ const tJefPericiaInfiltracoes: ThemeBuilder = (i) => ({
 
 // Contabilidade 1 — Revisão contratual com reconstrução de fluxo
 const tJefPericiaRevisaoContrato: ThemeBuilder = (i) => ({
-  area: "JEF_CIVEL",
-  themeLabel: "Revisão contratual complexa — perícia contábil — JEF Cível",
+  area: "JEF_FEDERAL",
+  themeLabel: "Revisão contratual complexa — perícia contábil — JEF Federal",
   autor: pick(NOMES, i + 7),
   reu: pick(JEF_BANCOS, i),
   comarca: pick(COMARCAS, i + 7),
@@ -2574,8 +2574,8 @@ const tJefPericiaRevisaoContrato: ThemeBuilder = (i) => ({
 
 // Contabilidade 2 — Auditoria de conta corrente
 const tJefPericiaAuditoria: ThemeBuilder = (i) => ({
-  area: "JEF_CIVEL",
-  themeLabel: "Auditoria financeira contábil — JEF Cível",
+  area: "JEF_FEDERAL",
+  themeLabel: "Auditoria financeira contábil — JEF Federal",
   autor: pick(NOMES, i + 8),
   reu: pick(JEF_BANCOS, i + 1),
   comarca: pick(COMARCAS, i + 8),
@@ -2586,8 +2586,8 @@ const tJefPericiaAuditoria: ThemeBuilder = (i) => ({
 
 // Tecnologia — Perícia forense digital
 const tJefPericiaForenseDigital: ThemeBuilder = (i) => ({
-  area: "JEF_CIVEL",
-  themeLabel: "Fraude eletrônica — perícia forense digital — JEF Cível",
+  area: "JEF_FEDERAL",
+  themeLabel: "Fraude eletrônica — perícia forense digital — JEF Federal",
   autor: pick(NOMES, i + 9),
   reu: pick(JEF_BANCOS, i + 2),
   comarca: pick(COMARCAS, i + 9),
@@ -2596,8 +2596,8 @@ const tJefPericiaForenseDigital: ThemeBuilder = (i) => ({
   norma: "arts. 14 e 22 CDC; Resolução BCB n. 4.658/2018 (cibersegurança); art. 3º Lei 9.099/95",
 });
 
-// Tutela themes — slots 0-39 de JEF_CIVEL (FASE 4.2)
-// Lote dedicado: --area=JEF_CIVEL --count=40 --trap=JEF_TUTELA_SEM_FUMUS
+// Tutela themes — slots 0-39 de JEF_ESTADUAL (FASE 4.2)
+// Lote dedicado: --area=JEF_ESTADUAL --count=40 --trap=JEF_TUTELA_SEM_FUMUS
 THEMES.push(
   { id: "jef_tutela_negativacao",         build: tJefTutelaNegativacao },
   { id: "jef_tutela_pix_fraudulento",     build: tJefTutelaPixFraudulento },
@@ -2611,8 +2611,8 @@ THEMES.push(
   { id: "jef_tutela_servico_essencial",   build: tJefTutelaServicoEssencial },
 );
 
-// Péricia themes — slots 40-79 de JEF_CIVEL (FASE 4.1)
-// Lote dedicado: --area=JEF_CIVEL --offset=40 --count=40 --trap=JEF_PERICIA_COMPLEXA
+// Péricia themes — slots 40-79 de JEF_FEDERAL (FASE 4.1)
+// Lote dedicado: --area=JEF_FEDERAL --count=40 --trap=JEF_PERICIA_COMPLEXA
 THEMES.push(
   { id: "jef_pericia_erro_medico",      build: tJefPericiaErroMedico },
   { id: "jef_pericia_invalidez",        build: tJefPericiaInvalidez },
@@ -2626,7 +2626,7 @@ THEMES.push(
   { id: "jef_pericia_forense_digital",  build: tJefPericiaForenseDigital },
 );
 
-// Temas originais de JEF Cível — slots 40-79 (ALL_PHASES — 10 × 4 = 40 casos)
+// Temas originais de JEF Estadual — slots 40-79 (ALL_PHASES — 10 × 4 = 40 casos)
 THEMES.push(
   { id: "jef_negativacao",          build: tJefNegativacao },
   { id: "jef_cobranca_indevida",    build: tJefCobrancaIndevida },

@@ -10,7 +10,17 @@ import type { ValidationError, LegalClassification } from "../pipeline/types.js"
 // ── Detector de contexto JEF ──────────────────────────────────────────────────
 
 const JEF_CONTEXT_RE =
-  /\b(juizado\s+especial\s+c[íi]vel|juizado\s+especial\b|jec\b|lei\s+(?:n[°º\.]\s*)?9\.099|rito\s+sumar[íi]ssimo|recurso\s+inominado|art\.\s*41\s+(?:da\s+)?lei\s+9\.099|competência\s+do\s+juizado)\b/i;
+  /\b(juizado\s+especial\s+c[íi]vel|juizado\s+especial\b|jec\b|lei\s+(?:n[°º\.]\s*)?9\.099|lei\s+(?:n[°º\.]\s*)?10\.259|rito\s+sumar[íi]ssimo|recurso\s+inominado|art\.\s*41\s+(?:da\s+)?lei\s+9\.099|competência\s+do\s+juizado)\b/i;
+
+/** Detecta se o draft se refere ao JEF Federal (Lei 10.259/01). */
+function isJefFederal(draft: string): boolean {
+  return /\b(lei\s+(?:n[°º\.]\s*)?10\.259|juizado\s+especial\s+federal|jef\s+federal|justi[cç]a\s+federal\s+especial|turma\s+recursal\s+federal)\b/i.test(draft);
+}
+
+/** Retorna o limite de salários mínimos aplicável ao draft (40 estadual, 60 federal). */
+function smLimit(draft: string): number {
+  return isJefFederal(draft) ? 60 : 40;
+}
 
 // ── Regras fatais ─────────────────────────────────────────────────────────────
 
@@ -41,16 +51,26 @@ const FATAL_RULES: Array<{
   {
     rule: "JEF_VALOR_EXCEDENTE",
     description:
-      "Valor da causa excede o limite de 40 salários mínimos do JEF (art. 3º, caput, Lei 9.099/95) " +
-      "sem que conste renúncia expressa ao excedente — ausência de renúncia invalida a competência.",
+      "Valor da causa excede o limite de competência do Juizado Especial sem renúncia expressa ao excedente: " +
+      "JEF Estadual (Lei 9.099/95): 40 salários mínimos; JEF Federal (Lei 10.259/01): 60 salários mínimos. " +
+      "Ausência de renúncia invalida a competência (art. 3º, caput, Lei 9.099/95; art. 3º, §3º, Lei 10.259/01).",
     detect: (draft) => {
       if (!JEF_CONTEXT_RE.test(draft)) return false;
-      // Detectar valores altos em R$ (acima de ~R$ 48.000 = 40 SM × R$ 1.200)
-      const temValorAlto = /r\$\s*(?:\d{1,3}\.)*(?:[5-9]\d{4}|\d{6,})/i.test(draft) ||
-        /\b(?:4[1-9]|[5-9]\d|\d{3,})\s+sal[aá]rios?\s+m[íi]nimos?\b/i.test(draft) ||
-        /acima\s+de\s+40\s+sal[aá]rios?\s+m[íi]nimos?/i.test(draft);
-      if (!temValorAlto) return false;
-      // Verificar se há renúncia ao excedente
+      const limite = smLimit(draft);
+      // Detectar SM numérico explícito acima do limite da jurisdição
+      const smMatches = [...draft.matchAll(/\b(\d+)\s+sal[aá]rios?\s+m[íi]nimos?\b/gi)];
+      const temSmAlto = smMatches.some((m) => Number.parseInt(m[1]!, 10) > limite);
+      // Detectar "acima de N SM" acima do limite
+      const acimaRe = new RegExp(`acima\\s+de\\s+${limite}\\s+sal[aá]rios?\\s+m[íi]nimos?`, "i");
+      const temAcimaExplicito = acimaRe.test(draft);
+      // Detectar R$ acima do limiar aproximado (limite × R$ 1.412, valor atual do SM)
+      const thresholdBrl = limite * 1412;
+      const brlMatches = [...draft.matchAll(/r\$\s*([\d.,]+)/gi)];
+      const temBrlAlto = brlMatches.some((m) => {
+        const raw = (m[1] ?? "").replace(/\./g, "").replace(",", ".");
+        return Number.parseFloat(raw) > thresholdBrl;
+      });
+      if (!temSmAlto && !temAcimaExplicito && !temBrlAlto) return false;
       const temRenuncia =
         /renunci[ao]\s+ao\s+excedente|renúncia\s+ao\s+valor\s+excedente|renuncia\s+ao\s+que\s+exceder|renuncia\s+expressamente\s+ao\s+excedente/i.test(draft);
       return !temRenuncia;

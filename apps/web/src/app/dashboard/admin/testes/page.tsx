@@ -366,7 +366,9 @@ export default function TestesPage() {
                 <option value="CONSUMIDOR">Consumidor (CDC)</option>
                 <option value="FAZENDA_PUBLICA">Fazenda Pública</option>
                 <option value="EXECUCAO_CUMPRIMENTO">Execução / Cumprimento</option>
-                <option value="JEF_CIVEL">JEF Cível (Lei 9.099/95)</option>
+                <option value="JEF_CIVEL">JEF Cível (legacy — todos)</option>
+                <option value="JEF_ESTADUAL">JEF Estadual (Lei 9.099/95 — 40 SM)</option>
+                <option value="JEF_FEDERAL">JEF Federal (Lei 10.259/01 — 60 SM)</option>
               </select>
             </div>
             <div>
@@ -402,13 +404,13 @@ export default function TestesPage() {
                 className="w-full px-3 py-2 text-sm border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-amber-500"
               >
                 <option value="">Distribuição normal (~30%)</option>
-                <optgroup label="JEF Cível — Tutelas (FASE 4.2)">
+                <optgroup label="JEF Estadual — Tutelas (FASE 4.2)">
                   <option value="JEF_TUTELA_SEM_FUMUS">JEF_TUTELA_SEM_FUMUS — tutela sem fumus boni iuris</option>
                   <option value="JEF_TUTELA_SEM_PERICULUM">JEF_TUTELA_SEM_PERICULUM — tutela sem periculum in mora</option>
                   <option value="JEF_TUTELA_DESPROPORCIONAL">JEF_TUTELA_DESPROPORCIONAL — medida desproporcional</option>
                   <option value="JEF_TUTELA_ARTIFICIAL">JEF_TUTELA_ARTIFICIAL — urgência artificial / mora própria</option>
                 </optgroup>
-                <optgroup label="JEF Cível — Outras (FASE 4.1)">
+                <optgroup label="JEF Federal — Perícias (FASE 4.1)">
                   <option value="JEF_PERICIA_COMPLEXA">JEF_PERICIA_COMPLEXA — perícia incompatível com rito</option>
                   <option value="JEF_VALOR_EXCEDENTE">JEF_VALOR_EXCEDENTE — valor acima de 40 SM sem renúncia</option>
                   <option value="JEF_RECURSO_ERRADO">JEF_RECURSO_ERRADO — apelação em vez de recurso inominado</option>

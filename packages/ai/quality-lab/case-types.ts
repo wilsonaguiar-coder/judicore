@@ -18,7 +18,9 @@ export type LegalArea =
   | "CONSUMIDOR"            // direito do consumidor: CDC, negativação, plano de saúde, banco
   | "FAZENDA_PUBLICA"       // direito público: saúde, concursos, servidores, prescrição quinquenal
   | "EXECUCAO_CUMPRIMENTO"  // fase executiva: cumprimento de sentença, impugnação, penhora
-  | "JEF_CIVEL";            // Juizado Especial Cível (Lei 9.099/95) — causas até 40 SM
+  | "JEF_CIVEL"             // @deprecated — alias legacy; usar JEF_ESTADUAL ou JEF_FEDERAL
+  | "JEF_ESTADUAL"          // Juizado Especial Estadual (Lei 9.099/95) — causas até 40 SM
+  | "JEF_FEDERAL";          // Juizado Especial Federal (Lei 10.259/01) — causas até 60 SM
 
 // Tipos de armadilhas jurídicas inseridas em ~30% dos casos
 export type TrapKind =
@@ -61,6 +63,7 @@ export type TrapKind =
 export interface SyntheticCase {
   id: string;
   area: LegalArea;
+  jurisdiction?: "JEF_ESTADUAL" | "JEF_FEDERAL"; // só para casos JEF_ESTADUAL / JEF_FEDERAL
   documentType: TipoPeca;
   theme: string;                 // chave do tema (ex: "rpps_paridade")
   themeLabel: string;            // rótulo legível
@@ -101,7 +104,15 @@ export const AREA_LABELS: Record<LegalArea, string> = {
   CONSUMIDOR: "Consumidor (CDC)",
   FAZENDA_PUBLICA: "Fazenda Pública",
   EXECUCAO_CUMPRIMENTO: "Execução / Cumprimento",
-  JEF_CIVEL: "JEF Cível (Lei 9.099/95)",
+  JEF_CIVEL: "JEF Cível (legacy)",
+  JEF_ESTADUAL: "JEF Estadual (Lei 9.099/95)",
+  JEF_FEDERAL: "JEF Federal (Lei 10.259/01)",
+};
+
+/** Limite de salários mínimos por jurisdição JEF. */
+export const JEF_SM_LIMIT: Record<"JEF_ESTADUAL" | "JEF_FEDERAL", number> = {
+  JEF_ESTADUAL: 40,
+  JEF_FEDERAL:  60,
 };
 
 export function mapRuleToValidator(rule: string): ValidatorComponent {
