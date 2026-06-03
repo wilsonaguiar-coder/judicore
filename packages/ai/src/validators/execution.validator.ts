@@ -91,8 +91,12 @@ const FATAL_RULES: Array<{
     description: "Impugnação por excesso de execução (art. 525 §1º, III, CPC) não analisada — penhora mantida pelo valor maior sem exame do cálculo correto.",
     detect: (draft, ctx) => {
       if (!ctx.tem_impugnacao) return false;
+      // Só se aplica a peças decisórias (juiz ignora o excesso).
+      // RECURSO, PETICAO_INICIAL etc. são do advogado que *argui* o excesso — não do juiz.
+      if (ctx.tipo_peca !== "SENTENCA" && ctx.tipo_peca !== "DECISAO") return false;
       const temExcesso = /excesso\s+de\s+execu[cç][aã]o|art\.\s*525/i.test(draft);
-      const foiAnalisado = /an[aá]lis[eo]|examin[ao]|calcul[ao]|per[ií]cia\s+cont[aá]bil/i.test(draft);
+      const foiAnalisado =
+        /an[aá]lis[eo]|examin[ao]|c[aá]lcul[ao]s?|per[ií]cia\s+cont[aá]bil|demonstrativ[ao]|planilha|erro\s+aritm[eé]tico/i.test(draft);
       return temExcesso && !foiAnalisado;
     },
   },
@@ -213,12 +217,17 @@ const NON_FATAL_RULES: Array<{
 
 const EXECUTION_SECTIONS: Array<{ pattern: RegExp; label: string }> = [
   {
-    pattern: /\bdos?\s+fatos?\b/i,
+    // DOS FATOS / SÍNTESE FÁTICA / DO CONTRATO (título extrajudicial) /
+    // DO TÍTULO EXECUTIVO / DA ORIGEM DO CRÉDITO / DO INADIMPLEMENTO
+    pattern:
+      /\b(dos?\s+fatos?|s[íi]ntese\s+f[aá]tica|do\s+contrato\b|do\s+t[íi]tulo\s+executivo|da\s+origem\s+do\s+cr[eé]dito|do\s+inadimplemento|do\s+d[eé]bito\s+exeq[üu]endo)\b/i,
     label: "I — DOS FATOS",
   },
   {
-    // DO DIREITO / FUNDAMENTOS JURÍDICOS / FUNDAMENTOS DE DIREITO / FUNDAMENTOS LEGAIS
-    pattern: /\b(do\s+direito|fundamentos?\s+(jur[íi]dicos?|legais?|de\s+direito))\b/i,
+    // DO DIREITO / FUNDAMENTOS JURÍDICOS / FUNDAMENTOS DE DIREITO / FUNDAMENTOS LEGAIS /
+    // DO REGIME JURÍDICO (APLICÁVEL) / DA FUNDAMENTAÇÃO JURÍDICA / DO CABIMENTO DA EXECUÇÃO
+    pattern:
+      /\b(do\s+direito|fundamentos?\s+(jur[íi]dicos?|legais?|de\s+direito)|do\s+regime\s+jur[íi]dico|da\s+fundamenta[cç][aã]o\s+jur[íi]dica|do\s+cabimento\s+da\s+execu[cç][aã]o)\b/i,
     label: "II — DO DIREITO",
   },
   {
@@ -230,9 +239,9 @@ const EXECUTION_SECTIONS: Array<{ pattern: RegExp; label: string }> = [
   {
     // DA APLICAÇÃO AO CASO CONCRETO / APLICAÇÃO AO CASO / APLICAÇÃO AO QUADRO CONCRETO /
     // DA ANÁLISE DO CASO CONCRETO / DO CASO CONCRETO / SUBSUNÇÃO DOS FATOS À NORMA /
-    // ENQUADRAMENTO JURÍDICO DO CASO / heading combinado "...APLICAÇÃO AO QUADRO CONCRETO"
+    // ENQUADRAMENTO JURÍDICO DO CASO / APLICAÇÃO À SITUAÇÃO DOS AUTOS (título extrajudicial)
     pattern:
-      /\b(da\s+)?(aplica[cç][aã]o\s+(ao|à)\s+(caso|quadro)|aplica[cç][aã]o\s+à\s+esp[eé]cie|subsun[cç][aã]o\s+dos?\s+fatos?|enquadramento\s+jur[íi]dico|an[aá]lise\s+do\s+caso\s+concreto|do\s+caso\s+concreto)\b|aplica[cç][aã]o.{0,60}concreto/i,
+      /\b(da\s+)?(aplica[cç][aã]o\s+(ao|à)\s+(caso|quadro|situa[cç][aã]o)|aplica[cç][aã]o\s+à\s+esp[eé]cie|subsun[cç][aã]o\s+dos?\s+fatos?|enquadramento\s+jur[íi]dico|an[aá]lise\s+do\s+caso\s+concreto|do\s+caso\s+concreto)\b|aplica[cç][aã]o.{0,60}(?:concreto|autos?)\b/i,
     label: "IV — DA APLICAÇÃO AO CASO CONCRETO",
   },
   {
@@ -242,7 +251,7 @@ const EXECUTION_SECTIONS: Array<{ pattern: RegExp; label: string }> = [
 ];
 
 const EXECUTION_CPC_RE =
-  /art\.\s*(?:523|524|525|526|527|783|784|785|829|854|855|914|915|917|139[\s,]*IV)\b/i;
+  /art(?:igo)?s?\.?\s*(?:523|524|525|526|527|783|784|785|829|854|855|914|915|917|139[\s,]*IV)\b/i;
 
 const EXECUTION_MODALITY_RE =
   /\b(cumprimento\s+de\s+senten[cç]a|execu[cç][aã]o\s+de\s+t[íi]tulo\s+extrajudicial|embargos?\s+[aà]\s+execu[cç][aã]o|impugna[cç][aã]o\s+ao\s+cumprimento|penhora\s+on[\s-]?line|sisbajud|art\.\s*523|art\.\s*784)\b/i;
