@@ -619,12 +619,19 @@ function applyTrap(
         instruction: "ARMADILHA: Incluir pedido expresso de produção de prova pericial técnica complexa (perícia médica especializada, laudo pericial de engenharia civil, perícia contábil detalhada ou perícia forense digital) na peça, sem reconhecer que a necessidade de tal prova pode tornar a causa de alta complexidade probatória e incompatível com o rito sumaríssimo do Juizado Especial Cível (art. 3º §3º Lei 9.099/95) — não mencionar possibilidade de remessa à justiça comum.",
         expectedRulesIfTrap: ["JEF_PERICIA_COMPLEXA"],
       };
-    case "JEF_VALOR_EXCEDENTE":
+    case "JEF_VALOR_EXCEDENTE": {
+      const isFederal = area === "JEF_FEDERAL";
+      const limite    = isFederal ? 60 : 40;
+      const smAlvo    = isFederal ? 68 : 48;
+      const valorBrl  = isFederal ? "R$ 96.016,00" : "R$ 67.776,00";
+      const lei       = isFederal ? "Lei 10.259/01 — art. 3º §1º" : "Lei 9.099/95 — art. 3º caput";
+      const juizado   = isFederal ? "Juizado Especial Federal" : "Juizado Especial Cível";
       return {
         description: base.description,
-        instruction: "ARMADILHA: Pleitear valor superior a 40 salários mínimos no Juizado Especial Cível sem incluir renúncia expressa ao valor excedente, como exige o art. 3º, §3º, Lei 9.099/95 para que o juizado mantenha competência.",
+        instruction: `ARMADILHA DE COMPETÊNCIA: O valor TOTAL do pedido nesta peça DEVE SER DECLARADO como ${valorBrl} (${smAlvo} salários mínimos). Esse valor supera o limite de ${limite} salários mínimos do ${juizado} (${lei}). Independentemente dos valores mencionados nos fatos, utilize ${valorBrl} como valor da causa e mencione explicitamente "${smAlvo} salários mínimos". NÃO inclua, mencione ou sugira renúncia ao valor excedente em nenhuma parte da peça.`,
         expectedRulesIfTrap: ["JEF_VALOR_EXCEDENTE"],
       };
+    }
     case "JEF_RECURSO_ERRADO":
       if (documentType === "RECURSO") {
         return {
@@ -2478,8 +2485,8 @@ const JEF_CONSTRUTORAS = [
 
 // Medicina 1 — Erro médico com néxo causal disputado
 const tJefPericiaErroMedico: ThemeBuilder = (i) => ({
-  area: "JEF_FEDERAL",
-  themeLabel: "Erro médico — perícia especializada — JEF Federal",
+  area: "JEF_ESTADUAL",
+  themeLabel: "Erro médico — perícia especializada — JEF Estadual",
   autor: pick(NOMES, i),
   reu: pick(JEF_CLINICAS, i),
   comarca: pick(COMARCAS, i),
@@ -2490,8 +2497,8 @@ const tJefPericiaErroMedico: ThemeBuilder = (i) => ({
 
 // Medicina 2 — Invalidez parcial com avaliação multiprofissional
 const tJefPericiaInvalidez: ThemeBuilder = (i) => ({
-  area: "JEF_FEDERAL",
-  themeLabel: "Invalidez parcial — avaliação multiprofissional — JEF Federal",
+  area: "JEF_ESTADUAL",
+  themeLabel: "Invalidez parcial — avaliação multiprofissional — JEF Estadual",
   autor: pick(NOMES, i + 1),
   reu: pick(JEF_CLINICAS, i + 1),
   comarca: pick(COMARCAS, i + 1),
@@ -2502,8 +2509,8 @@ const tJefPericiaInvalidez: ThemeBuilder = (i) => ({
 
 // Medicina 3 — Nexo causal complexo em exame de imagem
 const tJefPericiaNexoCausal: ThemeBuilder = (i) => ({
-  area: "JEF_FEDERAL",
-  themeLabel: "Nexo causal médico complexo — JEF Federal",
+  area: "JEF_ESTADUAL",
+  themeLabel: "Nexo causal médico complexo — JEF Estadual",
   autor: pick(NOMES, i + 2),
   reu: pick(JEF_CLINICAS, i + 2),
   comarca: pick(COMARCAS, i + 2),
@@ -2514,8 +2521,8 @@ const tJefPericiaNexoCausal: ThemeBuilder = (i) => ({
 
 // Medicina 4 — Dano estético grave
 const tJefPericiaDanoEstetico: ThemeBuilder = (i) => ({
-  area: "JEF_FEDERAL",
-  themeLabel: "Dano estético — avaliação pericial médica — JEF Federal",
+  area: "JEF_ESTADUAL",
+  themeLabel: "Dano estético — avaliação pericial médica — JEF Estadual",
   autor: pick(NOMES, i + 3),
   reu: pick(JEF_CLINICAS, i + 3),
   comarca: pick(COMARCAS, i + 3),
@@ -2526,8 +2533,8 @@ const tJefPericiaDanoEstetico: ThemeBuilder = (i) => ({
 
 // Engenharia 1 — Vício estrutural em imóvel
 const tJefPericiaVicioEstrutural: ThemeBuilder = (i) => ({
-  area: "JEF_FEDERAL",
-  themeLabel: "Vício estrutural em imóvel — JEF Federal",
+  area: "JEF_ESTADUAL",
+  themeLabel: "Vício estrutural em imóvel — JEF Estadual",
   autor: pick(NOMES, i + 4),
   reu: pick(JEF_CONSTRUTORAS, i),
   comarca: pick(COMARCAS, i + 4),
@@ -2538,8 +2545,8 @@ const tJefPericiaVicioEstrutural: ThemeBuilder = (i) => ({
 
 // Engenharia 2 — Recalque de fundação
 const tJefPericiaRecalque: ThemeBuilder = (i) => ({
-  area: "JEF_FEDERAL",
-  themeLabel: "Recalque de fundação — perícia geotécnica — JEF Federal",
+  area: "JEF_ESTADUAL",
+  themeLabel: "Recalque de fundação — perícia geotécnica — JEF Estadual",
   autor: pick(NOMES, i + 5),
   reu: pick(JEF_CONSTRUTORAS, i + 1),
   comarca: pick(COMARCAS, i + 5),
@@ -2550,8 +2557,8 @@ const tJefPericiaRecalque: ThemeBuilder = (i) => ({
 
 // Engenharia 3 — Infiltrações complexas
 const tJefPericiaInfiltracoes: ThemeBuilder = (i) => ({
-  area: "JEF_FEDERAL",
-  themeLabel: "Infiltrações complexas — perícia de engenharia — JEF Federal",
+  area: "JEF_ESTADUAL",
+  themeLabel: "Infiltrações complexas — perícia de engenharia — JEF Estadual",
   autor: pick(NOMES, i + 6),
   reu: pick(JEF_CONSTRUTORAS, i + 2),
   comarca: pick(COMARCAS, i + 6),
@@ -2562,8 +2569,8 @@ const tJefPericiaInfiltracoes: ThemeBuilder = (i) => ({
 
 // Contabilidade 1 — Revisão contratual com reconstrução de fluxo
 const tJefPericiaRevisaoContrato: ThemeBuilder = (i) => ({
-  area: "JEF_FEDERAL",
-  themeLabel: "Revisão contratual complexa — perícia contábil — JEF Federal",
+  area: "JEF_ESTADUAL",
+  themeLabel: "Revisão contratual complexa — perícia contábil — JEF Estadual",
   autor: pick(NOMES, i + 7),
   reu: pick(JEF_BANCOS, i),
   comarca: pick(COMARCAS, i + 7),
@@ -2574,8 +2581,8 @@ const tJefPericiaRevisaoContrato: ThemeBuilder = (i) => ({
 
 // Contabilidade 2 — Auditoria de conta corrente
 const tJefPericiaAuditoria: ThemeBuilder = (i) => ({
-  area: "JEF_FEDERAL",
-  themeLabel: "Auditoria financeira contábil — JEF Federal",
+  area: "JEF_ESTADUAL",
+  themeLabel: "Auditoria financeira contábil — JEF Estadual",
   autor: pick(NOMES, i + 8),
   reu: pick(JEF_BANCOS, i + 1),
   comarca: pick(COMARCAS, i + 8),
@@ -2586,14 +2593,224 @@ const tJefPericiaAuditoria: ThemeBuilder = (i) => ({
 
 // Tecnologia — Perícia forense digital
 const tJefPericiaForenseDigital: ThemeBuilder = (i) => ({
-  area: "JEF_FEDERAL",
-  themeLabel: "Fraude eletrônica — perícia forense digital — JEF Federal",
+  area: "JEF_ESTADUAL",
+  themeLabel: "Fraude eletrônica — perícia forense digital — JEF Estadual",
   autor: pick(NOMES, i + 9),
   reu: pick(JEF_BANCOS, i + 2),
   comarca: pick(COMARCAS, i + 9),
   fatos: `${pick(NOMES, i + 9)} (CPF ${cpf(i + 7900)}) foi vítima de invasão sofisticada ao aplicativo do ${pick(JEF_BANCOS, i + 2)} em ${dateBack(0, i)}, resultando em ${3 + i % 5} transferências não autorizadas totalizando ${brl(9000 + i * 300)}. A investigação da cadeia de acesso (logs de autenticação, IPs de origem, certificados digitais, vulnerabilidade explorada) exige perícia forense digital especializada para determinar se houve falha de segurança no sistema bancário ou se a vítima foi induzida por engenharia social sofisticada. Valor pleiteado: ${brl(12000 + i * 400)}.`,
   pedido: "ressarcimento integral das transferências não autorizadas e indenização por danos morais pela falha de segurança",
   norma: "arts. 14 e 22 CDC; Resolução BCB n. 4.658/2018 (cibersegurança); art. 3º Lei 9.099/95",
+});
+
+// ── JEF Federal — pools ────────────────────────────────────────────────────────
+
+const JEF_VARAS_FEDERAIS = [
+  "1ª Vara do JEF de São Paulo/SP",    "2ª Vara do JEF do Rio de Janeiro/RJ",
+  "JEF de Belo Horizonte/MG",          "JEF de Porto Alegre/RS",
+  "JEF de Brasília/DF",                "JEF de Fortaleza/CE",
+  "JEF de Recife/PE",                  "JEF de Salvador/BA",
+  "JEF de Curitiba/PR",                "JEF de Belém/PA",
+];
+
+// ── JEF Federal — temas (FASE 4.3) — INSS / CEF / União Federal ──────────────
+
+const tJefFederalAuxilioDoenca: ThemeBuilder = (i) => ({
+  area: "JEF_FEDERAL",
+  themeLabel: "INSS — auxílio-doença negado — JEF Federal",
+  autor: pick(NOMES, i),
+  reu: "Instituto Nacional do Seguro Social — INSS",
+  comarca: pick(JEF_VARAS_FEDERAIS, i),
+  fatos: `${pick(NOMES, i)} (CPF ${cpf(i + 9000)}) é segurado do RGPS com ${5 + i * 2} anos de contribuição. Em ${dateBack(0, i)} afastou-se do trabalho de ${pick(["auxiliar de produção", "operador de máquinas", "motorista", "técnico em eletrônica"], i)} por incapacidade decorrente de ${pick(["hérnia de disco lombar com radiculopatia", "LER/DORT bilateral", "síndrome do túnel do carpo grau III", "fratura com sequela funcional"], i)}. O INSS indeferiu o auxílio-doença (NIT ${300000 + i * 137}) em perícia de ${dateBack(0, i)}: concluiu incapacidade inferior a 15 dias. Competência: Juizado Especial Federal — art. 3º Lei 10.259/01. Valor da causa: ${brl(1412 * (6 + i % 12))} (${6 + i % 12} salários mínimos em atrasados).`,
+  pedido: "concessão/restabelecimento do auxílio-doença com pagamento das prestações vencidas desde a DER",
+  norma: "art. 59 Lei 8.213/91; art. 3º Lei 10.259/01; Súmula 47 TNU",
+});
+
+const tJefFederalAposentadoriaInvalidez: ThemeBuilder = (i) => ({
+  area: "JEF_FEDERAL",
+  themeLabel: "INSS — aposentadoria por invalidez negada — JEF Federal",
+  autor: pick(NOMES, i + 1),
+  reu: "Instituto Nacional do Seguro Social — INSS",
+  comarca: pick(JEF_VARAS_FEDERAIS, i + 1),
+  fatos: `${pick(NOMES, i + 1)} (CPF ${cpf(i + 9100)}) é segurado do RGPS com ${10 + i * 2} anos de contribuição. Foi acometido(a) de ${pick(["AVC com hemiplegia residual permanente", "neoplasia maligna com metástase", "insuficiência renal crônica em hemodiálise", "transtorno mental grave com internações recorrentes"], i)} em ${dateBack(1, i)}. O INSS negou a aposentadoria por invalidez (NIT ${400000 + i * 199}): perícia concluiu incapacidade não total e permanente. Valor da causa: ${brl(1412 * (18 + i * 2))} (${18 + i * 2} salários mínimos). Juizado Especial Federal — Lei 10.259/01.`,
+  pedido: "concessão de aposentadoria por invalidez ou, subsidiariamente, auxílio-doença, desde a data do requerimento",
+  norma: "art. 42 Lei 8.213/91; Súmula 47 TNU; art. 3º Lei 10.259/01",
+});
+
+const tJefFederalBpcLoas: ThemeBuilder = (i) => ({
+  area: "JEF_FEDERAL",
+  themeLabel: "INSS — BPC/LOAS negado — JEF Federal",
+  autor: pick(NOMES, i + 2),
+  reu: "Instituto Nacional do Seguro Social — INSS",
+  comarca: pick(JEF_VARAS_FEDERAIS, i + 2),
+  fatos: `${pick(NOMES, i + 2)} (CPF ${cpf(i + 9200)}) é ${pick(["pessoa com deficiência (TEA nível 2)", "idoso com 70 anos — renda per capita R$ 240,00", "pessoa com paraplegia adquirida", "idoso com 75 anos em situação de extrema pobreza"], i)}. Requereu BPC/LOAS (art. 20 Lei 8.742/93) perante o INSS em ${dateBack(0, i)} (NIT ${500000 + i * 211}). Indeferido: renda per capita apontada acima de 1/4 do SM sem considerar gastos médicos do grupo familiar. Valor: ${brl(1412 * (12 + i * 2))} (${12 + i * 2} salários mínimos em retroativo). JEF Federal — Lei 10.259/01.`,
+  pedido: "concessão do BPC/LOAS desde a data do requerimento, com pagamento dos atrasados",
+  norma: "art. 20 Lei 8.742/93 (LOAS); Súmula 48 TNU; art. 3º Lei 10.259/01; Tema STJ 732",
+});
+
+const tJefFederalFgts: ThemeBuilder = (i) => ({
+  area: "JEF_FEDERAL",
+  themeLabel: "CEF — FGTS não recolhido — JEF Federal",
+  autor: pick(NOMES, i + 3),
+  reu: "Caixa Econômica Federal — CEF",
+  comarca: pick(JEF_VARAS_FEDERAIS, i + 3),
+  fatos: `${pick(NOMES, i + 3)} (CPF ${cpf(i + 9300)}) foi empregado de ${pick(EMPRESAS, i).nome} de ${dateBack(3, i)} a ${dateBack(1, i)}. A empregadora não recolheu FGTS por ${18 + i * 3} meses: déficit de ${brl(280 * (18 + i * 3) + 800 * i)} na conta vinculada nº ${70000000 + i * 13577}. A Caixa Econômica Federal, gestora do fundo (art. 7º Lei 8.036/90), não fiscalizou os depósitos. Valor pleiteado: ${brl(9000 + i * 800)}. JEF Federal — art. 3º Lei 10.259/01.`,
+  pedido: "regularização da conta FGTS com depósito das parcelas em atraso e multa rescisória correspondente",
+  norma: "arts. 7º e 23 Lei 8.036/90; art. 3º Lei 10.259/01; Súmula 349 STJ",
+});
+
+const tJefFederalSalarioMaternidade: ThemeBuilder = (i) => ({
+  area: "JEF_FEDERAL",
+  themeLabel: "INSS — salário-maternidade MEI negado — JEF Federal",
+  autor: pick(NOMES, i + 4),
+  reu: "Instituto Nacional do Seguro Social — INSS",
+  comarca: pick(JEF_VARAS_FEDERAIS, i + 4),
+  fatos: `${pick(NOMES, i + 4)} (CPF ${cpf(i + 9400)}) é Microempreendedora Individual (MEI) com contribuições previdenciárias em dia desde ${dateBack(2, i)}. Em ${dateBack(0, i)} deu à luz e requereu salário-maternidade (art. 71 Lei 8.213/91). O INSS indeferiu (NIT ${600000 + i * 173}) alegando carência insuficiente — exigiu 10 contribuições indevidamente para MEI enquadrada como contribuinte individual. Valor: ${brl(1412 * 4)} (4 salários mínimos — 120 dias de benefício). JEF Federal — Lei 10.259/01.`,
+  pedido: "concessão do salário-maternidade por 120 dias, com pagamento das parcelas vencidas e juros",
+  norma: "arts. 71 e 71-A Lei 8.213/91; art. 3º Lei 10.259/01; Súmula 41 TNU",
+});
+
+const tJefFederalConcurso: ThemeBuilder = (i) => ({
+  area: "JEF_FEDERAL",
+  themeLabel: "União — nomeação em concurso público federal — JEF Federal",
+  autor: pick(NOMES, i + 5),
+  reu: "União Federal",
+  comarca: pick(JEF_VARAS_FEDERAIS, i + 5),
+  fatos: `${pick(NOMES, i + 5)} (CPF ${cpf(i + 9500)}) foi aprovado(a) dentro do número de vagas (${3 + i}º lugar para ${3 + i} vagas) no concurso público federal para ${pick(["Técnico do Seguro Social — INSS", "Agente Administrativo — MDIC", "Analista Tributário — Receita Federal", "Técnico de Nível Médio — IBGE"], i)} (Edital ${100 + i}/2022). Validade expirou em ${dateBack(0, i)} sem nomeação; novo concurso foi aberto antes do término. Preterição configurada (Súmula 15 STF; Tema STF 784). Valor: ${brl(15000 + i * 2000)}. JEF Federal — Lei 10.259/01.`,
+  pedido: "nomeação e posse no cargo, com diferenças remuneratórias desde a data da preterição",
+  norma: "Súmula 15 STF; Tema STF 784; art. 37, IV, CF/88; art. 3º Lei 10.259/01",
+});
+
+const tJefFederalPensaoMorte: ThemeBuilder = (i) => ({
+  area: "JEF_FEDERAL",
+  themeLabel: "INSS — pensão por morte negada — JEF Federal",
+  autor: pick(NOMES, i + 6),
+  reu: "Instituto Nacional do Seguro Social — INSS",
+  comarca: pick(JEF_VARAS_FEDERAIS, i + 6),
+  fatos: `${pick(NOMES, i + 6)} (CPF ${cpf(i + 9600)}) é ${pick(["cônjuge sobrevivente", "companheira em união estável de 8 anos", "filho menor de 21 anos", "genitora inválida"], i)} do segurado falecido ${pick(NOMES, i + 10)} (óbito em ${dateBack(0, i)}). INSS negou a pensão por morte (NIT ${700000 + i * 157}): de cujus não mantinha qualidade de segurado — última contribuição em ${dateBack(2, i)}. O autor comprova que o falecido era segurado especial rural até o óbito. Valor: ${brl(1412 * (14 + i * 2))} (${14 + i * 2} salários mínimos). JEF Federal — Lei 10.259/01.`,
+  pedido: "concessão da pensão por morte desde a data do óbito, com pagamento de atrasados e juros",
+  norma: "art. 74 Lei 8.213/91; Súmula 45 TNU; art. 3º Lei 10.259/01",
+});
+
+const tJefFederalSeguroEspecial: ThemeBuilder = (i) => ({
+  area: "JEF_FEDERAL",
+  themeLabel: "INSS — segurado especial rural — aposentadoria por idade — JEF Federal",
+  autor: pick(NOMES, i + 7),
+  reu: "Instituto Nacional do Seguro Social — INSS",
+  comarca: pick(JEF_VARAS_FEDERAIS, i + 7),
+  fatos: `${pick(NOMES, i + 7)} (CPF ${cpf(i + 9700)}) é trabalhador(a) rural — segurado especial (art. 11, VII, Lei 8.213/91) — com atividade agrícola de subsistência em propriedade familiar por mais de ${15 + i} anos. Requereu aposentadoria por idade rural (art. 143 Lei 8.213/91) em ${dateBack(0, i)}. INSS negou (NIT ${800000 + i * 143}): insuficiência de prova do labor rural. Autor possui declaração de sindicato rural, notas de produção e depoimentos de ${5 + i} vizinhos. Valor: ${brl(1412 * (24 + i * 3))} (${24 + i * 3} salários mínimos). JEF Federal — Lei 10.259/01.`,
+  pedido: "concessão de aposentadoria por idade rural desde o requerimento, com pagamento de atrasados",
+  norma: "arts. 11, VII, e 143 Lei 8.213/91; Súmulas 14 e 41 TNU; art. 3º Lei 10.259/01",
+});
+
+const tJefFederalAuxilioAcidente: ThemeBuilder = (i) => ({
+  area: "JEF_FEDERAL",
+  themeLabel: "INSS — auxílio-acidente negado — JEF Federal",
+  autor: pick(NOMES, i + 8),
+  reu: "Instituto Nacional do Seguro Social — INSS",
+  comarca: pick(JEF_VARAS_FEDERAIS, i + 8),
+  fatos: `${pick(NOMES, i + 8)} (CPF ${cpf(i + 9800)}) sofreu acidente de trabalho em ${dateBack(1, i)} como ${pick(["auxiliar de logística", "pedreiro", "operador de empilhadeira", "técnico de instalações"], i)}. Após alta, ficou com sequela funcional parcial de ${pick(["membro superior direito", "coluna lombar", "audição unilateral", "membro inferior esquerdo"], i)}. INSS negou o auxílio-acidente (art. 86 Lei 8.213/91 — NIT ${900000 + i * 167}): sequela não reduz capacidade laboral. Valor: ${brl(706 * (12 + i * 2))} (50% do SM × ${12 + i * 2} meses). JEF Federal — Lei 10.259/01.`,
+  pedido: "concessão do auxílio-acidente desde a cessação do auxílio-doença acidentário, com atrasados",
+  norma: "art. 86 Lei 8.213/91; art. 3º Lei 10.259/01; Súmula 44 TNU",
+});
+
+const tJefFederalMinhaCasa: ThemeBuilder = (i) => ({
+  area: "JEF_FEDERAL",
+  themeLabel: "CEF — financiamento habitacional MCMV — JEF Federal",
+  autor: pick(NOMES, i + 9),
+  reu: "Caixa Econômica Federal — CEF",
+  comarca: pick(JEF_VARAS_FEDERAIS, i + 9),
+  fatos: `${pick(NOMES, i + 9)} (CPF ${cpf(i + 9900)}) celebrou contrato habitacional (Minha Casa Minha Vida) com a CEF em ${dateBack(3, i)} — imóvel financiado por ${brl(130000 + i * 5000)} em ${240 + i * 12} parcelas. Após ${24 + i * 6} prestações, o saldo devedor diverge ${brl(8000 + i * 500)} do esperado: taxa efetiva (${10 + i}% a.a.) supera a contratada com subsídio do FAR (${8 + i}% a.a.). A CEF recusa exibir planilha de cálculo. Valor em discussão: ${brl(12000 + i * 800)}. JEF Federal — art. 3º Lei 10.259/01.`,
+  pedido: "exibição da planilha de evolução, revisão das taxas e devolução dos excessos cobrados",
+  norma: "arts. 6º e 51 CDC; Lei 11.977/09 (MCMV); Súmula 294 STJ; art. 3º Lei 10.259/01",
+});
+
+// ── Casos de teste — JEF_VALOR_EXCEDENTE — valores fixos ─────────────────────
+// Rodar SEM --trap para testar detecção natural pelo validator.
+// SM usado: R$ 1.412 (consistente com jef-civel.validator).
+
+// JEF_ESTADUAL — 45 SM (R$ 63.540) sem renúncia → esperado: DETECT
+const tJefEstadualValor45smSemRenuncia: ThemeBuilder = (i) => ({
+  area: "JEF_ESTADUAL",
+  themeLabel: "Valor 45 SM sem renúncia — JEF Estadual [teste VALOR_EXCEDENTE]",
+  autor: pick(NOMES, i),
+  reu: pick(JEF_LOJAS, i).nome,
+  comarca: pick(COMARCAS, i),
+  fatos: `${pick(NOMES, i)} (CPF ${cpf(i + 19000)}) propõe ação de indenização por danos materiais e morais contra ${pick(JEF_LOJAS, i).nome} (CNPJ ${pick(JEF_LOJAS, i).cnpj}) decorrente de vício de produto causador de dano extenso em ${dateBack(0, i)}. O valor total dos danos apurados é de R$ 63.540,00, equivalente a 45 salários mínimos — valor superior ao limite de 40 salários mínimos do Juizado Especial Cível (art. 3º Lei 9.099/95). O autor NÃO renuncia ao valor excedente e pleiteia o montante integral de R$ 63.540,00 (45 salários mínimos).`,
+  pedido: "indenização integral de R$ 63.540,00 (45 salários mínimos) por danos materiais e morais",
+  norma: "arts. 186 e 927 CC/2002; art. 6º, VI, CDC; art. 3º Lei 9.099/95",
+});
+
+// JEF_ESTADUAL — 55 SM (R$ 77.660) COM renúncia ao excedente → esperado: AVOID
+const tJefEstadualValor55smComRenuncia: ThemeBuilder = (i) => ({
+  area: "JEF_ESTADUAL",
+  themeLabel: "Valor 55 SM com renúncia ao excedente — JEF Estadual [teste VALOR_EXCEDENTE]",
+  autor: pick(NOMES, i + 1),
+  reu: pick(JEF_BANCOS, i),
+  comarca: pick(COMARCAS, i + 1),
+  fatos: `${pick(NOMES, i + 1)} (CPF ${cpf(i + 19100)}) sofreu prejuízo total de R$ 77.660,00 (55 salários mínimos) decorrente de cobranças indevidas e danos morais praticados pelo ${pick(JEF_BANCOS, i)}. Para manter a competência do Juizado Especial Cível (art. 3º Lei 9.099/95 — limite de 40 salários mínimos), o autor RENUNCIA EXPRESSAMENTE ao valor excedente, limitando o pedido a R$ 56.480,00 (40 salários mínimos). O autor renúncia ao que exceder R$ 56.480,00.`,
+  pedido: "indenização de R$ 56.480,00 (40 salários mínimos), com renúncia expressa ao valor excedente de R$ 21.180,00",
+  norma: "art. 3º §3º Lei 9.099/95 (renúncia ao excedente); arts. 14 e 42 CDC",
+});
+
+// JEF_ESTADUAL — 39 SM (R$ 55.068) — abaixo do limite → esperado: AVOID
+const tJefEstadualValor39smRegular: ThemeBuilder = (i) => ({
+  area: "JEF_ESTADUAL",
+  themeLabel: "Valor 39 SM regular — abaixo do limite — JEF Estadual [teste VALOR_EXCEDENTE]",
+  autor: pick(NOMES, i + 2),
+  reu: pick(JEF_LOJAS, i + 1).nome,
+  comarca: pick(COMARCAS, i + 2),
+  fatos: `${pick(NOMES, i + 2)} (CPF ${cpf(i + 19200)}) propõe ação indenizatória por danos materiais e morais contra ${pick(JEF_LOJAS, i + 1).nome} (CNPJ ${pick(JEF_LOJAS, i + 1).cnpj}) em ${dateBack(0, i)}. O valor total do pedido é de R$ 55.068,00 (39 salários mínimos) — valor inferior ao limite de 40 salários mínimos do Juizado Especial Cível (art. 3º Lei 9.099/95). Competência do JEF plenamente configurada, sem necessidade de renúncia.`,
+  pedido: "indenização de R$ 55.068,00 (39 salários mínimos) por danos materiais e morais",
+  norma: "arts. 186 e 927 CC/2002; art. 6º, VI, CDC; art. 3º Lei 9.099/95",
+});
+
+// JEF_FEDERAL — 65 SM (R$ 91.780) sem renúncia → esperado: DETECT
+const tJefFederalValor65smSemRenuncia: ThemeBuilder = (i) => ({
+  area: "JEF_FEDERAL",
+  themeLabel: "Valor 65 SM sem renúncia — JEF Federal [teste VALOR_EXCEDENTE]",
+  autor: pick(NOMES, i + 3),
+  reu: "Instituto Nacional do Seguro Social — INSS",
+  comarca: pick(JEF_VARAS_FEDERAIS, i),
+  fatos: `${pick(NOMES, i + 3)} (CPF ${cpf(i + 19300)}) propõe ação previdenciária contra o INSS pleiteando benefício previdenciário acumulado com indenização por danos morais causados pelo indeferimento indevido. O valor total calculado da causa é de R$ 91.780,00, equivalente a 65 salários mínimos — superior ao limite de 60 salários mínimos do Juizado Especial Federal (art. 3º §1º Lei 10.259/01). O autor NÃO renuncia ao valor excedente e pleiteia a integralidade de R$ 91.780,00 (65 salários mínimos). Competência: JEF Federal — Lei 10.259/01.`,
+  pedido: "concessão do benefício previdenciário e indenização por danos morais, totalizando R$ 91.780,00 (65 salários mínimos)",
+  norma: "art. 42 Lei 8.213/91; arts. 186 e 927 CC/2002; art. 3º §1º Lei 10.259/01",
+});
+
+// JEF_FEDERAL — 75 SM (R$ 105.900) sem renúncia → esperado: DETECT
+const tJefFederalValor75smSemRenuncia: ThemeBuilder = (i) => ({
+  area: "JEF_FEDERAL",
+  themeLabel: "Valor 75 SM sem renúncia — JEF Federal [teste VALOR_EXCEDENTE]",
+  autor: pick(NOMES, i + 4),
+  reu: "União Federal",
+  comarca: pick(JEF_VARAS_FEDERAIS, i + 1),
+  fatos: `${pick(NOMES, i + 4)} (CPF ${cpf(i + 19400)}) propõe ação indenizatória contra a União Federal por danos causados por servidor público federal em ${dateBack(1, i)}. O valor total apurado dos prejuízos é de R$ 105.900,00, equivalente a 75 salários mínimos — valor superior ao limite de 60 salários mínimos do Juizado Especial Federal (art. 3º §1º Lei 10.259/01). O autor NÃO apresenta renúncia ao valor excedente nem limita o pedido ao teto do JEF. Competência: JEF Federal — Lei 10.259/01.`,
+  pedido: "indenização por danos materiais e morais no valor de R$ 105.900,00 (75 salários mínimos)",
+  norma: "art. 37 §6º CF/88; arts. 186 e 927 CC/2002; art. 3º §1º Lei 10.259/01",
+});
+
+// JEF_FEDERAL — 55 SM (R$ 77.660) — abaixo de 60 SM → esperado: AVOID
+const tJefFederalValor55smRegular: ThemeBuilder = (i) => ({
+  area: "JEF_FEDERAL",
+  themeLabel: "Valor 55 SM regular — abaixo de 60 SM — JEF Federal [teste VALOR_EXCEDENTE]",
+  autor: pick(NOMES, i + 5),
+  reu: "Instituto Nacional do Seguro Social — INSS",
+  comarca: pick(JEF_VARAS_FEDERAIS, i + 2),
+  fatos: `${pick(NOMES, i + 5)} (CPF ${cpf(i + 19500)}) propõe ação previdenciária contra o INSS pleiteando retroativos de benefício negado. O valor total pleiteado é de R$ 77.660,00 (55 salários mínimos) — valor inferior ao limite de 60 salários mínimos do Juizado Especial Federal (art. 3º §1º Lei 10.259/01). Competência do JEF Federal plenamente configurada. Não há necessidade de renúncia ao excedente. JEF Federal — Lei 10.259/01.`,
+  pedido: "concessão do benefício previdenciário e pagamento de R$ 77.660,00 (55 salários mínimos) em retroativos",
+  norma: "art. 74 Lei 8.213/91; art. 3º §1º Lei 10.259/01",
+});
+
+// JEF_FEDERAL — 50 SM (R$ 70.600) — entre 40 e 60 SM → esperado: AVOID (sem reprovação)
+const tJefFederalValor50smRegular: ThemeBuilder = (i) => ({
+  area: "JEF_FEDERAL",
+  themeLabel: "Valor 50 SM regular (entre 40-60 SM) — JEF Federal [teste VALOR_EXCEDENTE]",
+  autor: pick(NOMES, i + 6),
+  reu: "Caixa Econômica Federal — CEF",
+  comarca: pick(JEF_VARAS_FEDERAIS, i + 3),
+  fatos: `${pick(NOMES, i + 6)} (CPF ${cpf(i + 19600)}) propõe ação contra a Caixa Econômica Federal por irregularidades em conta FGTS e danos morais. O valor total da causa é de R$ 70.600,00 (50 salários mínimos) — valor que: (a) supera o limite de 40 salários mínimos do JEF Estadual (Lei 9.099/95), mas (b) está dentro do limite de 60 salários mínimos do Juizado Especial Federal (art. 3º §1º Lei 10.259/01). Competência: exclusivamente JEF Federal. JEF Federal — Lei 10.259/01.`,
+  pedido: "regularização da conta FGTS e indenização por danos morais, totalizando R$ 70.600,00 (50 salários mínimos)",
+  norma: "arts. 7º e 23 Lei 8.036/90; art. 3º §1º Lei 10.259/01",
 });
 
 // Tutela themes — slots 0-39 de JEF_ESTADUAL (FASE 4.2)
@@ -2611,8 +2828,8 @@ THEMES.push(
   { id: "jef_tutela_servico_essencial",   build: tJefTutelaServicoEssencial },
 );
 
-// Péricia themes — slots 40-79 de JEF_FEDERAL (FASE 4.1)
-// Lote dedicado: --area=JEF_FEDERAL --count=40 --trap=JEF_PERICIA_COMPLEXA
+// Péricia themes — JEF_ESTADUAL (FASE 4.1) — clínicas/construtoras/bancos privados
+// Lote dedicado: --area=JEF_ESTADUAL --offset=40 --count=40 --trap=JEF_PERICIA_COMPLEXA
 THEMES.push(
   { id: "jef_pericia_erro_medico",      build: tJefPericiaErroMedico },
   { id: "jef_pericia_invalidez",        build: tJefPericiaInvalidez },
@@ -2626,7 +2843,7 @@ THEMES.push(
   { id: "jef_pericia_forense_digital",  build: tJefPericiaForenseDigital },
 );
 
-// Temas originais de JEF Estadual — slots 40-79 (ALL_PHASES — 10 × 4 = 40 casos)
+// Temas originais de JEF Estadual — ALL_PHASES
 THEMES.push(
   { id: "jef_negativacao",          build: tJefNegativacao },
   { id: "jef_cobranca_indevida",    build: tJefCobrancaIndevida },
@@ -2638,4 +2855,31 @@ THEMES.push(
   { id: "jef_falha_entrega",        build: tJefFalhaEntrega },
   { id: "jef_tutela_urgencia",      build: tJefTutelaUrgencia },
   { id: "jef_competencia",          build: tJefCompetencia },
+);
+
+// JEF Federal — temas INSS/CEF/União (FASE 4.3)
+// Lote dedicado: --area=JEF_FEDERAL --count=40 --trap=JEF_VALOR_EXCEDENTE
+THEMES.push(
+  { id: "jef_federal_auxilio_doenca",           build: tJefFederalAuxilioDoenca },
+  { id: "jef_federal_aposentadoria_invalidez",  build: tJefFederalAposentadoriaInvalidez },
+  { id: "jef_federal_bpc_loas",                 build: tJefFederalBpcLoas },
+  { id: "jef_federal_fgts",                     build: tJefFederalFgts },
+  { id: "jef_federal_salario_maternidade",      build: tJefFederalSalarioMaternidade },
+  { id: "jef_federal_concurso",                 build: tJefFederalConcurso },
+  { id: "jef_federal_pensao_morte",             build: tJefFederalPensaoMorte },
+  { id: "jef_federal_seguro_especial",          build: tJefFederalSeguroEspecial },
+  { id: "jef_federal_auxilio_acidente",         build: tJefFederalAuxilioAcidente },
+  { id: "jef_federal_minha_casa",               build: tJefFederalMinhaCasa },
+);
+
+// Casos de teste JEF_VALOR_EXCEDENTE — valores fixos para validação do detector
+// Rodar SEM --trap: tsx quality-runner.ts --area=JEF_ESTADUAL --count=7
+THEMES.push(
+  { id: "jef_estadual_val45sm_sem_renuncia",  build: tJefEstadualValor45smSemRenuncia },
+  { id: "jef_estadual_val55sm_com_renuncia",  build: tJefEstadualValor55smComRenuncia },
+  { id: "jef_estadual_val39sm_regular",       build: tJefEstadualValor39smRegular },
+  { id: "jef_federal_val65sm_sem_renuncia",   build: tJefFederalValor65smSemRenuncia },
+  { id: "jef_federal_val75sm_sem_renuncia",   build: tJefFederalValor75smSemRenuncia },
+  { id: "jef_federal_val55sm_regular",        build: tJefFederalValor55smRegular },
+  { id: "jef_federal_val50sm_regular",        build: tJefFederalValor50smRegular },
 );
