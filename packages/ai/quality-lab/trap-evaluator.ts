@@ -166,12 +166,18 @@ export function evaluateTrap(trap: TrapKind, result: CaseResult): TrapOutcome {
     case "JEF_PERICIA_COMPLEXA": {
       // DETECTED: validator JEF emitiu a regra
       if (hasRule("JEF_PERICIA_COMPLEXA")) return "DETECTED";
-      // MISSED: peça solicita perícia complexa sem reconhecer incompatibilidade com JEF
-      if (
-        /per[íi]cia\s+(m[eé]dica|cont[aá]bil|de\s+engenharia|complex|forense|multidisciplinar|t[eé]cnica)/i.test(draft) &&
-        !/incompetência|declino\s+da\s+competência|incompatível\s+com\s+o\s+juizado|supera\s+o\s+rito/i.test(draft)
-      ) return "MISSED";
-      return "AVOIDED";
+
+      // Verifica se o draft menciona perícia complexa
+      const menciona = /per[íi]cia\s+(?:m[eé]dica|cont[aá]bil|de\s+engenharia|estrutural|complex|forense|multidisciplinar|t[eé]cnica|atuarial|grafot[eé]cnica)|laudo\s+pericial|avalia[cç][aã]o\s+(?:m[eé]dica\s+especializada?|multiprofissional|pericial)/i.test(draft);
+      if (!menciona) return "AVOIDED";
+
+      // AVOIDED: IA reconheceu que a perícia era desnecessária ou incompatível com o JEF
+      // (inclui as diversas formulações que a IA usa para fazer isso corretamente)
+      const aiReconheceu =
+        /incompet[êe]ncia\s+(?:absoluta\s+)?(?:do\s+)?juizado|declino\s+da\s+compet[êe]ncia|incompatível\s+com\s+(?:o\s+)?(?:juizado|rito\s+sumar[íi]ssimo)|supera\s+o\s+rito\s+sumar[íi]ssimo|remessa\s+(?:dos\s+autos\s+)?(?:à|ao)\s+(?:var[ao]\s+)?(?:c[íi]vel\s+)?(?:comum|ordin[aá]ri[ao])|n[ãa]o\s+h[áa](?:vendo)?\s+(?:necessidade|demanda)\s+de\s+per[íi]cia|n[ãa]o\s+(?:demanda|requer|necessita|exige)\s+per[íi]cia\s+(?:complex|t[eé]cnica\s+elaborada)|dispensável\s+a?\s*per[íi]cia|sem\s+complexidade\s+incompatível|plenamente\s+dirimida\s+com\s+prova\s+documental|n[ãa]o\s+(?:versa|verse)\s+sobre.{0,60}(?:pericial|per[íi]cia)|per[íi]cia.{0,120}n[ãa]o\s+(?:é\s+)?(?:cabível|necessária|adequada)\s+(?:no|ao)\s+juizado|extingue?-se\s+sem\s+julgamento\s+do\s+m[eé]rito\s+por\s+complexidade/i.test(draft);
+
+      if (aiReconheceu) return "AVOIDED";
+      return "MISSED";
     }
 
     case "JEF_VALOR_EXCEDENTE": {

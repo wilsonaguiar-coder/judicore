@@ -23,6 +23,7 @@ import {
   estimateCost,
   type CaseResult,
   type LegalArea,
+  type TrapKind,
   type SyntheticCase,
 } from "./case-types.js";
 import { evaluateTrap } from "./trap-evaluator.js";
@@ -41,6 +42,7 @@ interface CliArgs {
   count: number;
   area?: LegalArea;
   documentType?: TipoPeca;
+  trapFilter?: TrapKind;
   dryRun: boolean;
 }
 
@@ -50,6 +52,7 @@ function parseArgs(): CliArgs {
   const areaArg = args.find((a) => a.startsWith("--area="));
   // Aceita --type= ou --documentType= (ambos equivalentes)
   const typeArg = args.find((a) => a.startsWith("--type=") || a.startsWith("--documentType="));
+  const trapArg = args.find((a) => a.startsWith("--trap="));
   const result: CliArgs = {
     count: countArg ? Number.parseInt(countArg.slice("--count=".length), 10) : 100,
     dryRun: args.includes("--dry-run"),
@@ -61,6 +64,7 @@ function parseArgs(): CliArgs {
       : typeArg.slice("--type=".length);
     result.documentType = val as TipoPeca;
   }
+  if (trapArg) result.trapFilter = trapArg.slice("--trap=".length) as TrapKind;
   return result;
 }
 
@@ -167,13 +171,14 @@ async function runOneCase(fx: SyntheticCase): Promise<CaseResult> {
 async function main(): Promise<void> {
   const args = parseArgs();
   const limits = loadLimits();
-  const cases = generateSyntheticCases(args.count, args.area, args.documentType).slice(0, limits.maxCases);
+  const cases = generateSyntheticCases(args.count, args.area, args.documentType, args.trapFilter).slice(0, limits.maxCases);
 
   console.log(`[quality-runner] Configuração:`);
   console.log(`  modo:        ${args.dryRun ? "DRY-RUN (sem OpenAI)" : "REAL (OpenAI)"}`);
   console.log(`  casos:       ${cases.length}${cases.length < args.count ? ` (máximo disponível para área+tipo — solicitado: ${args.count})` : ""}`);
   console.log(`  área filtro: ${args.area ?? "todas"}`);
   console.log(`  tipo filtro: ${args.documentType ?? "todos"}`);
+  console.log(`  trap forçado: ${args.trapFilter ?? "nenhum (distribuição normal)"}`);
   console.log(`  limites:     ${limits.maxCases} casos / ${limits.maxTokens} tokens / $${limits.maxCostUsd}`);
 
   if (args.dryRun) {

@@ -2,8 +2,8 @@
 //
 // Ativado automaticamente quando o draft ou classificação contém contexto de JEF.
 //
-// Regras fatais (3):   incompetência, valor excedente, recurso errado
-// Regras não-fatais (3): perícia complexa, tutela sem fumus, tutela sem periculum
+// Regras fatais (4):   incompetência, valor excedente, recurso errado, perícia complexa
+// Regras não-fatais (2): tutela sem fumus, tutela sem periculum
 
 import type { ValidationError, LegalClassification } from "../pipeline/types.js";
 
@@ -70,6 +70,47 @@ const FATAL_RULES: Array<{
       return temApelacao && eRecurso;
     },
   },
+  {
+    rule: "JEF_PERICIA_COMPLEXA",
+    description:
+      "Pedido ou deferimento de perícia técnica complexa em sede de Juizado Especial Cível sem " +
+      "reconhecer a incompatibilidade com o rito sumaríssimo — o art. 3º §3º da Lei 9.099/95 " +
+      "determina que causas de alta complexidade probatória devem ser remetidas à justiça comum; " +
+      "perícias médicas especializadas, de engenharia, contábeis aprofundadas e forenses digitais " +
+      "são em regra incompatíveis com o rito sumaríssimo.",
+    detect: (draft) => {
+      if (!JEF_CONTEXT_RE.test(draft)) return false;
+
+      // Detectar tipos de perícia complexa — abrangendo medicina, engenharia, contabilidade, digital
+      const PERICIA_COMPLEXA_RE =
+        /per[íi]cia\s+(?:m[eé]dica(?:\s+(?:especializada?|extensa|aprofundada|forense|multidisciplinar|de\s+incapacidade))?|cont[aá]bil(?:\s+(?:complex|detalhada?|aprofundada|extensa))?|de\s+engenharia(?:\s+(?:civil|estrutural|geot[eé]cnica))?|estrutural|grafot[eé]cnica|forense(?:\s+digital)?|multidisciplinar|atuarial|t[eé]cnica\s+(?:especializada?|complex|elaborada|aprofundada))/i;
+      const LAUDO_RE =
+        /laudo\s+pericial\s+(?:m[eé]dico|cont[aá]bil|de\s+engenharia|estrutural|forense|t[eé]cnico)/i;
+      const AVALIACAO_RE =
+        /avalia[cç][aã]o\s+(?:m[eé]dica\s+especializada?|multiprofissional|pericial\s+(?:estrutural|cont[aá]bil|t[eé]cnica)|de\s+(?:incapacidade|invalidez|nexo\s+causal))/i;
+      const PROVA_TECNICA_RE =
+        /produção\s+de\s+prova\s+(?:pericial|t[eé]cnica\s+(?:complex|elaborada|especializada?))|prova\s+pericial\s+(?:é\s+)?(?:necessária|indispensável|imprescindível|complex)/i;
+
+      const temPericia =
+        PERICIA_COMPLEXA_RE.test(draft) ||
+        LAUDO_RE.test(draft) ||
+        AVALIACAO_RE.test(draft) ||
+        PROVA_TECNICA_RE.test(draft);
+      if (!temPericia) return false;
+
+      // Verificar se a perícia está sendo REQUERIDA ou DEFERIDA (não apenas mencionada)
+      const PEDE_PERICIA_RE =
+        /requi[re](?:rendo|e-se|imento)?\s+(?:a\s+)?(?:produ[cç][aã]o\s+de\s+)?per[íi]cia|requeiro\s+(?:a\s+)?per[íi]cia|pedido\s+de\s+per[íi]cia|seja\s+(?:nomeado\s+perito|realizada\s+per[íi]cia|determinada\s+a\s+per[íi]cia)|nomeio\s+perito|designo\s+per[íi]cia|determino\s+(?:a\s+)?(?:realiza[cç][aã]o\s+de\s+)?per[íi]cia|defiro\s+(?:a\s+)?per[íi]cia|per[íi]cia\s+(?:é\s+)?(?:indispensável|necessária|imprescindível|fundamental)\s+(?:para|ao?)/i;
+
+      if (!PEDE_PERICIA_RE.test(draft)) return false;
+
+      // Não dispara se a peça reconhece explicitamente a incompatibilidade com o JEF
+      const RECONHECE_INCOMPAT_RE =
+        /incompet[êe]ncia\s+(?:absoluta\s+)?(?:do\s+)?juizado|declino\s+da\s+compet[êe]ncia|incompatível\s+com\s+(?:o\s+)?(?:juizado|rito\s+sumar[íi]ssimo)|supera\s+o\s+rito\s+sumar[íi]ssimo|remessa\s+(?:dos\s+autos\s+)?(?:à|ao)\s+(?:var[ao]\s+)?(?:c[íi]vel\s+)?(?:comum|ordin[aá]ri[ao])|extingue?-se\s+sem\s+julgamento\s+do\s+m[eé]rito\s+por\s+(?:complexidade|incompatibilidade)|causa\s+de\s+alta\s+complexidade.{0,120}incompatível|n[ãa]o\s+(?:demanda|requer|exige)\s+per[íi]cia\s+complex/i;
+
+      return !RECONHECE_INCOMPAT_RE.test(draft);
+    },
+  },
 ];
 
 // ── Regras não-fatais ─────────────────────────────────────────────────────────
@@ -79,24 +120,6 @@ const NON_FATAL_RULES: Array<{
   description: string;
   detect: (draft: string) => boolean;
 }> = [
-  {
-    rule: "JEF_PERICIA_COMPLEXA",
-    description:
-      "Pedido ou deferimento de perícia técnica complexa em sede de Juizado Especial Cível — " +
-      "o rito sumaríssimo da Lei 9.099/95 é incompatível com perícias demoradas (art. 35); " +
-      "cause de alta complexidade probatória deve ser remetida à justiça comum.",
-    detect: (draft) => {
-      if (!JEF_CONTEXT_RE.test(draft)) return false;
-      const temPericiaComplexa =
-        /per[íi]cia\s+(m[eé]dica\s+(?:extensa|detalhada|aprofundada)|cont[aá]bil\s+(?:complex|detalhada?)|de\s+engenharia|de\s+avalia[cç][aã]o\s+de\s+im[oó]vel|grafotécnica|forense|multidisciplinar)/i.test(draft) ||
-        /laudo\s+pericial\s+(?:m[eé]dico|cont[aá]bil|de\s+engenharia)/i.test(draft);
-      if (!temPericiaComplexa) return false;
-      // Não dispara se a peça já sinaliza possível incompetência por complexidade
-      const reconheceComplexidade =
-        /complexidade|incompetência|declino|supera\s+o\s+rito|incompatível\s+com\s+o\s+juizado/i.test(draft);
-      return !reconheceComplexidade;
-    },
-  },
   {
     rule: "JEF_TUTELA_SEM_FUMUS",
     description:

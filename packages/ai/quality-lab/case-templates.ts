@@ -607,9 +607,16 @@ function applyTrap(
     // ── Traps específicas de JEF Cível ────────────────────────────────────────
 
     case "JEF_PERICIA_COMPLEXA":
+      if (documentType === "DECISAO" || documentType === "SENTENCA") {
+        return {
+          description: base.description,
+          instruction: "ARMADILHA: Deferir ou determinar a realização de perícia técnica especializada (perícia médica especializada, laudo pericial de engenharia, perícia contábil aprofundada ou perícia forense digital) sem reconhecer que tal prova pode ser incompatível com o rito sumaríssimo do Juizado Especial Cível (art. 3º §3º Lei 9.099/95) — não declarar incompetência, não remeter os autos à vara cível comum e não extinguir sem resolução do mérito por complexidade probatória.",
+          expectedRulesIfTrap: ["JEF_PERICIA_COMPLEXA"],
+        };
+      }
       return {
         description: base.description,
-        instruction: "ARMADILHA: Requerer ou deferir perícia técnica complexa (perícia médica extensa, contábil, de engenharia ou grafotécnica) no bojo da ação, sem reconhecer que a necessidade de prova pericial elaborada pode tornar a causa complexa e incompatível com o rito sumaríssimo do Juizado Especial Cível (art. 3º §3º Lei 9.099/95).",
+        instruction: "ARMADILHA: Incluir pedido expresso de produção de prova pericial técnica complexa (perícia médica especializada, laudo pericial de engenharia civil, perícia contábil detalhada ou perícia forense digital) na peça, sem reconhecer que a necessidade de tal prova pode tornar a causa de alta complexidade probatória e incompatível com o rito sumaríssimo do Juizado Especial Cível (art. 3º §3º Lei 9.099/95) — não mencionar possibilidade de remessa à justiça comum.",
         expectedRulesIfTrap: ["JEF_PERICIA_COMPLEXA"],
       };
     case "JEF_VALOR_EXCEDENTE":
@@ -2229,7 +2236,157 @@ const tJefCompetencia: ThemeBuilder = (i) => ({
   norma: "art. 3º Lei 9.099/95 (competência material e valor); art. 3º §3º Lei 9.099/95 (questão complexa); CDC",
 });
 
-// Adiciona os 10 temas de JEF Cível ao THEMES (ALL_PHASES — 10 × 4 = 40 casos)
+// ── JEF CÍVEL — PERÍCIA COMPLEXA: temas especializados ───────────────────────
+//
+// 10 temas com fatos que naturalmente demandam prova pericial técnica elaborada.
+// Adicionados ANTES dos temas originais para que --count=40 --area=JEF_CIVEL
+// cubra estes cenários com --trap=JEF_PERICIA_COMPLEXA (lote dedicado FASE 4.1).
+
+const JEF_CLINICAS = [
+  "Clínica Saúde Vida Ltda.", "Hospital Promisse S.A.",
+  "Centro Médico São Lucas Ltda.", "Clínica Bem Estar Ltda.",
+];
+const JEF_CONSTRUTORAS = [
+  "Construtora Brasbuild S.A.", "Construtora Horizonte Ltda.",
+  "Incorporadora Prime S.A.", "Construtora União Ltda.",
+];
+
+// Medicina 1 — Erro médico com néxo causal disputado
+const tJefPericiaErroMedico: ThemeBuilder = (i) => ({
+  area: "JEF_CIVEL",
+  themeLabel: "Erro médico — perícia especializada — JEF Cível",
+  autor: pick(NOMES, i),
+  reu: pick(JEF_CLINICAS, i),
+  comarca: pick(COMARCAS, i),
+  fatos: `${pick(NOMES, i)} (CPF ${cpf(i + 7000)}) foi submetido(a) a ${pick(["procedimento cirúrgico ambulatorial", "tratamento odontológico extenso", "aplicação de medicamento injetável", "procedimento estético minimamente invasivo"], i)} pela ${pick(JEF_CLINICAS, i)} em ${dateBack(1, i)}. Após o procedimento, passou a apresentar ${pick(["infecção pós-operatória com sequelas permanentes", "reação adversa com dano neurológico parcial", "lesão estética irreversível no rosto", "dor crônica incapacitante no membro"], i)}. Autor alega negligência e imperícia do profissional. A clínica nega qualquer falha técnica. Há necessidade de prova técnica especializada para estabelecer o nexo causal entre o procedimento e as sequelas. Valor total pleiteado: ${brl(14000 + i * 400)}.`,
+  pedido: "indenização por danos morais e materiais decorrentes de erro médico",
+  norma: "art. 14 e art. 951 CC/2002; art. 6º, VI, CDC; art. 3º Lei 9.099/95",
+});
+
+// Medicina 2 — Invalidez parcial com avaliação multiprofissional
+const tJefPericiaInvalidez: ThemeBuilder = (i) => ({
+  area: "JEF_CIVEL",
+  themeLabel: "Invalidez parcial — avaliação multiprofissional — JEF Cível",
+  autor: pick(NOMES, i + 1),
+  reu: pick(JEF_CLINICAS, i + 1),
+  comarca: pick(COMARCAS, i + 1),
+  fatos: `${pick(NOMES, i + 1)} (CPF ${cpf(i + 7100)}) sofreu acidente em ${pick(["academia de ginástica", "clínica de fisioterapia", "sessão de quimioterapia", "tratamento odontológico"], i)} administrado pela ${pick(JEF_CLINICAS, i + 1)} em ${dateBack(1, i)}, resultando em invalidez parcial estimada em ${10 + i * 5}% da capacidade funcional do membro ${pick(["superior direito", "superior esquerdo", "inferior direito"], i)}. A extensão exata da invalidez e seu impacto laboral demandam avaliação multiprofissional (ortopedista, fisioterapeuta e perito do trabalho) para quantificação dos danos. Valor total pleiteado: ${brl(18000 + i * 600)}.`,
+  pedido: "indenização por danos materiais (lucros cessantes, tratamento continuado) e morais",
+  norma: "art. 949 CC/2002; art. 14 e art. 6º, VI, CDC; art. 3º Lei 9.099/95",
+});
+
+// Medicina 3 — Nexo causal complexo em exame de imagem
+const tJefPericiaNexoCausal: ThemeBuilder = (i) => ({
+  area: "JEF_CIVEL",
+  themeLabel: "Nexo causal médico complexo — JEF Cível",
+  autor: pick(NOMES, i + 2),
+  reu: pick(JEF_CLINICAS, i + 2),
+  comarca: pick(COMARCAS, i + 2),
+  fatos: `${pick(NOMES, i + 2)} (CPF ${cpf(i + 7200)}) realizou ${pick(["exame de imagem com contraste intravenoso", "cateterismo cardíaco de diagnóstico", "endoscopia digestiva com biópsia", "colonoscopia sob sedação profunda"], i)} na ${pick(JEF_CLINICAS, i + 2)} em ${dateBack(1, i)}. Desenvolveu complicações pós-exame — ${pick(["reação anafilática ao contraste iodado", "perfuração intestinal imperceptível", "infecção pós-procedimento com sepse", "lesão vascular periférica irreversível"], i)} — com internação de ${5 + i % 10} dias e sequelas. O nexo causal entre o exame e as complicações é tecnicamente disputado: a clínica alega condição clínica prévia do paciente. Perícia médica especializada é essencial para apurar o nexo. Valor total: ${brl(16000 + i * 500)}.`,
+  pedido: "indenização por danos morais e materiais e reembolso das despesas médicas adicionais",
+  norma: "arts. 945 e 951 CC/2002; art. 14 CDC; art. 3º Lei 9.099/95",
+});
+
+// Medicina 4 — Dano estético grave
+const tJefPericiaDanoEstetico: ThemeBuilder = (i) => ({
+  area: "JEF_CIVEL",
+  themeLabel: "Dano estético — avaliação pericial médica — JEF Cível",
+  autor: pick(NOMES, i + 3),
+  reu: pick(JEF_CLINICAS, i + 3),
+  comarca: pick(COMARCAS, i + 3),
+  fatos: `${pick(NOMES, i + 3)} (CPF ${cpf(i + 7300)}) realizou procedimento estético na ${pick(JEF_CLINICAS, i + 3)} em ${dateBack(1, i)}. O resultado foi insatisfatório e causou danos estéticos permanentes: ${pick(["queloides extensas no rosto e pescoço", "assimetria facial grave e perceptível", "cicatrizes hipertróficas visíveis", "depressão cutânea e irregularidade irreversível"], i)}. A avaliação do dano estético e sua extensão exige perícia médica especializada em cirurgia plástica e dermatologia, pois há disputas sobre a gravidade das sequelas e o padrão de cuidado aplicado. Valor total: ${brl(15000 + i * 600)}.`,
+  pedido: "indenização por danos morais e estéticos cumulados (Súmula 387 STJ)",
+  norma: "Súmula 387 STJ (cumulação de danos morais e estéticos); art. 14 CDC; art. 3º Lei 9.099/95",
+});
+
+// Engenharia 1 — Vício estrutural em imóvel
+const tJefPericiaVicioEstrutural: ThemeBuilder = (i) => ({
+  area: "JEF_CIVEL",
+  themeLabel: "Vício estrutural em imóvel — JEF Cível",
+  autor: pick(NOMES, i + 4),
+  reu: pick(JEF_CONSTRUTORAS, i),
+  comarca: pick(COMARCAS, i + 4),
+  fatos: `${pick(NOMES, i + 4)} (CPF ${cpf(i + 7400)}) adquiriu imóvel da ${pick(JEF_CONSTRUTORAS, i)} em ${dateBack(2, i)} e, após ${6 + i % 12} meses da entrega, constatou trincas e fissuras nos pilares e vigas da estrutura, indicando possível falha estrutural grave. A construtora nega responsabilidade, atribuindo os danos a acomodação natural do terreno. A avaliação técnica dos vícios estruturais, a determinação da causa e a quantificação dos reparos necessários exigem laudo de perícia de engenharia civil estrutural. Valor estimado dos reparos pleiteado: ${brl(12000 + i * 500)}.`,
+  pedido: "indenização pelos custos de reparação dos vícios estruturais e danos morais",
+  norma: "art. 618 CC/2002 (solidez e segurança da obra — 5 anos); art. 12 CDC; art. 3º Lei 9.099/95",
+});
+
+// Engenharia 2 — Recalque de fundação
+const tJefPericiaRecalque: ThemeBuilder = (i) => ({
+  area: "JEF_CIVEL",
+  themeLabel: "Recalque de fundação — perícia geotécnica — JEF Cível",
+  autor: pick(NOMES, i + 5),
+  reu: pick(JEF_CONSTRUTORAS, i + 1),
+  comarca: pick(COMARCAS, i + 5),
+  fatos: `${pick(NOMES, i + 5)} (CPF ${cpf(i + 7500)}) constatou em unidade adquirida da ${pick(JEF_CONSTRUTORAS, i + 1)} recalque diferencial de fundação manifestado por trincas diagonais de ${5 + i * 2} mm nas alvenarias e desnivelamento progressivo do piso de ${2 + i}cm desde ${dateBack(1, i)}. A apuração da causa (falha de projeto, execução, solo ou sobrecarga) e a quantificação dos danos exigem laudo pericial geotécnico e estrutural detalhado com ensaios de campo. Valor estimado de reparação: ${brl(10000 + i * 400)}.`,
+  pedido: "indenização pelos custos de reparação do recalque, danos emergentes e morais",
+  norma: "art. 618 CC/2002; art. 12 CDC; NBR 6118 (estruturas de concreto); art. 3º Lei 9.099/95",
+});
+
+// Engenharia 3 — Infiltrações complexas
+const tJefPericiaInfiltracoes: ThemeBuilder = (i) => ({
+  area: "JEF_CIVEL",
+  themeLabel: "Infiltrações complexas — perícia de engenharia — JEF Cível",
+  autor: pick(NOMES, i + 6),
+  reu: pick(JEF_CONSTRUTORAS, i + 2),
+  comarca: pick(COMARCAS, i + 6),
+  fatos: `${pick(NOMES, i + 6)} (CPF ${cpf(i + 7600)}) registra infiltrações persistentes em ${pick(["teto do quarto principal", "parede lateral da sala", "garagem coberta", "varanda e área de serviço"], i)} do imóvel adquirido da ${pick(JEF_CONSTRUTORAS, i + 2)} há ${1 + i % 3} anos. As infiltrações causaram mofo, deterioração de revestimentos e danos ao mobiliário. A origem — falha na impermeabilização, na cobertura ou nas tubulações — e a extensão dos danos exigem perícia técnica de engenharia civil com ensaio de estanqueidade e termografia. Valor pleiteado: ${brl(9000 + i * 300)}.`,
+  pedido: "indenização pelos reparos necessários e danos morais pela privação do uso adequado",
+  norma: "art. 618 CC/2002; art. 26 §3º CDC (vício oculto); art. 3º Lei 9.099/95",
+});
+
+// Contabilidade 1 — Revisão contratual com reconstrução de fluxo
+const tJefPericiaRevisaoContrato: ThemeBuilder = (i) => ({
+  area: "JEF_CIVEL",
+  themeLabel: "Revisão contratual complexa — perícia contábil — JEF Cível",
+  autor: pick(NOMES, i + 7),
+  reu: pick(JEF_BANCOS, i),
+  comarca: pick(COMARCAS, i + 7),
+  fatos: `${pick(NOMES, i + 7)} (CPF ${cpf(i + 7700)}) contratou financiamento com o ${pick(JEF_BANCOS, i)} em ${dateBack(3, i)} pelo valor de ${brl(14000 + i * 500)} em ${24 + i * 6} parcelas. Após o pagamento de ${12 + i * 3} parcelas, constatou que os juros aplicados superaram a taxa contratada e que há capitalização composta indevida. A verificação do cálculo correto das parcelas, do saldo devedor real e do excesso cobrado exige perícia contábil detalhada com reconstituição de todo o fluxo financeiro do contrato. Valor em discussão: ${brl(7000 + i * 300)}.`,
+  pedido: "declaração de nulidade das cláusulas abusivas, revisão do contrato e devolução dos excessos",
+  norma: "Súmula 294 STJ (capitalização); art. 51 CDC; art. 3º Lei 9.099/95",
+});
+
+// Contabilidade 2 — Auditoria de conta corrente
+const tJefPericiaAuditoria: ThemeBuilder = (i) => ({
+  area: "JEF_CIVEL",
+  themeLabel: "Auditoria financeira contábil — JEF Cível",
+  autor: pick(NOMES, i + 8),
+  reu: pick(JEF_BANCOS, i + 1),
+  comarca: pick(COMARCAS, i + 8),
+  fatos: `${pick(NOMES, i + 8)} (CPF ${cpf(i + 7800)}) manteve conta corrente e investimentos no ${pick(JEF_BANCOS, i + 1)} por ${3 + i % 5} anos. Ao encerrar a conta, constatou divergências de ${brl(3000 + i * 200)} entre o saldo declarado pelo banco e o apurado pelo autor a partir dos extratos. A reconstrução contábil das movimentações e a identificação das cobranças indevidas ao longo de anos exige análise contábil detalhada de centenas de lançamentos, incompatível com instrução simples. Valor pleiteado: ${brl(6000 + i * 300)}.`,
+  pedido: "devolução dos valores cobrados indevidamente apurados na auditoria e indenização por danos morais",
+  norma: "arts. 14 e 43 CDC; Resolução CMN n. 3.919/2010; art. 3º Lei 9.099/95",
+});
+
+// Tecnologia — Perícia forense digital
+const tJefPericiaForenseDigital: ThemeBuilder = (i) => ({
+  area: "JEF_CIVEL",
+  themeLabel: "Fraude eletrônica — perícia forense digital — JEF Cível",
+  autor: pick(NOMES, i + 9),
+  reu: pick(JEF_BANCOS, i + 2),
+  comarca: pick(COMARCAS, i + 9),
+  fatos: `${pick(NOMES, i + 9)} (CPF ${cpf(i + 7900)}) foi vítima de invasão sofisticada ao aplicativo do ${pick(JEF_BANCOS, i + 2)} em ${dateBack(0, i)}, resultando em ${3 + i % 5} transferências não autorizadas totalizando ${brl(9000 + i * 300)}. A investigação da cadeia de acesso (logs de autenticação, IPs de origem, certificados digitais, vulnerabilidade explorada) exige perícia forense digital especializada para determinar se houve falha de segurança no sistema bancário ou se a vítima foi induzida por engenharia social sofisticada. Valor pleiteado: ${brl(12000 + i * 400)}.`,
+  pedido: "ressarcimento integral das transferências não autorizadas e indenização por danos morais pela falha de segurança",
+  norma: "arts. 14 e 22 CDC; Resolução BCB n. 4.658/2018 (cibersegurança); art. 3º Lei 9.099/95",
+});
+
+// Péricia themes registrados ANTES dos originais — slots 0-39 de JEF_CIVEL
+// Permite rodar --area=JEF_CIVEL --count=40 --trap=JEF_PERICIA_COMPLEXA como lote dedicado
+THEMES.push(
+  { id: "jef_pericia_erro_medico",      build: tJefPericiaErroMedico },
+  { id: "jef_pericia_invalidez",        build: tJefPericiaInvalidez },
+  { id: "jef_pericia_nexo_causal",      build: tJefPericiaNexoCausal },
+  { id: "jef_pericia_dano_estetico",    build: tJefPericiaDanoEstetico },
+  { id: "jef_pericia_vicio_estrutural", build: tJefPericiaVicioEstrutural },
+  { id: "jef_pericia_recalque",         build: tJefPericiaRecalque },
+  { id: "jef_pericia_infiltracoes",     build: tJefPericiaInfiltracoes },
+  { id: "jef_pericia_revisao_contrato", build: tJefPericiaRevisaoContrato },
+  { id: "jef_pericia_auditoria",        build: tJefPericiaAuditoria },
+  { id: "jef_pericia_forense_digital",  build: tJefPericiaForenseDigital },
+);
+
+// Temas originais de JEF Cível — slots 40-79 (ALL_PHASES — 10 × 4 = 40 casos)
 THEMES.push(
   { id: "jef_negativacao",          build: tJefNegativacao },
   { id: "jef_cobranca_indevida",    build: tJefCobrancaIndevida },

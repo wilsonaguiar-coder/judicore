@@ -142,6 +142,7 @@ export function generateSyntheticCases(
   count = 100,
   areaFilter?: LegalArea,
   typeFilter?: TipoPeca,
+  trapFilter?: TrapKind,
 ): SyntheticCase[] {
   const cases: SyntheticCase[] = [];
 
@@ -161,7 +162,8 @@ export function generateSyntheticCases(
   for (const theme of themesToUse) {
     const narrative = theme.build(slot);
     for (const phase of PHASES) {
-      const trap = decideTrap(slot, narrative.area, phase);
+      // trapFilter forçado: usa a trap especificada para 100% dos casos (lote dedicado)
+      const trap = trapFilter ?? decideTrap(slot, narrative.area, phase);
 
       // Validação de compatibilidade: só gera caso se o tipo for compatível com o tema.
       // O slot é incrementado mesmo quando o caso é pulado — mantém a distribuição
@@ -196,10 +198,12 @@ async function main(): Promise<void> {
   const countArg = args.find((a) => a.startsWith("--count="));
   const areaArg = args.find((a) => a.startsWith("--area="));
   const typeArg = args.find((a) => a.startsWith("--type="));
+  const trapArg = args.find((a) => a.startsWith("--trap="));
   const count = countArg ? Number.parseInt(countArg.slice("--count=".length), 10) : 100;
   const area = areaArg ? (areaArg.slice("--area=".length) as LegalArea) : undefined;
   const documentType = typeArg ? (typeArg.slice("--type=".length) as TipoPeca) : undefined;
-  const cases = generateSyntheticCases(count, area, documentType);
+  const trapFilter = trapArg ? (trapArg.slice("--trap=".length) as TrapKind) : undefined;
+  const cases = generateSyntheticCases(count, area, documentType, trapFilter);
 
   const outDir = join(__dirname, "output");
   await mkdir(outDir, { recursive: true });
