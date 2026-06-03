@@ -35,6 +35,7 @@ function emptyByArea(): Record<LegalArea, AreaStats> {
     CRIMINAL: emptyArea(), CRIMINAL_MERITO: emptyArea(),
     CIVEL: emptyArea(), CIVEL_GERAL: emptyArea(), CONSUMIDOR: emptyArea(),
     FAZENDA_PUBLICA: emptyArea(), EXECUCAO_CUMPRIMENTO: emptyArea(),
+    JEF_CIVEL: emptyArea(),
   };
 }
 
@@ -56,6 +57,7 @@ function emptyByValidator(): Record<ValidatorComponent, ValidatorStats> {
     CivilValidator: emptyValidator(),
     ConsumerValidator: emptyValidator(),
     ExecutionValidator: emptyValidator(),
+    JefCivelValidator: emptyValidator(),
     Other: emptyValidator(),
   };
 }
@@ -82,11 +84,11 @@ function summarize(results: CaseResult[]): RunSummary {
     StructuralValidator: new Map(), FinalValidator: new Map(),
     JurisprudenceValidator: new Map(), GenericityValidator: new Map(),
     MatrixQualityValidator: new Map(), RichnessValidator: new Map(),
-    CivilValidator: new Map(), ConsumerValidator: new Map(), ExecutionValidator: new Map(), Other: new Map(),
+    CivilValidator: new Map(), ConsumerValidator: new Map(), ExecutionValidator: new Map(), JefCivelValidator: new Map(), Other: new Map(),
   };
 
-  const areaScoreSum: Record<LegalArea, number> = { RPPS: 0, RGPS: 0, TRABALHISTA: 0, CRIMINAL: 0, CRIMINAL_MERITO: 0, CIVEL: 0, CIVEL_GERAL: 0, CONSUMIDOR: 0, FAZENDA_PUBLICA: 0, EXECUCAO_CUMPRIMENTO: 0 };
-  const areaScoreN: Record<LegalArea, number> = { RPPS: 0, RGPS: 0, TRABALHISTA: 0, CRIMINAL: 0, CRIMINAL_MERITO: 0, CIVEL: 0, CIVEL_GERAL: 0, CONSUMIDOR: 0, FAZENDA_PUBLICA: 0, EXECUCAO_CUMPRIMENTO: 0 };
+  const areaScoreSum: Record<LegalArea, number> = { RPPS: 0, RGPS: 0, TRABALHISTA: 0, CRIMINAL: 0, CRIMINAL_MERITO: 0, CIVEL: 0, CIVEL_GERAL: 0, CONSUMIDOR: 0, FAZENDA_PUBLICA: 0, EXECUCAO_CUMPRIMENTO: 0, JEF_CIVEL: 0 };
+  const areaScoreN: Record<LegalArea, number> = { RPPS: 0, RGPS: 0, TRABALHISTA: 0, CRIMINAL: 0, CRIMINAL_MERITO: 0, CIVEL: 0, CIVEL_GERAL: 0, CONSUMIDOR: 0, FAZENDA_PUBLICA: 0, EXECUCAO_CUMPRIMENTO: 0, JEF_CIVEL: 0 };
   const docScoreSum: Record<string, number> = {};
   const docScoreN: Record<string, number> = {};
   const themeScoreSum: Record<string, number> = {};
