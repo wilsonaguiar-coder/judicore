@@ -107,7 +107,16 @@ const FATAL_RULES: Array<{
       const match = /juros\s+de\s+(\d+(?:[.,]\d+)?)\s*%\s*(?:ao|a\.?o\.?)\s*m[eê]s/i.exec(draft);
       if (!match) return false;
       const taxa = parseFloat(match[1]!.replace(",", "."));
-      return taxa > 1.5;
+      if (taxa <= 1.5) return false;
+      // Não disparar quando a taxa abusiva é mencionada para ser rejeitada.
+      // Janela de 200 chars antes + 200 após o match — se contém termos de rejeição, é crítica, não aplicação.
+      const inicio = Math.max(0, match.index - 200);
+      const janela = draft.slice(inicio, match.index + 200);
+      const estaSendoRejeitada =
+        /vedada?|indevid[ao]|abusiv[ao]|ilegal|excessiv[ao]|exclu[ií]|afastar|afastamento|inaplic[aá]vel|extrapola|sem\s+base\s+legal|contrár[íi]/i.test(janela);
+      if (estaSendoRejeitada) return false;
+      // Sem termos de rejeição → a taxa está sendo aplicada (ou mencionada neutramente) → dispara.
+      return true;
     },
   },
   {
@@ -239,9 +248,10 @@ const EXECUTION_SECTIONS: Array<{ pattern: RegExp; label: string }> = [
   {
     // DA APLICAÇÃO AO CASO CONCRETO / APLICAÇÃO AO CASO / APLICAÇÃO AO QUADRO CONCRETO /
     // DA ANÁLISE DO CASO CONCRETO / DO CASO CONCRETO / SUBSUNÇÃO DOS FATOS À NORMA /
-    // ENQUADRAMENTO JURÍDICO DO CASO / APLICAÇÃO À SITUAÇÃO DOS AUTOS (título extrajudicial)
+    // ENQUADRAMENTO JURÍDICO DO CASO / APLICAÇÃO À SITUAÇÃO DOS AUTOS (título extrajudicial) /
+    // DA EXIGIBILIDADE DO CRÉDITO (execução de título extrajudicial — aplica requisitos ao caso)
     pattern:
-      /\b(da\s+)?(aplica[cç][aã]o\s+(ao|à)\s+(caso|quadro|situa[cç][aã]o|execu[cç][aã]o)|aplica[cç][aã]o\s+à\s+esp[eé]cie|subsun[cç][aã]o\s+dos?\s+fatos?|enquadramento\s+jur[íi]dico|an[aá]lise\s+do\s+caso\s+concreto|do\s+caso\s+concreto)\b|aplica[cç][aã]o.{0,60}(?:concreto|autos?)\b/i,
+      /\b(da\s+)?(aplica[cç][aã]o\s+(ao|à)\s+(caso|quadro|situa[cç][aã]o|execu[cç][aã]o)|aplica[cç][aã]o\s+à\s+esp[eé]cie|subsun[cç][aã]o\s+dos?\s+fatos?|enquadramento\s+jur[íi]dico|an[aá]lise\s+do\s+caso\s+concreto|do\s+caso\s+concreto|exigibilidade\s+do\s+cr[eé]dito)\b|aplica[cç][aã]o.{0,60}(?:concreto|autos?)\b/i,
     label: "IV — DA APLICAÇÃO AO CASO CONCRETO",
   },
   {
