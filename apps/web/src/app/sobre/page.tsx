@@ -41,7 +41,6 @@ export default function SobrePage() {
 
   return (
     <div className="min-h-screen relative bg-gradient-to-b from-white via-slate-50 to-white text-slate-900">
-      <div className="dynamic-bg" />
 
       {/* Header */}
       <header className="relative z-30 flex items-center justify-between px-6 md:px-12 py-3.5 band-dark shadow-sm">

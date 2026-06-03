@@ -121,12 +121,12 @@
   inset: 0;
   z-index: 0;
   pointer-events: none;
-  background-image: radial-gradient(700px 340px at 8% 18%, rgba(99,102,241,0.14), transparent 28%),
-                    radial-gradient(480px 260px at 92% 62%, rgba(14,165,233,0.12), transparent 28%),
+  background-image: radial-gradient(820px 380px at 6% 16%, rgba(99,102,241,0.28), transparent 36%),
+                    radial-gradient(560px 300px at 94% 64%, rgba(14,165,233,0.24), transparent 36%),
                     linear-gradient(180deg, rgba(255,255,255,0), rgba(255,255,255,0));
-  filter: blur(18px) saturate(1.08);
+  filter: blur(12px) saturate(1.1) contrast(1.02);
   transform-origin: center;
-  animation: bg-move 16s ease-in-out infinite;
+  animation: bg-move 14s ease-in-out infinite;
 }
 
 /* Dark header/footer utility */
