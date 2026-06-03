@@ -40,6 +40,7 @@ const OUTPUT_DIR = join(__dirname, "output");
 
 interface CliArgs {
   count: number;
+  offset: number;
   area?: LegalArea;
   documentType?: TipoPeca;
   trapFilter?: TrapKind;
@@ -48,13 +49,15 @@ interface CliArgs {
 
 function parseArgs(): CliArgs {
   const args = process.argv.slice(2);
-  const countArg = args.find((a) => a.startsWith("--count="));
-  const areaArg = args.find((a) => a.startsWith("--area="));
+  const countArg  = args.find((a) => a.startsWith("--count="));
+  const offsetArg = args.find((a) => a.startsWith("--offset="));
+  const areaArg   = args.find((a) => a.startsWith("--area="));
   // Aceita --type= ou --documentType= (ambos equivalentes)
   const typeArg = args.find((a) => a.startsWith("--type=") || a.startsWith("--documentType="));
   const trapArg = args.find((a) => a.startsWith("--trap="));
   const result: CliArgs = {
-    count: countArg ? Number.parseInt(countArg.slice("--count=".length), 10) : 100,
+    count:  countArg  ? Number.parseInt(countArg.slice("--count=".length),   10) : 100,
+    offset: offsetArg ? Number.parseInt(offsetArg.slice("--offset=".length), 10) : 0,
     dryRun: args.includes("--dry-run"),
   };
   if (areaArg) result.area = areaArg.slice("--area=".length) as LegalArea;
@@ -171,7 +174,7 @@ async function runOneCase(fx: SyntheticCase): Promise<CaseResult> {
 async function main(): Promise<void> {
   const args = parseArgs();
   const limits = loadLimits();
-  const cases = generateSyntheticCases(args.count, args.area, args.documentType, args.trapFilter).slice(0, limits.maxCases);
+  const cases = generateSyntheticCases(args.count, args.area, args.documentType, args.trapFilter, args.offset).slice(0, limits.maxCases);
 
   console.log(`[quality-runner] Configuração:`);
   console.log(`  modo:        ${args.dryRun ? "DRY-RUN (sem OpenAI)" : "REAL (OpenAI)"}`);

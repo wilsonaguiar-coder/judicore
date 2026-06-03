@@ -115,6 +115,10 @@ const FATAL_RULES: Array<{
 
 // ── Regras não-fatais ─────────────────────────────────────────────────────────
 
+// Padrão compartilhado: tutela mencionada em qualquer tipo de peça
+const TUTELA_MENCIONADA_RE =
+  /defiro\s+(?:a\s+)?(?:tutela|liminar|antecipa[cç][aã]o)|concedo\s+(?:a\s+)?(?:tutela|liminar)|requeiro?\s+(?:a\s+)?tutela|pedido\s+de\s+tutela|requer(?:-se)?\s+(?:a\s+)?tutela|tutela\s+(?:de\s+urg[eê]ncia|antecipada|cautelar)\s+(?:é\s+)?(?:cab[íi]vel|adequada|necess[aá]ria|deve\s+ser)|antecipa[cç][aã]o\s+(?:dos\s+efeitos|da\s+tutela)|concessão\s+da\s+(?:tutela|liminar)/i;
+
 const NON_FATAL_RULES: Array<{
   rule: string;
   description: string;
@@ -124,14 +128,14 @@ const NON_FATAL_RULES: Array<{
     rule: "JEF_TUTELA_SEM_FUMUS",
     description:
       "Tutela de urgência concedida ou requerida sem análise da probabilidade do direito " +
-      "(fumus boni iuris — art. 300 CPC c/c art. 4º Lei 9.099/95).",
+      "(fumus boni iuris — art. 300 CPC c/c art. 4º Lei 9.099/95). " +
+      "Exige-se ao menos um dos seguintes: verossimilhança das alegações, probabilidade do direito, " +
+      "prova documental do fundamento ou citação expressa do art. 300 CPC.",
     detect: (draft) => {
       if (!JEF_CONTEXT_RE.test(draft)) return false;
-      const temTutela =
-        /defiro\s+(?:a\s+)?(?:tutela|liminar)|concedo\s+(?:a\s+)?(?:tutela|liminar)|requer\s+tutela\s+de\s+urgência|pedido\s+de\s+tutela\s+de\s+urgência/i.test(draft);
-      if (!temTutela) return false;
+      if (!TUTELA_MENCIONADA_RE.test(draft)) return false;
       const temFumus =
-        /fumus\s+boni\s+iuris|probabilidade\s+do\s+direito|verossimilhan[cç]a\s+(?:das?\s+)?alegações?|art\.\s*300\s+(?:do\s+)?cpc/i.test(draft);
+        /fumus\s+boni\s+iuris|probabilidade\s+(?:do\s+direito|de\s+procedência)|verossimilhan[cç]a|art\.\s*300\s+(?:do\s+)?cpc|prova\s+(?:documental|inequ[íi]voca|robusta)\s+(?:do\s+direito|da\s+(?:verossimilhança|probabilidade))|aparência\s+do\s+direito|indício\s+(?:sólido|robusto|razo[aá]vel)\s+do\s+direito/i.test(draft);
       return !temFumus;
     },
   },
@@ -139,15 +143,53 @@ const NON_FATAL_RULES: Array<{
     rule: "JEF_TUTELA_SEM_PERICULUM",
     description:
       "Tutela de urgência concedida ou requerida sem demonstração de perigo de dano ou risco ao " +
-      "resultado útil do processo (periculum in mora — art. 300 CPC c/c art. 4º Lei 9.099/95).",
+      "resultado útil do processo (periculum in mora — art. 300 CPC c/c art. 4º Lei 9.099/95). " +
+      "Exige-se urgência concreta: perigo de dano irreparável, risco de ineficácia ou prejuízo atual demonstrado.",
     detect: (draft) => {
       if (!JEF_CONTEXT_RE.test(draft)) return false;
-      const temTutela =
-        /defiro\s+(?:a\s+)?(?:tutela|liminar)|concedo\s+(?:a\s+)?(?:tutela|liminar)|requer\s+tutela\s+de\s+urgência|pedido\s+de\s+tutela\s+de\s+urgência/i.test(draft);
-      if (!temTutela) return false;
+      if (!TUTELA_MENCIONADA_RE.test(draft)) return false;
       const temPericulum =
-        /periculum\s+in\s+mora|perigo\s+de\s+dano|risco\s+(?:ao|de)\s+(?:resultado\s+[úu]til|dano\s+irrepará)|urg[eê]ncia\s+(?:comprova|demonstra|evidente)|dano\s+irrepará|dano\s+de\s+difícil\s+repara[cç][aã]o/i.test(draft);
+        /periculum\s+in\s+mora|perigo\s+de\s+dano|risco\s+(?:ao|de)\s+(?:resultado\s+[úu]til|dano\s+irrepará|inutilidade)|urg[eê]ncia\s+(?:comprova|demonstra|evidente|concreta|atual)|dano\s+irrepará|dano\s+de\s+dif[íi]cil\s+repara[cç][aã]o|prejuízo\s+(?:imediato|atual|iminente|concreto)|risco\s+(?:imediato|atual|iminente)\s+de\s+dano/i.test(draft);
       return !temPericulum;
+    },
+  },
+  {
+    rule: "JEF_TUTELA_DESPROPORCIONAL",
+    description:
+      "Tutela de urgência requerida ou concedida com medida desproporcional — bloqueio total de conta " +
+      "bancária, suspensão integral de serviço ou cancelamento completo de contrato — sem análise da " +
+      "proporcionalidade e da medida menos gravosa (art. 300 CPC; princípio da proporcionalidade). " +
+      "A tutela deve ser adequada, necessária e proporcional ao direito tutelado.",
+    detect: (draft) => {
+      if (!JEF_CONTEXT_RE.test(draft)) return false;
+      if (!TUTELA_MENCIONADA_RE.test(draft)) return false;
+      const medidaAmplа =
+        /bloqueio\s+(?:total\s+)?(?:d[ae]\s+)?conta|suspensão\s+(?:total|integral|completa)\s+(?:d[eo]\s+)?(?:serviço|contrato|fornecimento)|cancelamento\s+(?:total|imediato)\s+(?:d[eo]\s+)?(?:contrato|plano|serviço)|bloquear\s+(?:toda[s]?\s+)?(?:a[s]?\s+)?(?:conta[s]?|opera[cç][õo]es)|bloqueio\s+d[ae]\s+(?:conta[s]?|ativo[s]?)/i.test(draft);
+      if (!medidaAmplа) return false;
+      const temProporcionalidade =
+        /proporcionalidade|razoabilidade|medida\s+menos\s+gravosa|medida\s+(?:mais\s+)?adequada|proporcional\s+ao\s+(?:caso|valor|dano)|princípio\s+da\s+proporcionalidade|adequa[cç][aã]o\s+da\s+medida|necess[aá]ria\s+e\s+adequada/i.test(draft);
+      return !temProporcionalidade;
+    },
+  },
+  {
+    rule: "JEF_TUTELA_ARTIFICIAL",
+    description:
+      "Urgência invocada para tutela de urgência em situação cronicamente conhecida pela parte — " +
+      "mora própria descaracteriza a urgência (art. 300 CPC). O periculum in mora deve ser atual " +
+      "e contemporâneo; a parte que deixou fluir longo período sem agir não pode invocar urgência " +
+      "fabricada como fundamento para medida de exceção.",
+    detect: (draft) => {
+      if (!JEF_CONTEXT_RE.test(draft)) return false;
+      const temTutela = TUTELA_MENCIONADA_RE.test(draft);
+      const temUrgencia =
+        /urg[eê]n(?:cia|te)|periculum\s+in\s+mora|perigo\s+de\s+dano\s+irrepará/i.test(draft);
+      if (!temTutela || !temUrgencia) return false;
+      const temPeríodoLongo =
+        /h[aá]\s+(?:mais\s+de\s+)?\d+\s+(?:meses|anos)|desde\s+(?:janeiro|fevereiro|março|abril|maio|junho|julho|agosto|setembro|outubro|novembro|dezembro)\s+de\s+20(?:2[0-4])|h[aá]\s+(?:dois|três|quatro|cinco|\d+)\s+anos|por\s+mais\s+de\s+\d+\s+(?:meses|anos)/i.test(draft);
+      if (!temPeríodoLongo) return false;
+      const temExplicacaoRecente =
+        /apenas\s+(?:recentemente|agora|neste\s+mês)|fato\s+superveniente|nova\s+circunstância|nova\s+situação|recentemente\s+(?:agravou|deteriorou|piorou|se\s+agravou)|agravamento\s+recente|inesperadamente|de\s+forma\s+repentina|evento\s+recente|situação\s+(?:nova|recente)\s+(?:que|e)/i.test(draft);
+      return !temExplicacaoRecente;
     },
   },
 ];

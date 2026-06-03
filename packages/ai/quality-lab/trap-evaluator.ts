@@ -233,14 +233,29 @@ export function evaluateTrap(trap: TrapKind, result: CaseResult): TrapOutcome {
     }
 
     case "JEF_TUTELA_SEM_FUMUS": {
-      // DETECTED: validator JEF emitiu a regra
       if (hasRule("JEF_TUTELA_SEM_FUMUS", "TUTELA_MISSING_ART300")) return "DETECTED";
-      // MISSED: tutela concedida em DECISAO sem mencionar fumus/probabilidade
-      if (
-        result.documentType === "DECISAO" &&
-        /defiro|concedo\s+(?:a\s+)?(?:tutela|liminar)/i.test(draft) &&
-        !/fumus\s+boni\s+iuris|probabilidade\s+do\s+direito|verossimilhan[cç]a|art\.\s*300/i.test(draft)
-      ) return "MISSED";
+      const tutelaAto = /defiro|concedo\s+(?:a\s+)?(?:tutela|liminar)|requeiro?\s+(?:a\s+)?tutela|pedido\s+de\s+tutela/i.test(draft);
+      const temFumus  = /fumus\s+boni\s+iuris|probabilidade\s+do\s+direito|verossimilhan[cç]a|art\.\s*300|prova\s+(?:documental|inequ[íi]voca)\s+do\s+direito|aparência\s+do\s+direito/i.test(draft);
+      if (tutelaAto && !temFumus) return "MISSED";
+      return "AVOIDED";
+    }
+
+    case "JEF_TUTELA_DESPROPORCIONAL": {
+      if (hasRule("JEF_TUTELA_DESPROPORCIONAL")) return "DETECTED";
+      const tutelaAto     = /defiro|concedo\s+(?:a\s+)?(?:tutela|liminar)|requeiro?\s+(?:a\s+)?tutela|pedido\s+de\s+tutela/i.test(draft);
+      const medidaAmpla   = /bloqueio\s+(?:total\s+)?(?:d[ae]\s+)?conta|suspensão\s+(?:total|integral)\s+(?:d[eo]\s+)?(?:serviço|contrato)|cancelamento\s+(?:total|imediato)\s+(?:d[eo]\s+)?(?:contrato|plano|serviço)|bloqueio\s+d[ae]\s+(?:conta[s]?|ativo[s]?)/i.test(draft);
+      const temProporc    = /proporcionalidade|razoabilidade|medida\s+menos\s+gravosa|medida\s+(?:mais\s+)?adequada|proporcional\s+ao\s+(?:caso|valor|dano)|princípio\s+da\s+proporcionalidade/i.test(draft);
+      if (tutelaAto && medidaAmpla && !temProporc) return "MISSED";
+      return "AVOIDED";
+    }
+
+    case "JEF_TUTELA_ARTIFICIAL": {
+      if (hasRule("JEF_TUTELA_ARTIFICIAL")) return "DETECTED";
+      const tutelaAto     = /defiro|concedo\s+(?:a\s+)?(?:tutela|liminar)|requeiro?\s+(?:a\s+)?tutela|pedido\s+de\s+tutela/i.test(draft);
+      const temUrgencia   = /urg[eê]n(?:cia|te)|periculum\s+in\s+mora|perigo\s+de\s+dano\s+irrepará/i.test(draft);
+      const temPeríodoLongo = /h[aá]\s+(?:mais\s+de\s+)?\d+\s+(?:meses|anos)|desde\s+(?:janeiro|fevereiro|março|abril|maio|junho|julho|agosto|setembro|outubro|novembro|dezembro)\s+de\s+20(?:2[0-4])|h[aá]\s+(?:dois|três|quatro|cinco|\d+)\s+anos/i.test(draft);
+      const temJustificativa = /fato\s+superveniente|nova\s+circunstância|recentemente\s+(?:agravou|piorou)|agravamento\s+recente|inesperadamente|situação\s+(?:nova|recente)/i.test(draft);
+      if (tutelaAto && temUrgencia && temPeríodoLongo && !temJustificativa) return "MISSED";
       return "AVOIDED";
     }
 

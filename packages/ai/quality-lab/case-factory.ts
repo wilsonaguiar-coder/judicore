@@ -106,13 +106,13 @@ function decideTrap(slotIndex: number, area: LegalArea, phase: Phase | "DESPACHO
       "JEF_LEGITIMIDADE_PASSIVA",
       "JEF_TUTELA_SEM_PERICULUM",
       "JEF_TUTELA_SEM_FUMUS",
+      "JEF_TUTELA_DESPROPORCIONAL",
+      "JEF_TUTELA_ARTIFICIAL",
     ];
     kind = jefTrapTable[cycleIdx % jefTrapTable.length]!;
-    // Ajuste de fase: recurso errado só faz sentido em RECURSO
+    // Recurso errado só faz sentido em RECURSO
     if (kind === "JEF_RECURSO_ERRADO" && phase !== "RECURSO") kind = "JEF_VALOR_EXCEDENTE";
-    // Tutela sem periculum/fumus só faz sentido em DECISAO
-    if (kind === "JEF_TUTELA_SEM_PERICULUM" && phase !== "DECISAO") kind = "JEF_PERICIA_COMPLEXA";
-    if (kind === "JEF_TUTELA_SEM_FUMUS" && phase !== "DECISAO") kind = "JEF_PERICIA_COMPLEXA";
+    // Tutelas cobrem todos os tipos de peça — sem restrição de fase
     return kind;
   }
 
@@ -143,6 +143,7 @@ export function generateSyntheticCases(
   areaFilter?: LegalArea,
   typeFilter?: TipoPeca,
   trapFilter?: TrapKind,
+  offset = 0,
 ): SyntheticCase[] {
   const cases: SyntheticCase[] = [];
 
@@ -188,7 +189,7 @@ export function generateSyntheticCases(
   // Filtro por tipo de peça — aplicado após gerar todos os casos da área
   const filtered = typeFilter ? cases.filter((c) => c.documentType === typeFilter) : cases;
 
-  return filtered.slice(0, count);
+  return filtered.slice(offset, offset + count);
 }
 
 // ── CLI ───────────────────────────────────────────────────────────────────────

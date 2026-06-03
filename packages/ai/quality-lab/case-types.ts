@@ -54,7 +54,9 @@ export type TrapKind =
   | "JEF_RECURSO_ERRADO"               // apelação em vez de recurso inominado (art. 41 Lei 9.099/95)
   | "JEF_LEGITIMIDADE_PASSIVA"         // parte errada no polo passivo (banco/empresa/operadora)
   | "JEF_TUTELA_SEM_PERICULUM"         // tutela deferida sem periculum in mora
-  | "JEF_TUTELA_SEM_FUMUS";            // tutela deferida sem fumus boni iuris / probabilidade do direito
+  | "JEF_TUTELA_SEM_FUMUS"             // tutela deferida sem fumus boni iuris / probabilidade do direito
+  | "JEF_TUTELA_DESPROPORCIONAL"       // medida cautelar desproporcional ao direito tutelado (bloqueio total vs. valor pequeno)
+  | "JEF_TUTELA_ARTIFICIAL";           // urgência artificial — mora própria ou urgência fabricada (art. 300 CPC)
 
 export interface SyntheticCase {
   id: string;

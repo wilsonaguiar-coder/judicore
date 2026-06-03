@@ -641,20 +641,97 @@ function applyTrap(
         expectedRulesIfTrap: [],
       };
     case "JEF_TUTELA_SEM_PERICULUM":
-      if (documentType === "DECISAO") {
+      if (documentType === "DECISAO" || documentType === "SENTENCA") {
         return {
           description: base.description,
-          instruction: "ARMADILHA: Deferir a tutela de urgência analisando APENAS a probabilidade do direito (fumus boni iuris), sem examinar o periculum in mora — perigo de dano irreparável ou urgência comprovada (art. 300 CPC).",
+          instruction: "ARMADILHA: Deferir a tutela de urgência analisando APENAS a probabilidade do direito (fumus boni iuris), sem examinar o periculum in mora — não mencionar perigo de dano irreparável, urgência concreta, risco de inutilidade do processo ou dano de difícil reparação (art. 300 CPC).",
+          expectedRulesIfTrap: ["JEF_TUTELA_SEM_PERICULUM"],
+        };
+      }
+      if (documentType === "PETICAO_INICIAL") {
+        return {
+          description: base.description,
+          instruction: "ARMADILHA: Requerer tutela de urgência apresentando APENAS a probabilidade do direito (fumus boni iuris), sem demonstrar o periculum in mora — não descrever urgência concreta, perigo de dano atual, risco de inutilidade do processo ou irreparabilidade do dano (art. 300 CPC).",
+          expectedRulesIfTrap: ["JEF_TUTELA_SEM_PERICULUM"],
+        };
+      }
+      if (documentType === "RECURSO") {
+        return {
+          description: base.description,
+          instruction: "ARMADILHA: Impugnar a negativa de tutela de urgência argumentando exclusivamente pela probabilidade do direito (fumus boni iuris), sem reafirmar o periculum in mora — não mencionar urgência, perigo de dano ou risco de inutilidade (art. 300 CPC).",
           expectedRulesIfTrap: ["JEF_TUTELA_SEM_PERICULUM"],
         };
       }
       return { description: base.description, instruction: base.instruction ?? "", expectedRulesIfTrap: [] };
+
     case "JEF_TUTELA_SEM_FUMUS":
-      if (documentType === "DECISAO") {
+      if (documentType === "DECISAO" || documentType === "SENTENCA") {
         return {
           description: base.description,
-          instruction: "ARMADILHA: Deferir a tutela de urgência com base apenas no periculum in mora (urgência), sem demonstrar a probabilidade do direito (fumus boni iuris / verossimilhança das alegações — art. 300 CPC).",
+          instruction: "ARMADILHA: Deferir a tutela de urgência com base apenas no periculum in mora (urgência), sem demonstrar a probabilidade do direito (fumus boni iuris) — não mencionar verossimilhança das alegações, probabilidade do direito, prova documental do fundamento nem citar o art. 300 do CPC.",
           expectedRulesIfTrap: ["JEF_TUTELA_SEM_FUMUS"],
+        };
+      }
+      if (documentType === "PETICAO_INICIAL") {
+        return {
+          description: base.description,
+          instruction: "ARMADILHA: Requerer tutela de urgência descrevendo apenas a urgência do caso (periculum in mora), sem demonstrar a probabilidade do direito (fumus boni iuris) — não mencionar verossimilhança, não apresentar prova documental do direito alegado, não citar o art. 300 do CPC.",
+          expectedRulesIfTrap: ["JEF_TUTELA_SEM_FUMUS"],
+        };
+      }
+      if (documentType === "RECURSO") {
+        return {
+          description: base.description,
+          instruction: "ARMADILHA: Impugnar a negativa de tutela de urgência argumentando exclusivamente pela urgência (periculum in mora), sem demonstrar a probabilidade do direito (fumus boni iuris) — não citar verossimilhança, não apresentar prova documental do direito, não referenciar o art. 300 do CPC.",
+          expectedRulesIfTrap: ["JEF_TUTELA_SEM_FUMUS"],
+        };
+      }
+      return { description: base.description, instruction: base.instruction ?? "", expectedRulesIfTrap: [] };
+
+    case "JEF_TUTELA_DESPROPORCIONAL":
+      if (documentType === "DECISAO" || documentType === "SENTENCA") {
+        return {
+          description: base.description,
+          instruction: "ARMADILHA: Deferir tutela de urgência impondo medida DESPROPORCIONAL — ordenar bloqueio total de conta bancária, suspensão integral de serviço ou cancelamento completo de contrato — sem analisar a proporcionalidade da medida, sem considerar alternativas menos gravosas e sem verificar se a restrição é adequada e necessária ao valor do direito em disputa (art. 300 CPC; princípio da proporcionalidade).",
+          expectedRulesIfTrap: ["JEF_TUTELA_DESPROPORCIONAL"],
+        };
+      }
+      if (documentType === "PETICAO_INICIAL") {
+        return {
+          description: base.description,
+          instruction: "ARMADILHA: Requerer tutela de urgência pleiteando medida DESPROPORCIONAL — bloqueio total de conta, suspensão integral ou cancelamento completo — sem fundamentar a proporcionalidade da medida, sem indicar medidas menos gravosas alternativas e sem demonstrar que a restrição total é necessária e adequada ao caso concreto (art. 300 CPC; princípio da proporcionalidade).",
+          expectedRulesIfTrap: ["JEF_TUTELA_DESPROPORCIONAL"],
+        };
+      }
+      if (documentType === "RECURSO") {
+        return {
+          description: base.description,
+          instruction: "ARMADILHA: Impugnar a negativa de tutela pleiteando medida DESPROPORCIONAL — bloqueio total de conta ou suspensão integral de serviço — sem justificar a proporcionalidade, sem mencionar medidas menos gravosas e sem fundamentar por que a restrição total é necessária (art. 300 CPC; princípio da proporcionalidade).",
+          expectedRulesIfTrap: ["JEF_TUTELA_DESPROPORCIONAL"],
+        };
+      }
+      return { description: base.description, instruction: base.instruction ?? "", expectedRulesIfTrap: [] };
+
+    case "JEF_TUTELA_ARTIFICIAL":
+      if (documentType === "DECISAO" || documentType === "SENTENCA") {
+        return {
+          description: base.description,
+          instruction: "ARMADILHA: Deferir tutela de urgência sem verificar se a urgência é genuína — a situação descrita é conhecida pela parte há longo período (meses ou mais de um ano), mas tratar como se a urgência fosse atual e recente; não analisar se há mora própria da parte que descaracteriza o periculum in mora (art. 300 CPC).",
+          expectedRulesIfTrap: ["JEF_TUTELA_ARTIFICIAL"],
+        };
+      }
+      if (documentType === "PETICAO_INICIAL") {
+        return {
+          description: base.description,
+          instruction: "ARMADILHA: Invocar urgência para tutela em situação que a parte conhece há longo período — mencionar que a situação dura meses ou anos, mas apresentar a urgência como se fosse atual e recente; não reconhecer que a mora própria (inação prolongada) descaracteriza o periculum in mora exigido pelo art. 300 do CPC.",
+          expectedRulesIfTrap: ["JEF_TUTELA_ARTIFICIAL"],
+        };
+      }
+      if (documentType === "RECURSO") {
+        return {
+          description: base.description,
+          instruction: "ARMADILHA: Impugnar a negativa de tutela invocando urgência em situação crônica — reconhecer que a situação se arrasta há meses ou anos, mas argumentar como se a urgência fosse atual e recente; não enfrentar a questão da mora própria que descaracteriza o periculum in mora (art. 300 CPC).",
+          expectedRulesIfTrap: ["JEF_TUTELA_ARTIFICIAL"],
         };
       }
       return { description: base.description, instruction: base.instruction ?? "", expectedRulesIfTrap: [] };
@@ -2236,11 +2313,159 @@ const tJefCompetencia: ThemeBuilder = (i) => ({
   norma: "art. 3º Lei 9.099/95 (competência material e valor); art. 3º §3º Lei 9.099/95 (questão complexa); CDC",
 });
 
+// ── JEF CÍVEL — TUTELAS DE URGÊNCIA: temas especializados ────────────────────
+//
+// 10 temas naturalmente urgentes (negativação, PIX, energia, saúde, etc.).
+// Adicionados ANTES dos temas de perícia para que --count=40 --area=JEF_CIVEL
+// cubra estes cenários com --trap=JEF_TUTELA_* (lote dedicado FASE 4.2).
+// Para rodar o lote de perícia da FASE 4.1: --offset=40 --count=40 --trap=JEF_PERICIA_COMPLEXA
+
+const JEF_DISTRIBUIDORAS = [
+  "Enel Distribuição São Paulo S.A.", "Cemig Distribuição S.A.",
+  "CPFL Energia S.A.", "Energisa Sergipe Distribuidora de Energia S.A.",
+];
+const JEF_INTERNET = [
+  "NET Virtua / Claro S.A.", "Vivo Fibra — Telefônica Brasil S.A.",
+  "TIM Live S.A.", "Oi Fibra — Oi Móvel S.A.",
+];
+const JEF_PLANOS_SAUDE = [
+  "Unimed Brasil Cooperativa Médica Ltda.", "Amil Assistência Médica Internacional S.A.",
+  "Bradesco Saúde S.A.", "SulAmérica Saúde S.A.",
+];
+const JEF_FARMACIAS = [
+  "Drogasil S.A.", "Ultrafarma Farmácias Ltda.",
+  "Raia Drogasil S.A.", "Drogaria Araujo S.A.",
+];
+const JEF_FINTECHS = [
+  "Nubank S.A.", "PicPay Serviços S.A.",
+  "Mercado Pago — Mercado Livre S.A.", "PagBank — PagSeguro Internet Ltda.",
+];
+
+// Tutela 1 — Negativação indevida com urgência de exclusão
+const tJefTutelaNegativacao: ThemeBuilder = (i) => ({
+  area: "JEF_CIVEL",
+  themeLabel: "Negativação indevida — tutela urgente — JEF Cível",
+  autor: pick(NOMES, i),
+  reu: pick(JEF_LOJAS, i).nome,
+  comarca: pick(COMARCAS, i),
+  fatos: `${pick(NOMES, i)} (CPF ${cpf(i + 8000)}) teve o nome inscrito indevidamente no SPC/Serasa pela ${pick(JEF_LOJAS, i).nome} (CNPJ ${pick(JEF_LOJAS, i).cnpj}) em ${dateBack(0, i)}, por débito de ${brl(600 + i * 40)} inexistente. O autor nunca firmou contrato com a ré. A negativação está causando recusa de crédito imediata: o autor teve pedido de financiamento negado em ${dateBack(0, i)} e não consegue acesso a serviços essenciais. Valor total pleiteado: ${brl(5500 + i * 200)}. JEF Cível — valor abaixo de 40 SM.`,
+  pedido: "tutela de urgência para exclusão imediata da negativação, com declaração de inexistência do débito e indenização por danos morais",
+  norma: "art. 300 CPC; art. 4º Lei 9.099/95; art. 6º, VI, e art. 43 CDC; arts. 186 e 927 CC/2002",
+});
+
+// Tutela 2 — PIX fraudulento com pedido de bloqueio urgente
+const tJefTutelaPixFraudulento: ThemeBuilder = (i) => ({
+  area: "JEF_CIVEL",
+  themeLabel: "PIX fraudulento — tutela de bloqueio — JEF Cível",
+  autor: pick(NOMES, i + 1),
+  reu: pick(JEF_FINTECHS, i),
+  comarca: pick(COMARCAS, i + 1),
+  fatos: `${pick(NOMES, i + 1)} (CPF ${cpf(i + 8100)}) foi vítima de fraude via PIX em ${dateBack(0, i)}: estelionatário que se passou por atendente da ${pick(JEF_FINTECHS, i)} induziu transferência de ${brl(2800 + i * 300)}. O autor notificou o banco imediatamente (protocolo ${300000 + i * 137}), mas a conta receptora não foi bloqueada. Há risco real de saque total dos valores ainda hoje. Valor pleiteado: ${brl(6000 + i * 250)}.`,
+  pedido: "tutela de urgência para bloqueio da conta receptora e reversão do PIX fraudulento, com indenização por danos morais e materiais",
+  norma: "art. 300 CPC; art. 4º Lei 9.099/95; arts. 14 e 22 CDC; Resolução BCB n. 93/2021 (MED); art. 3º Lei 9.099/95",
+});
+
+// Tutela 3 — Bloqueio indevido de conta corrente
+const tJefTutelaBloqueioContaIndevida: ThemeBuilder = (i) => ({
+  area: "JEF_CIVEL",
+  themeLabel: "Bloqueio indevido de conta — tutela urgente — JEF Cível",
+  autor: pick(NOMES, i + 2),
+  reu: pick(JEF_BANCOS, i),
+  comarca: pick(COMARCAS, i + 2),
+  fatos: `${pick(NOMES, i + 2)} (CPF ${cpf(i + 8200)}) teve a conta corrente no ${pick(JEF_BANCOS, i)} bloqueada indevidamente em ${dateBack(0, i)}, sem notificação prévia, alegando suspeita de fraude que o autor nega categoricamente. O bloqueio impede o autor de receber seu salário de ${brl(3200 + i * 100)}, pagar aluguel com vencimento em ${dateBack(0, i)} e honrar obrigações básicas. Valor pleiteado: ${brl(7000 + i * 300)}.`,
+  pedido: "tutela de urgência para desbloqueio imediato da conta corrente, com indenização por danos morais e materiais decorrentes do bloqueio indevido",
+  norma: "art. 300 CPC; art. 4º Lei 9.099/95; arts. 14 e 22 CDC; Res. CMN n. 4.753/2019; art. 3º Lei 9.099/95",
+});
+
+// Tutela 4 — Suspensão de energia elétrica
+const tJefTutelaSuspensaoEnergia: ThemeBuilder = (i) => ({
+  area: "JEF_CIVEL",
+  themeLabel: "Suspensão de energia elétrica — tutela urgente — JEF Cível",
+  autor: pick(NOMES, i + 3),
+  reu: pick(JEF_DISTRIBUIDORAS, i),
+  comarca: pick(COMARCAS, i + 3),
+  fatos: `${pick(NOMES, i + 3)} (CPF ${cpf(i + 8300)}) teve o fornecimento de energia elétrica suspenso indevidamente pela ${pick(JEF_DISTRIBUIDORAS, i)} em ${dateBack(0, i)}, sob alegação de débito de ${brl(280 + i * 30)} já quitado (comprovante de pagamento em anexo). O autor reside com ${pick(["familiar dependente de aparelho de hemodiálise domiciliar", "idoso com deficiência que utiliza cadeira de rodas motorizada", "criança de 3 anos"], i)} cuja saúde e segurança dependem do fornecimento contínuo de energia. Valor pleiteado: ${brl(5000 + i * 200)}.`,
+  pedido: "tutela de urgência para restabelecimento imediato do fornecimento de energia elétrica, com indenização por danos morais",
+  norma: "art. 300 CPC; arts. 22 e 42 CDC; art. 17 Lei 8.987/95 (serviço essencial); Resolução ANEEL n. 414/2010; art. 3º Lei 9.099/95",
+});
+
+// Tutela 5 — Suspensão de internet (home office / trabalho remoto)
+const tJefTutelaSuspensaoInternet: ThemeBuilder = (i) => ({
+  area: "JEF_CIVEL",
+  themeLabel: "Suspensão de internet — tutela urgente — JEF Cível",
+  autor: pick(NOMES, i + 4),
+  reu: pick(JEF_INTERNET, i),
+  comarca: pick(COMARCAS, i + 4),
+  fatos: `${pick(NOMES, i + 4)} (CPF ${cpf(i + 8400)}) tem contrato de internet fibra com a ${pick(JEF_INTERNET, i)} pelo plano de ${brl(100 + i * 10)}/mês. O serviço foi suspenso indevidamente em ${dateBack(0, i)} por suposto débito de ${brl(200 + i * 20)} já pago (comprovante em anexo). O autor trabalha ${pick(["exclusivamente em regime de home office", "como desenvolvedor de software freelancer", "como professor de cursos online"], i)} e a interrupção da internet causa perda diária de ${brl(400 + i * 30)}. Valor pleiteado: ${brl(5500 + i * 200)}.`,
+  pedido: "tutela de urgência para restabelecimento imediato do serviço de internet, com indenização por danos materiais e morais",
+  norma: "art. 300 CPC; arts. 22 e 42 CDC; Resolução Anatel n. 614/2013; art. 3º Lei 9.099/95",
+});
+
+// Tutela 6 — Cancelamento indevido de plano de saúde
+const tJefTutelaPlanoSaude: ThemeBuilder = (i) => ({
+  area: "JEF_CIVEL",
+  themeLabel: "Cancelamento de plano de saúde — tutela urgente — JEF Cível",
+  autor: pick(NOMES, i + 5),
+  reu: pick(JEF_PLANOS_SAUDE, i),
+  comarca: pick(COMARCAS, i + 5),
+  fatos: `${pick(NOMES, i + 5)} (CPF ${cpf(i + 8500)}) tem plano de saúde pela ${pick(JEF_PLANOS_SAUDE, i)} há ${2 + i % 5} anos, pelo valor de ${brl(450 + i * 30)}/mês. A operadora cancelou unilateralmente o plano em ${dateBack(0, i)}, sem justificativa, enquanto o autor está em ${pick(["tratamento quimioterápico em curso", "recuperação pós-cirúrgica (cirurgia realizada há 15 dias)", "acompanhamento cardiológico com consultas semanais"], i)}. A interrupção coloca em risco a continuidade do tratamento médico essencial. Valor pleiteado: ${brl(8000 + i * 300)}.`,
+  pedido: "tutela de urgência para restabelecimento imediato do plano de saúde, com indenização por danos morais",
+  norma: "art. 300 CPC; art. 13 Lei 9.656/98 (vedação ao cancelamento unilateral); arts. 6º e 14 CDC; RN ANS n. 412/2016; art. 3º Lei 9.099/95",
+});
+
+// Tutela 7 — Negativa de fornecimento de medicamento
+const tJefTutelaMedicamento: ThemeBuilder = (i) => ({
+  area: "JEF_CIVEL",
+  themeLabel: "Fornecimento de medicamento — tutela urgente — JEF Cível",
+  autor: pick(NOMES, i + 6),
+  reu: pick(JEF_PLANOS_SAUDE, i + 1),
+  comarca: pick(COMARCAS, i + 6),
+  fatos: `${pick(NOMES, i + 6)} (CPF ${cpf(i + 8600)}) necessita de ${pick(["insulina análoga de longa ação (Lantus)", "medicamento biológico para artrite reumatoide (Adalimumabe)", "anticonvulsivante de segunda linha (Levetiracetam)", "imunossupressor pós-transplante (Tacrolimus)"], i)}, prescrito por médico especialista em ${dateBack(0, i)}. A ${pick(JEF_PLANOS_SAUDE, i + 1)} negou a cobertura sob alegação de exclusão contratual, embora o medicamento seja essencial ao tratamento. A interrupção por mais de ${3 + i}  dias causa risco à saúde. Valor pleiteado: ${brl(6500 + i * 250)}.`,
+  pedido: "tutela de urgência para obrigar o fornecimento imediato do medicamento prescrito, com indenização por danos morais pela negativa abusiva",
+  norma: "art. 300 CPC; art. 10, §12, Lei 9.656/98 (cobertura de medicamentos); Súmula 102 TJSP; arts. 6º e 14 CDC; art. 3º Lei 9.099/95",
+});
+
+// Tutela 8 — Exclusão indevida de cadastro de plataforma
+const tJefTutelaExclusaoCadastro: ThemeBuilder = (i) => ({
+  area: "JEF_CIVEL",
+  themeLabel: "Exclusão indevida de cadastro — tutela urgente — JEF Cível",
+  autor: pick(NOMES, i + 7),
+  reu: pick(JEF_LOJAS, i + 2).nome,
+  comarca: pick(COMARCAS, i + 7),
+  fatos: `${pick(NOMES, i + 7)} (CPF ${cpf(i + 8700)}) teve sua conta e cadastro na plataforma da ${pick(JEF_LOJAS, i + 2).nome} excluídos indevidamente em ${dateBack(0, i)}, sem notificação prévia e sem qualquer violação dos termos de uso. O autor é ${pick(["vendedor com ${brl(15000 + i * 500)} em estoque pendente de entrega", "prestador de serviços com contratos ativos na plataforma", "microempreendedor com faturamento mensal de ${brl(4000 + i * 300)} pela plataforma"], i)}. A exclusão causou perda imediata de renda e impossibilidade de acesso às vendas em curso. Valor pleiteado: ${brl(9000 + i * 400)}.`,
+  pedido: "tutela de urgência para reintegração imediata do cadastro e conta na plataforma, com indenização por danos materiais e morais",
+  norma: "art. 300 CPC; art. 49 e art. 51 CDC (cláusula abusiva); LGPD (Lei 13.709/2018, arts. 15 e 18); art. 3º Lei 9.099/95",
+});
+
+// Tutela 9 — Falha bancária urgente (transferência não creditada + vencimento iminente)
+const tJefTutelaFalhaBancariaUrgente: ThemeBuilder = (i) => ({
+  area: "JEF_CIVEL",
+  themeLabel: "Falha bancária urgente — tutela de estorno — JEF Cível",
+  autor: pick(NOMES, i + 8),
+  reu: pick(JEF_BANCOS, i + 1),
+  comarca: pick(COMARCAS, i + 8),
+  fatos: `${pick(NOMES, i + 8)} (CPF ${cpf(i + 8800)}) realizou transferência de ${brl(3500 + i * 200)} pelo ${pick(JEF_BANCOS, i + 1)} em ${dateBack(0, i)} para pagamento de ${pick(["aluguel com multa por atraso de 10% ao dia", "parcela de financiamento com vencimento hoje", "boleto de fornecedor com protesto imediato em caso de inadimplemento"], i)}. O valor foi debitado da conta do autor mas não creditado no destino. O banco reconhece a falha mas não efetuou o estorno. Há risco de multa e protesto dentro de ${pick(["24 horas", "48 horas", "hoje às 18h"], i)}. Valor pleiteado: ${brl(7000 + i * 300)}.`,
+  pedido: "tutela de urgência para estorno imediato da transferência falha ou creditamento no destino, com indenização por danos morais e materiais",
+  norma: "art. 300 CPC; arts. 14 e 43 CDC; Resolução BCB n. 4.658/2018; art. 3º Lei 9.099/95",
+});
+
+// Tutela 10 — Interrupção de serviço essencial (gás canalizado / água)
+const tJefTutelaServicoEssencial: ThemeBuilder = (i) => ({
+  area: "JEF_CIVEL",
+  themeLabel: "Interrupção de serviço essencial — tutela urgente — JEF Cível",
+  autor: pick(NOMES, i + 9),
+  reu: pick(["Comgás — Companhia de Gás de São Paulo S.A.", "Sabesp — Cia. de Saneamento Básico do Estado de SP", "Copasa — Cia. de Saneamento de Minas Gerais S.A.", "Embasa — Empresa Baiana de Águas e Saneamento S.A."], i),
+  comarca: pick(COMARCAS, i + 9),
+  fatos: `${pick(NOMES, i + 9)} (CPF ${cpf(i + 8900)}) teve o fornecimento de ${pick(["gás canalizado", "água potável e esgotamento sanitário", "gás encanado"], i)} interrompido pela concessionária em ${dateBack(0, i)}, sob alegação de débito de ${brl(180 + i * 20)} já quitado (comprovante em anexo). A interrupção impede a ${pick(["preparação de alimentos para família com crianças menores", "higiene e saneamento básico de moradia com idosos", "funcionamento de pequeno restaurante com alvará regular"], i)}. Valor pleiteado: ${brl(5000 + i * 150)}.`,
+  pedido: "tutela de urgência para restabelecimento imediato do serviço essencial, com indenização por danos morais",
+  norma: "art. 300 CPC; art. 22 CDC; art. 6º, X, CDC (serviços públicos essenciais); art. 17 Lei 8.987/95; art. 3º Lei 9.099/95",
+});
+
 // ── JEF CÍVEL — PERÍCIA COMPLEXA: temas especializados ───────────────────────
 //
 // 10 temas com fatos que naturalmente demandam prova pericial técnica elaborada.
-// Adicionados ANTES dos temas originais para que --count=40 --area=JEF_CIVEL
-// cubra estes cenários com --trap=JEF_PERICIA_COMPLEXA (lote dedicado FASE 4.1).
+// Slots 40-79 de JEF_CIVEL quando --area=JEF_CIVEL.
+// Para lote dedicado FASE 4.1: --offset=40 --count=40 --trap=JEF_PERICIA_COMPLEXA
 
 const JEF_CLINICAS = [
   "Clínica Saúde Vida Ltda.", "Hospital Promisse S.A.",
@@ -2371,8 +2596,23 @@ const tJefPericiaForenseDigital: ThemeBuilder = (i) => ({
   norma: "arts. 14 e 22 CDC; Resolução BCB n. 4.658/2018 (cibersegurança); art. 3º Lei 9.099/95",
 });
 
-// Péricia themes registrados ANTES dos originais — slots 0-39 de JEF_CIVEL
-// Permite rodar --area=JEF_CIVEL --count=40 --trap=JEF_PERICIA_COMPLEXA como lote dedicado
+// Tutela themes — slots 0-39 de JEF_CIVEL (FASE 4.2)
+// Lote dedicado: --area=JEF_CIVEL --count=40 --trap=JEF_TUTELA_SEM_FUMUS
+THEMES.push(
+  { id: "jef_tutela_negativacao",         build: tJefTutelaNegativacao },
+  { id: "jef_tutela_pix_fraudulento",     build: tJefTutelaPixFraudulento },
+  { id: "jef_tutela_bloqueio_conta",      build: tJefTutelaBloqueioContaIndevida },
+  { id: "jef_tutela_suspensao_energia",   build: tJefTutelaSuspensaoEnergia },
+  { id: "jef_tutela_suspensao_internet",  build: tJefTutelaSuspensaoInternet },
+  { id: "jef_tutela_plano_saude",         build: tJefTutelaPlanoSaude },
+  { id: "jef_tutela_medicamento",         build: tJefTutelaMedicamento },
+  { id: "jef_tutela_exclusao_cadastro",   build: tJefTutelaExclusaoCadastro },
+  { id: "jef_tutela_falha_bancaria",      build: tJefTutelaFalhaBancariaUrgente },
+  { id: "jef_tutela_servico_essencial",   build: tJefTutelaServicoEssencial },
+);
+
+// Péricia themes — slots 40-79 de JEF_CIVEL (FASE 4.1)
+// Lote dedicado: --area=JEF_CIVEL --offset=40 --count=40 --trap=JEF_PERICIA_COMPLEXA
 THEMES.push(
   { id: "jef_pericia_erro_medico",      build: tJefPericiaErroMedico },
   { id: "jef_pericia_invalidez",        build: tJefPericiaInvalidez },
