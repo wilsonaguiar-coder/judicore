@@ -21,7 +21,7 @@ export default function LandingPage() {
   return (
     <div className="min-h-screen relative bg-gradient-to-b from-white via-slate-50 to-white text-slate-900 flex flex-col">
 
-      <div className="dynamic-bg" />
+      {/* dynamic-bg removed globally; hero has its own decoration below */}
 
       <header className="z-30 w-full px-6 md:px-12 py-4 flex items-center justify-between band-dark shadow-sm">
         <div className="flex items-center gap-4">
@@ -39,7 +39,10 @@ export default function LandingPage() {
         <div className="w-full max-w-5xl">
           <div className="grid md:grid-cols-2 gap-12 items-center">
 
-            <section className="space-y-6">
+            <section className="space-y-6 relative overflow-visible">
+              {/* Hero decorative shape */}
+              <div className="absolute -right-16 -top-6 w-96 h-80 rounded-3xl bg-gradient-to-br from-indigo-50 to-cyan-50 transform rotate-6 blur-2xl opacity-90 pointer-events-none" />
+              <div className="absolute -right-40 top-28 w-2 h-36 rounded-full bg-gradient-to-b from-indigo-500 to-cyan-400 opacity-80 pointer-events-none" />
               <motion.div
                 initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4 }}
                 className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-indigo-100 bg-indigo-50 text-indigo-600 text-xs font-medium"
@@ -66,6 +69,11 @@ export default function LandingPage() {
                 Gere peças, realize cálculos e audite documentos jurídicos com base
                 na legislação e jurisprudência atualizada dos principais tribunais brasileiros.
               </motion.p>
+
+              <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.15 }} className="mt-6 flex items-center gap-4">
+                <a href="/login" className="glass-cta">Começar</a>
+                <a href="/sobre" className="btn-ghost">Saiba mais</a>
+              </motion.div>
 
               <motion.div
                 initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, delay: 0.15 }}
