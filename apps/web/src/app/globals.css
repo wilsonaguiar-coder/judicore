@@ -3,6 +3,7 @@
 @tailwind utilities;
 
 @import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap");
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700&display=swap');
 
 @layer base {
   :root {
@@ -29,7 +30,51 @@
 
 @layer base {
   * { @apply border-border; }
-  body { @apply bg-background text-foreground font-sans antialiased; }
+  body { @apply bg-background text-foreground antialiased; font-family: 'Poppins', Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial; }
+}
+
+@layer components {
+  .btn-primary {
+    @apply inline-flex items-center gap-2 px-5 py-3 rounded-lg font-semibold text-white shadow-lg bg-gradient-to-r from-violet-600 to-indigo-500 transform transition-all hover:scale-[1.02];
+  }
+  .btn-ghost {
+    @apply inline-flex items-center gap-2 px-4 py-3 rounded-lg font-medium text-white/85 bg-white/6 hover:bg-white/10 border border-white/8;
+  }
+
+  @keyframes float-y {
+    0% { transform: translateY(0px); }
+    50% { transform: translateY(-6px); }
+    100% { transform: translateY(0px); }
+  }
+  .float-anim { animation: float-y 4s ease-in-out infinite; }
+
+  .shimmer-text {
+    background: linear-gradient(90deg, rgba(255,255,255,0.08) 0%, rgba(255,255,255,0.18) 50%, rgba(255,255,255,0.08) 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    background-size: 200% 100%;
+    animation: shimmer 3.5s linear infinite;
+  }
+
+  @keyframes shimmer {
+    0% { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
+  }
+}
+
+@layer components {
+  .testimonials {
+    @apply grid grid-cols-1 md:grid-cols-3 gap-4 mt-8;
+  }
+  .testimonial-card {
+    @apply p-5 rounded-xl bg-white/[0.03] border border-white/6 text-white/85 shadow-md;
+  }
+  .trust-logos { @apply flex items-center gap-4 flex-wrap mt-4 opacity-90; }
+  .logo-pill { @apply px-3 py-1 rounded-full bg-white/5 border border-white/6 text-sm text-white/60; }
+
+  .scroll-hint { @apply mt-6 flex items-center gap-3 text-white/40 text-sm; }
+  .scroll-dot { @apply w-2 h-2 rounded-full bg-white/40 animate-bounce; }
 }
 
 input:-webkit-autofill,

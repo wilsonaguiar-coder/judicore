@@ -180,7 +180,7 @@ export default function LandingPage() {
             >
               Inteligência que<br />
               transforma o{" "}
-              <span className="bg-gradient-to-r from-violet-400 via-indigo-400 to-purple-400 bg-clip-text text-transparent">
+              <span className="bg-gradient-to-r from-violet-400 via-indigo-400 to-purple-400 bg-clip-text text-transparent shimmer-text">
                 Direito.
               </span>
             </motion.h1>
@@ -192,6 +192,24 @@ export default function LandingPage() {
               Gere peças, realize cálculos e audite documentos jurídicos com base
               na legislação e jurisprudência atualizada dos principais tribunais.
             </motion.p>
+
+            <motion.div custom={2.5} variants={fadeUp} initial="hidden" animate="visible" className="flex items-center gap-3 mb-6">
+              <Link href="/login" className="btn-primary">Iniciar grátis</Link>
+              <Link href="/sobre" className="btn-ghost">Ver demonstração</Link>
+            </motion.div>
+
+            <div className="scroll-hint">
+              <div className="scroll-dot" />
+              <div>Role para ver recursos e depoimentos</div>
+            </div>
+
+            <motion.div custom={2.7} variants={fadeUp} initial="hidden" animate="visible" className="flex items-center gap-3 mt-0 text-sm text-white/40">
+              <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/[0.02] border border-white/6">
+                <Sparkles size={13} className="text-violet-300" /> Confiado por escritórios e tribunais
+              </span>
+              <span className="text-xs text-white/30">•</span>
+              <span className="text-xs">Suíte completa: geração • cálculo • auditoria</span>
+            </motion.div>
 
             {/* Pills — grid 2×2, tamanho uniforme */}
             <motion.div
@@ -254,7 +272,7 @@ export default function LandingPage() {
             </div>
 
             {/* Themis */}
-            <div className="absolute inset-0" style={{ zIndex: 1 }}>
+            <div className="absolute inset-0 float-anim" style={{ zIndex: 1 }}>
               <Image src="/hero.png" alt="Themis" fill className="object-contain object-bottom" priority />
             </div>
 
@@ -382,6 +400,32 @@ export default function LandingPage() {
           </motion.div>
 
         </div>
+
+        {/* Depoimentos */}
+        <motion.section custom={8} variants={fadeUp} initial="hidden" animate="visible" className="max-w-6xl mx-auto mt-8">
+          <h3 className="text-lg font-bold mb-4">O que dizem sobre a plataforma</h3>
+          <div className="testimonials">
+            <div className="testimonial-card">
+              <p className="text-sm text-white/70 mb-3">"A integração com o PJe e a geração automática de peças reduziram nosso tempo de trabalho em mais de 50%."</p>
+              <div className="text-sm font-semibold">— Escritório Silva & Associados</div>
+            </div>
+            <div className="testimonial-card">
+              <p className="text-sm text-white/70 mb-3">"A auditoria automática aponta inconsistências que antes passavam despercebidas. Melhora real na qualidade."</p>
+              <div className="text-sm font-semibold">— Tribunal Regional (teste)</div>
+            </div>
+            <div className="testimonial-card">
+              <p className="text-sm text-white/70 mb-3">"Ferramenta robusta e confiável — recomendamos para times de contencioso e departamentos jurídicos."</p>
+              <div className="text-sm font-semibold">— Departamento Jurídico ACME</div>
+            </div>
+          </div>
+
+          <div className="trust-logos">
+            <div className="logo-pill">STJ</div>
+            <div className="logo-pill">TRF</div>
+            <div className="logo-pill">PJe</div>
+            <div className="logo-pill">Escritórios</div>
+          </div>
+        </motion.section>
       </section>
 
       {/* Fluxo + Stats */}
