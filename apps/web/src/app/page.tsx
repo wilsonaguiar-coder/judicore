@@ -154,9 +154,9 @@ export default function LandingPage() {
           </span>
         </div>
         <nav className="hidden md:flex items-center gap-5 text-sm text-white/40">
-          {["Sobre", "Privacidade", "Termos de Uso"].map((l) => (
-            <span key={l} className="hover:text-white/70 cursor-pointer transition-colors">{l}</span>
-          ))}
+          <Link href="/sobre" className="hover:text-white/70 transition-colors">Sobre</Link>
+          <Link href="/privacidade" className="hover:text-white/70 transition-colors">Privacidade</Link>
+          <Link href="/termos" className="hover:text-white/70 transition-colors">Termos de Uso</Link>
         </nav>
       </motion.nav>
 
