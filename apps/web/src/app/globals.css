@@ -119,3 +119,5 @@ input:-webkit-autofill:active {
   caret-color: #1e293b;
   transition: background-color 5000s ease-in-out 0s;
 }
+
+/* ui-redesign: glass helpers added */
