@@ -410,9 +410,11 @@ export default function TestesPage() {
                   <option value="JEF_TUTELA_DESPROPORCIONAL">JEF_TUTELA_DESPROPORCIONAL — medida desproporcional</option>
                   <option value="JEF_TUTELA_ARTIFICIAL">JEF_TUTELA_ARTIFICIAL — urgência artificial / mora própria</option>
                 </optgroup>
-                <optgroup label="JEF Federal — Perícias (FASE 4.1)">
-                  <option value="JEF_PERICIA_COMPLEXA">JEF_PERICIA_COMPLEXA — perícia incompatível com rito</option>
-                  <option value="JEF_VALOR_EXCEDENTE">JEF_VALOR_EXCEDENTE — valor acima de 40 SM sem renúncia</option>
+                <optgroup label="JEF Estadual — Perícias (FASE 4.1)">
+                  <option value="JEF_PERICIA_COMPLEXA">JEF_PERICIA_COMPLEXA — perícia incompatível com rito sumaríssimo</option>
+                </optgroup>
+                <optgroup label="JEF Estadual / Federal — Competência (FASE 4.3)">
+                  <option value="JEF_VALOR_EXCEDENTE">JEF_VALOR_EXCEDENTE — valor acima de 40 SM (estadual) ou 60 SM (federal) sem renúncia</option>
                   <option value="JEF_RECURSO_ERRADO">JEF_RECURSO_ERRADO — apelação em vez de recurso inominado</option>
                   <option value="JEF_LEGITIMIDADE_PASSIVA">JEF_LEGITIMIDADE_PASSIVA — polo passivo errado</option>
                 </optgroup>
