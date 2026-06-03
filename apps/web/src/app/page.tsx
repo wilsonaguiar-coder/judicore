@@ -406,16 +406,36 @@ export default function LandingPage() {
           <h3 className="text-lg font-bold mb-4">O que dizem sobre a plataforma</h3>
           <div className="testimonials">
             <div className="testimonial-card">
-              <p className="text-sm text-white/70 mb-3">"A integração com o PJe e a geração automática de peças reduziram nosso tempo de trabalho em mais de 50%."</p>
-              <div className="text-sm font-semibold">— Escritório Silva & Associados</div>
+              <p className="testimonial-quote">"A integração com o PJe e a geração automática de peças reduziram nosso tempo de trabalho em mais de 50%. A interface é limpa e o suporte foi excelente durante a implantação."</p>
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-full bg-gradient-to-br from-violet-600 to-indigo-500 flex items-center justify-center text-white font-bold">SS</div>
+                <div>
+                  <div className="testimonial-author">Escritório Silva & Associados</div>
+                  <div className="text-xs text-white/[0.6]">Contencioso - São Paulo</div>
+                </div>
+              </div>
             </div>
+
             <div className="testimonial-card">
-              <p className="text-sm text-white/70 mb-3">"A auditoria automática aponta inconsistências que antes passavam despercebidas. Melhora real na qualidade."</p>
-              <div className="text-sm font-semibold">— Tribunal Regional (teste)</div>
+              <p className="testimonial-quote">"A auditoria automática aponta inconsistências e sugere fundamentações. A qualidade das peças subiu e o tempo de revisão caiu significativamente."</p>
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-full bg-gradient-to-br from-amber-500 to-orange-400 flex items-center justify-center text-white font-bold">TR</div>
+                <div>
+                  <div className="testimonial-author">Tribunal Regional (teste)</div>
+                  <div className="text-xs text-white/[0.6]">Equipe de Auditoria</div>
+                </div>
+              </div>
             </div>
+
             <div className="testimonial-card">
-              <p className="text-sm text-white/70 mb-3">"Ferramenta robusta e confiável — recomendamos para times de contencioso e departamentos jurídicos."</p>
-              <div className="text-sm font-semibold">— Departamento Jurídico ACME</div>
+              <p className="testimonial-quote">"Ferramenta robusta e confiável — recomendamos para times de contencioso e departamentos jurídicos que buscam automação e qualidade."</p>
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-full bg-gradient-to-br from-emerald-600 to-teal-400 flex items-center justify-center text-white font-bold">AC</div>
+                <div>
+                  <div className="testimonial-author">Departamento Jurídico ACME</div>
+                  <div className="text-xs text-white/[0.6]">Corporativo</div>
+                </div>
+              </div>
             </div>
           </div>
 

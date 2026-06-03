@@ -65,11 +65,13 @@
 
 @layer components {
   .testimonials {
-    @apply grid grid-cols-1 md:grid-cols-3 gap-4 mt-8;
+    @apply flex gap-6 mt-8 overflow-x-auto no-scrollbar py-2;
   }
   .testimonial-card {
-    @apply p-5 rounded-xl bg-white/[0.03] border border-white/[0.06] text-white/[0.85] shadow-md;
+    @apply p-6 rounded-2xl bg-white/[0.03] border border-white/[0.06] text-white/[0.9] shadow-md min-w-[300px] md:min-w-[340px];
   }
+  .testimonial-quote { @apply text-sm text-white/[0.8] mb-3 leading-relaxed; }
+  .testimonial-author { @apply text-sm font-semibold; }
   .trust-logos { @apply flex items-center gap-4 flex-wrap mt-4 opacity-90; }
   .logo-pill { @apply px-3 py-1 rounded-full bg-white/[0.05] border border-white/[0.06] text-sm text-white/[0.6]; }
 
