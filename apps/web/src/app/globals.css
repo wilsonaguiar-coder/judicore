@@ -118,7 +118,7 @@
 }
 .dynamic-bg { display: none !important; }
 
-/* Dark header/footer utility */
+/* Legacy — kept for compatibility, unused on landing */
 .band-dark { @apply bg-slate-900 text-white; }
 .band-strong { @apply bg-slate-950 text-white; }
 
