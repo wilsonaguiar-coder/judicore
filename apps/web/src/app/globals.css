@@ -90,6 +90,26 @@
   .hero-accent { position: absolute; right: -60px; top: -30px; width: 420px; height: 220px; border-radius: 999px; background: linear-gradient(90deg, rgba(139,92,246,0.18), rgba(99,102,241,0.12)); filter: blur(36px); }
 }
 
+@layer components {
+  /* Glassmorphism helpers */
+  .glass-card {
+    @apply rounded-2xl bg-white/60 border border-slate-100/60 shadow-lg backdrop-blur-md;
+  }
+  .glass-sm {
+    @apply rounded-xl bg-white/50 border border-slate-100/50 backdrop-blur-sm;
+  }
+  .glass-cta {
+    @apply inline-flex items-center gap-2 px-4 py-2 rounded-md font-semibold text-white bg-gradient-to-r from-indigo-600 to-sky-500 shadow-md;
+  }
+  .muted-text { @apply text-slate-500; }
+  .glass-accent {
+    background: linear-gradient(90deg, rgba(99,102,241,0.12), rgba(14,165,233,0.06));
+  }
+
+  /* Subtle card scale on hover */
+  .glass-hover:hover { transform: translateY(-6px) scale(1.01); transition: transform 220ms ease; }
+}
+
 input:-webkit-autofill,
 input:-webkit-autofill:hover,
 input:-webkit-autofill:focus,
