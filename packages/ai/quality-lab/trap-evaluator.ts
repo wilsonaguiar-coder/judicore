@@ -171,10 +171,17 @@ export function evaluateTrap(trap: TrapKind, result: CaseResult): TrapOutcome {
       const menciona = /per[íi]cia\s+(?:m[eé]dica|cont[aá]bil|de\s+engenharia|estrutural|complex|forense|multidisciplinar|t[eé]cnica|atuarial|grafot[eé]cnica)|laudo\s+pericial|avalia[cç][aã]o\s+(?:m[eé]dica\s+especializada?|multiprofissional|pericial)/i.test(draft);
       if (!menciona) return "AVOIDED";
 
-      // AVOIDED: IA reconheceu que a perícia era desnecessária ou incompatível com o JEF
-      // (inclui as diversas formulações que a IA usa para fazer isso corretamente)
+      // SENTENÇA: só é MISSED se a sentença ORDENA nova perícia.
+      // Referência a laudo já existente nos autos = AVOIDED (prova pré-existente).
+      if (result.documentType === "SENTENCA") {
+        const ordenaNova = /determino\s+(?:a\s+)?(?:realiza[cç][aã]o\s+de\s+)?(?:nova\s+)?per[íi]cia|designo\s+(?:nova\s+)?per[íi]cia|reabro\s+a\s+instru[cç][aã]o|determino\s+a\s+reabertura|designo\s+novo\s+perito|produza-se\s+prova\s+pericial/i.test(draft);
+        if (!ordenaNova) return "AVOIDED";
+      }
+
+      // AVOIDED: IA reconheceu que a perícia era desnecessária ou incompatível com o JEF,
+      // ou argumentou pela permanência no JEF apesar da complexidade probatória.
       const aiReconheceu =
-        /incompet[êe]ncia\s+(?:absoluta\s+)?(?:do\s+)?juizado|declino\s+da\s+compet[êe]ncia|incompatível\s+com\s+(?:o\s+)?(?:juizado|rito\s+sumar[íi]ssimo)|supera\s+o\s+rito\s+sumar[íi]ssimo|remessa\s+(?:dos\s+autos\s+)?(?:à|ao)\s+(?:var[ao]\s+)?(?:c[íi]vel\s+)?(?:comum|ordin[aá]ri[ao])|n[ãa]o\s+h[áa](?:vendo)?\s+(?:necessidade|demanda)\s+de\s+per[íi]cia|n[ãa]o\s+(?:demanda|requer|necessita|exige)\s+per[íi]cia\s+(?:complex|t[eé]cnica\s+elaborada)|dispensável\s+a?\s*per[íi]cia|sem\s+complexidade\s+incompatível|plenamente\s+dirimida\s+com\s+prova\s+documental|n[ãa]o\s+(?:versa|verse)\s+sobre.{0,60}(?:pericial|per[íi]cia)|per[íi]cia.{0,120}n[ãa]o\s+(?:é\s+)?(?:cabível|necessária|adequada)\s+(?:no|ao)\s+juizado|extingue?-se\s+sem\s+julgamento\s+do\s+m[eé]rito\s+por\s+complexidade/i.test(draft);
+        /incompet[êe]ncia\s+(?:absoluta\s+)?(?:do\s+)?juizado|declino\s+da\s+compet[êe]ncia|incompatível\s+com\s+(?:o\s+)?(?:juizado|rito\s+sumar[íi]ssimo)|supera\s+o\s+rito\s+sumar[íi]ssimo|remessa\s+(?:dos\s+autos\s+)?(?:à|ao)\s+(?:var[ao]\s+)?(?:c[íi]vel\s+)?(?:comum|ordin[aá]ri[ao])|n[ãa]o\s+h[áa](?:vendo)?\s+(?:necessidade|demanda)\s+de\s+per[íi]cia|n[ãa]o\s+(?:demanda|requer|necessita|exige)\s+per[íi]cia\s+(?:complex|t[eé]cnica\s+elaborada)|dispensável\s+a?\s*per[íi]cia|sem\s+complexidade\s+incompatível|plenamente\s+dirimida\s+com\s+prova\s+documental|n[ãa]o\s+(?:versa|verse)\s+sobre.{0,60}(?:pericial|per[íi]cia)|per[íi]cia.{0,120}n[ãa]o\s+(?:é\s+)?(?:cabível|necessária|adequada)\s+(?:no|ao)\s+juizado|extingue?-se\s+sem\s+julgamento\s+do\s+m[eé]rito\s+por\s+complexidade|ainda\s+que.{0,80}per[íi]cia\s+t[eé]cnica.{0,120}matéria|matéria\s+controvertida\s+refere-se\s+essencialmente|per[íi]cia\s+n[ãa]o\s+(?:inviabiliza|compromete|afasta)|n[ãa]o\s+obstante\s+(?:as\s+)?limita[cç][õo]es\s+do\s+procedimento\s+sumar[íi]ssimo|limita[cç][õo]es\s+do\s+rito\s+sumar[íi]ssimo/i.test(draft);
 
       if (aiReconheceu) return "AVOIDED";
       return "MISSED";

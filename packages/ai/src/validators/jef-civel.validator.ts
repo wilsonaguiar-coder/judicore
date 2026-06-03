@@ -100,7 +100,7 @@ const FATAL_RULES: Array<{
 
       // Verificar se a perícia está sendo REQUERIDA ou DEFERIDA (não apenas mencionada)
       const PEDE_PERICIA_RE =
-        /requi[re](?:rendo|e-se|imento)?\s+(?:a\s+)?(?:produ[cç][aã]o\s+de\s+)?per[íi]cia|requeiro\s+(?:a\s+)?per[íi]cia|pedido\s+de\s+per[íi]cia|seja\s+(?:nomeado\s+perito|realizada\s+per[íi]cia|determinada\s+a\s+per[íi]cia)|nomeio\s+perito|designo\s+per[íi]cia|determino\s+(?:a\s+)?(?:realiza[cç][aã]o\s+de\s+)?per[íi]cia|defiro\s+(?:a\s+)?per[íi]cia|per[íi]cia\s+(?:é\s+)?(?:indispensável|necessária|imprescindível|fundamental)\s+(?:para|ao?)/i;
+        /requi[re](?:rendo|e-se|imento)?\s+(?:a\s+)?(?:produ[cç][aã]o\s+de\s+)?per[íi]cia|requeiro\s+(?:a\s+)?per[íi]cia|pedido\s+de\s+per[íi]cia|seja\s+(?:nomeado\s+perito|realizada\s+per[íi]cia|determinada\s+a\s+per[íi]cia)|nomeio\s+perito|designo\s+per[íi]cia|determino\s+(?:a\s+)?(?:realiza[cç][aã]o\s+de\s+)?per[íi]cia|defiro\s+(?:a\s+)?per[íi]cia|per[íi]cia\s+(?:é\s+)?(?:indispensável|necessária|imprescindível|fundamental)\s+(?:para|ao?)|(?:é\s+)?(?:essencial|indispensável|imprescindível|necess[aá]ri[ao])\s+a\s+produ[cç][aã]o\s+de\s+prova\s+pericial|requer(?:-se)?\s+.{0,80}produ[cç][aã]o\s+de\s+prova\s+pericial/i;
 
       if (!PEDE_PERICIA_RE.test(draft)) return false;
 
