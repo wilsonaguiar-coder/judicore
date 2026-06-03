@@ -54,23 +54,23 @@ function Sparkline() {
 
 function JudiCoreMockup() {
   return (
-    <div className="w-[130px] h-[100px] rounded-xl bg-[#0d1020] border border-violet-500/20 overflow-hidden shrink-0 shadow-xl">
-      <div className="flex items-center gap-1 px-2.5 py-1.5 border-b border-white/5">
+    <div className="w-[175px] h-[135px] rounded-xl bg-[#0d1020] border border-violet-500/20 overflow-hidden shrink-0 shadow-xl">
+      <div className="flex items-center gap-1.5 px-3 py-2 border-b border-white/5">
         {["bg-red-500/60", "bg-yellow-500/60", "bg-green-500/60"].map((c) => (
-          <span key={c} className={`w-1.5 h-1.5 rounded-full ${c}`} />
+          <span key={c} className={`w-2 h-2 rounded-full ${c}`} />
         ))}
       </div>
-      <div className="px-2.5 pt-2 space-y-1.5">
-        <div className="h-1.5 rounded-full bg-violet-400/30 w-3/4" />
-        <div className="h-1.5 rounded-full bg-white/10 w-full" />
-        <div className="h-1.5 rounded-full bg-white/10 w-5/6" />
-        <div className="h-1.5 rounded-full bg-white/10 w-4/5" />
-        <div className="h-1.5 rounded-full bg-violet-400/20 w-2/3" />
+      <div className="px-3 pt-2.5 space-y-2">
+        <div className="h-2 rounded-full bg-violet-400/30 w-3/4" />
+        <div className="h-2 rounded-full bg-white/10 w-full" />
+        <div className="h-2 rounded-full bg-white/10 w-5/6" />
+        <div className="h-2 rounded-full bg-white/10 w-4/5" />
+        <div className="h-2 rounded-full bg-violet-400/20 w-2/3" />
       </div>
-      <div className="flex justify-between items-end px-2.5 pt-2">
-        <div className="h-1 rounded-full bg-white/8 w-10" />
-        <div className="w-5 h-5 rounded-full bg-violet-500/30 flex items-center justify-center">
-          <span className="text-[7px] font-bold text-violet-300">A</span>
+      <div className="flex justify-between items-end px-3 pt-2.5">
+        <div className="h-1.5 rounded-full bg-white/8 w-14" />
+        <div className="w-6 h-6 rounded-full bg-violet-500/30 flex items-center justify-center">
+          <span className="text-[9px] font-bold text-violet-300">A</span>
         </div>
       </div>
     </div>
@@ -80,15 +80,15 @@ function JudiCoreMockup() {
 function JudiCalcMockup() {
   const keys = ["7","8","9","×","4","5","6","−","1","2","3","+","0",".",null,"="];
   return (
-    <div className="w-[130px] h-[100px] rounded-xl bg-[#0d1a12] border border-emerald-500/20 overflow-hidden shrink-0 shadow-xl p-2 flex flex-col gap-1.5">
-      <div className="bg-black/30 rounded px-2 py-0.5 text-right">
-        <p className="text-[7px] text-white/30">Total</p>
-        <p className="text-[10px] font-bold text-emerald-400">R$ 125.430,87</p>
+    <div className="w-[175px] h-[135px] rounded-xl bg-[#0d1a12] border border-emerald-500/20 overflow-hidden shrink-0 shadow-xl p-2.5 flex flex-col gap-2">
+      <div className="bg-black/30 rounded px-2.5 py-1 text-right">
+        <p className="text-[8px] text-white/30">Total</p>
+        <p className="text-[13px] font-bold text-emerald-400">R$ 125.430,87</p>
       </div>
       <div className="grid grid-cols-4 gap-0.5 flex-1">
         {keys.map((k, idx) =>
           k === null ? <div key={idx} /> : (
-            <div key={idx} className={`flex items-center justify-center text-[8px] font-semibold rounded
+            <div key={idx} className={`flex items-center justify-center text-[9px] font-semibold rounded
               ${k === "=" ? "bg-emerald-500 text-white" :
                 ["×","−","+"].includes(k) ? "bg-white/10 text-emerald-300" :
                 "bg-white/5 text-white/70"}`}>
@@ -103,25 +103,25 @@ function JudiCalcMockup() {
 
 function JudiAuditMockup() {
   return (
-    <div className="w-[110px] h-[110px] rounded-xl bg-[#1a1208] border border-amber-500/20 overflow-hidden shadow-xl p-2.5 flex flex-col gap-1.5 shrink-0">
+    <div className="w-[145px] h-[145px] rounded-xl bg-[#1a1208] border border-amber-500/20 overflow-hidden shadow-xl p-3 flex flex-col gap-2 shrink-0">
       <div className="flex items-center justify-between">
-        <span className="text-[7px] text-amber-300/50 uppercase tracking-wide font-semibold">Score</span>
-        <span className="text-sm font-extrabold text-amber-400">97</span>
+        <span className="text-[9px] text-amber-300/50 uppercase tracking-wide font-semibold">Score</span>
+        <span className="text-lg font-extrabold text-amber-400">97</span>
       </div>
-      <div className="text-[7px] text-white/25">/100</div>
-      <div className="w-full h-1 rounded-full bg-white/8">
+      <div className="text-[8px] text-white/25">/100</div>
+      <div className="w-full h-1.5 rounded-full bg-white/8">
         <div className="h-full rounded-full bg-gradient-to-r from-amber-500 to-amber-300" style={{ width: "97%" }} />
       </div>
-      <div className="space-y-0.5 mt-0.5">
+      <div className="space-y-1 mt-0.5">
         {[
           { ok: true,  label: "Estrutura" },
           { ok: false, label: "Fundament." },
           { ok: true,  label: "Jurisprudência" },
           { ok: true,  label: "Pedidos" },
         ].map((r) => (
-          <div key={r.label} className="flex items-center gap-1">
-            <span className={`text-[7px] font-bold ${r.ok ? "text-emerald-400" : "text-amber-400"}`}>{r.ok ? "✓" : "⚠"}</span>
-            <span className="text-[7px] text-white/40">{r.label}</span>
+          <div key={r.label} className="flex items-center gap-1.5">
+            <span className={`text-[9px] font-bold ${r.ok ? "text-emerald-400" : "text-amber-400"}`}>{r.ok ? "✓" : "⚠"}</span>
+            <span className="text-[9px] text-white/40">{r.label}</span>
           </div>
         ))}
       </div>
