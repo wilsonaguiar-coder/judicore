@@ -193,10 +193,7 @@ export default function LandingPage() {
               na legislação e jurisprudência atualizada dos principais tribunais.
             </motion.p>
 
-            <motion.div custom={2.5} variants={fadeUp} initial="hidden" animate="visible" className="flex items-center gap-3 mb-8">
-              <Link href="/login" className="btn-primary">Iniciar grátis</Link>
-              <Link href="/sobre" className="btn-ghost">Ver demonstração</Link>
-            </motion.div>
+            {/* CTAs removidos (não existem) */}
 
             <div className="scroll-hint">
               <div className="scroll-dot" />
@@ -211,10 +208,10 @@ export default function LandingPage() {
               <span className="text-xs">Suíte completa: geração • cálculo • auditoria</span>
             </motion.div>
 
-            {/* Pills — grid 2×2, tamanho uniforme */}
+            {/* Pills — grid 1×2 responsivo, mais espaçamento */}
             <motion.div
               custom={3} variants={fadeUp} initial="hidden" animate="visible"
-              className="grid grid-cols-2 gap-4 max-w-[520px]"
+              className="grid grid-cols-1 sm:grid-cols-2 gap-5 max-w-[560px]"
             >
               {[
                 { icon: <Shield size={15} className="text-violet-400" />, label: "Confiável", sub: "Baseado em jurisprudência real" },
@@ -222,7 +219,7 @@ export default function LandingPage() {
                 { icon: <Lock size={15} className="text-emerald-400" />, label: "Seguro",    sub: "Seus dados protegidos" },
                 { icon: <Link2 size={15} className="text-blue-400" />,   label: "Integrado", sub: "Processo Judicial Eletrônico - PJE" },
               ].map((f) => (
-                <div key={f.label} className="flex items-center gap-3 px-4 py-3 rounded-xl border border-white/8 bg-white/[0.03]">
+                <div key={f.label} className="flex items-center gap-3 px-5 py-4 rounded-xl border border-white/[0.08] bg-white/[0.03] w-full min-h-[72px]">
                   <div className="shrink-0">{f.icon}</div>
                   <div className="min-w-0">
                     <p className="text-sm font-semibold text-white/85 leading-none">{f.label}</p>
@@ -254,7 +251,7 @@ export default function LandingPage() {
           <motion.div
             custom={4} variants={fadeUp} initial="hidden" animate="visible"
             className="relative hidden md:block"
-            style={{ minHeight: 480 }}
+            style={{ minHeight: 420 }}
           >
             {/* Glow */}
             <div className="absolute inset-0 flex items-center justify-center pointer-events-none" style={{ zIndex: 0 }}>
@@ -271,9 +268,9 @@ export default function LandingPage() {
               }} />
             </div>
 
-            {/* Themis */}
-            <div className="absolute inset-0 float-anim" style={{ zIndex: 1 }}>
-              <Image src="/hero.png" alt="Themis" fill className="object-contain object-bottom" priority />
+            {/* Themis — ancorada à direita, menor e alinhada à base */}
+            <div className="absolute right-0 bottom-0 pointer-events-none" style={{ zIndex: 1 }}>
+              <Image src="/hero.png" alt="Themis" width={460} height={520} className="object-contain object-bottom" priority />
             </div>
 
           </motion.div>
