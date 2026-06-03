@@ -82,6 +82,12 @@
 
   .scroll-hint { @apply mt-6 flex items-center gap-3 text-white/[0.40] text-sm; }
   .scroll-dot { @apply w-2 h-2 rounded-full bg-white/[0.40] animate-bounce; }
+  /* Elevated card for product-led look */
+  .card-elevated { @apply rounded-2xl bg-white/[0.03] border border-white/[0.06] p-6 shadow-lg; }
+  .hero-metric { @apply mt-6 inline-flex items-start gap-4; }
+  .hero-metric .value { @apply text-4xl md:text-5xl font-extrabold text-white; }
+  .hero-metric .label { @apply text-sm text-white/[0.65] mt-1; }
+  .hero-accent { position: absolute; right: -60px; top: -30px; width: 420px; height: 220px; border-radius: 999px; background: linear-gradient(90deg, rgba(139,92,246,0.18), rgba(99,102,241,0.12)); filter: blur(36px); }
 }
 
 input:-webkit-autofill,

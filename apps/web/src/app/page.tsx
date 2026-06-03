@@ -193,6 +193,12 @@ export default function LandingPage() {
               na legislação e jurisprudência atualizada dos principais tribunais.
             </motion.p>
 
+            {/* Hero metric — destaque de valor */}
+            <div className="hero-metric">
+              <div className="value">1M+</div>
+              <div className="label">Acórdãos e decisões atualizados diariamente</div>
+            </div>
+
             {/* CTAs removidos (não existem) */}
 
             <div className="scroll-hint">
@@ -230,8 +236,8 @@ export default function LandingPage() {
             </motion.div>
 
             {/* Card "Base de Conhecimento" — abaixo dos pills, simétrico */}
-            <motion.div custom={3.5} variants={fadeUp} initial="hidden" animate="visible" className="mt-6 max-w-[520px]">
-              <div className="flex items-center justify-between gap-4 px-5 py-4 rounded-xl border border-violet-500/20 bg-[#10142a]/80 backdrop-blur-sm">
+            <motion.div custom={3.5} variants={fadeUp} initial="hidden" animate="visible" className="mt-6 max-w-[520px] card-elevated">
+              <div className="flex items-center justify-between gap-4">
                 <div>
                   <div className="flex items-center gap-2 mb-1">
                     <Sparkles size={11} className="text-violet-400" />
@@ -281,7 +287,7 @@ export default function LandingPage() {
 
           {/* JudiCore */}
           <motion.div custom={5} variants={fadeUp} initial="hidden" animate="visible" className="h-full">
-            <Link href="/login" className="group flex flex-col h-full p-6 rounded-2xl border border-white/[0.08] bg-white/[0.025] hover:bg-white/[0.045] hover:border-violet-500/25 transition-all overflow-hidden">
+            <Link href="/login" className="group card-elevated hover:-translate-y-1 transition-transform h-full flex flex-col">
               {/* Header */}
               <div className="flex items-center gap-2.5 mb-3">
                 <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-violet-600/40 to-indigo-600/40 border border-violet-500/30 flex items-center justify-center shrink-0">
@@ -320,7 +326,7 @@ export default function LandingPage() {
 
           {/* JudiCalc */}
           <motion.div custom={6} variants={fadeUp} initial="hidden" animate="visible" className="h-full">
-            <a href={JUDICALC_URL} className="group flex flex-col h-full p-6 rounded-2xl border border-white/[0.08] bg-white/[0.025] hover:bg-white/[0.045] hover:border-emerald-500/25 transition-all overflow-hidden">
+            <a href={JUDICALC_URL} className="group card-elevated hover:-translate-y-1 transition-transform h-full flex flex-col">
               {/* Header */}
               <div className="flex items-center gap-2.5 mb-3">
                 <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-emerald-600/40 to-teal-600/40 border border-emerald-500/30 flex items-center justify-center shrink-0">
@@ -359,7 +365,7 @@ export default function LandingPage() {
 
           {/* JudiAudit */}
           <motion.div custom={7} variants={fadeUp} initial="hidden" animate="visible" className="h-full">
-            <Link href="/login" className="group flex flex-col h-full p-6 rounded-2xl border border-white/[0.08] bg-white/[0.025] hover:bg-white/[0.045] hover:border-amber-500/25 transition-all overflow-hidden">
+            <Link href="/login" className="group card-elevated hover:-translate-y-1 transition-transform h-full flex flex-col">
               {/* Header */}
               <div className="flex items-center gap-2.5 mb-3">
                 <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-amber-600/40 to-orange-600/40 border border-amber-500/30 flex items-center justify-center shrink-0">
