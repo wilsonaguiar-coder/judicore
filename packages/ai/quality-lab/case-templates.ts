@@ -603,6 +603,54 @@ function applyTrap(
         instruction: "ARMADILHA: Prosseguir o cumprimento de sentença contra parte que NÃO consta como condenada no título executivo — estender a obrigação a terceiro (sócio da empresa, fiador não incluído na sentença, familiar do devedor) sem base no art. 513 §5º CPC.",
         expectedRulesIfTrap: [],
       };
+
+    // ── Traps específicas de JEF Cível ────────────────────────────────────────
+
+    case "JEF_PERICIA_COMPLEXA":
+      return {
+        description: base.description,
+        instruction: "ARMADILHA: Requerer ou deferir perícia técnica complexa (perícia médica extensa, contábil, de engenharia ou grafotécnica) no bojo da ação, sem reconhecer que a necessidade de prova pericial elaborada pode tornar a causa complexa e incompatível com o rito sumaríssimo do Juizado Especial Cível (art. 3º §3º Lei 9.099/95).",
+        expectedRulesIfTrap: ["JEF_PERICIA_COMPLEXA"],
+      };
+    case "JEF_VALOR_EXCEDENTE":
+      return {
+        description: base.description,
+        instruction: "ARMADILHA: Pleitear valor superior a 40 salários mínimos no Juizado Especial Cível sem incluir renúncia expressa ao valor excedente, como exige o art. 3º, §3º, Lei 9.099/95 para que o juizado mantenha competência.",
+        expectedRulesIfTrap: ["JEF_VALOR_EXCEDENTE"],
+      };
+    case "JEF_RECURSO_ERRADO":
+      if (documentType === "RECURSO") {
+        return {
+          description: base.description,
+          instruction: "ARMADILHA: Interpor APELAÇÃO (art. 1.009 CPC) contra a sentença do Juizado Especial Cível, em vez do RECURSO INOMINADO (art. 41 da Lei 9.099/95), que é o único recurso cabível nesse rito sumaríssimo.",
+          expectedRulesIfTrap: ["JEF_RECURSO_ERRADO"],
+        };
+      }
+      return { description: base.description, instruction: base.instruction ?? "", expectedRulesIfTrap: [] };
+    case "JEF_LEGITIMIDADE_PASSIVA":
+      return {
+        description: base.description,
+        instruction: "ARMADILHA: Dirigir a ação contra empresa ou entidade ERRADA no polo passivo — por exemplo, acionar a administradora de cartão em vez do banco emissor, a transportadora em vez do e-commerce, ou a franqueada em vez da franqueadora — sem verificar corretamente a legitimidade passiva.",
+        expectedRulesIfTrap: [],
+      };
+    case "JEF_TUTELA_SEM_PERICULUM":
+      if (documentType === "DECISAO") {
+        return {
+          description: base.description,
+          instruction: "ARMADILHA: Deferir a tutela de urgência analisando APENAS a probabilidade do direito (fumus boni iuris), sem examinar o periculum in mora — perigo de dano irreparável ou urgência comprovada (art. 300 CPC).",
+          expectedRulesIfTrap: ["JEF_TUTELA_SEM_PERICULUM"],
+        };
+      }
+      return { description: base.description, instruction: base.instruction ?? "", expectedRulesIfTrap: [] };
+    case "JEF_TUTELA_SEM_FUMUS":
+      if (documentType === "DECISAO") {
+        return {
+          description: base.description,
+          instruction: "ARMADILHA: Deferir a tutela de urgência com base apenas no periculum in mora (urgência), sem demonstrar a probabilidade do direito (fumus boni iuris / verossimilhança das alegações — art. 300 CPC).",
+          expectedRulesIfTrap: ["JEF_TUTELA_SEM_FUMUS"],
+        };
+      }
+      return { description: base.description, instruction: base.instruction ?? "", expectedRulesIfTrap: [] };
   }
 }
 
