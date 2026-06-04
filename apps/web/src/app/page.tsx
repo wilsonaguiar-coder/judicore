@@ -19,14 +19,14 @@ const fadeUp = {
 
 function PreviewJudiCore() {
   return (
-    <div className="relative w-full rounded-xl bg-[#0d1117] border border-white/[0.07] p-4 overflow-hidden shadow-2xl group-hover:shadow-indigo-500/20 transition-all">
-      <div className="flex gap-2 mb-4">
+    <div className="relative w-full h-[220px] flex flex-col rounded-xl bg-[#0d1117] border border-white/[0.07] p-5 overflow-hidden shadow-2xl group-hover:shadow-indigo-500/20 transition-all">
+      <div className="flex gap-2 mb-5">
         <div className="w-2.5 h-2.5 rounded-full bg-red-500/60" />
         <div className="w-2.5 h-2.5 rounded-full bg-yellow-500/60" />
         <div className="w-2.5 h-2.5 rounded-full bg-green-500/60" />
       </div>
-      <div className="text-sm text-white/70 font-semibold mb-3 leading-none">Petição Inicial</div>
-      <div className="space-y-2.5">
+      <div className="text-sm text-white/70 font-semibold mb-4 leading-none">Petição Inicial</div>
+      <div className="space-y-3 flex-1">
         <div className="h-2 bg-white/15 rounded-full w-full" />
         <div className="h-2 bg-white/10 rounded-full w-4/5" />
         <div className="h-2 bg-white/15 rounded-full w-full" />
@@ -34,7 +34,7 @@ function PreviewJudiCore() {
         <div className="h-2 bg-white/10 rounded-full w-full" />
         <div className="h-2 bg-white/12 rounded-full w-5/6" />
       </div>
-      <div className="absolute bottom-4 right-4 w-10 h-10 rounded-full bg-indigo-600 flex items-center justify-center text-[14px] font-bold text-white shadow-lg shadow-indigo-600/40">
+      <div className="absolute bottom-5 right-5 w-10 h-10 rounded-full bg-indigo-600 flex items-center justify-center text-[14px] font-bold text-white shadow-lg shadow-indigo-600/40">
         A
       </div>
     </div>
@@ -49,17 +49,17 @@ function PreviewJudiCalc() {
     ["0",".","","="],
   ];
   return (
-    <div className="w-full rounded-xl bg-[#071410] border border-emerald-900/40 p-4 overflow-hidden shadow-2xl group-hover:shadow-emerald-500/20 transition-all">
-      <div className="mb-4">
-        <div className="text-xs text-emerald-400/70 font-medium leading-none mb-1.5">Total Atualizado</div>
-        <div className="text-lg font-bold text-emerald-400 leading-tight">R$ 125.430,87</div>
+    <div className="w-full h-[220px] flex flex-col rounded-xl bg-[#071410] border border-emerald-900/40 p-5 overflow-hidden shadow-2xl group-hover:shadow-emerald-500/20 transition-all">
+      <div className="mb-auto">
+        <div className="text-xs text-emerald-400/70 font-medium leading-none mb-2">Total Atualizado</div>
+        <div className="text-[22px] font-bold text-emerald-400 leading-tight">R$ 125.430,87</div>
       </div>
-      <div className="grid grid-cols-4 gap-1">
+      <div className="grid grid-cols-4 gap-1.5 mt-4">
         {rows.map((row, ri) =>
           row.map((n, ci) => (
             <div
               key={`${ri}-${ci}`}
-              className={`text-center text-sm py-2 rounded leading-none ${
+              className={`text-center text-sm py-2 rounded leading-none flex items-center justify-center ${
                 n === "=" ? "bg-emerald-600 text-white font-bold shadow-lg shadow-emerald-600/40" : "bg-white/[0.06] text-white/70"
               }`}
             >
@@ -80,18 +80,20 @@ function PreviewJudiAudit() {
     ["Pedidos Finais", "green"],
   ];
   return (
-    <div className="w-full rounded-xl bg-[#100a02] border border-amber-900/40 p-4 overflow-hidden shadow-2xl group-hover:shadow-amber-500/20 transition-all">
+    <div className="w-full h-[220px] flex flex-col rounded-xl bg-[#100a02] border border-amber-900/40 p-5 overflow-hidden shadow-2xl group-hover:shadow-amber-500/20 transition-all">
       <div className="flex items-start justify-between mb-1">
-        <div className="text-xs text-amber-400/70 font-bold uppercase tracking-wider leading-none">SCORE DE RISCO</div>
-        <div className="text-4xl font-black text-amber-400 leading-none drop-shadow-md">97</div>
+        <div className="text-xs text-amber-400/70 font-bold uppercase tracking-wider leading-none mt-1.5">SCORE DE RISCO</div>
+        <div className="text-[44px] font-black text-amber-400 leading-none drop-shadow-md">97</div>
       </div>
-      <div className="text-xs text-white/40 mb-5 leading-none">/100</div>
-      {items.map(([label, color]) => (
-        <div key={label} className="flex items-center gap-2 mb-2.5">
-          <div className={`w-2 h-2 rounded-full shrink-0 ${color === "green" ? "bg-green-400 shadow-[0_0_8px_rgba(74,222,128,0.6)]" : "bg-amber-400 shadow-[0_0_8px_rgba(251,191,36,0.6)]"}`} />
-          <div className="text-xs text-white/75 font-medium leading-none">{label}</div>
-        </div>
-      ))}
+      <div className="text-xs text-white/40 mb-auto leading-none">/100</div>
+      <div className="space-y-3 mt-4">
+        {items.map(([label, color]) => (
+          <div key={label} className="flex items-center gap-3">
+            <div className={`w-2.5 h-2.5 rounded-full shrink-0 ${color === "green" ? "bg-green-400 shadow-[0_0_10px_rgba(74,222,128,0.6)]" : "bg-amber-400 shadow-[0_0_10px_rgba(251,191,36,0.6)]"}`} />
+            <div className="text-sm text-white/75 font-medium leading-none">{label}</div>
+          </div>
+        ))}
+      </div>
     </div>
   );
 }
@@ -234,13 +236,14 @@ export default function LandingPage() {
       {/* ── Hero ─────────────────────────────────────────────────────────── */}
       <main className="relative z-10 flex-1 flex flex-col items-center justify-start px-6 md:px-14 pt-10 pb-20">
         
-        <div className="w-full max-w-6xl flex flex-col md:flex-row items-center gap-10 -mb-6 md:-mb-14 relative z-0">
+        {/* Usando items-end e mb-0 para que a Themis repouse perfeitamente em cima da linha dos cards */}
+        <div className="w-full max-w-6xl flex flex-col md:flex-row items-end gap-10 mb-0 relative z-0">
           {/* Coluna de Texto (Esquerda) */}
           <motion.div 
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6 }}
-            className="flex-1 text-center md:text-left"
+            className="flex-1 text-center md:text-left pb-8 md:pb-12"
           >
             <h1 className="text-5xl md:text-[64px] lg:text-[72px] font-black tracking-tight mb-6 leading-[1.05] drop-shadow-2xl">
               Inteligência que<br className="hidden md:block" /> transforma o{" "}
@@ -299,7 +302,7 @@ export default function LandingPage() {
                     <div className="absolute -inset-px bg-gradient-to-b from-white/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 rounded-3xl pointer-events-none" />
 
                     {/* Body */}
-                    <div className="flex-1 p-6 relative z-10">
+                    <div className="flex-1 p-6 relative z-10 flex flex-col">
                       {/* Icon + name + tagline */}
                       <div className="flex items-center gap-4 mb-6">
                         <div className={`w-12 h-12 rounded-xl flex items-center justify-center shrink-0 ${p.iconBg} shadow-lg group-hover:scale-110 group-hover:rotate-3 transition-transform duration-500`}>
@@ -323,7 +326,7 @@ export default function LandingPage() {
                       
                       {/* Preview area */}
                       <div className="w-full flex justify-center mt-auto opacity-90 group-hover:opacity-100 transition-opacity duration-500 transform group-hover:scale-[1.03]">
-                        <div className="w-full max-w-[95%]">
+                        <div className="w-full">
                           <p.Preview />
                         </div>
                       </div>
