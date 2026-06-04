@@ -3,328 +3,203 @@
 import { motion } from "framer-motion";
 import Link from "next/link";
 import Image from "next/image";
-import { Gavel, Calculator, ClipboardCheck, Sparkles, Check } from "lucide-react";
+import { ArrowRight, FileText, Calculator, CheckCircle, Sparkles } from "lucide-react";
 
-const fadeUp = {
-  hidden: { opacity: 0, y: 20 },
-  visible: (i = 0) => ({
-    opacity: 1, y: 0,
-    transition: { delay: i * 0.1, duration: 0.5, ease: [0.22, 1, 0.36, 1] as [number, number, number, number] },
+// URL do módulo de cálculos. Configurável via env para facilitar testes.
+// Ambos os módulos apontam direto para o login da respectiva plataforma
+const JUDICALC_URL = process.env["NEXT_PUBLIC_JUDICALC_URL"] ?? "https://calculos.judicore.com.br/login.html";
+
+const cardFade = {
+  hidden: { opacity: 0, y: 40 },
+  visible: (i: number) => ({
+    opacity: 1,
+    y: 0,
+    transition: { delay: 0.2 + i * 0.15, duration: 0.7, ease: [0.22, 1, 0.36, 1] },
   }),
 };
 
-// ── Mini preview mockups ──────────────────────────────────────────────────────
-
-function PreviewJudiCore() {
-  return (
-    <div className="relative w-full rounded-xl bg-[#0d1117] border border-white/[0.07] p-3 overflow-hidden">
-      <div className="flex gap-1.5 mb-3">
-        <div className="w-2 h-2 rounded-full bg-red-500/60" />
-        <div className="w-2 h-2 rounded-full bg-yellow-500/60" />
-        <div className="w-2 h-2 rounded-full bg-green-500/60" />
-      </div>
-      <div className="text-[10px] text-white/50 font-semibold mb-2.5 leading-none">Petição Inicial</div>
-      <div className="space-y-2">
-        <div className="h-1.5 bg-white/15 rounded-full w-full" />
-        <div className="h-1.5 bg-white/10 rounded-full w-4/5" />
-        <div className="h-1.5 bg-white/15 rounded-full w-full" />
-        <div className="h-1.5 bg-indigo-400/35 rounded-full w-3/4" />
-        <div className="h-1.5 bg-white/10 rounded-full w-full" />
-        <div className="h-1.5 bg-white/12 rounded-full w-5/6" />
-      </div>
-      <div className="absolute bottom-3 right-3 w-8 h-8 rounded-full bg-indigo-600 flex items-center justify-center text-[11px] font-bold text-white">
-        A
-      </div>
-    </div>
-  );
-}
-
-function PreviewJudiCalc() {
-  const rows = [
-    ["7","8","9","×"],
-    ["4","5","6","−"],
-    ["1","2","3","+"],
-    ["0",".","","="],
-  ];
-  return (
-    <div className="w-full rounded-xl bg-[#071410] border border-emerald-900/40 p-3 overflow-hidden">
-      <div className="mb-3">
-        <div className="text-[9px] text-emerald-400/60 leading-none mb-1">Total</div>
-        <div className="text-[13px] font-bold text-emerald-400 leading-tight">R$ 125.430,87</div>
-      </div>
-      <div className="grid grid-cols-4 gap-0.5">
-        {rows.map((row, ri) =>
-          row.map((n, ci) => (
-            <div
-              key={`${ri}-${ci}`}
-              className={`text-center text-[10px] py-1 rounded leading-none ${
-                n === "=" ? "bg-emerald-600 text-white font-bold" : "bg-white/[0.06] text-white/55"
-              }`}
-            >
-              {n}
-            </div>
-          ))
-        )}
-      </div>
-    </div>
-  );
-}
-
-function PreviewJudiAudit() {
-  const items: [string, "green" | "amber"][] = [
-    ["Estrutura",     "green"],
-    ["Fundament.",    "amber"],
-    ["Jurisprudência","green"],
-    ["Pedidos",       "green"],
-  ];
-  return (
-    <div className="w-full rounded-xl bg-[#100a02] border border-amber-900/40 p-3 overflow-hidden">
-      <div className="flex items-start justify-between mb-0.5">
-        <div className="text-[9px] text-amber-400/60 uppercase tracking-wider leading-none">SCORE</div>
-        <div className="text-[26px] font-black text-amber-400 leading-none">97</div>
-      </div>
-      <div className="text-[9px] text-white/30 mb-3 leading-none">/100</div>
-      {items.map(([label, color]) => (
-        <div key={label} className="flex items-center gap-1.5 mb-1.5">
-          <div className={`w-1.5 h-1.5 rounded-full shrink-0 ${color === "green" ? "bg-green-400" : "bg-amber-400"}`} />
-          <div className="text-[10px] text-white/55 leading-none">{label}</div>
-        </div>
-      ))}
-    </div>
-  );
-}
-
-// ── Data ─────────────────────────────────────────────────────────────────────
-
-type Product = {
-  icon: React.ElementType;
-  name: string;
-  tagline: string;
-  features: string[];
-  iconBg: string;
-  checkColor: string;
-  Preview: () => React.ReactElement;
-};
-
-const PRODUCTS: Product[] = [
-  {
-    icon: Gavel,
-    name: "JudiCore",
-    tagline: "Geração Inteligente de Peças",
-    features: [
-      "Mais de 1 milhão de acórdãos",
-      "Fundamentação automática",
-      "Teses e jurisprudência aplicáveis",
-      "Peças personalizadas ao seu caso",
-    ],
-    iconBg: "bg-indigo-600",
-    checkColor: "text-indigo-400",
-    Preview: PreviewJudiCore,
-  },
-  {
-    icon: Calculator,
-    name: "JudiCalc",
-    tagline: "Automação Completa de Cálculos",
-    features: [
-      "Acesso via SOAP ao PJe",
-      "Cálculos automáticos precisos",
-      "Geração de memória e PDF",
-      "Assinatura com PJeOffice",
-      "Envio automático ao processo",
-    ],
-    iconBg: "bg-emerald-600",
-    checkColor: "text-emerald-400",
-    Preview: PreviewJudiCalc,
-  },
-  {
-    icon: ClipboardCheck,
-    name: "JudiAudit",
-    tagline: "Auditoria Inteligente de Peças",
-    features: [
-      "Score de qualidade (0–100)",
-      "Análise de estrutura e conteúdo",
-      "Fundamentação e jurisprudência",
-      "Detecta riscos e inconsistências",
-      "Sugestões de melhoria",
-    ],
-    iconBg: "bg-amber-600",
-    checkColor: "text-amber-400",
-    Preview: PreviewJudiAudit,
-  },
-];
-
-const STATS = [
-  { value: "1M+",  label: "acórdãos indexados" },
-  { value: "98%",  label: "precisão média"      },
-  { value: "−70%", label: "tempo economizado"   },
-];
-
-// ── Page ─────────────────────────────────────────────────────────────────────
-
 export default function LandingPage() {
   return (
-    <div className="min-h-screen bg-[#080c14] text-white flex flex-col selection:bg-indigo-500/30 overflow-x-hidden">
-
-      {/* ── Ambient glow ─────────────────────────────────────────────────── */}
-      <div className="pointer-events-none fixed inset-0 overflow-hidden" aria-hidden>
-        <div className="absolute -top-48 left-1/2 -translate-x-1/2 w-[900px] h-[600px] rounded-full bg-indigo-600/10 blur-3xl" />
-        <div className="absolute top-[40%] -left-48 w-[500px] h-[500px] rounded-full bg-violet-700/[0.07] blur-3xl" />
-        <div className="absolute top-[30%] -right-48 w-[450px] h-[450px] rounded-full bg-sky-600/[0.06] blur-3xl" />
-        <div
-          className="absolute inset-0 opacity-[0.025]"
-          style={{
-            backgroundImage:
-              "linear-gradient(rgba(255,255,255,0.3) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,0.3) 1px,transparent 1px)",
-            backgroundSize: "60px 60px",
+    <div className="min-h-screen bg-[#05050A] text-white flex flex-col overflow-x-hidden selection:bg-violet-500/30">
+      {/* Background Dinâmico e Motion */}
+      <div className="fixed inset-0 pointer-events-none z-0">
+        <div className="absolute inset-0 bg-[linear-gradient(to_right,#ffffff0a_1px,transparent_1px),linear-gradient(to_bottom,#ffffff0a_1px,transparent_1px)] bg-[size:32px_32px] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_100%)]" />
+        
+        {/* Glows com animação */}
+        <motion.div
+          animate={{
+            scale: [1, 1.2, 1],
+            opacity: [0.15, 0.3, 0.15],
+            rotate: [0, 90, 0],
           }}
+          transition={{ duration: 15, repeat: Infinity, ease: "linear" }}
+          className="absolute top-[-20%] left-[10%] w-[800px] h-[800px] rounded-full bg-violet-600/20 blur-[150px]"
+        />
+        <motion.div
+          animate={{
+            scale: [1, 1.3, 1],
+            opacity: [0.1, 0.25, 0.1],
+            rotate: [0, -90, 0],
+          }}
+          transition={{ duration: 20, repeat: Infinity, ease: "linear", delay: 2 }}
+          className="absolute bottom-[-10%] right-[10%] w-[600px] h-[600px] rounded-full bg-indigo-600/20 blur-[150px]"
         />
       </div>
 
-      {/* ── Header ───────────────────────────────────────────────────────── */}
-      <header className="relative z-20 w-full px-6 md:px-14 py-4 flex items-center justify-between border-b border-white/[0.05] bg-[#080c14]/80 backdrop-blur-xl">
+      {/* Navbar com Glassmorphism */}
+      <motion.nav
+        initial={{ y: -20, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        transition={{ duration: 0.6 }}
+        className="relative z-50 flex items-center justify-between px-6 md:px-12 py-5 border-b border-white/5 backdrop-blur-2xl bg-[#05050A]/60"
+      >
         <div className="flex items-center gap-4">
-          <Image src="/logo.png" alt="JudiCore" width={112} height={38} className="object-contain" />
-          <span className="hidden sm:inline text-xs text-white/35 border-l border-white/10 pl-4 tracking-wide font-light">
-            Suíte de Inteligência Jurídica
-          </span>
+          <Image src="/logo.png" alt="Judicore" width={110} height={110} className="rounded-xl drop-shadow-[0_0_15px_rgba(139,92,246,0.2)]" />
+          <div className="h-6 w-px bg-white/10 hidden sm:block" />
+          <span className="text-xs tracking-widest uppercase font-semibold text-white/40 hidden sm:inline">Suíte de Inteligência Jurídica</span>
         </div>
-        <nav className="flex items-center gap-5 text-sm text-white/45">
-          <Link href="/sobre"       className="hidden md:block hover:text-white/80 transition-colors">Sobre</Link>
-          <Link href="/privacidade" className="hidden md:block hover:text-white/80 transition-colors">Privacidade</Link>
-          <Link href="/termos"      className="hidden md:block hover:text-white/80 transition-colors">Termos</Link>
-          <a
-            href="/login"
-            className="px-4 py-1.5 rounded-full bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold transition-colors shadow-lg shadow-indigo-900/40"
+        <div className="flex items-center gap-8">
+          <Link href="/login" className="group relative px-6 py-2.5 rounded-full overflow-hidden bg-white/5 hover:bg-white/10 border border-white/10 hover:border-violet-500/50 transition-all">
+            <span className="relative z-10 text-sm font-medium text-white group-hover:text-violet-200 transition-colors">Entrar no Sistema</span>
+            <div className="absolute inset-0 bg-gradient-to-r from-violet-600/20 to-indigo-600/20 translate-y-full group-hover:translate-y-0 transition-transform duration-300 ease-out" />
+          </Link>
+        </div>
+      </motion.nav>
+
+      {/* Hero e Cards */}
+      {/* Ajustado o flex e padding para remover o excesso de espaço centralizado que afastava o hero */}
+      <main className="relative z-10 flex-1 flex flex-col items-center pt-20 md:pt-32 pb-20 px-6">
+        <div className="max-w-6xl w-full">
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, ease: "easeOut" }}
+            className="text-center mb-24"
           >
-            Entrar
-          </a>
-        </nav>
-      </header>
-
-      {/* ── Hero ─────────────────────────────────────────────────────────── */}
-      <main className="relative z-10 flex-1 flex flex-col items-center px-6 md:px-14 pt-6 pb-20">
-
-        {/* Hero row: texto esquerda + Themis direita */}
-        <div className="w-full max-w-5xl flex items-center gap-8 mb-0">
-
-          {/* Coluna esquerda */}
-          <div className="flex-1 flex flex-col items-start pb-12">
-
-            {/* Badge */}
-            <motion.div
-              initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4 }}
-              className="mb-7"
+            <motion.div 
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ delay: 0.2, duration: 0.5 }}
+              className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-violet-500/10 border border-violet-500/20 text-violet-300 text-xs font-semibold uppercase tracking-wider mb-8 backdrop-blur-md"
             >
-              <span className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-indigo-500/20 bg-indigo-500/[0.08] text-indigo-300 text-[11px] font-medium tracking-widest uppercase">
-                <Sparkles size={10} />
-                IA Jurídica Avançada
+              <Sparkles size={14} />
+              <span>IA Jurídica Avançada</span>
+            </motion.div>
+            
+            <h1 className="text-5xl md:text-7xl font-black tracking-tight mb-8 leading-[1.1] drop-shadow-2xl">
+              Suíte{" "}
+              <span className="relative inline-block">
+                <span className="bg-gradient-to-r from-violet-400 via-indigo-400 to-purple-400 bg-clip-text text-transparent">
+                  Judicore
+                </span>
+                <div className="absolute -inset-1 bg-gradient-to-r from-violet-600/20 to-purple-600/20 blur-xl -z-10" />
               </span>
+            </h1>
+            <p className="text-lg md:text-2xl text-white/60 max-w-2xl mx-auto font-light leading-relaxed">
+              Ferramentas inteligentes para operadores do direito. Escolha o módulo que deseja e deixe a IA te ajudar.
+            </p>
+          </motion.div>
+
+          <div className="grid md:grid-cols-2 gap-8">
+            {/* Card: Peças Jurídicas */}
+            <motion.div custom={0} variants={cardFade} initial="hidden" animate="visible">
+              <Link
+                href="/login"
+                className="group relative block h-full p-8 md:p-10 rounded-[2.5rem] border border-white/5 bg-white/[0.02] hover:bg-white/[0.04] backdrop-blur-xl overflow-hidden transition-all duration-500 hover:-translate-y-2"
+              >
+                {/* Efeito Glow Interno */}
+                <div className="absolute inset-0 bg-gradient-to-br from-violet-600/10 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                <div className="absolute -inset-px bg-gradient-to-b from-white/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 rounded-[2.5rem] pointer-events-none" />
+                
+                <div className="relative z-10 w-16 h-16 rounded-2xl bg-gradient-to-br from-violet-500/20 to-indigo-500/20 border border-violet-500/30 flex items-center justify-center mb-8 group-hover:scale-110 group-hover:rotate-3 transition-transform duration-500 shadow-[0_0_30px_-10px_rgba(139,92,246,0.4)]">
+                  <FileText size={28} className="text-violet-300" />
+                </div>
+                
+                <h2 className="relative z-10 text-3xl font-bold mb-4 tracking-tight group-hover:text-violet-200 transition-colors">Peças Jurídicas</h2>
+                <p className="relative z-10 text-white/50 mb-8 leading-relaxed text-lg">
+                  Geração de minutas com IA — despachos, decisões, sentenças e petições com base em jurisprudência real do STJ, STF e TRFs. Sem alucinação.
+                </p>
+                
+                <ul className="relative z-10 space-y-4 mb-10">
+                  {[
+                    "Busca semântica em > 1 milhão de acórdãos",
+                    "RAG com citações 100% auditáveis",
+                    "Export em DOCX com formatação ABNT",
+                  ].map((item) => (
+                    <li key={item} className="flex items-start gap-3 text-white/70 font-medium">
+                      <div className="mt-1 rounded-full p-1 bg-violet-500/20 text-violet-400 shadow-[0_0_10px_rgba(139,92,246,0.3)]">
+                        <CheckCircle size={14} />
+                      </div>
+                      <span>{item}</span>
+                    </li>
+                  ))}
+                </ul>
+                
+                <div className="relative z-10 flex items-center gap-2 text-violet-400 font-semibold text-lg group-hover:text-violet-300 transition-colors">
+                  Acessar Módulo
+                  <ArrowRight size={20} className="group-hover:translate-x-2 transition-transform duration-300" />
+                </div>
+              </Link>
             </motion.div>
 
-            {/* Headline */}
-            <motion.h1
-              initial={{ opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.55, delay: 0.06 }}
-              className="text-5xl md:text-6xl lg:text-[68px] font-bold leading-[1.07] tracking-tight max-w-xl mb-6"
-            >
-              <span className="text-white">Inteligência que</span>
-              <br />
-              <span className="bg-gradient-to-r from-indigo-400 via-sky-400 to-cyan-400 bg-clip-text text-transparent">
-                transforma o Direito.
-              </span>
-            </motion.h1>
-
-            {/* Subtext */}
-            <motion.p
-              initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, delay: 0.12 }}
-              className="text-white/45 text-[15px] md:text-base leading-relaxed max-w-md"
-            >
-              Gere peças, calcule valores e audite documentos com base na legislação e jurisprudência atualizada dos principais tribunais brasileiros.
-            </motion.p>
-          </div>
-
-          {/* Coluna direita: Themis */}
-          <motion.div
-            initial={{ opacity: 0, x: 24 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.7, delay: 0.08 }}
-            className="hidden md:block relative w-[480px] h-[640px] shrink-0"
-          >
-            <Image
-              src="/hero.png"
-              alt="Themis"
-              fill
-              sizes="400px"
-              className="object-contain object-bottom drop-shadow-2xl"
-              priority
-            />
-          </motion.div>
-        </div>
-
-        {/* Product cards */}
-        <div className="w-full max-w-5xl">
-          <div className="grid md:grid-cols-3 gap-5">
-            {PRODUCTS.map((p, idx) => (
-              <motion.div
-                key={p.name}
-                custom={idx * 0.08}
-                variants={fadeUp}
-                initial="hidden"
-                animate="visible"
-                className="flex flex-col rounded-2xl bg-white/[0.03] border border-white/[0.06] overflow-hidden"
+            {/* Card: Cálculos Judiciais */}
+            <motion.div custom={1} variants={cardFade} initial="hidden" animate="visible">
+              <a
+                href={JUDICALC_URL}
+                className="group relative block h-full p-8 md:p-10 rounded-[2.5rem] border border-white/5 bg-white/[0.02] hover:bg-white/[0.04] backdrop-blur-xl overflow-hidden transition-all duration-500 hover:-translate-y-2"
               >
-                {/* Body */}
-                <div className="flex-1 p-5">
-                  {/* Icon + name + tagline */}
-                  <div className="flex items-center gap-3 mb-5">
-                    <div className={`w-9 h-9 rounded-xl flex items-center justify-center shrink-0 ${p.iconBg}`}>
-                      <p.icon size={16} className="text-white" />
-                    </div>
-                    <div>
-                      <div className="text-[15px] font-bold text-white leading-tight">{p.name}</div>
-                      <div className="text-[10px] text-white/35 tracking-wide leading-tight mt-0.5">{p.tagline}</div>
-                    </div>
-                  </div>
-
-                  {/* Features + preview side-by-side */}
-                  <div className="flex gap-3">
-                    <ul className="flex-1 space-y-2.5">
-                      {p.features.map((f) => (
-                        <li key={f} className="flex items-start gap-1.5">
-                          <Check size={11} className={`mt-0.5 shrink-0 ${p.checkColor}`} />
-                          <span className="text-[11px] text-white/55 leading-tight">{f}</span>
-                        </li>
-                      ))}
-                    </ul>
-                    <div className="w-[140px] shrink-0">
-                      <p.Preview />
-                    </div>
-                  </div>
+                {/* Efeito Glow Interno */}
+                <div className="absolute inset-0 bg-gradient-to-br from-emerald-600/10 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                <div className="absolute -inset-px bg-gradient-to-b from-white/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 rounded-[2.5rem] pointer-events-none" />
+                
+                <div className="relative z-10 w-16 h-16 rounded-2xl bg-gradient-to-br from-emerald-500/20 to-teal-500/20 border border-emerald-500/30 flex items-center justify-center mb-8 group-hover:scale-110 group-hover:rotate-3 transition-transform duration-500 shadow-[0_0_30px_-10px_rgba(16,185,129,0.4)]">
+                  <Calculator size={28} className="text-emerald-300" />
                 </div>
-
-              </motion.div>
-            ))}
+                
+                <h2 className="relative z-10 text-3xl font-bold mb-4 tracking-tight group-hover:text-emerald-200 transition-colors">Cálculos Judiciais</h2>
+                <p className="relative z-10 text-white/50 mb-8 leading-relaxed text-lg">
+                  Cálculos previdenciários, trabalhistas e cíveis com índices oficiais do Banco Central — IPCA, SELIC, INPC, TR e demais correções.
+                </p>
+                
+                <ul className="relative z-10 space-y-4 mb-10">
+                  {[
+                    "Atualização automática via BCB",
+                    "Integração SOAP com PJe",
+                    "Exportação em PDF e Excel",
+                  ].map((item) => (
+                    <li key={item} className="flex items-start gap-3 text-white/70 font-medium">
+                      <div className="mt-1 rounded-full p-1 bg-emerald-500/20 text-emerald-400 shadow-[0_0_10px_rgba(16,185,129,0.3)]">
+                        <CheckCircle size={14} />
+                      </div>
+                      <span>{item}</span>
+                    </li>
+                  ))}
+                </ul>
+                
+                <div className="relative z-10 flex items-center gap-2 text-emerald-400 font-semibold text-lg group-hover:text-emerald-300 transition-colors">
+                  Acessar Módulo
+                  <ArrowRight size={20} className="group-hover:translate-x-2 transition-transform duration-300" />
+                </div>
+              </a>
+            </motion.div>
           </div>
         </div>
-
-        {/* Stats strip */}
-        <motion.div
-          initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.18, duration: 0.5 }}
-          className="w-full max-w-3xl flex flex-wrap justify-center gap-x-12 gap-y-5 pt-16 mt-16 border-t border-white/[0.06]"
-        >
-          {STATS.map((s) => (
-            <div key={s.label} className="flex flex-col items-center gap-1">
-              <span className="text-2xl font-bold text-white tracking-tight">{s.value}</span>
-              <span className="text-xs text-white/35 tracking-wide">{s.label}</span>
-            </div>
-          ))}
-        </motion.div>
-
       </main>
 
-      {/* ── Footer ───────────────────────────────────────────────────────── */}
-      <footer className="relative z-10 py-5 px-6 md:px-14 border-t border-white/[0.05] flex items-center justify-between">
-        <Image src="/logo.png" alt="JudiCore" width={80} height={26} className="object-contain opacity-20" />
-        <p className="text-[11px] text-white/20">© {new Date().getFullYear()} JudiCore. Todos os direitos reservados.</p>
+      {/* Footer Minimalista */}
+      <footer className="relative z-10 mt-auto py-8 px-6">
+        <div className="max-w-6xl mx-auto flex flex-col md:flex-row items-center justify-between gap-6 border-t border-white/5 pt-8">
+          <div className="flex items-center gap-3 opacity-60 hover:opacity-100 transition-opacity">
+            <Image src="/logo.png" alt="Judicore" width={60} height={60} className="rounded-lg grayscale hover:grayscale-0 transition-all" />
+            <span className="text-white text-sm font-semibold tracking-wide">Judicore</span>
+          </div>
+          <div className="flex gap-6 text-sm text-white/40">
+            <Link href="#" className="hover:text-white transition-colors">Privacidade</Link>
+            <Link href="#" className="hover:text-white transition-colors">Termos</Link>
+            <span>© {new Date().getFullYear()}</span>
+          </div>
+        </div>
       </footer>
-
     </div>
   );
 }
