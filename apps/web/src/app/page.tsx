@@ -270,9 +270,9 @@ export default function LandingPage() {
               className="flex flex-wrap items-center justify-center md:justify-start gap-3 mt-8 relative z-20"
             >
               {STATS.map((s) => (
-                <div key={s.label} className="flex items-center gap-2 px-4 py-2 rounded-full bg-white/[0.04] border border-white/[0.08] backdrop-blur-md shadow-[0_0_15px_rgba(255,255,255,0.03)]">
-                  <span className="text-base font-black text-white tracking-tight">{s.value}</span>
-                  <span className="text-[11px] text-white/50 tracking-wider uppercase font-semibold">{s.label}</span>
+                <div key={s.label} className="flex flex-col items-center justify-center gap-1 px-4 py-2.5 rounded-2xl bg-white/[0.04] border border-white/[0.08] backdrop-blur-md shadow-[0_0_15px_rgba(255,255,255,0.03)] text-center">
+                  <span className="text-xl font-black text-white tracking-tight leading-none">{s.value}</span>
+                  <span className="text-[10px] text-white/50 tracking-wider uppercase font-bold leading-none">{s.label}</span>
                 </div>
               ))}
             </motion.div>
