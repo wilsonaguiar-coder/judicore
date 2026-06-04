@@ -1,8 +1,4 @@
-// Tipos do Stance Check Engine — FASE 4.4.1
-//
-// Camada de validação lógica pré-geração: detecta contradições entre
-// a tese pretendida e as autoridades jurídicas encontradas (legislação,
-// jurisprudência, provas) ANTES da chamada ao modelo de linguagem.
+// Tipos do Stance Check Engine — FASE 4.4.1 / 4.4.2
 
 export enum StanceResult {
   SUPPORTED     = "SUPPORTED",     // legislação + jurisprudência amparam a tese
@@ -28,10 +24,16 @@ export interface StanceInput {
 export interface StanceAnalysis {
   result: StanceResult;
   confidence: number;               // 0.0 – 1.0
+
+  // Diagnóstico — "qual premissa destrói a tese, onde foi encontrada, por que bloqueio"
   reasons: string[];                // por que a classificação foi dada
   blockingIssues: string[];         // o que especificamente impede a geração
+  blockingPremise: string | null;   // nome canônico da premissa impeditiva (ex: "RPPS_PARIDADE_EC41")
+  blockingEvidence: string[];       // trechos exatos das autoridades que disparam o bloqueio
+
   supportingAuthorities: string[];  // excertos de autoridades favoráveis
   contraryAuthorities: string[];    // excertos de autoridades contrárias
+
   blockGeneration: boolean;         // true → abortar geração antes do GPT
   distinguishingFound: boolean;     // true → distinguishing válido encontrado no input
   subsidiaryThesisFound: boolean;   // true → há pedido subsidiário juridicamente viável

@@ -252,20 +252,21 @@ export function evaluateTrap(trap: TrapKind, result: CaseResult): TrapOutcome {
     // ── Stance Check Engine (FASE 4.4.1) ─────────────────────────────────────────
 
     case "STANCE_CONTRADICTION_RPPS": {
-      // DETECTED: validator disparou qualquer regra de contradição de postura ou evidence stance
       if (hasRule(
         "STANCE_CONTRADICTION_RPPS",
         "EVIDENCE_STANCE_VIOLATION",
         "STANCE_MISMATCH_PRE_GENERATION",
         "EVIDENCE_STANCE_MATRIX",
       )) return "DETECTED";
-      // MISSED: draft pleiteia paridade E reconhece EC 41 como impedimento E sem distinguishing
+      // MISSED: draft pleiteia paridade/integralidade AND reconhece EC 41/ingresso como impedimento
+      // AND não há distinguishing substantivo
       const pleadsParidade =
-        /\b(requer.{0,150}paridade|faz\s+jus\s+(?:à|a)\s+paridade|tem\s+direito\s+(?:à|a)\s+paridade|paridade\s+(?:deve\s+ser\s+)?(?:concedida?|reconhecida?))\b/i.test(draft);
+        /\b(paridade|integralidade\s+(?:dos\s+)?proventos?)\b/i.test(draft);
       const acknowledgesBar =
-        /\b(não\s+faz\s+jus\s+(?:à|a)\s+paridade|EC\s*41.{0,100}(afasta|veda|impede|não\s+garante)\b.{0,80}paridade|sem\s+paridade\s+pós[-\s]EC\s*41|RE\s*590[\.\s]*260)\b/i.test(draft);
-      const noDistinguishing = !/distinguishing|situação\s+fática\s+distinta|caso\s+concreto.{0,40}diferente|peculiaridade/i.test(draft);
-      if (pleadsParidade && acknowledgesBar && noDistinguishing) return "MISSED";
+        /não\s+faz\s+jus\s+(?:à|a)\s+(?:paridade|integralidade)|EC\s*41.{0,200}(?:afasta|veda|impede|suprime|não\s+(?:tem|garante|assegura)).{0,100}(?:paridade|integralidade)|sem\s+paridade\s+pós[-\s]EC\s*41|(?:paridade|integralidade).{0,120}(?:afastada?|vedada?|suprimida?)\s+(?:pela?|por\s+força\s+d[ae])\s+EC\s*41|RE\s*590[\s\.\,]*260|ingressou?.{0,120}após.{0,80}(?:EC\s*41|31\/12\/2003).{0,120}(?:paridade|integralidade).{0,80}(?:afastada?|não\s+devida?|vedada?)/i.test(draft);
+      const hasSubstantiveDistinguishing =
+        /distinguishing|o\s+presente\s+caso\s+(?:difere|apresenta\s+peculiaridade)|hipótese\s+dos\s+autos\s+(?:difere|é\s+distinta)\s+do\s+precedente|situação\s+fática\s+distinta\s+do\s+precedente|peculiaridade\s+(?:fática|concreta)\s*[:—]/i.test(draft);
+      if (pleadsParidade && acknowledgesBar && !hasSubstantiveDistinguishing) return "MISSED";
       return "AVOIDED";
     }
 
@@ -276,11 +277,12 @@ export function evaluateTrap(trap: TrapKind, result: CaseResult): TrapOutcome {
         "STANCE_MISMATCH_PRE_GENERATION",
       )) return "DETECTED";
       const pleadsBenefit =
-        /\b(requer.{0,150}(auxílio|benefício|aposentadoria|pensão)|faz\s+jus\s+ao?\s+(auxílio|benefício|aposentadoria))\b/i.test(draft);
+        /\b(?:requer|pleiteia?|pede|pugna|faz\s+jus\s+ao?|tem\s+direito\s+ao?).{0,200}\b(?:auxílio|benefício|aposentadoria|pensão\s+por\s+morte|salário[-\s]maternidade)\b|\b(?:auxílio|benefício|aposentadoria|pensão\s+por\s+morte)\b.{0,200}(?:deve\s+ser\s+(?:concedid[oa]|deferido)|requer(?:-se)?)/i.test(draft);
       const acknowledgesBar =
-        /\b(perdeu?\s+(?:a\s+)?qualidade\s+de\s+segurado|sem\s+qualidade\s+de\s+segurado|carência\s+insuficiente|não\s+cumpri[ou]\s+(?:a\s+)?carência|período\s+de\s+graça\s+expirado?)\b/i.test(draft);
-      const noDistinguishing = !/distinguishing|situação\s+fática\s+distinta|peculiaridade|hipótese.{0,40}distinta/i.test(draft);
-      if (pleadsBenefit && acknowledgesBar && noDistinguishing) return "MISSED";
+        /perdeu?\s+(?:a\s+)?qualidade\s+de\s+segurado|sem\s+qualidade\s+de\s+segurado|não\s+(?:mantinha|manteve)\s+(?:a\s+)?qualidade\s+de\s+segurado|período\s+de\s+graça.{0,80}(?:expirou|encerrou|findou|esgotou|venceu)|carência\s+(?:insuficiente|não\s+(?:cumprida|implementada|atingida))|não\s+cumpri[ou]\s+(?:a\s+)?carência|última\s+contribuição.{0,120}há\s+(?:mais\s+de\s+)?\d+\s+meses|sem\s+(?:recolhimento|contribuição)\s+(?:há|por)\s+(?:mais\s+de\s+)?\d+\s+(?:meses|anos)|ausência\s+de\s+recolhimentos?.{0,80}(?:por|há)\s+(?:mais\s+de\s+)?\d+\s+(?:meses|anos)/i.test(draft);
+      const hasSubstantiveDistinguishing =
+        /distinguishing|o\s+presente\s+caso\s+(?:difere|apresenta\s+peculiaridade)|hipótese\s+dos\s+autos\s+(?:difere|é\s+distinta)\s+do\s+precedente|situação\s+fática\s+distinta\s+do\s+precedente/i.test(draft);
+      if (pleadsBenefit && acknowledgesBar && !hasSubstantiveDistinguishing) return "MISSED";
       return "AVOIDED";
     }
 

@@ -251,11 +251,22 @@ export class LegalPipeline {
       ctx.stanceAnalysis = stanceResult;
       yield { event: "stance", data: stanceResult };
       if (stanceResult.blockGeneration) {
+        // Relatório diagnóstico detalhado (FASE 4.4.2)
+        const premissaLabel = stanceResult.blockingPremise
+          ? ` | Premissa: ${stanceResult.blockingPremise}`
+          : "";
+        const evidenciaTrechos = stanceResult.blockingEvidence.length > 0
+          ? ` | Evidência: ${stanceResult.blockingEvidence.slice(0, 2).join("; ")}`
+          : "";
         yield {
           event: "validation_errors",
           data: stanceResult.blockingIssues.map((issue) => ({
             rule: "STANCE_MISMATCH_PRE_GENERATION",
-            message: `[StanceAnalyzer] Contradição detectada antes da geração: ${issue}`,
+            message:
+              `[StanceAnalyzer] Geração bloqueada — contradição pré-geração detectada.\n` +
+              `Qual premissa destrói a tese: ${issue}${premissaLabel}.\n` +
+              `Onde foi encontrada${evidenciaTrechos}.\n` +
+              `Por que houve bloqueio: tese sustenta procedência mas autoridade dominante indica improcedência; sem distinguishing válido nem tese subsidiária.`,
             fatal: true,
           })),
         };
