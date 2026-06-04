@@ -249,6 +249,48 @@ export function evaluateTrap(trap: TrapKind, result: CaseResult): TrapOutcome {
       return "AVOIDED";
     }
 
+    // ── Recursos nos Juizados (FASE 4.4) ─────────────────────────────────────────
+
+    case "JEF_ENDERECAMENTO_ERRADO": {
+      if (hasRule("JEF_ENDERECAMENTO_ERRADO")) return "DETECTED";
+      if (result.documentType !== "RECURSO") return "AVOIDED";
+      const enderecoErrado =
+        /(?:excelentíssim[oa]|egrégi[oa])\s+(?:senhor[a]?\s+)?desembargador[a]?|tribunal\s+de\s+justiça\s+d[oe]|câmara\s+cível|tribunal\s+regional\s+federal/i.test(draft);
+      const enderecoCorreto = /turma\s+recursal/i.test(draft);
+      if (enderecoErrado && !enderecoCorreto) return "MISSED";
+      return "AVOIDED";
+    }
+
+    case "JEF_PRAZO_ERRADO": {
+      if (hasRule("JEF_PRAZO_ERRADO")) return "DETECTED";
+      if (result.documentType !== "RECURSO") return "AVOIDED";
+      const prazoCpc = /prazo\s+de\s+(?:quinze|15)\s*(?:\(quinze\)\s*)?dias|15\s+\(quinze\)\s+dias\s+(?:para\s+recorrer|recursais?)|art\.\s*1\.003\s+(?:do\s+)?cpc/i.test(draft);
+      const prazoCorreto = /(?:dez|10)\s+(?:\(dez\)\s+)?dias|art\.\s*42\s+(?:da\s+)?lei\s+9\.099|art\.\s*5[oº]\s+(?:da\s+)?lei\s+10\.259/i.test(draft);
+      if (prazoCpc && !prazoCorreto) return "MISSED";
+      return "AVOIDED";
+    }
+
+    case "JEF_PREPARO_ERRADO": {
+      if (hasRule("JEF_PREPARO_ERRADO")) return "DETECTED";
+      if (result.documentType !== "RECURSO") return "AVOIDED";
+      const mentionaPreparo = /preparo\s+recursal|recolhimento\s+do\s+preparo|custas\s+recursais?/i.test(draft);
+      if (!mentionaPreparo) return "AVOIDED";
+      const preparoCpc = /preparo\s+(?:nos\s+termos\s+d[oa]\s+art\.\s*1\.007|de\s+[123]%|calculado\s+sobre)|art\.\s*1\.007\s+(?:do\s+)?cpc/i.test(draft);
+      const preparoCorreto = /lei\s+9\.099|lei\s+10\.259|isento\s+de\s+preparo|dispensado\s+(?:do\s+)?preparo|gratuidade\s+(?:de\s+)?justiça/i.test(draft);
+      if (preparoCpc && !preparoCorreto) return "MISSED";
+      return "AVOIDED";
+    }
+
+    case "JEF_PEDIDO_INCOMPATIVEL": {
+      if (hasRule("JEF_PEDIDO_INCOMPATIVEL")) return "DETECTED";
+      if (result.documentType !== "RECURSO") return "AVOIDED";
+      const pedidoErrado =
+        /(?:remetam-se?|remeta-se)\s+os\s+autos\s+ao?\s+(?:tribunal(?!\s+recursal)|t[jrf])|conhecer\s+(?:e\s+dar\s+provimento\s+(?:à|a)\s+)?apela[cç][aã]o(?!\s+(?:inominada|voluntária))|receber\s+(?:o\s+recurso\s+)?como\s+apela[cç][aã]o|câmara\s+cível\s+(?:julgue|aprecie|conheça)/i.test(draft);
+      const pedidoCorreto = /turma\s+recursal|recurso\s+inominado\s+(?:seja\s+)?(?:conhecido|provido)|dar\s+provimento\s+ao\s+recurso(?!\s+de\s+apela[cç][aã]o)/i.test(draft);
+      if (pedidoErrado && !pedidoCorreto) return "MISSED";
+      return "AVOIDED";
+    }
+
     case "JEF_TUTELA_ARTIFICIAL": {
       if (hasRule("JEF_TUTELA_ARTIFICIAL")) return "DETECTED";
       const tutelaAto     = /defiro|concedo\s+(?:a\s+)?(?:tutela|liminar)|requeiro?\s+(?:a\s+)?tutela|pedido\s+de\s+tutela/i.test(draft);

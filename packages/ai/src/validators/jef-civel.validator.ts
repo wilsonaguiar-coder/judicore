@@ -17,6 +17,10 @@ function isJefFederal(draft: string): boolean {
   return /\b(lei\s+(?:n[°º\.]\s*)?10\.259|juizado\s+especial\s+federal|jef\s+federal|justi[cç]a\s+federal\s+especial|turma\s+recursal\s+federal)\b/i.test(draft);
 }
 
+/** Detecta que o draft é um recurso (inominado ou erroneamente nomeado) em contexto JEF. */
+const JEF_RECURSO_CONTEXT_RE =
+  /\b(recurso\s+inominado|interpõe?\s+(?:o\s+)?(?:presente\s+)?(?:recurso|apela[cç][aã]o)|apelante|recorrente|razões\s+(?:do|de|recursais)\s+(?:recurso|apela[cç][aã]o)|sentença\s+recorrida|decisão\s+recorrida|d[ae]\s+sentença\s+ora\s+recorrida|à?\s*turma\s+recursal|recorre\s+(?:de|da)\s+sentença|contrarrazões)\b/i;
+
 /** Retorna o limite de salários mínimos aplicável ao draft (40 estadual, 60 federal). */
 function smLimit(draft: string): number {
   return isJefFederal(draft) ? 60 : 40;
@@ -79,15 +83,23 @@ const FATAL_RULES: Array<{
   {
     rule: "JEF_RECURSO_ERRADO",
     description:
-      "Recurso de apelação utilizado em sede de Juizado Especial Cível — o recurso cabível é o " +
-      "recurso inominado (art. 41 Lei 9.099/95), não a apelação (art. 1.009 CPC).",
+      "Recurso inadequado utilizado em sede de Juizado Especial — o recurso cabível é o recurso inominado " +
+      "(art. 41 Lei 9.099/95; art. 5º Lei 10.259/01). Não são cabíveis: apelação (art. 1.009 CPC), " +
+      "agravo de instrumento, recurso ordinário nem recurso especial.",
     detect: (draft) => {
       if (!JEF_CONTEXT_RE.test(draft)) return false;
-      const temApelacao = /\bapela[cç][aã]o\b/i.test(draft) &&
-        !/recurso\s+inominado/i.test(draft);
-      // Só dispara em peças que realmente interpõem o recurso errado
-      const eRecurso = /apelante|razões\s+de\s+apela[cç][aã]o|interpõe\s+(?:a\s+presente\s+)?apela[cç][aã]o|recorre\s+por\s+meio\s+de\s+apela[cç][aã]o/i.test(draft);
-      return temApelacao && eRecurso;
+      // Apelação usada sem mencionar recurso inominado
+      const temApelacao = /\bapela[cç][aã]o\b/i.test(draft) && !/recurso\s+inominado/i.test(draft);
+      // Agravo de instrumento (não cabível no JEF exceto em casos específicos)
+      const temAgravo = /\bagravo\s+de\s+instrumento\b/i.test(draft);
+      // Recurso ordinário / especial (fora do microssistema)
+      const temRecursoFora = /\brecurso\s+(?:ordin[aá]rio|especial|extraordin[aá]rio)\b/i.test(draft);
+      const temRecursoErrado = temApelacao || temAgravo || temRecursoFora;
+      if (!temRecursoErrado) return false;
+      // Confirmar que é uma peça que efetivamente interpõe o recurso (não apenas menciona)
+      const eRecurso =
+        /apelante|razões\s+de\s+apela[cç][aã]o|interpõe?\s+(?:a\s+presente\s+)?apela[cç][aã]o|recorre\s+por\s+meio\s+de\s+apela[cç][aã]o|interpõe?\s+(?:o\s+presente\s+)?agravo|razões\s+d[eo]\s+agravo|interpõe?\s+(?:o\s+presente\s+)?recurso\s+(?:ordin[aá]rio|especial)/i.test(draft);
+      return eRecurso;
     },
   },
   {
@@ -210,6 +222,78 @@ const NON_FATAL_RULES: Array<{
       const temExplicacaoRecente =
         /apenas\s+(?:recentemente|agora|neste\s+mês)|fato\s+superveniente|nova\s+circunstância|nova\s+situação|recentemente\s+(?:agravou|deteriorou|piorou|se\s+agravou)|agravamento\s+recente|inesperadamente|de\s+forma\s+repentina|evento\s+recente|situação\s+(?:nova|recente)\s+(?:que|e)/i.test(draft);
       return !temExplicacaoRecente;
+    },
+  },
+
+  // ── Regras de Recursos nos Juizados (FASE 4.4) ───────────────────────────────
+
+  {
+    rule: "JEF_ENDERECAMENTO_ERRADO",
+    description:
+      "Recurso endereçado ao Tribunal de Justiça, Tribunal Regional Federal, Câmara Cível ou " +
+      "desembargadores em vez da Turma Recursal dos Juizados Especiais (art. 41 §1º Lei 9.099/95; " +
+      "art. 5º §2º Lei 10.259/01). O único órgão ad quem competente para recursos nos Juizados é " +
+      "a Turma Recursal — não o TJ/TRF.",
+    detect: (draft) => {
+      if (!JEF_CONTEXT_RE.test(draft)) return false;
+      if (!JEF_RECURSO_CONTEXT_RE.test(draft)) return false;
+      const enderecoErrado =
+        /(?:excelentíssim[oa]|egrégi[oa]|ilustríssim[oa])\s+(?:senhor[a]?\s+)?desembargador[a]?|tribunal\s+de\s+justiça\s+d[oe]|câmara\s+(?:cível|de\s+direito\s+(?:privado|público))|tribunal\s+regional\s+federal|desembargadores?\s+(?:federais?|estaduais?|integrantes)/i.test(draft);
+      const enderecoCorreto =
+        /turma\s+recursal\s+(?:dos|do|da|de)\s+(?:juizados?\s+especiais?\s+(?:c[íi]veis|federais?|estaduais?)|jef|jec)|turma\s+recursal\s+(?:cível|federal)/i.test(draft);
+      return enderecoErrado && !enderecoCorreto;
+    },
+  },
+  {
+    rule: "JEF_PRAZO_ERRADO",
+    description:
+      "Prazo recursal incorreto em recurso nos Juizados Especiais — o prazo do recurso inominado é " +
+      "de 10 (dez) dias (art. 42 Lei 9.099/95; art. 5º Lei 10.259/01), não 15 dias como na " +
+      "apelação comum do CPC (art. 1.003 §5º CPC).",
+    detect: (draft) => {
+      if (!JEF_CONTEXT_RE.test(draft)) return false;
+      if (!JEF_RECURSO_CONTEXT_RE.test(draft)) return false;
+      const prazoCpc =
+        /prazo\s+de\s+(?:quinze|15)\s*(?:\(quinze\)\s*)?dias|15\s+\(quinze\)\s+dias\s+(?:para\s+recorrer|recursais?|de\s+recurso)|prazo\s+(?:recursal|para\s+(?:recorrer|apelar))\s+(?:é\s+)?(?:de\s+)?(?:quinze|15)|art\.\s*1\.003\s+(?:§5[oº])?\s+(?:do\s+)?cpc/i.test(draft);
+      const prazoCorreto =
+        /(?:dez|10)\s+(?:\(dez\)\s+)?dias\s+(?:para\s+recorrer|de\s+(?:prazo|recurso))|prazo\s+de\s+(?:dez|10)\s+dias|art\.\s*42\s+(?:da\s+)?lei\s+9\.099|art\.\s*5[oº]\s+(?:da\s+)?lei\s+10\.259/i.test(draft);
+      return prazoCpc && !prazoCorreto;
+    },
+  },
+  {
+    rule: "JEF_PREPARO_ERRADO",
+    description:
+      "Preparo recursal calculado segundo as regras do CPC comum (art. 1.007 CPC) em recurso nos " +
+      "Juizados Especiais, sem observar o regramento específico do microssistema " +
+      "(Lei 9.099/95; Lei 10.259/01) nem mencionar gratuidade de justiça ou isenção quando aplicável.",
+    detect: (draft) => {
+      if (!JEF_CONTEXT_RE.test(draft)) return false;
+      if (!JEF_RECURSO_CONTEXT_RE.test(draft)) return false;
+      const mentionaPreparo =
+        /preparo\s+recursal|recolhimento\s+do\s+preparo|custas\s+recursais?|guia\s+de\s+recolhimento\s+(?:do\s+)?preparo/i.test(draft);
+      if (!mentionaPreparo) return false;
+      const preparoCpc =
+        /preparo\s+(?:nos\s+termos\s+d[oa]\s+art\.\s*1\.007|calculado\s+(?:sobre|a\s+razão\s+de)\s+[0-9]+%|de\s+[123]%\s+(?:do\s+valor|sobre))|art\.\s*1\.007\s+(?:do\s+)?cpc|tabela\s+(?:de\s+)?custas\s+do\s+(?:tj|tribunal\s+de\s+justiça)/i.test(draft);
+      const preparoCorreto =
+        /lei\s+9\.099|lei\s+10\.259|isento\s+de\s+preparo|dispensado\s+(?:do\s+)?preparo|gratuidade\s+(?:de\s+)?(?:justiça|judici[aá]ria)|benefici[aá]rio\s+(?:da\s+)?(?:assistência\s+)?judici[aá]ria\s+gratuita|regimento\s+(?:interno\s+)?(?:da\s+)?turma\s+recursal/i.test(draft);
+      return preparoCpc && !preparoCorreto;
+    },
+  },
+  {
+    rule: "JEF_PEDIDO_INCOMPATIVEL",
+    description:
+      "Pedido recursal incompatível com o microssistema dos Juizados Especiais — requer remessa ao " +
+      "TJ/TRF, recebimento como apelação comum ou julgamento por Câmara Cível, em vez de pedir " +
+      "que a Turma Recursal conheça e dê provimento ao recurso inominado " +
+      "(art. 41 Lei 9.099/95; art. 5º Lei 10.259/01).",
+    detect: (draft) => {
+      if (!JEF_CONTEXT_RE.test(draft)) return false;
+      if (!JEF_RECURSO_CONTEXT_RE.test(draft)) return false;
+      const pedidoErrado =
+        /(?:remetam-se?|remeta-se)\s+os\s+autos\s+ao?\s+(?:tribunal(?!\s+recursal)|t[jrf]|tribunal\s+de\s+justiça|tribunal\s+regional)|conhecer\s+(?:e\s+(?:dar|negar)\s+provimento\s+(?:à|a)\s+(?:a\s+)?)?apela[cç][aã]o(?!\s+(?:inominada|voluntária))|receber\s+(?:o\s+(?:presente\s+)?recurso\s+)?como\s+apela[cç][aã]o|câmara\s+cível\s+(?:julgue|aprecie|decida|conheça)|após\s+(?:as\s+)?contrarrazões?\s+(?:subam|subir)\s+ao\s+tribunal(?!\s+recursal)|distribuição\s+ao?\s+(?:livre|prevento)\s+(?:n[oa]\s+)?(?:tribunal|câmara)\s+(?!recursal)/i.test(draft);
+      const pedidoCorreto =
+        /turma\s+recursal|recurso\s+inominado\s+(?:seja\s+)?(?:conhecido|provido|improvido|recebido)|dar\s+provimento\s+ao\s+recurso(?!\s+de\s+apela[cç][aã]o)/i.test(draft);
+      return pedidoErrado && !pedidoCorreto;
     },
   },
 ];

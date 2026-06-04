@@ -415,8 +415,14 @@ export default function TestesPage() {
                 </optgroup>
                 <optgroup label="JEF Estadual / Federal — Competência (FASE 4.3)">
                   <option value="JEF_VALOR_EXCEDENTE">JEF_VALOR_EXCEDENTE — valor acima de 40 SM (estadual) ou 60 SM (federal) sem renúncia</option>
-                  <option value="JEF_RECURSO_ERRADO">JEF_RECURSO_ERRADO — apelação em vez de recurso inominado</option>
+                  <option value="JEF_RECURSO_ERRADO">JEF_RECURSO_ERRADO — apelação / agravo em vez de recurso inominado</option>
                   <option value="JEF_LEGITIMIDADE_PASSIVA">JEF_LEGITIMIDADE_PASSIVA — polo passivo errado</option>
+                </optgroup>
+                <optgroup label="JEF Estadual / Federal — Recursos (FASE 4.4)">
+                  <option value="JEF_ENDERECAMENTO_ERRADO">JEF_ENDERECAMENTO_ERRADO — recurso endereçado ao TJ/TRF em vez da Turma Recursal</option>
+                  <option value="JEF_PRAZO_ERRADO">JEF_PRAZO_ERRADO — prazo de 15 dias (CPC) em vez de 10 dias (Lei 9.099/95)</option>
+                  <option value="JEF_PREPARO_ERRADO">JEF_PREPARO_ERRADO — preparo calculado como apelação comum</option>
+                  <option value="JEF_PEDIDO_INCOMPATIVEL">JEF_PEDIDO_INCOMPATIVEL — pedido de remessa ao TJ/TRF ou recebimento como apelação</option>
                 </optgroup>
                 <optgroup label="Execução / Cumprimento">
                   <option value="EXCESSO_EXECUCAO_IGNORADO">EXCESSO_EXECUCAO_IGNORADO</option>

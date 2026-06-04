@@ -58,7 +58,12 @@ export type TrapKind =
   | "JEF_TUTELA_SEM_PERICULUM"         // tutela deferida sem periculum in mora
   | "JEF_TUTELA_SEM_FUMUS"             // tutela deferida sem fumus boni iuris / probabilidade do direito
   | "JEF_TUTELA_DESPROPORCIONAL"       // medida cautelar desproporcional ao direito tutelado (bloqueio total vs. valor pequeno)
-  | "JEF_TUTELA_ARTIFICIAL";           // urgência artificial — mora própria ou urgência fabricada (art. 300 CPC)
+  | "JEF_TUTELA_ARTIFICIAL"            // urgência artificial — mora própria ou urgência fabricada (art. 300 CPC)
+  // Traps específicas de Recursos nos Juizados Especiais (FASE 4.4)
+  | "JEF_ENDERECAMENTO_ERRADO"         // recurso endereçado ao TJ/TRF em vez da Turma Recursal
+  | "JEF_PRAZO_ERRADO"                 // prazo de 15 dias (CPC) em vez de 10 dias (art. 42 Lei 9.099/95)
+  | "JEF_PREPARO_ERRADO"               // preparo calculado como apelação comum — ignora microssistema JEF
+  | "JEF_PEDIDO_INCOMPATIVEL";         // pedido de remessa ao TJ/TRF ou recebimento como apelação comum
 
 export interface SyntheticCase {
   id: string;

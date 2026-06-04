@@ -647,6 +647,51 @@ function applyTrap(
         instruction: "ARMADILHA: Dirigir a ação contra empresa ou entidade ERRADA no polo passivo — por exemplo, acionar a administradora de cartão em vez do banco emissor, a transportadora em vez do e-commerce, ou a franqueada em vez da franqueadora — sem verificar corretamente a legitimidade passiva.",
         expectedRulesIfTrap: [],
       };
+    // ── Recursos nos Juizados (FASE 4.4) ─────────────────────────────────────────
+
+    case "JEF_ENDERECAMENTO_ERRADO": {
+      const isFederal = area === "JEF_FEDERAL";
+      const tribunal  = isFederal ? "Tribunal Regional Federal (TRF)" : "Tribunal de Justiça (TJ)";
+      const turmaErrada = isFederal ? "Câmara Federal" : "Câmara Cível";
+      const turmaCorreta = isFederal ? "Turma Recursal dos Juizados Especiais Federais" : "Turma Recursal dos Juizados Especiais Cíveis";
+      return {
+        description: base.description,
+        instruction: `ARMADILHA DE ENDEREÇAMENTO: Endereçar o recurso ao ${tribunal}, iniciando com "Excelentíssimo Senhor Desembargador" e designando o órgão julgador como "${turmaErrada}". NÃO mencionar a ${turmaCorreta}. Usar o endereçamento de apelação comum, com "Câmara" ou "desembargadores", como se o recurso saísse do sistema dos Juizados.`,
+        expectedRulesIfTrap: ["JEF_ENDERECAMENTO_ERRADO"],
+      };
+    }
+
+    case "JEF_PRAZO_ERRADO": {
+      const isFederal = area === "JEF_FEDERAL";
+      const artCorreto = isFederal ? "art. 5º Lei 10.259/01" : "art. 42 Lei 9.099/95";
+      return {
+        description: base.description,
+        instruction: `ARMADILHA DE PRAZO: Declarar na peça que o prazo para a interposição do recurso é de 15 (quinze) dias, citando o art. 1.003 §5º do CPC como fundamento. NÃO mencionar que o prazo correto para o recurso inominado nos Juizados Especiais é de 10 (dez) dias (${artCorreto}). Usar expressamente "15 (quinze) dias úteis" ao referir o prazo recursal.`,
+        expectedRulesIfTrap: ["JEF_PRAZO_ERRADO"],
+      };
+    }
+
+    case "JEF_PREPARO_ERRADO": {
+      const isFederal = area === "JEF_FEDERAL";
+      const lei = isFederal ? "Lei 10.259/01" : "Lei 9.099/95";
+      return {
+        description: base.description,
+        instruction: `ARMADILHA DE PREPARO: Tratar o preparo recursal como apelação comum do CPC — mencionar que o preparo corresponde a 2% do valor da causa (art. 1.007 CPC) e que deve ser recolhido na guia DARE/DAJE conforme tabela do Tribunal. NÃO referenciar a ${lei} nem mencionar gratuidade de justiça, isenção de preparo ou as regras específicas do microssistema dos Juizados.`,
+        expectedRulesIfTrap: ["JEF_PREPARO_ERRADO"],
+      };
+    }
+
+    case "JEF_PEDIDO_INCOMPATIVEL": {
+      const isFederal = area === "JEF_FEDERAL";
+      const tribunal  = isFederal ? "Tribunal Regional Federal" : "Tribunal de Justiça";
+      const turmaCorreta = isFederal ? "Turma Recursal dos Juizados Especiais Federais" : "Turma Recursal dos Juizados Especiais Cíveis";
+      return {
+        description: base.description,
+        instruction: `ARMADILHA DE PEDIDO RECURSAL: Formular pedido final para que "os autos sejam remetidos ao ${tribunal} para julgamento do presente recurso" e requerer que o recurso seja "recebido e processado como apelação". NÃO usar os pedidos típicos do microssistema (não mencionar a ${turmaCorreta} nem pedir que o recurso inominado seja conhecido e provido).`,
+        expectedRulesIfTrap: ["JEF_PEDIDO_INCOMPATIVEL"],
+      };
+    }
+
     case "JEF_TUTELA_SEM_PERICULUM":
       if (documentType === "DECISAO" || documentType === "SENTENCA") {
         return {
@@ -2725,6 +2770,122 @@ const tJefFederalMinhaCasa: ThemeBuilder = (i) => ({
   norma: "arts. 6º e 51 CDC; Lei 11.977/09 (MCMV); Súmula 294 STJ; art. 3º Lei 10.259/01",
 });
 
+// ── JEF Recursos (FASE 4.4) — temas compatibleTypes: ["RECURSO"] ─────────────
+
+// JEF_ESTADUAL — 5 temas de recurso inominado
+
+const tJefEstadualRecursoNegativacao: ThemeBuilder = (i) => ({
+  area: "JEF_ESTADUAL",
+  themeLabel: "Negativação indevida — recurso inominado — JEF Estadual",
+  autor: pick(NOMES, i),
+  reu: pick(JEF_LOJAS, i).nome,
+  comarca: pick(COMARCAS, i),
+  fatos: `${pick(NOMES, i)} (CPF ${cpf(i + 21000)}) ajuizou ação no Juizado Especial Cível (Lei 9.099/95) por negativação indevida — valor: ${brl(6000 + i * 300)} (abaixo de 40 salários mínimos). A sentença julgou ${pick(["improcedente o pedido de danos morais", "parcialmente procedente, fixando indenização inferior", "improcedente"], i)}. O recorrente interpõe recurso inominado (art. 42 Lei 9.099/95) para a Turma Recursal dos Juizados Especiais Cíveis. Prazo: 10 dias.`,
+  pedido: "reforma da sentença para reconhecer a negativação indevida e fixar indenização por danos morais",
+  norma: "arts. 186 e 927 CC/2002; art. 43 CDC; art. 42 Lei 9.099/95",
+});
+
+const tJefEstadualRecursoPix: ThemeBuilder = (i) => ({
+  area: "JEF_ESTADUAL",
+  themeLabel: "PIX fraudulento — recurso inominado — JEF Estadual",
+  autor: pick(NOMES, i + 1),
+  reu: pick(JEF_FINTECHS, i),
+  comarca: pick(COMARCAS, i + 1),
+  fatos: `${pick(NOMES, i + 1)} (CPF ${cpf(i + 21100)}) ajuizou ação no Juizado Especial Cível (Lei 9.099/95) contra ${pick(JEF_FINTECHS, i)} pelo estorno de PIX fraudulento de ${brl(3500 + i * 200)} e danos morais — valor total: ${brl(7000 + i * 300)} (abaixo de 40 salários mínimos). A sentença julgou ${pick(["improcedente o estorno", "procedente apenas materialmente, sem danos morais", "improcedente integralmente"], i)}. Recurso inominado (art. 42 Lei 9.099/95) para a Turma Recursal dos Juizados Especiais Cíveis. Prazo: 10 dias.`,
+  pedido: "reforma da sentença para condenar a instituição ao estorno integral e ao pagamento de danos morais",
+  norma: "arts. 14 e 22 CDC; Resolução BCB n. 93/2021 (MED); art. 42 Lei 9.099/95",
+});
+
+const tJefEstadualRecursoBloqueioConta: ThemeBuilder = (i) => ({
+  area: "JEF_ESTADUAL",
+  themeLabel: "Bloqueio indevido de conta — recurso inominado — JEF Estadual",
+  autor: pick(NOMES, i + 2),
+  reu: pick(JEF_BANCOS, i),
+  comarca: pick(COMARCAS, i + 2),
+  fatos: `${pick(NOMES, i + 2)} (CPF ${cpf(i + 21200)}) propôs ação no Juizado Especial Cível (Lei 9.099/95) por bloqueio indevido de conta — valor: ${brl(5000 + i * 200)} (abaixo de 40 salários mínimos). A sentença julgou ${pick(["improcedente por insuficiência de provas", "parcialmente procedente apenas pela devolução da tarifa", "improcedente"], i)}. Recurso inominado (art. 42 Lei 9.099/95) para a Turma Recursal dos Juizados Especiais Cíveis. Prazo: 10 dias.`,
+  pedido: "reforma da sentença para reconhecer o bloqueio indevido e condenar ao pagamento de danos morais",
+  norma: "arts. 14 e 43 CDC; art. 42 Lei 9.099/95",
+});
+
+const tJefEstadualRecursoCobrancaIndevida: ThemeBuilder = (i) => ({
+  area: "JEF_ESTADUAL",
+  themeLabel: "Cobrança indevida — recurso inominado — JEF Estadual",
+  autor: pick(NOMES, i + 3),
+  reu: pick(JEF_LOJAS, i + 1).nome,
+  comarca: pick(COMARCAS, i + 3),
+  fatos: `${pick(NOMES, i + 3)} (CPF ${cpf(i + 21300)}) ajuizou ação no Juizado Especial Cível (Lei 9.099/95) pela devolução em dobro de ${brl(1200 + i * 100)} cobrado indevidamente e danos morais — total: ${brl(5500 + i * 200)} (abaixo de 40 salários mínimos). A sentença julgou ${pick(["improcedente a devolução em dobro, apenas simples", "improcedente sem os danos morais", "improcedente integralmente"], i)}. Recurso inominado (art. 42 Lei 9.099/95) para a Turma Recursal dos Juizados Especiais Cíveis.`,
+  pedido: "reforma da sentença para reconhecer a devolução em dobro e os danos morais",
+  norma: "art. 42 parágrafo único CDC; arts. 186 e 927 CC/2002; art. 42 Lei 9.099/95",
+});
+
+const tJefEstadualRecursoFalhaServico: ThemeBuilder = (i) => ({
+  area: "JEF_ESTADUAL",
+  themeLabel: "Falha de serviço — recurso inominado — JEF Estadual",
+  autor: pick(NOMES, i + 4),
+  reu: pick(JEF_DISTRIBUIDORAS, i),
+  comarca: pick(COMARCAS, i + 4),
+  fatos: `${pick(NOMES, i + 4)} (CPF ${cpf(i + 21400)}) propôs ação no Juizado Especial Cível (Lei 9.099/95) por interrupção indevida de serviço por ${3 + i} dias — valor: ${brl(4000 + i * 300)} (abaixo de 40 salários mínimos). A sentença julgou ${pick(["improcedente por caso fortuito", "procedente parcialmente sem lucros cessantes", "improcedente"], i)}. Recurso inominado (art. 42 Lei 9.099/95) para a Turma Recursal dos Juizados Especiais Cíveis. Prazo: 10 dias.`,
+  pedido: "reforma da sentença para condenar ao pagamento de danos materiais e morais pela falha na prestação do serviço",
+  norma: "arts. 14 e 22 CDC; art. 42 Lei 9.099/95",
+});
+
+// JEF_FEDERAL — 5 temas de recurso inominado (INSS/União)
+
+const tJefFederalRecursoAuxilioDoenca: ThemeBuilder = (i) => ({
+  area: "JEF_FEDERAL",
+  themeLabel: "INSS — auxílio-doença — recurso inominado — JEF Federal",
+  autor: pick(NOMES, i + 5),
+  reu: "Instituto Nacional do Seguro Social — INSS",
+  comarca: pick(JEF_VARAS_FEDERAIS, i),
+  fatos: `${pick(NOMES, i + 5)} (CPF ${cpf(i + 21500)}) ajuizou ação no Juizado Especial Federal (Lei 10.259/01) para concessão de auxílio-doença. A sentença julgou ${pick(["improcedente, não reconhecendo a incapacidade", "improcedente por ausência de carência", "extinto por inadmissibilidade da prova"], i)}. O segurado interpõe recurso inominado (art. 5º Lei 10.259/01) para a Turma Recursal dos Juizados Especiais Federais. Prazo: 10 dias. Partes: segurado × INSS.`,
+  pedido: "reforma da sentença para concessão do auxílio-doença desde a data do requerimento",
+  norma: "art. 59 Lei 8.213/91; art. 5º Lei 10.259/01; Súmula 47 TNU",
+});
+
+const tJefFederalRecursoAposentadoriaInvalidez: ThemeBuilder = (i) => ({
+  area: "JEF_FEDERAL",
+  themeLabel: "INSS — aposentadoria por invalidez — recurso inominado — JEF Federal",
+  autor: pick(NOMES, i + 6),
+  reu: "Instituto Nacional do Seguro Social — INSS",
+  comarca: pick(JEF_VARAS_FEDERAIS, i + 1),
+  fatos: `${pick(NOMES, i + 6)} (CPF ${cpf(i + 21600)}) propôs ação no Juizado Especial Federal (Lei 10.259/01) pleiteando aposentadoria por invalidez. A sentença julgou ${pick(["improcedente, atestando capacidade residual", "improcedente por insuficiência de contribuições", "improcedente pela qualidade de segurado"], i)}. O recorrente interpõe recurso inominado (art. 5º Lei 10.259/01) para a Turma Recursal dos Juizados Especiais Federais. Prazo: 10 dias.`,
+  pedido: "reforma da sentença para concessão da aposentadoria por invalidez desde a data do requerimento",
+  norma: "art. 42 Lei 8.213/91; Súmula 47 TNU; art. 5º Lei 10.259/01",
+});
+
+const tJefFederalRecursoBpcLoas: ThemeBuilder = (i) => ({
+  area: "JEF_FEDERAL",
+  themeLabel: "INSS — BPC/LOAS — recurso inominado — JEF Federal",
+  autor: pick(NOMES, i + 7),
+  reu: "Instituto Nacional do Seguro Social — INSS",
+  comarca: pick(JEF_VARAS_FEDERAIS, i + 2),
+  fatos: `${pick(NOMES, i + 7)} (CPF ${cpf(i + 21700)}) ajuizou ação no Juizado Especial Federal (Lei 10.259/01) pleiteando BPC/LOAS. A sentença julgou ${pick(["improcedente por renda per capita acima do critério", "improcedente por não configurar deficiência grave", "improcedente por ausência de hipossuficiência"], i)}. O autor recorre para a Turma Recursal dos Juizados Especiais Federais via recurso inominado (art. 5º Lei 10.259/01). Prazo: 10 dias.`,
+  pedido: "reforma da sentença para concessão do BPC/LOAS desde a data do requerimento administrativo",
+  norma: "art. 20 Lei 8.742/93; Súmula 48 TNU; art. 5º Lei 10.259/01",
+});
+
+const tJefFederalRecursoRevisaoBeneficio: ThemeBuilder = (i) => ({
+  area: "JEF_FEDERAL",
+  themeLabel: "INSS — revisão de benefício — recurso inominado — JEF Federal",
+  autor: pick(NOMES, i + 8),
+  reu: "Instituto Nacional do Seguro Social — INSS",
+  comarca: pick(JEF_VARAS_FEDERAIS, i + 3),
+  fatos: `${pick(NOMES, i + 8)} (CPF ${cpf(i + 21800)}) pleiteou no Juizado Especial Federal (Lei 10.259/01) a revisão do salário-de-benefício para incluir ${pick(["maiores salários-de-contribuição", "período de atividade especial", "remuneração não considerada pelo INSS", "correção do período básico de cálculo"], i)}. A sentença julgou ${pick(["improcedente", "procedente apenas parcialmente", "improcedente por prescrição"], i)}. Recurso inominado (art. 5º Lei 10.259/01) para a Turma Recursal dos Juizados Especiais Federais. Prazo: 10 dias.`,
+  pedido: "reforma da sentença para revisão do benefício com inclusão dos valores contestados",
+  norma: "arts. 28 e 29 Lei 8.213/91; art. 5º Lei 10.259/01; Súmula 44 TNU",
+});
+
+const tJefFederalRecursoServidor: ThemeBuilder = (i) => ({
+  area: "JEF_FEDERAL",
+  themeLabel: "União — servidor federal — recurso inominado — JEF Federal",
+  autor: pick(NOMES, i + 9),
+  reu: "União Federal",
+  comarca: pick(JEF_VARAS_FEDERAIS, i + 4),
+  fatos: `${pick(NOMES, i + 9)} (CPF ${cpf(i + 21900)}) ajuizou ação no Juizado Especial Federal (Lei 10.259/01) contra a União Federal pleiteando ${pick(["diferenças remuneratórias de progressão funcional", "gratificação negada administrativamente", "ressarcimento de desconto indevido em remuneração", "reconhecimento de tempo de serviço para aposentadoria"], i)}. A sentença julgou ${pick(["improcedente", "improcedente por decadência do ato administrativo", "parcialmente procedente em valor inferior ao pleiteado"], i)}. Recurso inominado (art. 5º Lei 10.259/01) para a Turma Recursal dos Juizados Especiais Federais. Prazo: 10 dias.`,
+  pedido: "reforma da sentença para reconhecimento do direito e condenação da União ao pagamento",
+  norma: "Lei 8.112/90; art. 5º Lei 10.259/01",
+});
+
 // ── Casos de teste — JEF_VALOR_EXCEDENTE — valores fixos ─────────────────────
 // Rodar SEM --trap para testar detecção natural pelo validator.
 // SM usado: R$ 1.412 (consistente com jef-civel.validator).
@@ -2870,6 +3031,22 @@ THEMES.push(
   { id: "jef_federal_seguro_especial",          build: tJefFederalSeguroEspecial },
   { id: "jef_federal_auxilio_acidente",         build: tJefFederalAuxilioAcidente },
   { id: "jef_federal_minha_casa",               build: tJefFederalMinhaCasa },
+);
+
+// JEF Recursos (FASE 4.4) — compatibleTypes: ["RECURSO"]
+// Lote: --area=JEF_ESTADUAL --count=20 --trap=JEF_RECURSO_ERRADO
+//       --area=JEF_FEDERAL  --count=20 --trap=JEF_ENDERECAMENTO_ERRADO
+THEMES.push(
+  { id: "jef_estadual_recurso_negativacao",    build: tJefEstadualRecursoNegativacao,   compatibleTypes: ["RECURSO"] },
+  { id: "jef_estadual_recurso_pix",            build: tJefEstadualRecursoPix,            compatibleTypes: ["RECURSO"] },
+  { id: "jef_estadual_recurso_bloqueio_conta", build: tJefEstadualRecursoBloqueioConta,  compatibleTypes: ["RECURSO"] },
+  { id: "jef_estadual_recurso_cobranca",       build: tJefEstadualRecursoCobrancaIndevida, compatibleTypes: ["RECURSO"] },
+  { id: "jef_estadual_recurso_falha_servico",  build: tJefEstadualRecursoFalhaServico,   compatibleTypes: ["RECURSO"] },
+  { id: "jef_federal_recurso_auxilio_doenca",  build: tJefFederalRecursoAuxilioDoenca,   compatibleTypes: ["RECURSO"] },
+  { id: "jef_federal_recurso_aposent_invalid", build: tJefFederalRecursoAposentadoriaInvalidez, compatibleTypes: ["RECURSO"] },
+  { id: "jef_federal_recurso_bpc_loas",        build: tJefFederalRecursoBpcLoas,         compatibleTypes: ["RECURSO"] },
+  { id: "jef_federal_recurso_revisao",         build: tJefFederalRecursoRevisaoBeneficio, compatibleTypes: ["RECURSO"] },
+  { id: "jef_federal_recurso_servidor",        build: tJefFederalRecursoServidor,         compatibleTypes: ["RECURSO"] },
 );
 
 // Casos de teste JEF_VALOR_EXCEDENTE — valores fixos para validação do detector

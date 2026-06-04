@@ -108,6 +108,11 @@ function decideTrap(slotIndex: number, area: LegalArea, phase: Phase | "DESPACHO
       "JEF_TUTELA_SEM_FUMUS",
       "JEF_TUTELA_DESPROPORCIONAL",
       "JEF_TUTELA_ARTIFICIAL",
+      // FASE 4.4 — Recursos
+      "JEF_ENDERECAMENTO_ERRADO",
+      "JEF_PRAZO_ERRADO",
+      "JEF_PREPARO_ERRADO",
+      "JEF_PEDIDO_INCOMPATIVEL",
     ];
     kind = jefTrapTable[cycleIdx % jefTrapTable.length]!;
     // Recurso errado só faz sentido em RECURSO
