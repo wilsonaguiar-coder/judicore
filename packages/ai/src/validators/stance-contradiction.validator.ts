@@ -80,7 +80,34 @@ const CONTRADICTION_SPECS: ContradictionSpec[] = [
       "sem\\s+paridade\\s+pós[-\\s]EC\\s*41" +
       "|" +
       // 7: ingresso posterior à EC 41 como fato impeditivo
-      "ingresso[\\s\\S]{0,80}(?:após|posterior|depois)[\\s\\S]{0,80}(?:EC\\s*41|vigência\\s+da\\s+emenda)[\\s\\S]{0,80}(?:não\\s+(?:faz\\s+jus|tem\\s+direito|h[aá]\\s+direito)|paridade[\\s\\S]{0,40}(?:afastada?|vedada?|não\\s+cabível))",
+      "ingresso[\\s\\S]{0,80}(?:após|posterior|depois)[\\s\\S]{0,80}(?:EC\\s*41|vigência\\s+da\\s+emenda)[\\s\\S]{0,80}(?:não\\s+(?:faz\\s+jus|tem\\s+direito|h[aá]\\s+direito)|paridade[\\s\\S]{0,40}(?:afastada?|vedada?|não\\s+cabível))" +
+      "|" +
+      // 8: afasta a paridade/integralidade (verbo — EC 41, STF ou doutrina como sujeito)
+      "(?:EC\\s*41|emenda\\s+constitucional\\s+41|STF|Supremo\\s+Tribunal\\s+Federal|jurisprud[êe]ncia|doutrina|orienta[cç][aã]o)[\\s\\S]{0,150}afasta\\s+a?\\s*(?:paridade|integralidade)" +
+      "|" +
+      "afasta\\s+a?\\s*(?:paridade|integralidade)\\s+(?:para\\s+servidores?|dos\\s+servidores?|para\\s+os\\s+dependentes?)" +
+      "|" +
+      // 9: STF firmou / tem entendimento contrário/oposto
+      "(?:STF|Supremo\\s+Tribunal\\s+Federal)[\\s\\S]{0,200}(?:firmou|tem|possui|firmando|consolidou)\\s+entendimento\\s+(?:em\\s+sentido\\s+)?(?:contrário|oposto)" +
+      "|" +
+      "entendimento\\s+(?:consolidado|firmado|pac[íi]fico|dominante)[\\s\\S]{0,80}(?:em\\s+sentido\\s+(?:contrário|oposto)|contrário\\s+(?:à|a)\\s+pretens[ãa]o|oposto\\s+(?:à|a)\\s+pretens[ãa]o)" +
+      "|" +
+      // 10: não obstante o entendimento do STF / não obstante a EC 41/2003
+      "não\\s+obstante[\\s\\S]{0,80}entendimento[\\s\\S]{0,80}(?:STF|Supremo)" +
+      "|" +
+      "não\\s+obstante\\s+a\\s+EC\\s*41" +
+      "|" +
+      // 11: precedente contrário / pretensão incompatível / paridade afastada pela EC 41
+      "precedente\\s+contrário\\s+(?:à|a)\\s+pretens[ãa]o" +
+      "|" +
+      "pretens[ãa]o\\s+incompatível\\s+com\\s+a?\\s*EC\\s*41" +
+      "|" +
+      "(?:paridade|integralidade)\\s+afastada\\s+pela\\s+EC\\s*41" +
+      "|" +
+      // 12: sentido oposto à pretensão (sem mencionar STF explicitamente)
+      "entendimento\\s+(?:em\\s+sentido\\s+)?oposto\\s+(?:à|a)\\s+pretens[ãa]o" +
+      "|" +
+      "firmado\\s+entendimento\\s+(?:em\\s+sentido\\s+)?(?:contrário|oposto)",
       "i",
     ),
   },
