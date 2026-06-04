@@ -17,7 +17,17 @@ export class DomainRichnessAnalyzer {
     const isSentenca = tipoPeca === "SENTENCA";
     const { dimensions, bannedExpressionsFound } = scoreDomainProfile(profile, draft, isSentenca);
     const total = Math.min(100, dimensions.reduce((s, d) => s + d.score, 0));
-    return { profile, total, dimensions, bannedExpressionsFound };
+
+    // Score normalizado: desconta dimensão jur quando score=0, evitando penalização
+    // por característica ausente em determinados ritos (execução, JEF, RPPS sem precedentes).
+    const jurDim = dimensions.find((d) => d.key === "jurisprudencia");
+    const missedJur = jurDim && jurDim.score === 0 ? jurDim.max : 0;
+    const practicalMax = 100 - missedJur;
+    const normalizedScore = missedJur > 0
+      ? Math.min(100, Math.round((total / practicalMax) * 100))
+      : total;
+
+    return { profile, total, normalizedScore, dimensions, bannedExpressionsFound };
   }
 
   private selectProfile(

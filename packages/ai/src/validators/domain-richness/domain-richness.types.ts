@@ -17,6 +17,8 @@ export interface DomainDimension {
 export interface DomainScoreDetail {
   profile: DomainProfile;
   total: number;
+  /** Score sem penalização por ausência de jurisprudência (FASE 4.6.1). */
+  normalizedScore: number;
   dimensions: DomainDimension[];
   bannedExpressionsFound: string[];
 }

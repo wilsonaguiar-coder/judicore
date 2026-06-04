@@ -57,11 +57,15 @@ export class RichnessValidator {
         .join(" | ");
 
       const profileLabel = score.profile !== "CIVEL_GERAL" ? ` [perfil: ${score.profile}]` : "";
+      const normalizedPart = score.normalizedScore > score.total
+        ? ` normalizado: ${score.normalizedScore}/100 (sem penalização por ausência de jur.)`
+        : "";
 
       errors.push({
         rule: "FINAL_DRAFT_WEAK_ARGUMENTATION",
         message:
-          `Score de riqueza argumentativa: ${score.total}/100 (mínimo: ${RichnessValidator.MIN_SCORE})${profileLabel}. ` +
+          `Score de riqueza argumentativa: ${score.total}/100 (mínimo: ${RichnessValidator.MIN_SCORE})${profileLabel}.` +
+          (normalizedPart ? ` ${normalizedPart}.` : "") + " " +
           `Detalhamento: ${breakdown}. ` +
           (score.bannedExpressionsFound.length > 0
             ? `Expressões genéricas: ${score.bannedExpressionsFound.map((e) => `"${e}"`).join(", ")}.`

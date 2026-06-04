@@ -55,7 +55,6 @@ function countNormasGeral(draft: string): number {
   return arts.size + laws.size;
 }
 
-// tiered4: 4 tiers — 25%, 50%, 75%, 100%
 function tiered4(n: number, t1: number, t2: number, t3: number, t4: number, max: number): number {
   return n >= t4 ? max :
     n >= t3 ? Math.round(max * 0.75) :
@@ -63,7 +62,6 @@ function tiered4(n: number, t1: number, t2: number, t3: number, t4: number, max:
     n >= t1 ? Math.round(max * 0.25) : 0;
 }
 
-// tiered3: 3 tiers — 25%, 60%, 100%
 function tiered3(n: number, t1: number, t2: number, t3: number, max: number): number {
   return n >= t3 ? max :
     n >= t2 ? Math.round(max * 0.6) :
@@ -89,55 +87,74 @@ function objecoesDim(draft: string, max: number): DomainDimension {
 }
 
 // ── EXECUCAO_CUMPRIMENTO ──────────────────────────────────────────────────────
-// Execuções citam poucos arts/jur mas exigem estratégia executiva sólida.
-// Pesos: medidas(30) + estrategia(20) + estrutura(20) > normas(15) + jur(5) + objeções(10)
+// FASE 4.6.1 — tiers recalibrados para medidas e estratégia.
+// Peças executivas tecnicamente corretas devem marcar 80+ sem depender de jur.
+// Medidas (30): 1→15 | 2→22 | 3→27 | 4+→30
+// Estratégia (20): 1→8 | 2→14 | 3→18 | 4+→20
 
 function scoreExecucao(draft: string): DomainDimension[] {
-  // Normas (15) — arts. do CPC execução + lei processual
+  // Normas (15) — arts. de execução do CPC + lei processual
   const n = countNormasGeral(draft);
   const normasScore = tiered4(n, 1, 2, 4, 6, 15);
 
-  // Jurisprudência (5) — requisito mínimo para execução
+  // Jurisprudência (5) — requisito mínimo; não penaliza ausência
   const jc = jurCount(draft);
   const jurScore = jc >= 2 ? 5 : jc >= 1 ? 3 : 0;
 
   // Estrutura (20)
   const estr = sectionDim(draft, 20);
 
-  // Medidas executivas (30) — SISBAJUD, RENAJUD, penhora, bloqueio, expropriação...
+  // Medidas executivas (30) — FASE 4.6.1: tiers generosos + padrões expandidos
+  // Valoriza: SISBAJUD, RENAJUD, INFOJUD, CNIB, penhora, expropriação,
+  // art. 523/524/835/854, multa, impugnação, excesso de execução, honorários
   const medidas = [
     /SISBAJUD/i,
     /RENAJUD/i,
     /INFOJUD/i,
     /BacenJud/i,
-    /penhora\s+(?:de\s+)?(?:valores?|dinheiro|ativos?|online|créditos?)/i,
-    /bloqueio\s+(?:de\s+)?(?:valores?|ativos?|conta)/i,
+    /\bCNIB\b/i,
+    /\bpenhora\b/i,
+    /bloqueio\s+(?:de\s+)?(?:valores?|ativos?|conta)|bloqueio\s+eletr[oô]nico/i,
     /expropia[cç][aã]o/i,
     /grada[cç][aã]o\s+(?:de\s+)?bens\s+pen[uh]or[aá]veis|art\.?\s*835\s+(?:do\s+)?CPC/i,
     /arresto/i,
-    /sequestro\s+(?:de\s+)?(?:valores?|bens?)/i,
     /hasta\s+p[úu]blica|leil[ãa]o\s+(?:judicial|eletr[oô]nico)/i,
     /adjudica[cç][aã]o/i,
+    /art\.?\s*523\s+(?:do\s+)?CPC|multa\s+(?:de\s+)?10\s*%\s+(?:do\s+)?d[eé]bito/i,
+    /art\.?\s*524\s+(?:do\s+)?CPC|demonstrativo\s+(?:do\s+)?d[eé]bito/i,
+    /art\.?\s*854\s+(?:do\s+)?CPC|penhora\s+(?:de\s+ativos\s+)?online/i,
+    /impugna[cç][aã]o\s+(?:ao\s+)?cumprimento/i,
+    /excesso\s+de\s+execu[cç][aã]o/i,
+    /honor[aá]rios\s+(?:advocat[íi]cios\s+)?da\s+(?:fase\s+de\s+)?execu[cç][aã]o/i,
   ];
   const medidasCount = medidas.filter((re) => re.test(draft)).length;
-  const medidasScore = tiered4(medidasCount, 1, 2, 3, 5, 30);
+  // Tiers customizados: 2 medidas relevantes já pontuam 22/30
+  const medidasScore =
+    medidasCount >= 4 ? 30 :
+    medidasCount >= 3 ? 27 :
+    medidasCount >= 2 ? 22 :
+    medidasCount >= 1 ? 15 : 0;
 
-  // Estratégia processual (20) — cálculos, prazo, impugnação, certidão...
+  // Estratégia processual (20) — FASE 4.6.1: tiers mais generosos
   const estrategia = [
     /intimação\s+(?:do\s+)?(?:executado|devedor|réu)/i,
     /prazo\s+de\s+(?:15|quinze)\s+dias?\s+(?:úteis?\s+)?(?:para|a\s+contar)/i,
-    /impugna[cç][aã]o\s+(?:ao\s+)?cumprimento\s+de\s+senten[cç]a/i,
-    /exce[cç][aã]o\s+de\s+pré[-\s]executividade/i,
-    /certid[aã]o\s+de\s+d[íi]vida\s+ativa|CDA/i,
+    /certid[aã]o\s+de\s+d[íi]vida\s+ativa|CDA\b/i,
     /t[íi]tulo\s+executivo\s+(?:judicial|extrajudicial)/i,
-    /multa\s+(?:do\s+)?art\.?\s*523|multa\s+de\s+10\s*%/i,
     /juros\s+de\s+mora|corre[cç][aã]o\s+monet[aá]ria/i,
     /mem[oó]ria\s+de\s+c[áa]lculo|planilha\s+de\s+(?:cálculo|débito)/i,
     /liquida[cç][aã]o\s+de\s+senten[cç]a|cálculo\s+de\s+liquida[cç][aã]o/i,
-    /cit[ae][çc][aã]o\s+(?:do\s+)?executado|citação\s+(?:do\s+)?réu\s+(?:para\s+pagar)/i,
+    /cita[cç][aã]o\s+(?:do\s+)?executado|citar\s+o\s+(?:executado|réu)/i,
+    /exce[cç][aã]o\s+de\s+pré[-\s]executividade/i,
+    /pagamento\s+voluntário|pagamento\s+em\s+(?:15|quinze)\s+dias/i,
   ];
   const estrategiaCount = estrategia.filter((re) => re.test(draft)).length;
-  const estrategiaScore = tiered4(estrategiaCount, 1, 2, 3, 5, 20);
+  // Tiers customizados: 3 estratégias já garantem 18/20
+  const estrategiaScore =
+    estrategiaCount >= 4 ? 20 :
+    estrategiaCount >= 3 ? 18 :
+    estrategiaCount >= 2 ? 14 :
+    estrategiaCount >= 1 ? 8 : 0;
 
   return [
     { key: "normas", label: "Normas Processuais", score: normasScore, max: 15 },
@@ -150,15 +167,18 @@ function scoreExecucao(draft: string): DomainDimension[] {
 }
 
 // ── RPPS ──────────────────────────────────────────────────────────────────────
-// Regime próprio: jurisprudência STF + argumentação constitucional são primários.
+// FASE 4.6.1 — peso jurisprudência 25→15, argumentação constitucional 20→30.
+// RPPS é predominantemente constitucional: EC + paridade + transição compensam
+// ausência de múltiplos precedentes.
+// ArgConst tiers: n=1→8 | n=2→16 | n=3→22 | n=4→27 | n=5+→30
 
 function scoreRpps(draft: string): DomainDimension[] {
   // Normas (25) — Emendas constitucionais + art. 40 CF
   const emendas = [
-    /\bEC\s+20(?:\/\d+)?|emenda\s+constitucional\s+(?:n[.°º]?\s*)?20\b/i,
-    /\bEC\s+41(?:\/\d+)?|emenda\s+constitucional\s+(?:n[.°º]?\s*)?41\b/i,
-    /\bEC\s+47(?:\/\d+)?|emenda\s+constitucional\s+(?:n[.°º]?\s*)?47\b/i,
-    /\bEC\s+70(?:\/\d+)?|emenda\s+constitucional\s+(?:n[.°º]?\s*)?70\b/i,
+    /\bEC\s+20(?:\/\d+)?|\bemenda\s+constitucional\s+(?:n[.°º]?\s*)?20\b/i,
+    /\bEC\s+41(?:\/\d+)?|\bemenda\s+constitucional\s+(?:n[.°º]?\s*)?41\b/i,
+    /\bEC\s+47(?:\/\d+)?|\bemenda\s+constitucional\s+(?:n[.°º]?\s*)?47\b/i,
+    /\bEC\s+70(?:\/\d+)?|\bemenda\s+constitucional\s+(?:n[.°º]?\s*)?70\b/i,
     /art\.?\s*40\s+(?:da\s+)?(?:CF|Constitui[cç][aã]o)/i,
     /art\.?\s*6[oº°]\s+(?:da\s+)?EC\s+41/i,
     /regime\s+pr[oó]prio\s+de\s+previd[eê]ncia/i,
@@ -167,42 +187,54 @@ function scoreRpps(draft: string): DomainDimension[] {
   const emendaCount = emendas.filter((re) => re.test(draft)).length;
   const normasScore = tiered4(emendaCount, 1, 2, 4, 6, 25);
 
-  // Jurisprudência STF (25)
+  // Jurisprudência STF (15) — FASE 4.6.1: peso reduzido de 25 → 15
   const jc = jurCount(draft);
-  const jurScore = tiered3(jc, 1, 2, 3, 25);
+  const jurScore = jc >= 3 ? 15 : jc >= 2 ? 10 : jc >= 1 ? 5 : 0;
 
   // Estrutura (15)
   const estr = sectionDim(draft, 15);
 
-  // Argumentação constitucional (20) — paridade, integralidade, transição, direito adquirido
+  // Argumentação constitucional (30) — FASE 4.6.1: peso ampliado de 20 → 30
+  // Detecta: EC refs (overlap intencional com normas), paridade standalone,
+  // integralidade standalone, transição, direito adquirido, isonomia, ingresso.
+  // A sobreposição com normas é INTENCIONAL — citar EC 41 É um argumento constitucional.
   const args = [
-    /paridade\s+(?:remuneratória|de\s+vencimentos|com\s+ativos?)/i,
-    /integralidade\s+(?:dos?\s+proventos?|remuneratória)/i,
-    /revis[aã]o\s+geral\s+anual/i,
+    /\bparidade\b/i,
+    /\bintegralidade\b/i,
     /regra\s+de\s+transi[cç][aã]o/i,
+    /\bEC\s+41(?:\/\d+)?|\bemenda\s+constitucional\s+(?:n[.°º]?\s*)?41\b/i,
+    /\bEC\s+47(?:\/\d+)?|\bemenda\s+constitucional\s+(?:n[.°º]?\s*)?47\b/i,
+    /\bEC\s+70(?:\/\d+)?|\bemenda\s+constitucional\s+(?:n[.°º]?\s*)?70\b/i,
+    /art\.?\s*40\s+(?:da\s+)?(?:CF|Constitui[cç][aã]o)/i,
     /art\.?\s*6[oº°]\s+(?:da\s+)?EC\s+41/i,
-    /EC\s+70\/2012/i,
-    /ingresso\s+(?:no\s+servi[cç]o|antes|anterior)\s+(?:à\s+EC|da\s+EC|da\s+Emenda)/i,
     /direito\s+adquirido/i,
     /ato\s+jur[íi]dico\s+perfeito/i,
-    /irredutibilidade\s+de\s+vencimentos/i,
-    /isonomia\s+remuneratória/i,
-    /equipara[cç][aã]o\s+de\s+vencimentos/i,
+    /irredutibilidade/i,
+    /isonomia/i,
+    /ingresso\s+(?:antes|anterior)\s+(?:da|à)\s+(?:EC|Emenda|reforma)/i,
+    /proventos?\s+(?:de|da)\s+aposentadoria/i,
   ];
   const argCount = args.filter((re) => re.test(draft)).length;
-  const argScore = tiered4(argCount, 1, 3, 5, 8, 20);
+  // Tiers customizados: 4 argumentos constitucionais → 27/30 (90%)
+  const argScore =
+    argCount >= 5 ? 30 :
+    argCount >= 4 ? 27 :
+    argCount >= 3 ? 22 :
+    argCount >= 2 ? 16 :
+    argCount >= 1 ? 8 : 0;
 
   return [
     { key: "normas", label: "Normas Constitucionais", score: normasScore, max: 25 },
-    { key: "jurisprudencia", label: "Jurisprudência STF", score: jurScore, max: 25 },
+    { key: "jurisprudencia", label: "Jurisprudência STF", score: jurScore, max: 15 },
     { ...estr },
-    { key: "argumentacao_constitucional", label: "Argumentação Constitucional", score: argScore, max: 20 },
+    { key: "argumentacao_constitucional", label: "Argumentação Constitucional", score: argScore, max: 30 },
     { ...objecoesDim(draft, 15) },
   ];
 }
 
 // ── RGPS ──────────────────────────────────────────────────────────────────────
-// Previdência social: requisitos do benefício são o núcleo da análise.
+// FASE 4.6.1 — tiers de jurisprudência suavizados (0 courts → 4 pts, não 0).
+// Requisitos previdenciários robustos devem compensar ausência de precedentes.
 
 function scoreRgps(draft: string): DomainDimension[] {
   // Normas (25) — Lei 8.213, Decreto 3.048, art. 201 CF
@@ -222,14 +254,20 @@ function scoreRgps(draft: string): DomainDimension[] {
   );
   const normasScore = tiered4(specificCount + artCount, 1, 3, 5, 8, 25);
 
-  // Jurisprudência STJ/TNU (20)
+  // Jurisprudência STJ/TNU (20) — FASE 4.6.1: tiers suavizados
+  // jc=0 → 4 pts (pontuação base para não punir ausência de citação direta)
   const jc = jurCount(draft);
-  const jurScore = tiered3(jc, 1, 2, 3, 20);
+  const jurScore =
+    jc >= 3 ? 20 :
+    jc >= 2 ? 14 :
+    jc >= 1 ? 9 :
+    4;  // baseline — requisitos sólidos compensam ausência de jur
 
   // Estrutura (15)
   const estr = sectionDim(draft, 15);
 
-  // Requisitos previdenciários (25) — qualidade de segurado, carência, incapacidade, CNIS, DER...
+  // Requisitos previdenciários (25) — FASE 4.6.1: tiers mais generosos
+  // reqCount=5 → 21/25 (84%) para premiar cobertura sólida
   const requisitos = [
     /qualidade\s+de\s+segurado/i,
     /per[íi]odo\s+de\s+gra[cç]a/i,
@@ -244,7 +282,13 @@ function scoreRgps(draft: string): DomainDimension[] {
     /tempo\s+de\s+contribui[cç][aã]o/i,
     /segurado\s+especial/i,
   ];
-  const reqScore = tiered4(requisitos.filter((re) => re.test(draft)).length, 1, 3, 5, 8, 25);
+  const reqCount = requisitos.filter((re) => re.test(draft)).length;
+  // Tiers customizados: cobertura de 5 requisitos já atinge 84% do máximo
+  const reqScore =
+    reqCount >= 7 ? 25 :
+    reqCount >= 5 ? 21 :
+    reqCount >= 3 ? 15 :
+    reqCount >= 1 ? 7 : 0;
 
   return [
     { key: "normas", label: "Normas Previdenciárias", score: normasScore, max: 25 },
@@ -259,7 +303,6 @@ function scoreRgps(draft: string): DomainDimension[] {
 // Juizados estaduais: rito dos juizados + tutela e competência são primários.
 
 function scoreJefEstadual(draft: string): DomainDimension[] {
-  // Normas (15) — Lei 9.099/95
   const jefNorms = [
     /lei\s+(?:n[.°º]?\s*)?9\.099/i,
     /lei\s+dos?\s+juizados?\s+especiais?\s+(?:cíveis?\s+e\s+)?criminais?/i,
@@ -270,14 +313,11 @@ function scoreJefEstadual(draft: string): DomainDimension[] {
   const normCount = jefNorms.filter((re) => re.test(draft)).length;
   const normasScore = normCount >= 3 ? 15 : normCount >= 2 ? 10 : normCount >= 1 ? 5 : 0;
 
-  // Jurisprudência TNU/Turma Recursal (10)
   const jc = jurCount(draft);
   const jurScore = jc >= 2 ? 10 : jc >= 1 ? 5 : 0;
 
-  // Estrutura (15)
   const estr = sectionDim(draft, 15);
 
-  // Rito dos Juizados (35) — recurso inominado, competência, SM, informalismo
   const rito = [
     /recurso\s+inominado/i,
     /[Tt]urma\s+[Rr]ecursal/i,
@@ -294,7 +334,6 @@ function scoreJefEstadual(draft: string): DomainDimension[] {
   ];
   const ritoScore = tiered4(rito.filter((re) => re.test(draft)).length, 1, 3, 6, 9, 35);
 
-  // Tutela e Competência (25)
   const tutela = [
     /tutela\s+de\s+urg[eê]ncia|tutela\s+antecipada/i,
     /tutela\s+cautelar/i,
@@ -320,7 +359,6 @@ function scoreJefEstadual(draft: string): DomainDimension[] {
 // Juizados federais: direito material federal (INSS/União/CEF) é primário.
 
 function scoreJefFederal(draft: string): DomainDimension[] {
-  // Normas (15) — Lei 10.259/01
   const jefFedNorms = [
     /lei\s+(?:n[.°º]?\s*)?10\.259/i,
     /art\.?\s*3[oº°]?\s+(?:da\s+)?lei\s+(?:n[.°º]?\s*)?10\.259/i,
@@ -331,14 +369,11 @@ function scoreJefFederal(draft: string): DomainDimension[] {
   const normCount = jefFedNorms.filter((re) => re.test(draft)).length;
   const normasScore = normCount >= 3 ? 15 : normCount >= 2 ? 10 : normCount >= 1 ? 5 : 0;
 
-  // Jurisprudência TNU/TRF (10)
   const jc = jurCount(draft);
   const jurScore = jc >= 2 ? 10 : jc >= 1 ? 5 : 0;
 
-  // Estrutura (15)
   const estr = sectionDim(draft, 15);
 
-  // Rito dos Juizados Federais (25)
   const rito = [
     /recurso\s+inominado/i,
     /[Tt]urma\s+[Rr]ecursal\s+[Ff]ederal/i,
@@ -350,7 +385,6 @@ function scoreJefFederal(draft: string): DomainDimension[] {
   ];
   const ritoScore = tiered4(rito.filter((re) => re.test(draft)).length, 1, 2, 4, 6, 25);
 
-  // Direito Material Federal (35) — INSS, União, benefícios previdenciários
   const material = [
     /\bINSS\b/i,
     /Uni[aã]o\s+Federal/i,
@@ -382,7 +416,6 @@ function scoreJefFederal(draft: string): DomainDimension[] {
 // Direito do consumidor: CDC e responsabilidade objetiva são o núcleo.
 
 function scoreConsumidor(draft: string): DomainDimension[] {
-  // Normas (20) — CDC, LGPD, CF
   const cdcNorms = [
     /\bCDC\b/i,
     /lei\s+(?:n[.°º]?\s*)?8\.078/i,
@@ -397,14 +430,11 @@ function scoreConsumidor(draft: string): DomainDimension[] {
   );
   const normasScore = tiered4(cdcNormCount + artCount, 1, 2, 4, 7, 20);
 
-  // Jurisprudência STJ/TJ (20)
   const jc = jurCount(draft);
   const jurScore = tiered3(jc, 1, 2, 3, 20);
 
-  // Estrutura (15)
   const estr = sectionDim(draft, 15);
 
-  // Princípios CDC (30) — responsabilidade objetiva, dano moral, inversão ônus...
   const cdcPrincipios = [
     /responsabilidade\s+objetiva/i,
     /dano\s+moral/i,
@@ -435,7 +465,6 @@ function scoreConsumidor(draft: string): DomainDimension[] {
 // ── CIVEL_GERAL — modelo atual ─────────────────────────────────────────────────
 
 function scoreCivelGeral(draft: string, isSentenca?: boolean): DomainDimension[] {
-  // Variedade normativa (30)
   const normCount = countNormasGeral(draft);
   const normasScore =
     normCount >= 8 ? 30 :
@@ -443,7 +472,6 @@ function scoreCivelGeral(draft: string, isSentenca?: boolean): DomainDimension[]
     normCount >= 3 ? Math.round(30 * 0.5) :
     normCount >= 1 ? Math.round(30 * 0.17) : 0;
 
-  // Estrutura de seções (25)
   const secCount = countSections(draft);
   const secScore =
     secCount >= 6 ? 25 :
@@ -451,17 +479,14 @@ function scoreCivelGeral(draft: string, isSentenca?: boolean): DomainDimension[]
     secCount >= 2 ? Math.round(25 * 0.4) :
     secCount >= 1 ? Math.round(25 * 0.2) : 0;
 
-  // Variedade jurisprudencial (20)
   const jc = jurCount(draft);
   const jurScore =
     jc >= 3 ? 20 :
     jc >= 2 ? Math.round(20 * 0.6) :
     jc >= 1 ? Math.round(20 * 0.25) : 0;
 
-  // Objeções (15)
   const objScore = OBJECTION_HANDLING_RE.test(draft) ? 15 : 0;
 
-  // Ausência de expressões genéricas (10)
   const lower = draft.toLowerCase();
   const fundamentacaoStart = isSentenca
     ? (() => {
