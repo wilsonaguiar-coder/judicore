@@ -6,6 +6,7 @@ import { LegalAuditService } from "./auditor.js";
 import { LegalValidator } from "./validator.js";
 import { EvidenceAnalyzerService } from "./evidence-analyzer.js";
 import { FinalValidator, MatrixQualityValidator, StanceConsistencyValidator, resolveDocumentStatus } from "../validators/index.js";
+import { AuditReportEngine } from "../audit-report/audit-report.engine.js";
 import { StanceAnalyzer } from "../stance/stance-analyzer.js";
 import type { FinalValidationResult } from "../validators/index.js";
 import type {
@@ -156,6 +157,7 @@ export class LegalPipeline {
   private evidenceAnalyzer = new EvidenceAnalyzerService();
   private stanceConsistency = new StanceConsistencyValidator();
   private stanceAnalyzer    = new StanceAnalyzer();
+  private auditReport       = new AuditReportEngine();
 
   async *run(
     input: PipelineInput,
@@ -423,6 +425,24 @@ export class LegalPipeline {
       yield { event: "error", data: { message: String(err), phase: "auditing", fatal: false } };
       yield { event: "done", data: { generationId, aprovada: false, blocked: true, mode, status: "REPROVADA" } };
       return;
+    }
+
+    // ── Audit Report Engine — consolida todos os validators em relatório visual ─
+    try {
+      const report = this.auditReport.generate(
+        ctx.draft!,
+        finalResult!,
+        ctx.classification!,
+        ctx.extraction!,
+        ctx.matrix!,
+        ctx.audit!,
+        ctx.jurisprudencias,
+        ctx.evidenceAnalysis ?? [],
+        ctx.stanceAnalysis,
+      );
+      yield { event: "audit-report", data: report };
+    } catch {
+      // Não-fatal: relatório de auditoria é opcional
     }
 
     yield {

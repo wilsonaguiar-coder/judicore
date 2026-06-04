@@ -6,3 +6,5 @@ export type { PipelineInput, PipelineEvent, LegalClassification, LegalExtraction
 export { FinalValidator, resolveDocumentStatus, StructuralValidator, LegalRulesValidator, AppealValidator, JurisprudenceValidator, GenericityValidator, MatrixQualityValidator, RichnessValidator, EvidenceStanceValidator, SentencaValidator, CriminalSentenceValidator } from "./validators/index.js";
 export type { FinalValidationResult } from "./validators/index.js";
 export type { DocumentStatus } from "./pipeline/types.js";
+export { AuditReportEngine } from "./audit-report/audit-report.engine.js";
+export type { AuditReport, AuditClassificacao, AuditItem, FundamentacaoJuridicaItem, QualidadeScore, ConsistenciaArgumentativa, QualidadeArgumentativa } from "./audit-report/audit-report.types.js";

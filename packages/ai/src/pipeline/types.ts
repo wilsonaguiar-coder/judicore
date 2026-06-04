@@ -173,7 +173,8 @@ export type PipelineEvent =
   | { event: "evidence"; data: EvidenceAnalysis[] }
   | { event: "stance"; data: import("../stance/stance-types.js").StanceAnalysis }
   | { event: "error"; data: { message: string; phase: string; fatal: boolean } }
-  | { event: "validation_errors"; data: ValidationError[] };
+  | { event: "validation_errors"; data: ValidationError[] }
+  | { event: "audit-report"; data: import("../audit-report/audit-report.types.js").AuditReport };
 
 export interface ServiceUsage {
   inputTokens: number;
