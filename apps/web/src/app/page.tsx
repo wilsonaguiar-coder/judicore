@@ -173,43 +173,55 @@ const STATS = [
 
 export default function LandingPage() {
   return (
-    <div className="min-h-screen bg-[#050505] text-white flex flex-col selection:bg-indigo-500/30 overflow-x-hidden relative">
+    <div className="min-h-screen bg-[#030014] text-white flex flex-col selection:bg-indigo-500/30 overflow-x-hidden relative">
       
       {/* ── Background Animations ────────────────────────────────────────── */}
       <div className="pointer-events-none fixed inset-0 overflow-hidden" aria-hidden>
-        {/* Animated Radial Gradients */}
+        {/* Animated Radial Gradients (Floating Orbs) */}
         <motion.div 
-          animate={{ scale: [1, 1.1, 1], opacity: [0.15, 0.2, 0.15] }}
-          transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
-          className="absolute -top-48 left-1/2 -translate-x-1/2 w-[900px] h-[600px] rounded-full bg-indigo-600/20 blur-[120px]" 
+          animate={{ 
+            x: [0, 80, -80, 0],
+            y: [0, -80, 80, 0],
+            scale: [1, 1.2, 1],
+            opacity: [0.3, 0.5, 0.3] 
+          }}
+          transition={{ duration: 15, repeat: Infinity, ease: "linear" }}
+          className="absolute -top-48 -left-48 w-[600px] h-[600px] rounded-full bg-indigo-600/30 blur-[150px]" 
         />
         <motion.div 
-          animate={{ scale: [1, 1.2, 1], opacity: [0.1, 0.15, 0.1] }}
-          transition={{ duration: 10, repeat: Infinity, ease: "easeInOut", delay: 1 }}
-          className="absolute top-[40%] -left-48 w-[500px] h-[500px] rounded-full bg-violet-700/10 blur-[100px]" 
+          animate={{ 
+            x: [0, -100, 100, 0],
+            y: [0, 80, -80, 0],
+            scale: [1, 1.3, 1],
+            opacity: [0.3, 0.4, 0.3] 
+          }}
+          transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
+          className="absolute top-[20%] -right-48 w-[700px] h-[700px] rounded-full bg-fuchsia-600/20 blur-[150px]" 
         />
         <motion.div 
-          animate={{ scale: [1, 1.15, 1], opacity: [0.1, 0.15, 0.1] }}
-          transition={{ duration: 9, repeat: Infinity, ease: "easeInOut", delay: 2 }}
-          className="absolute top-[30%] -right-48 w-[450px] h-[450px] rounded-full bg-sky-600/10 blur-[100px]" 
+          animate={{ 
+            x: [0, 120, -120, 0],
+            y: [0, 60, -60, 0],
+            scale: [1, 1.1, 1],
+            opacity: [0.3, 0.5, 0.3] 
+          }}
+          transition={{ duration: 25, repeat: Infinity, ease: "linear" }}
+          className="absolute -bottom-48 left-[20%] w-[800px] h-[800px] rounded-full bg-cyan-600/20 blur-[150px]" 
         />
         
         {/* Modern Grid Background */}
-        <div className="absolute inset-0 bg-[linear-gradient(to_right,#4f4f4f2e_1px,transparent_1px),linear-gradient(to_bottom,#4f4f4f2e_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_100%)] opacity-30" />
+        <div className="absolute inset-0 bg-[linear-gradient(to_right,#ffffff0a_1px,transparent_1px),linear-gradient(to_bottom,#ffffff0a_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_80%_60%_at_50%_40%,#000_70%,transparent_100%)]" />
       </div>
 
       {/* ── Header ───────────────────────────────────────────────────────── */}
-      <header className="relative z-20 w-full px-6 md:px-14 py-4 flex items-center justify-between border-b border-white/[0.05] bg-[#050505]/70 backdrop-blur-xl">
-        <div className="flex items-center gap-4">
-          <Image src="/logo.png" alt="JudiCore" width={112} height={38} className="object-contain" />
+      <header className="relative z-20 w-full px-6 md:px-14 py-4 flex items-center justify-between border-b border-white/[0.05] bg-[#030014]/50 backdrop-blur-xl">
+        <div className="flex items-center gap-4 hover:opacity-80 transition-opacity">
+          <Image src="/logo.png" alt="Judicore" width={112} height={38} className="object-contain" priority />
           <span className="hidden sm:inline text-xs text-white/35 border-l border-white/10 pl-4 tracking-wide font-light">
-            Suíte de Inteligência Jurídica
+            SUÍTE DE INTELIGÊNCIA JURÍDICA
           </span>
         </div>
-        <nav className="flex items-center gap-5 text-sm text-white/45">
-          <Link href="/sobre"       className="hidden md:block hover:text-white/80 transition-colors">Sobre</Link>
-          <Link href="/privacidade" className="hidden md:block hover:text-white/80 transition-colors">Privacidade</Link>
-          <Link href="/termos"      className="hidden md:block hover:text-white/80 transition-colors">Termos</Link>
+        <nav className="flex items-center gap-5 text-sm text-white/50 font-medium">
           <a
             href="/login"
             className="px-5 py-2 rounded-full bg-white text-black hover:bg-gray-200 text-xs font-bold transition-all shadow-[0_0_20px_rgba(255,255,255,0.15)] hover:scale-105"
@@ -220,127 +232,118 @@ export default function LandingPage() {
       </header>
 
       {/* ── Hero ─────────────────────────────────────────────────────────── */}
-      <main className="relative z-10 flex-1 flex flex-col items-center px-6 md:px-14 pt-6 pb-20">
-
-        {/* Hero row: texto esquerda + Themis direita */}
-        <div className="w-full max-w-5xl flex flex-col md:flex-row items-center gap-8 mb-0">
-
-          {/* Coluna esquerda */}
-          <div className="flex-1 flex flex-col items-start pb-12 z-10 mt-12 md:mt-0">
-
-            {/* Badge */}
-            <motion.div
-              initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4 }}
-              className="mb-7"
+      <main className="relative z-10 flex-1 flex flex-col items-center justify-start px-6 md:px-14 pt-16 md:pt-24 pb-20">
+        <div className="w-full max-w-5xl flex flex-col items-center">
+          
+          <motion.div 
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6 }}
+            className="text-center mb-24"
+          >
+            <motion.div 
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ delay: 0.2, duration: 0.5 }}
+              className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-violet-500/10 border border-violet-500/20 text-violet-300 text-xs font-semibold uppercase tracking-wider mb-8 backdrop-blur-md shadow-[0_0_15px_rgba(139,92,246,0.3)]"
             >
-              <span className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-indigo-500/20 bg-indigo-500/[0.08] text-indigo-300 text-[11px] font-medium tracking-widest uppercase shadow-[0_0_15px_rgba(99,102,241,0.2)]">
-                <Sparkles size={10} className="animate-pulse" />
-                IA Jurídica Avançada
+              <Sparkles size={14} className="animate-pulse" />
+              <span>IA Jurídica Avançada</span>
+            </motion.div>
+            
+            <h1 className="text-5xl md:text-7xl font-black tracking-tight mb-8 leading-[1.1] drop-shadow-2xl">
+              Suíte{" "}
+              <span className="relative inline-block">
+                <span className="bg-gradient-to-r from-violet-400 via-indigo-400 to-purple-400 bg-clip-text text-transparent">
+                  Judicore
+                </span>
+                <div className="absolute -inset-1 bg-gradient-to-r from-violet-600/30 to-purple-600/30 blur-2xl -z-10 opacity-70" />
               </span>
+            </h1>
+            <p className="text-lg md:text-2xl text-white/60 max-w-2xl mx-auto font-light leading-relaxed">
+              Ferramentas inteligentes para operadores do direito. Escolha o módulo que deseja e deixe a IA te ajudar.
+            </p>
+          </motion.div>
+
+          <div className="w-full max-w-6xl mt-4 relative">
+            
+            {/* Imagem da Themis Absoluta no Background (Removida do Grid) */}
+            <motion.div
+              initial={{ opacity: 0, x: 24 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.7, delay: 0.08 }}
+              className="hidden lg:block absolute -top-[450px] right-0 w-[550px] h-[750px] pointer-events-none -z-10 opacity-80"
+            >
+              <Image
+                src="/hero.png"
+                alt="Themis"
+                fill
+                sizes="550px"
+                className="object-contain object-bottom drop-shadow-[0_0_50px_rgba(139,92,246,0.4)] filter contrast-[1.15] brightness-90"
+                priority
+              />
             </motion.div>
 
-            {/* Headline */}
-            <motion.h1
-              initial={{ opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.55, delay: 0.06 }}
-              className="text-5xl md:text-6xl lg:text-[68px] font-black leading-[1.07] tracking-tight max-w-xl mb-6 drop-shadow-2xl"
-            >
-              <span className="text-white">Inteligência que</span>
-              <br />
-              <span className="relative inline-block mt-2">
-                <span className="bg-gradient-to-r from-indigo-400 via-sky-400 to-cyan-400 bg-clip-text text-transparent">
-                  transforma o Direito.
-                </span>
-                <div className="absolute -inset-1 bg-gradient-to-r from-indigo-600/30 to-cyan-600/30 blur-2xl -z-10 opacity-70" />
-              </span>
-            </motion.h1>
+            <div className="grid md:grid-cols-3 gap-6 relative z-10">
+              {PRODUCTS.map((p, idx) => {
+                // Determina as cores do hover baseadas no card
+                const colorClasses = {
+                  indigo: "from-indigo-600/20 hover:shadow-indigo-500/30 group-hover:border-indigo-500/40",
+                  emerald: "from-emerald-600/20 hover:shadow-emerald-500/30 group-hover:border-emerald-500/40",
+                  amber: "from-amber-600/20 hover:shadow-amber-500/30 group-hover:border-amber-500/40",
+                }[p.colorName];
 
-            {/* Subtext */}
-            <motion.p
-              initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, delay: 0.12 }}
-              className="text-white/60 text-[16px] md:text-lg leading-relaxed max-w-md font-light"
-            >
-              Gere peças, calcule valores e audite documentos com base na legislação e jurisprudência atualizada dos principais tribunais brasileiros.
-            </motion.p>
-          </div>
-
-          {/* Coluna direita: Themis */}
-          <motion.div
-            initial={{ opacity: 0, x: 24 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.7, delay: 0.08 }}
-            className="relative w-[320px] h-[450px] md:w-[480px] md:h-[640px] shrink-0"
-          >
-            <Image
-              src="/hero.png"
-              alt="Themis"
-              fill
-              sizes="(max-width: 768px) 320px, 480px"
-              className="object-contain object-bottom drop-shadow-[0_0_40px_rgba(99,102,241,0.3)] filter contrast-125"
-              priority
-            />
-          </motion.div>
-        </div>
-
-        {/* Product cards */}
-        <div className="w-full max-w-6xl mt-8">
-          <div className="grid md:grid-cols-3 gap-6">
-            {PRODUCTS.map((p, idx) => {
-              // Determina as cores do hover baseadas no card
-              const colorClasses = {
-                indigo: "from-indigo-600/10 hover:shadow-indigo-500/20 group-hover:border-indigo-500/30",
-                emerald: "from-emerald-600/10 hover:shadow-emerald-500/20 group-hover:border-emerald-500/30",
-                amber: "from-amber-600/10 hover:shadow-amber-500/20 group-hover:border-amber-500/30",
-              }[p.colorName];
-
-              return (
-                <motion.div
-                  key={p.name}
-                  custom={idx * 0.08}
-                  variants={fadeUp}
-                  initial="hidden"
-                  animate="visible"
-                >
-                  <Link
-                    href={p.link}
-                    className={`group relative flex flex-col h-full rounded-3xl bg-white/[0.02] border border-white/[0.06] overflow-hidden transition-all duration-500 hover:-translate-y-2 hover:bg-white/[0.04] shadow-2xl backdrop-blur-xl ${colorClasses}`}
+                return (
+                  <motion.div
+                    key={p.name}
+                    custom={idx * 0.08}
+                    variants={fadeUp}
+                    initial="hidden"
+                    animate="visible"
                   >
-                    {/* Efeito Glow Interno */}
-                    <div className={`absolute inset-0 bg-gradient-to-br ${colorClasses.split(' ')[0]} via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500`} />
-                    <div className="absolute -inset-px bg-gradient-to-b from-white/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 rounded-3xl pointer-events-none" />
+                    <Link
+                      href={p.link}
+                      className={`group relative flex flex-col h-full rounded-3xl bg-white/[0.04] border border-white/[0.08] overflow-hidden transition-all duration-500 hover:-translate-y-2 hover:bg-white/[0.06] shadow-2xl backdrop-blur-xl ${colorClasses}`}
+                    >
+                      {/* Efeito Glow Interno */}
+                      <div className={`absolute inset-0 bg-gradient-to-br ${colorClasses.split(' ')[0]} via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500`} />
+                      <div className="absolute -inset-px bg-gradient-to-b from-white/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 rounded-3xl pointer-events-none" />
 
-                    {/* Body */}
-                    <div className="flex-1 p-6 relative z-10">
-                      {/* Icon + name + tagline */}
-                      <div className="flex items-center gap-4 mb-6">
-                        <div className={`w-12 h-12 rounded-xl flex items-center justify-center shrink-0 ${p.iconBg} shadow-lg group-hover:scale-110 group-hover:rotate-3 transition-transform duration-500`}>
-                          <p.icon size={22} className="text-white" />
+                      {/* Body */}
+                      <div className="flex-1 p-6 relative z-10">
+                        {/* Icon + name + tagline */}
+                        <div className="flex items-center gap-4 mb-6">
+                          <div className={`w-12 h-12 rounded-xl flex items-center justify-center shrink-0 ${p.iconBg} shadow-lg group-hover:scale-110 group-hover:rotate-3 transition-transform duration-500`}>
+                            <p.icon size={22} className="text-white" />
+                          </div>
+                          <div>
+                            <div className="text-lg font-bold text-white leading-tight group-hover:text-gray-200 transition-colors">{p.name}</div>
+                            <div className="text-xs text-white/50 tracking-wide leading-tight mt-1 font-light">{p.tagline}</div>
+                          </div>
                         </div>
-                        <div>
-                          <div className="text-lg font-bold text-white leading-tight group-hover:text-gray-200 transition-colors">{p.name}</div>
-                          <div className="text-xs text-white/40 tracking-wide leading-tight mt-1">{p.tagline}</div>
+
+                        {/* Features */}
+                        <ul className="space-y-3 mb-8">
+                          {p.features.map((f) => (
+                            <li key={f} className="flex items-start gap-2">
+                              <Check size={14} className={`mt-0.5 shrink-0 ${p.checkColor}`} />
+                              <span className="text-sm text-white/70 leading-tight">{f}</span>
+                            </li>
+                          ))}
+                        </ul>
+                        
+                        {/* Preview area */}
+                        <div className="w-full flex justify-center mt-auto opacity-90 group-hover:opacity-100 transition-opacity duration-500 transform group-hover:scale-[1.03]">
+                          <div className="w-[90%]">
+                            <p.Preview />
+                          </div>
                         </div>
                       </div>
-
-                      {/* Features */}
-                      <ul className="space-y-3 mb-6">
-                        {p.features.map((f) => (
-                          <li key={f} className="flex items-start gap-2">
-                            <Check size={14} className={`mt-0.5 shrink-0 ${p.checkColor}`} />
-                            <span className="text-sm text-white/60 leading-tight">{f}</span>
-                          </li>
-                        ))}
-                      </ul>
-                      
-                      {/* Preview area */}
-                      <div className="w-full flex justify-center mt-auto opacity-80 group-hover:opacity-100 transition-opacity duration-500 transform group-hover:scale-[1.02]">
-                        <div className="w-[85%]">
-                          <p.Preview />
-                        </div>
-                      </div>
-                    </div>
-                  </Link>
-                </motion.div>
-              );
-            })}
+                    </Link>
+                  </motion.div>
+                );
+              })}
+            </div>
           </div>
+
         </div>
 
         {/* Stats strip */}
@@ -359,7 +362,7 @@ export default function LandingPage() {
       </main>
 
       {/* ── Footer ───────────────────────────────────────────────────────── */}
-      <footer className="relative z-10 py-8 px-6 md:px-14 border-t border-white/[0.05] flex flex-col md:flex-row items-center justify-between gap-4 bg-[#050505]/70 backdrop-blur-xl">
+      <footer className="relative z-10 py-8 px-6 md:px-14 border-t border-white/[0.05] flex flex-col md:flex-row items-center justify-between gap-4 bg-[#030014]/50 backdrop-blur-xl">
         <div className="flex items-center gap-3 opacity-40 hover:opacity-100 transition-opacity">
           <Image src="/logo.png" alt="JudiCore" width={80} height={26} className="object-contain grayscale hover:grayscale-0 transition-all" />
         </div>
