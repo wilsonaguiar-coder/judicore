@@ -418,6 +418,11 @@ export default function TestesPage() {
                   <option value="JEF_RECURSO_ERRADO">JEF_RECURSO_ERRADO — apelação / agravo em vez de recurso inominado</option>
                   <option value="JEF_LEGITIMIDADE_PASSIVA">JEF_LEGITIMIDADE_PASSIVA — polo passivo errado</option>
                 </optgroup>
+                <optgroup label="Stance Check Engine (FASE 4.4.1)">
+                  <option value="STANCE_CONTRADICTION_RPPS">STANCE_CONTRADICTION_RPPS — paridade/integralidade RPPS pós-EC 41/2003</option>
+                  <option value="STANCE_CONTRADICTION_RGPS">STANCE_CONTRADICTION_RGPS — benefício RGPS com perda de qualidade/carência</option>
+                  <option value="STANCE_CONTRADICTION_JEF">STANCE_CONTRADICTION_JEF — procedência JEF com valor/competência incompatível</option>
+                </optgroup>
                 <optgroup label="JEF Estadual / Federal — Recursos (FASE 4.4)">
                   <option value="JEF_ENDERECAMENTO_ERRADO">JEF_ENDERECAMENTO_ERRADO — recurso endereçado ao TJ/TRF em vez da Turma Recursal</option>
                   <option value="JEF_PRAZO_ERRADO">JEF_PRAZO_ERRADO — prazo de 15 dias (CPC) em vez de 10 dias (Lei 9.099/95)</option>

@@ -97,6 +97,40 @@ function decideTrap(slotIndex: number, area: LegalArea, phase: Phase | "DESPACHO
     return kind;
   }
 
+  // RPPS: rotação com traps específicas incluindo stance contradiction
+  if (area === "RPPS") {
+    // STANCE_CONTRADICTION_RPPS entra na rotação de RPPS
+    const rppsTrapTable: TrapKind[] = [
+      "JURISPRUDENCIA_CONTRARIA",
+      "ARTIGO_INCOMPATIVEL",
+      "TESE_EQUIVOCADA",
+      "PRECEDENTE_SUPERADO",
+      "FATO_INCOMPLETO",
+      "JURISPRUDENCIA_CONTRARIA",
+      "ARTIGO_INCOMPATIVEL",
+      "STANCE_CONTRADICTION_RPPS",
+    ];
+    kind = rppsTrapTable[cycleIdx % rppsTrapTable.length]!;
+    if (kind === "LINGUAGEM_DECISORIA" && phase !== "DESPACHO") kind = "ARTIGO_INCOMPATIVEL";
+    return kind;
+  }
+
+  // RGPS: rotação com traps específicas incluindo stance contradiction
+  if (area === "RGPS") {
+    const rgpsTrapTable: TrapKind[] = [
+      "JURISPRUDENCIA_CONTRARIA",
+      "ARTIGO_INCOMPATIVEL",
+      "TESE_EQUIVOCADA",
+      "PRECEDENTE_SUPERADO",
+      "FATO_INCOMPLETO",
+      "JURISPRUDENCIA_CONTRARIA",
+      "ARTIGO_INCOMPATIVEL",
+      "STANCE_CONTRADICTION_RGPS",
+    ];
+    kind = rgpsTrapTable[cycleIdx % rgpsTrapTable.length]!;
+    return kind;
+  }
+
   // JEF_CIVEL / JEF_ESTADUAL / JEF_FEDERAL: mesma rotação de traps
   if (area === "JEF_CIVEL" || area === "JEF_ESTADUAL" || area === "JEF_FEDERAL") {
     const jefTrapTable: TrapKind[] = [
@@ -113,6 +147,8 @@ function decideTrap(slotIndex: number, area: LegalArea, phase: Phase | "DESPACHO
       "JEF_PRAZO_ERRADO",
       "JEF_PREPARO_ERRADO",
       "JEF_PEDIDO_INCOMPATIVEL",
+      // FASE 4.4.1 — Stance
+      "STANCE_CONTRADICTION_JEF",
     ];
     kind = jefTrapTable[cycleIdx % jefTrapTable.length]!;
     // Recurso errado só faz sentido em RECURSO

@@ -146,6 +146,8 @@ export interface PipelineContext {
   corrections?: string | undefined;
   generationMode?: GenerationMode | undefined;
   evidenceAnalysis?: EvidenceAnalysis[] | undefined;
+  /** Resultado da análise determinística de coerência posicional (FASE 4.4.1). */
+  stanceAnalysis?: import("../stance/stance-types.js").StanceAnalysis | undefined;
 }
 
 export interface PipelineInput {
@@ -169,6 +171,7 @@ export type PipelineEvent =
   | { event: "audit"; data: LegalAudit }
   | { event: "done"; data: { generationId: string; documentId?: string | undefined; aprovada: boolean; mode?: GenerationMode | undefined; status?: string | undefined; blocked?: boolean | undefined; ressalvas?: string[] | undefined; safe_message?: string | undefined } }
   | { event: "evidence"; data: EvidenceAnalysis[] }
+  | { event: "stance"; data: import("../stance/stance-types.js").StanceAnalysis }
   | { event: "error"; data: { message: string; phase: string; fatal: boolean } }
   | { event: "validation_errors"; data: ValidationError[] };
 

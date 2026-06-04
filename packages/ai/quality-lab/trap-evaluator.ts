@@ -249,6 +249,58 @@ export function evaluateTrap(trap: TrapKind, result: CaseResult): TrapOutcome {
       return "AVOIDED";
     }
 
+    // ── Stance Check Engine (FASE 4.4.1) ─────────────────────────────────────────
+
+    case "STANCE_CONTRADICTION_RPPS": {
+      // DETECTED: validator disparou qualquer regra de contradição de postura ou evidence stance
+      if (hasRule(
+        "STANCE_CONTRADICTION_RPPS",
+        "EVIDENCE_STANCE_VIOLATION",
+        "STANCE_MISMATCH_PRE_GENERATION",
+        "EVIDENCE_STANCE_MATRIX",
+      )) return "DETECTED";
+      // MISSED: draft pleiteia paridade E reconhece EC 41 como impedimento E sem distinguishing
+      const pleadsParidade =
+        /\b(requer.{0,150}paridade|faz\s+jus\s+(?:à|a)\s+paridade|tem\s+direito\s+(?:à|a)\s+paridade|paridade\s+(?:deve\s+ser\s+)?(?:concedida?|reconhecida?))\b/i.test(draft);
+      const acknowledgesBar =
+        /\b(não\s+faz\s+jus\s+(?:à|a)\s+paridade|EC\s*41.{0,100}(afasta|veda|impede|não\s+garante)\b.{0,80}paridade|sem\s+paridade\s+pós[-\s]EC\s*41|RE\s*590[\.\s]*260)\b/i.test(draft);
+      const noDistinguishing = !/distinguishing|situação\s+fática\s+distinta|caso\s+concreto.{0,40}diferente|peculiaridade/i.test(draft);
+      if (pleadsParidade && acknowledgesBar && noDistinguishing) return "MISSED";
+      return "AVOIDED";
+    }
+
+    case "STANCE_CONTRADICTION_RGPS": {
+      if (hasRule(
+        "STANCE_CONTRADICTION_RGPS",
+        "EVIDENCE_STANCE_VIOLATION",
+        "STANCE_MISMATCH_PRE_GENERATION",
+      )) return "DETECTED";
+      const pleadsBenefit =
+        /\b(requer.{0,150}(auxílio|benefício|aposentadoria|pensão)|faz\s+jus\s+ao?\s+(auxílio|benefício|aposentadoria))\b/i.test(draft);
+      const acknowledgesBar =
+        /\b(perdeu?\s+(?:a\s+)?qualidade\s+de\s+segurado|sem\s+qualidade\s+de\s+segurado|carência\s+insuficiente|não\s+cumpri[ou]\s+(?:a\s+)?carência|período\s+de\s+graça\s+expirado?)\b/i.test(draft);
+      const noDistinguishing = !/distinguishing|situação\s+fática\s+distinta|peculiaridade|hipótese.{0,40}distinta/i.test(draft);
+      if (pleadsBenefit && acknowledgesBar && noDistinguishing) return "MISSED";
+      return "AVOIDED";
+    }
+
+    case "STANCE_CONTRADICTION_JEF": {
+      if (hasRule(
+        "STANCE_CONTRADICTION_JEF",
+        "JEF_VALOR_EXCEDENTE",
+        "JEF_COMPETENCIA",
+        "STANCE_MISMATCH_PRE_GENERATION",
+        "EVIDENCE_STANCE_VIOLATION",
+      )) return "DETECTED";
+      const pleadsJef =
+        /\b(requer.{0,150}procedência|procedência.{0,100}juizado|pleiteia?.{0,150}juizado)\b/i.test(draft);
+      const acknowledgesBar =
+        /\b(valor.{0,80}(acima\s+de\s+(?:40|60)\s+salários?|excede.{0,40}(limite|teto)).{0,60}juizado|sem\s+renúncia\s+ao\s+excedente.{0,80}juizado|matéria\s+excluída?.{0,80}juizado|incompetência.{0,80}juizado|acima\s+de\s+40\s+salários?\s+mínimos?\s+sem\s+renúncia)\b/i.test(draft);
+      const noDistinguishing = !/distinguishing|situação\s+fática\s+distinta|peculiaridade|renúncia\s+expressa/i.test(draft);
+      if (pleadsJef && acknowledgesBar && noDistinguishing) return "MISSED";
+      return "AVOIDED";
+    }
+
     // ── Recursos nos Juizados (FASE 4.4) ─────────────────────────────────────────
 
     case "JEF_ENDERECAMENTO_ERRADO": {

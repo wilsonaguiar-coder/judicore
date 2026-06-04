@@ -13,5 +13,6 @@ export { CriminalSentenceValidator } from "./criminal-sentenca.validator.js";
 export { StanceConsistencyValidator } from "./stance-consistency.validator.js";
 export { ExecutionValidator } from "./execution.validator.js";
 export { JefCivelValidator } from "./jef-civel.validator.js";
+export { StanceContradictionValidator } from "./stance-contradiction.validator.js";
 export { detectArticleContext, isArticleUsedAsDistinction } from "./article-context.js";
 export type { ArticleContext } from "./article-context.js";

@@ -6,6 +6,7 @@ import { LegalAuditService } from "./auditor.js";
 import { LegalValidator } from "./validator.js";
 import { EvidenceAnalyzerService } from "./evidence-analyzer.js";
 import { FinalValidator, MatrixQualityValidator, StanceConsistencyValidator, resolveDocumentStatus } from "../validators/index.js";
+import { StanceAnalyzer } from "../stance/stance-analyzer.js";
 import type { FinalValidationResult } from "../validators/index.js";
 import type {
   PipelineInput,
@@ -154,6 +155,7 @@ export class LegalPipeline {
   private finalValidator = new FinalValidator();
   private evidenceAnalyzer = new EvidenceAnalyzerService();
   private stanceConsistency = new StanceConsistencyValidator();
+  private stanceAnalyzer    = new StanceAnalyzer();
 
   async *run(
     input: PipelineInput,
@@ -227,6 +229,42 @@ export class LegalPipeline {
     const extractionValidation = this.validator.validateExtractionSufficiency(ctx.extraction!);
     if (extractionValidation.errors.length > 0) {
       yield { event: "validation_errors", data: extractionValidation.errors };
+    }
+
+    // ── STANCE CHECK — verificação determinística PRÉ-OpenAI (FASE 4.4.1) ──────
+    // Detecta contradições óbvias entre a tese pretendida e as autoridades
+    // jurídicas fornecidas ANTES de qualquer chamada GPT adicional.
+    // Não bloqueia se há distinguishing válido ou tese subsidiária.
+    if (ctx.jurisprudencias.length > 0) {
+      const jurTexts = StanceAnalyzer.toJurisprudenceTexts(ctx.jurisprudencias);
+      const tipoPeca = ctx.classification!.tipo_peca;
+      const requestedOutcome: import("../stance/stance-types.js").RequestedOutcome =
+        tipoPeca === "PETICAO_INICIAL" || tipoPeca === "RECURSO" ? "PROCEDENCIA" : "IMPROCEDENCIA";
+      const stanceInput: import("../stance/stance-types.js").StanceInput = {
+        claim: ctx.caseDescription,
+        legislation: [],
+        jurisprudence: jurTexts,
+        evidence: ctx.extraction ? [...ctx.extraction.fatos, ...ctx.extraction.questoes_juridicas] : [],
+        requestedOutcome,
+      };
+      const stanceResult = this.stanceAnalyzer.analyze(stanceInput);
+      ctx.stanceAnalysis = stanceResult;
+      yield { event: "stance", data: stanceResult };
+      if (stanceResult.blockGeneration) {
+        yield {
+          event: "validation_errors",
+          data: stanceResult.blockingIssues.map((issue) => ({
+            rule: "STANCE_MISMATCH_PRE_GENERATION",
+            message: `[StanceAnalyzer] Contradição detectada antes da geração: ${issue}`,
+            fatal: true,
+          })),
+        };
+        yield {
+          event: "done",
+          data: { generationId, aprovada: false, blocked: true, mode: "SAFE_SKELETON" as const, status: "REPROVADA" as const },
+        };
+        return;
+      }
     }
 
     // ── Fase 3: Análise de posicionamento das evidências ─────────────────────

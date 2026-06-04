@@ -647,6 +647,32 @@ function applyTrap(
         instruction: "ARMADILHA: Dirigir a ação contra empresa ou entidade ERRADA no polo passivo — por exemplo, acionar a administradora de cartão em vez do banco emissor, a transportadora em vez do e-commerce, ou a franqueada em vez da franqueadora — sem verificar corretamente a legitimidade passiva.",
         expectedRulesIfTrap: [],
       };
+    // ── Stance Contradiction (FASE 4.4.1) ────────────────────────────────────────
+
+    case "STANCE_CONTRADICTION_RPPS":
+      return {
+        description: base.description,
+        instruction:
+          "ARMADILHA DE POSTURA CONTRADITÓRIA (RPPS): A jurisprudência fornecida demonstra que o servidor NÃO tem direito à paridade/integralidade por força da EC 41/2003. MESMO ASSIM, construa a fundamentação reconhecendo expressamente a existência da EC 41/2003 e do entendimento do STF (RE 590.260) que veda a paridade para ingressantes posteriores, e prossiga argumentando que o autor FAZ JUS à paridade e requerendo procedência — SEM fazer distinguishing válido, SEM tese subsidiária. O texto deve simultaneamente afirmar 'não faz jus à paridade por força da EC 41/2003' e 'requer-se a procedência com reconhecimento da paridade'.",
+        expectedRulesIfTrap: ["STANCE_CONTRADICTION_RPPS", "EVIDENCE_STANCE_VIOLATION"],
+      };
+
+    case "STANCE_CONTRADICTION_RGPS":
+      return {
+        description: base.description,
+        instruction:
+          "ARMADILHA DE POSTURA CONTRADITÓRIA (RGPS): A jurisprudência fornecida demonstra que o segurado perdeu a qualidade de segurado ou não cumpriu a carência. MESMO ASSIM, construa a fundamentação reconhecendo expressamente a perda da qualidade de segurado ou a carência insuficiente, e prossiga argumentando que o autor FAZ JUS ao benefício pretendido e requerendo procedência — SEM fazer distinguishing, SEM tese subsidiária viável. O texto deve simultâneamente registrar 'perdeu a qualidade de segurado' e 'requer-se a concessão do benefício'.",
+        expectedRulesIfTrap: ["STANCE_CONTRADICTION_RGPS", "EVIDENCE_STANCE_VIOLATION"],
+      };
+
+    case "STANCE_CONTRADICTION_JEF":
+      return {
+        description: base.description,
+        instruction:
+          "ARMADILHA DE POSTURA CONTRADITÓRIA (JEF): A jurisprudência ou a própria descrição indica que o valor da causa excede o limite de competência do Juizado Especial (40/60 SM) sem renúncia, ou que a matéria é excluída do JEF. MESMO ASSIM, construa a fundamentação reconhecendo expressamente que o valor excede o limite sem renúncia ao excedente, e prossiga argumentando pela competência do Juizado e requerendo procedência — SEM renúncia ao excedente, SEM distinguishing. O texto deve registrar 'valor superior ao limite do juizado sem renúncia' e ao mesmo tempo 'requer-se a procedência perante o Juizado Especial'.",
+        expectedRulesIfTrap: ["STANCE_CONTRADICTION_JEF", "JEF_VALOR_EXCEDENTE"],
+      };
+
     // ── Recursos nos Juizados (FASE 4.4) ─────────────────────────────────────────
 
     case "JEF_ENDERECAMENTO_ERRADO": {
@@ -3047,6 +3073,103 @@ THEMES.push(
   { id: "jef_federal_recurso_bpc_loas",        build: tJefFederalRecursoBpcLoas,         compatibleTypes: ["RECURSO"] },
   { id: "jef_federal_recurso_revisao",         build: tJefFederalRecursoRevisaoBeneficio, compatibleTypes: ["RECURSO"] },
   { id: "jef_federal_recurso_servidor",        build: tJefFederalRecursoServidor,         compatibleTypes: ["RECURSO"] },
+);
+
+// ── Temas de teste Stance Check Engine (FASE 4.4.1) ──────────────────────────
+// RPPS: 2 temas (paridade e integralidade post-EC 41)
+// RGPS: 2 temas (perda qualidade de segurado e carência insuficiente)
+// JEF:  2 temas (valor acima da competência e competência inadequada)
+//
+// Comandos de teste:
+//   tsx quality-runner.ts --area=RPPS  --count=20 --trap=STANCE_CONTRADICTION_RPPS
+//   tsx quality-runner.ts --area=RGPS  --count=20 --trap=STANCE_CONTRADICTION_RGPS
+//   tsx quality-runner.ts --area=JEF_ESTADUAL --count=10 --trap=STANCE_CONTRADICTION_JEF
+
+// RPPS 1 — paridade pós-EC 41/2003 (jurisprudência contrária injetada)
+const tStanceRppsParidade: ThemeBuilder = (i) => ({
+  area: "RPPS",
+  themeLabel: "RPPS — paridade pós-EC 41/2003 [teste STANCE_CONTRADICTION_RPPS]",
+  autor: pick(NOMES, i),
+  reu: pick(ENTES, i),
+  comarca: pick(COMARCAS, i),
+  fatos: `${pick(NOMES, i)} (CPF ${cpf(i + 30000)}) é servidor(a) público(a) do ${pick(ENTES, i)}, com ingresso em ${dateBack(10, i)} (após a Emenda Constitucional 41/2003, vigente desde 31/12/2003). Requer pensão por morte com paridade integral aos vencimentos do cargo do falecido cônjuge. O STF (RE 590.260) afastou a paridade para servidores ingressos após a EC 41/2003: 'não faz jus à paridade nem à integralidade, salvo regras de transição'. Pedido administrativo indeferido em ${dateBack(0, i)}.`,
+  pedido: "concessão de pensão por morte com paridade integral aos vencimentos do cargo do falecido",
+  norma: "art. 40 §7º CF/88; EC 41/2003; RE 590.260 STF (paridade negada para ingressantes pós-EC 41)",
+  jurisprudencias: [JUR_CONTRARIO_PARIDADE],
+});
+
+// RPPS 2 — integralidade pós-EC 41/2003 (jurisprudência contrária injetada)
+const tStanceRppsIntegralidade: ThemeBuilder = (i) => ({
+  area: "RPPS",
+  themeLabel: "RPPS — integralidade pós-EC 41/2003 [teste STANCE_CONTRADICTION_RPPS]",
+  autor: pick(NOMES, i + 1),
+  reu: pick(ENTES, i + 1),
+  comarca: pick(COMARCAS, i + 1),
+  fatos: `${pick(NOMES, i + 1)} (CPF ${cpf(i + 30100)}) é servidor(a) aposentado(a) por invalidez do ${pick(ENTES, i + 1)}, com ingresso após a EC 41/2003 (${dateBack(8, i)}). Pleiteia integralidade dos proventos ao valor da remuneração do cargo em atividade. O STF (RE 590.260) afastou a integralidade para servidores ingressos após EC 41/2003: 'sem integralidade pós-EC 41/2003'. Proventos calculados pela média contribuída. Requer revisão para integralidade.`,
+  pedido: "revisão dos proventos de aposentadoria para garantir integralidade da remuneração do cargo ativo",
+  norma: "art. 40 §1º CF/88; EC 41/2003; RE 590.260 STF (integralidade negada pós-EC 41)",
+  jurisprudencias: [JUR_CONTRARIO_PARIDADE],
+});
+
+// RGPS 1 — perda da qualidade de segurado
+const tStanceRgpsPerdaQualidade: ThemeBuilder = (i) => ({
+  area: "RGPS",
+  themeLabel: "RGPS — perda da qualidade de segurado [teste STANCE_CONTRADICTION_RGPS]",
+  autor: pick(NOMES, i + 2),
+  reu: "Instituto Nacional do Seguro Social — INSS",
+  comarca: pick(COMARCAS, i + 2),
+  fatos: `${pick(NOMES, i + 2)} (CPF ${cpf(i + 30200)}) requer auxílio-doença. Última contribuição ao RGPS em ${dateBack(3, i)} — há mais de ${24 + i * 3} meses sem recolhimento. O segurado perdeu a qualidade de segurado: o período de graça de 12 meses (art. 15, II, Lei 8.213/91) expirou em ${dateBack(2, i)}. Sem qualidade de segurado na data do sinistro (${dateBack(0, i)}), o benefício é indevido. Requer-se a concessão do auxílio-doença desde o requerimento administrativo (NB ${700_000_000 + i * 1337}).`,
+  pedido: "concessão de auxílio-doença com efeitos retroativos à DER, apesar da perda da qualidade de segurado",
+  norma: "arts. 15 e 59 Lei 8.213/91; Súmula 27 TNU (período de graça esgotado — qualidade de segurado não mantida)",
+  jurisprudencias: [],
+});
+
+// RGPS 2 — carência insuficiente
+const tStanceRgpsCarenciaInsuficiente: ThemeBuilder = (i) => ({
+  area: "RGPS",
+  themeLabel: "RGPS — carência insuficiente [teste STANCE_CONTRADICTION_RGPS]",
+  autor: pick(NOMES, i + 3),
+  reu: "Instituto Nacional do Seguro Social — INSS",
+  comarca: pick(COMARCAS, i + 3),
+  fatos: `${pick(NOMES, i + 3)} (CPF ${cpf(i + 30300)}) requer aposentadoria por tempo de contribuição. Possui ${80 + i * 2} contribuições mensais ao RGPS, mas a carência exigida é de 180 meses (art. 25, II, Lei 8.213/91). Carência insuficiente: faltam ${100 - i * 2 - 80} contribuições para completar o período mínimo. Não há implementação do requisito temporal. Requer-se mesmo assim a concessão da aposentadoria por tempo de contribuição.`,
+  pedido: "concessão de aposentadoria por tempo de contribuição apesar de carência insuficiente",
+  norma: "arts. 24 e 25, II, Lei 8.213/91 (carência de 180 meses não cumprida)",
+  jurisprudencias: [],
+});
+
+// JEF 1 — valor acima da competência sem renúncia
+const tStanceJefValorAcima: ThemeBuilder = (i) => ({
+  area: "JEF_ESTADUAL",
+  themeLabel: "JEF — valor acima do limite de competência sem renúncia [teste STANCE_CONTRADICTION_JEF]",
+  autor: pick(NOMES, i + 4),
+  reu: pick(JEF_BANCOS, i),
+  comarca: pick(COMARCAS, i + 4),
+  fatos: `${pick(NOMES, i + 4)} (CPF ${cpf(i + 30400)}) propõe ação de indenização por danos materiais e morais no Juizado Especial Cível (Lei 9.099/95). O valor total dos danos é de R$ 63.540,00 (45 salários mínimos), valor superior ao limite de 40 salários mínimos do JEF (art. 3º Lei 9.099/95). Não há renúncia ao valor excedente. O valor excede o teto sem renúncia ao excedente — a competência do Juizado está comprometida. Mesmo assim, requer-se a procedência integral perante o Juizado Especial Cível.`,
+  pedido: "procedência dos pedidos de indenização no valor integral de R$ 63.540,00 (45 SM) perante o Juizado Especial",
+  norma: "arts. 186 e 927 CC/2002; art. 3º Lei 9.099/95 (valor excede limite sem renúncia ao excedente)",
+  jurisprudencias: [],
+});
+
+// JEF 2 — competência inadequada (matéria excluída)
+const tStanceJefMateriaExcluida: ThemeBuilder = (i) => ({
+  area: "JEF_ESTADUAL",
+  themeLabel: "JEF — matéria excluída da competência [teste STANCE_CONTRADICTION_JEF]",
+  autor: pick(NOMES, i + 5),
+  reu: pick(JEF_CONSTRUTORAS, i),
+  comarca: pick(COMARCAS, i + 5),
+  fatos: `${pick(NOMES, i + 5)} (CPF ${cpf(i + 30500)}) propõe ação relativa a imóvel urbano com alegação de vício estrutural e usucapião parcial de área. A causa envolve direito real sobre imóvel — matéria excluída da competência do Juizado Especial Cível por art. 3º §2º Lei 9.099/95, que afasta do JEF causas relativas a imóvel. A matéria é excluída do rol de competência do Juizado. Mesmo assim, requer-se a procedência integral perante o Juizado Especial Cível.`,
+  pedido: "procedência da ação perante o Juizado Especial Cível envolvendo direito real sobre imóvel",
+  norma: "art. 618 CC/2002; art. 3º §2º Lei 9.099/95 (imóvel excluído da competência do JEF)",
+  jurisprudencias: [],
+});
+
+THEMES.push(
+  { id: "stance_rpps_paridade",        build: tStanceRppsParidade },
+  { id: "stance_rpps_integralidade",   build: tStanceRppsIntegralidade },
+  { id: "stance_rgps_perda_qualidade", build: tStanceRgpsPerdaQualidade },
+  { id: "stance_rgps_carencia",        build: tStanceRgpsCarenciaInsuficiente },
+  { id: "stance_jef_valor_acima",      build: tStanceJefValorAcima },
+  { id: "stance_jef_materia_excluida", build: tStanceJefMateriaExcluida },
 );
 
 // Casos de teste JEF_VALOR_EXCEDENTE — valores fixos para validação do detector

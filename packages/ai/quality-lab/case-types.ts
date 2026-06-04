@@ -63,7 +63,11 @@ export type TrapKind =
   | "JEF_ENDERECAMENTO_ERRADO"         // recurso endereçado ao TJ/TRF em vez da Turma Recursal
   | "JEF_PRAZO_ERRADO"                 // prazo de 15 dias (CPC) em vez de 10 dias (art. 42 Lei 9.099/95)
   | "JEF_PREPARO_ERRADO"               // preparo calculado como apelação comum — ignora microssistema JEF
-  | "JEF_PEDIDO_INCOMPATIVEL";         // pedido de remessa ao TJ/TRF ou recebimento como apelação comum
+  | "JEF_PEDIDO_INCOMPATIVEL"          // pedido de remessa ao TJ/TRF ou recebimento como apelação comum
+  // Traps de Contradição de Postura — Stance Check Engine (FASE 4.4.1)
+  | "STANCE_CONTRADICTION_RPPS"        // peça pleiteia paridade/integralidade mas fundamentação demonstra impossibilidade (EC 41/2003)
+  | "STANCE_CONTRADICTION_RGPS"        // peça pleiteia benefício mas fundamentação demonstra perda de qualidade/carência
+  | "STANCE_CONTRADICTION_JEF";        // peça pleiteia procedência no JEF mas fundamentação demonstra incompetência/valor excedente
 
 export interface SyntheticCase {
   id: string;
@@ -191,6 +195,11 @@ export function mapRuleToValidator(rule: string): ValidatorComponent {
     rule === "EXECUTION_SISBAJUD_MISSING"
   ) return "ExecutionValidator";
   if (rule === "STANCE_MISMATCH_PRE_GENERATION") return "EvidenceAnalyzer";
+  if (
+    rule === "STANCE_CONTRADICTION_RPPS" ||
+    rule === "STANCE_CONTRADICTION_RGPS" ||
+    rule === "STANCE_CONTRADICTION_JEF"
+  ) return "EvidenceAnalyzer";
   if (rule.startsWith("JEF_")) return "JefCivelValidator";
   return "Other";
 }

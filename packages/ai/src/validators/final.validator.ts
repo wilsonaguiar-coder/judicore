@@ -23,6 +23,7 @@ import { CivilValidator } from "./civil.validator.js";
 import { ConsumerValidator } from "./consumer.validator.js";
 import { ExecutionValidator } from "./execution.validator.js";
 import { JefCivelValidator } from "./jef-civel.validator.js";
+import { StanceContradictionValidator } from "./stance-contradiction.validator.js";
 
 export interface FinalValidationResult {
   valid: boolean;
@@ -86,6 +87,7 @@ export class FinalValidator {
   private consumer = new ConsumerValidator();
   private execution = new ExecutionValidator();
   private jefCivel = new JefCivelValidator();
+  private stanceContradiction = new StanceContradictionValidator();
 
   validate(
     draft: string,
@@ -121,6 +123,9 @@ export class FinalValidator {
 
     // 1g. Validação de JEF Cível (competência, valor, recurso, perícia, tutela)
     allErrors.push(...this.jefCivel.validate(draft, classification).errors);
+
+    // 1h. Detector de contradição semântica pós-draft (STANCE_CONTRADICTION — FASE 4.4.1)
+    allErrors.push(...this.stanceContradiction.validate(draft));
 
     // 2. Validação de regras jurídicas (artigos, diplomas)
     const legalResult = this.legal.validateDraftArticles(draft, classification);
