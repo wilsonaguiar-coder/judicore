@@ -127,7 +127,11 @@ export const JEF_SM_LIMIT: Record<"JEF_ESTADUAL" | "JEF_FEDERAL", number> = {
 export function mapRuleToValidator(rule: string): ValidatorComponent {
   if (rule.startsWith("EVIDENCE_")) return "EvidenceAnalyzer";
   if (rule.startsWith("MATRIX_")) return "MatrixQualityValidator";
-  if (rule.startsWith("RICHNESS_") || rule === "FINAL_DRAFT_GENERIC_LANGUAGE") return "RichnessValidator";
+  if (
+    rule.startsWith("RICHNESS_") ||
+    rule === "FINAL_DRAFT_GENERIC_LANGUAGE" ||
+    rule === "FINAL_DRAFT_WEAK_ARGUMENTATION"
+  ) return "RichnessValidator";
   if (
     rule === "JUR_MARKER_IN_DRAFT" ||
     rule === "GENERIC_JURISPRUDENCE" ||

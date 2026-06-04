@@ -72,6 +72,29 @@ export function resolveDocumentStatus(
   return { status: "REPROVADA", blocked: true, ressalvas: errors.map((e) => e.message) };
 }
 
+// ── Derivação de área de riqueza (FASE 4.6) ──────────────────────────────────
+// Mapeia LegalClassification para um perfil de DomainRichnessAnalyzer.
+
+function deriveRichnessArea(c: LegalClassification): string {
+  if (c.regime_juridico === "RPPS") return "RPPS";
+  if (c.regime_juridico === "RGPS") return "RGPS";
+  if (c.tipo_justica === "JEF" || c.tipo_justica === "JEC") {
+    const assunto = c.assunto_principal ?? "";
+    const isFederal =
+      /lei\s+10\.259|JEF\s+[Ff]ederal|Turma\s+Recursal\s+[Ff]ederal|TRF\d?|INSS|Uni[aã]o\s+Federal/i.test(assunto);
+    return isFederal ? "JEF_FEDERAL" : "JEF_ESTADUAL";
+  }
+  if (c.tipo_justica === "EXECUCAO_FISCAL") return "EXECUCAO_CUMPRIMENTO";
+  const assunto = c.assunto_principal ?? "";
+  if (/execu[cç][aã]o|cumprimento\s+de\s+senten[cç]a|penhora|SISBAJUD/i.test(assunto)) {
+    return "EXECUCAO_CUMPRIMENTO";
+  }
+  if (/consumidor|CDC|rela[cç][aã]o\s+de\s+consumo|c[oó]digo\s+de\s+defesa/i.test(assunto)) {
+    return "CONSUMIDOR";
+  }
+  return "CIVEL_GERAL";
+}
+
 export class FinalValidator {
   private structural = new StructuralValidator();
   private legal = new LegalRulesValidator();
@@ -163,13 +186,14 @@ export class FinalValidator {
       });
     }
 
-    // 8. FINAL_DRAFT: validação de riqueza argumentativa
+    // 8. FINAL_DRAFT: validação de riqueza argumentativa (FASE 4.6 — perfil por domínio)
     if (mode === "FINAL_DRAFT") {
       allErrors.push(...this.richness.validate(draft, {
         tipo_peca: classification.tipo_peca,
         regime_juridico: classification.regime_juridico,
         assunto_principal: classification.assunto_principal,
         pedidos: extraction.pedidos,
+        area: deriveRichnessArea(classification),
       }));
     }
 
