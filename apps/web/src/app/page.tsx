@@ -19,22 +19,22 @@ const fadeUp = {
 
 function PreviewJudiCore() {
   return (
-    <div className="relative w-full rounded-xl bg-[#0d1117] border border-white/[0.07] p-3 overflow-hidden shadow-2xl group-hover:shadow-indigo-500/20 transition-all">
-      <div className="flex gap-1.5 mb-3">
-        <div className="w-2 h-2 rounded-full bg-red-500/60" />
-        <div className="w-2 h-2 rounded-full bg-yellow-500/60" />
-        <div className="w-2 h-2 rounded-full bg-green-500/60" />
+    <div className="relative w-full rounded-xl bg-[#0d1117] border border-white/[0.07] p-4 overflow-hidden shadow-2xl group-hover:shadow-indigo-500/20 transition-all">
+      <div className="flex gap-2 mb-4">
+        <div className="w-2.5 h-2.5 rounded-full bg-red-500/60" />
+        <div className="w-2.5 h-2.5 rounded-full bg-yellow-500/60" />
+        <div className="w-2.5 h-2.5 rounded-full bg-green-500/60" />
       </div>
-      <div className="text-[10px] text-white/50 font-semibold mb-2.5 leading-none">Petição Inicial</div>
-      <div className="space-y-2">
-        <div className="h-1.5 bg-white/15 rounded-full w-full" />
-        <div className="h-1.5 bg-white/10 rounded-full w-4/5" />
-        <div className="h-1.5 bg-white/15 rounded-full w-full" />
-        <div className="h-1.5 bg-indigo-400/35 rounded-full w-3/4" />
-        <div className="h-1.5 bg-white/10 rounded-full w-full" />
-        <div className="h-1.5 bg-white/12 rounded-full w-5/6" />
+      <div className="text-sm text-white/70 font-semibold mb-3 leading-none">Petição Inicial</div>
+      <div className="space-y-2.5">
+        <div className="h-2 bg-white/15 rounded-full w-full" />
+        <div className="h-2 bg-white/10 rounded-full w-4/5" />
+        <div className="h-2 bg-white/15 rounded-full w-full" />
+        <div className="h-2 bg-indigo-400/35 rounded-full w-3/4" />
+        <div className="h-2 bg-white/10 rounded-full w-full" />
+        <div className="h-2 bg-white/12 rounded-full w-5/6" />
       </div>
-      <div className="absolute bottom-3 right-3 w-8 h-8 rounded-full bg-indigo-600 flex items-center justify-center text-[11px] font-bold text-white shadow-lg shadow-indigo-600/40">
+      <div className="absolute bottom-4 right-4 w-10 h-10 rounded-full bg-indigo-600 flex items-center justify-center text-[14px] font-bold text-white shadow-lg shadow-indigo-600/40">
         A
       </div>
     </div>
@@ -49,18 +49,18 @@ function PreviewJudiCalc() {
     ["0",".","","="],
   ];
   return (
-    <div className="w-full rounded-xl bg-[#071410] border border-emerald-900/40 p-3 overflow-hidden shadow-2xl group-hover:shadow-emerald-500/20 transition-all">
-      <div className="mb-3">
-        <div className="text-[9px] text-emerald-400/60 leading-none mb-1">Total</div>
-        <div className="text-[13px] font-bold text-emerald-400 leading-tight">R$ 125.430,87</div>
+    <div className="w-full rounded-xl bg-[#071410] border border-emerald-900/40 p-4 overflow-hidden shadow-2xl group-hover:shadow-emerald-500/20 transition-all">
+      <div className="mb-4">
+        <div className="text-xs text-emerald-400/70 font-medium leading-none mb-1.5">Total Atualizado</div>
+        <div className="text-lg font-bold text-emerald-400 leading-tight">R$ 125.430,87</div>
       </div>
-      <div className="grid grid-cols-4 gap-0.5">
+      <div className="grid grid-cols-4 gap-1">
         {rows.map((row, ri) =>
           row.map((n, ci) => (
             <div
               key={`${ri}-${ci}`}
-              className={`text-center text-[10px] py-1 rounded leading-none ${
-                n === "=" ? "bg-emerald-600 text-white font-bold shadow-lg shadow-emerald-600/40" : "bg-white/[0.06] text-white/55"
+              className={`text-center text-sm py-2 rounded leading-none ${
+                n === "=" ? "bg-emerald-600 text-white font-bold shadow-lg shadow-emerald-600/40" : "bg-white/[0.06] text-white/70"
               }`}
             >
               {n}
@@ -74,22 +74,22 @@ function PreviewJudiCalc() {
 
 function PreviewJudiAudit() {
   const items: [string, "green" | "amber"][] = [
-    ["Estrutura",     "green"],
-    ["Fundament.",    "amber"],
-    ["Jurisprudência","green"],
-    ["Pedidos",       "green"],
+    ["Estrutura Base", "green"],
+    ["Fundamentação",  "amber"],
+    ["Jurisprudência", "green"],
+    ["Pedidos Finais", "green"],
   ];
   return (
-    <div className="w-full rounded-xl bg-[#100a02] border border-amber-900/40 p-3 overflow-hidden shadow-2xl group-hover:shadow-amber-500/20 transition-all">
-      <div className="flex items-start justify-between mb-0.5">
-        <div className="text-[9px] text-amber-400/60 uppercase tracking-wider leading-none">SCORE</div>
-        <div className="text-[26px] font-black text-amber-400 leading-none drop-shadow-md">97</div>
+    <div className="w-full rounded-xl bg-[#100a02] border border-amber-900/40 p-4 overflow-hidden shadow-2xl group-hover:shadow-amber-500/20 transition-all">
+      <div className="flex items-start justify-between mb-1">
+        <div className="text-xs text-amber-400/70 font-bold uppercase tracking-wider leading-none">SCORE DE RISCO</div>
+        <div className="text-4xl font-black text-amber-400 leading-none drop-shadow-md">97</div>
       </div>
-      <div className="text-[9px] text-white/30 mb-3 leading-none">/100</div>
+      <div className="text-xs text-white/40 mb-5 leading-none">/100</div>
       {items.map(([label, color]) => (
-        <div key={label} className="flex items-center gap-1.5 mb-1.5">
-          <div className={`w-1.5 h-1.5 rounded-full shrink-0 ${color === "green" ? "bg-green-400 shadow-[0_0_8px_rgba(74,222,128,0.6)]" : "bg-amber-400 shadow-[0_0_8px_rgba(251,191,36,0.6)]"}`} />
-          <div className="text-[10px] text-white/55 leading-none">{label}</div>
+        <div key={label} className="flex items-center gap-2 mb-2.5">
+          <div className={`w-2 h-2 rounded-full shrink-0 ${color === "green" ? "bg-green-400 shadow-[0_0_8px_rgba(74,222,128,0.6)]" : "bg-amber-400 shadow-[0_0_8px_rgba(251,191,36,0.6)]"}`} />
+          <div className="text-xs text-white/75 font-medium leading-none">{label}</div>
         </div>
       ))}
     </div>
@@ -232,16 +232,17 @@ export default function LandingPage() {
       </header>
 
       {/* ── Hero ─────────────────────────────────────────────────────────── */}
-      <main className="relative z-10 flex-1 flex flex-col items-center justify-start px-6 md:px-14 pt-8 md:pt-12 pb-20">
-        <div className="w-full max-w-5xl flex flex-col items-center">
-          
+      <main className="relative z-10 flex-1 flex flex-col items-center justify-start px-6 md:px-14 pt-10 pb-20">
+        
+        <div className="w-full max-w-6xl flex flex-col md:flex-row items-center gap-10 mb-12">
+          {/* Coluna de Texto (Esquerda) */}
           <motion.div 
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6 }}
-            className="text-center mb-12"
+            className="flex-1 text-center md:text-left"
           >
-            <h1 className="text-5xl md:text-7xl font-black tracking-tight mb-6 leading-[1.1] drop-shadow-2xl">
+            <h1 className="text-5xl md:text-[64px] lg:text-[72px] font-black tracking-tight mb-6 leading-[1.05] drop-shadow-2xl">
               Suíte{" "}
               <span className="relative inline-block">
                 <span className="bg-gradient-to-r from-violet-400 via-indigo-400 to-purple-400 bg-clip-text text-transparent">
@@ -250,90 +251,88 @@ export default function LandingPage() {
                 <div className="absolute -inset-1 bg-gradient-to-r from-violet-600/30 to-purple-600/30 blur-2xl -z-10 opacity-70" />
               </span>
             </h1>
-            <p className="text-lg md:text-2xl text-white/60 max-w-2xl mx-auto font-light leading-relaxed">
+            <p className="text-lg md:text-2xl text-white/60 max-w-2xl font-light leading-relaxed mx-auto md:mx-0">
               Ferramentas inteligentes para operadores do direito. Escolha o módulo que deseja e deixe a IA te ajudar.
             </p>
           </motion.div>
 
-          <div className="w-full max-w-6xl mt-4 relative">
-            
-            {/* Imagem da Themis Absoluta no Background (Removida do Grid) */}
-            <motion.div
-              initial={{ opacity: 0, x: 24 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.7, delay: 0.08 }}
-              className="hidden lg:block absolute -top-[350px] right-0 w-[550px] h-[750px] pointer-events-none -z-10 opacity-80"
-            >
-              <Image
-                src="/hero.png"
-                alt="Themis"
-                fill
-                sizes="550px"
-                className="object-contain object-bottom drop-shadow-[0_0_50px_rgba(139,92,246,0.4)] filter contrast-[1.15] brightness-90"
-                priority
-              />
-            </motion.div>
+          {/* Imagem da Themis (Direita) */}
+          <motion.div
+            initial={{ opacity: 0, x: 24 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.7, delay: 0.08 }}
+            className="hidden md:block relative w-[380px] h-[450px] shrink-0"
+          >
+            <Image
+              src="/hero.png"
+              alt="Themis"
+              fill
+              sizes="380px"
+              className="object-contain object-bottom drop-shadow-[0_0_50px_rgba(139,92,246,0.3)] filter contrast-[1.15] brightness-90"
+              priority
+            />
+          </motion.div>
+        </div>
 
-            <div className="grid md:grid-cols-3 gap-6 relative z-10">
-              {PRODUCTS.map((p, idx) => {
-                // Determina as cores do hover baseadas no card
-                const colorClasses = {
-                  indigo: "from-indigo-600/20 hover:shadow-indigo-500/30 group-hover:border-indigo-500/40",
-                  emerald: "from-emerald-600/20 hover:shadow-emerald-500/30 group-hover:border-emerald-500/40",
-                  amber: "from-amber-600/20 hover:shadow-amber-500/30 group-hover:border-amber-500/40",
-                }[p.colorName];
+        <div className="w-full max-w-6xl relative">
+          <div className="grid md:grid-cols-3 gap-6 relative z-10">
+            {PRODUCTS.map((p, idx) => {
+              // Determina as cores do hover baseadas no card
+              const colorClasses = {
+                indigo: "from-indigo-600/20 hover:shadow-indigo-500/30 group-hover:border-indigo-500/40",
+                emerald: "from-emerald-600/20 hover:shadow-emerald-500/30 group-hover:border-emerald-500/40",
+                amber: "from-amber-600/20 hover:shadow-amber-500/30 group-hover:border-amber-500/40",
+              }[p.colorName];
 
-                return (
-                  <motion.div
-                    key={p.name}
-                    custom={idx * 0.08}
-                    variants={fadeUp}
-                    initial="hidden"
-                    animate="visible"
+              return (
+                <motion.div
+                  key={p.name}
+                  custom={idx * 0.08}
+                  variants={fadeUp}
+                  initial="hidden"
+                  animate="visible"
+                >
+                  <Link
+                    href={p.link}
+                    className={`group relative flex flex-col h-full rounded-3xl bg-white/[0.04] border border-white/[0.08] overflow-hidden transition-all duration-500 hover:-translate-y-2 hover:bg-white/[0.06] shadow-2xl backdrop-blur-xl ${colorClasses}`}
                   >
-                    <Link
-                      href={p.link}
-                      className={`group relative flex flex-col h-full rounded-3xl bg-white/[0.04] border border-white/[0.08] overflow-hidden transition-all duration-500 hover:-translate-y-2 hover:bg-white/[0.06] shadow-2xl backdrop-blur-xl ${colorClasses}`}
-                    >
-                      {/* Efeito Glow Interno */}
-                      <div className={`absolute inset-0 bg-gradient-to-br ${colorClasses.split(' ')[0]} via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500`} />
-                      <div className="absolute -inset-px bg-gradient-to-b from-white/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 rounded-3xl pointer-events-none" />
+                    {/* Efeito Glow Interno */}
+                    <div className={`absolute inset-0 bg-gradient-to-br ${colorClasses.split(' ')[0]} via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500`} />
+                    <div className="absolute -inset-px bg-gradient-to-b from-white/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 rounded-3xl pointer-events-none" />
 
-                      {/* Body */}
-                      <div className="flex-1 p-6 relative z-10">
-                        {/* Icon + name + tagline */}
-                        <div className="flex items-center gap-4 mb-6">
-                          <div className={`w-12 h-12 rounded-xl flex items-center justify-center shrink-0 ${p.iconBg} shadow-lg group-hover:scale-110 group-hover:rotate-3 transition-transform duration-500`}>
-                            <p.icon size={22} className="text-white" />
-                          </div>
-                          <div>
-                            <div className="text-lg font-bold text-white leading-tight group-hover:text-gray-200 transition-colors">{p.name}</div>
-                            <div className="text-xs text-white/50 tracking-wide leading-tight mt-1 font-light">{p.tagline}</div>
-                          </div>
+                    {/* Body */}
+                    <div className="flex-1 p-6 relative z-10">
+                      {/* Icon + name + tagline */}
+                      <div className="flex items-center gap-4 mb-6">
+                        <div className={`w-12 h-12 rounded-xl flex items-center justify-center shrink-0 ${p.iconBg} shadow-lg group-hover:scale-110 group-hover:rotate-3 transition-transform duration-500`}>
+                          <p.icon size={22} className="text-white" />
                         </div>
-
-                        {/* Features */}
-                        <ul className="space-y-3 mb-8">
-                          {p.features.map((f) => (
-                            <li key={f} className="flex items-start gap-2">
-                              <Check size={14} className={`mt-0.5 shrink-0 ${p.checkColor}`} />
-                              <span className="text-sm text-white/70 leading-tight">{f}</span>
-                            </li>
-                          ))}
-                        </ul>
-                        
-                        {/* Preview area */}
-                        <div className="w-full flex justify-center mt-auto opacity-90 group-hover:opacity-100 transition-opacity duration-500 transform group-hover:scale-[1.03]">
-                          <div className="w-[90%]">
-                            <p.Preview />
-                          </div>
+                        <div>
+                          <div className="text-lg font-bold text-white leading-tight group-hover:text-gray-200 transition-colors">{p.name}</div>
+                          <div className="text-xs text-white/50 tracking-wide leading-tight mt-1 font-light">{p.tagline}</div>
                         </div>
                       </div>
-                    </Link>
-                  </motion.div>
-                );
-              })}
-            </div>
-          </div>
 
+                      {/* Features */}
+                      <ul className="space-y-3 mb-8">
+                        {p.features.map((f) => (
+                          <li key={f} className="flex items-start gap-2">
+                            <Check size={14} className={`mt-0.5 shrink-0 ${p.checkColor}`} />
+                            <span className="text-sm text-white/70 leading-tight">{f}</span>
+                          </li>
+                        ))}
+                      </ul>
+                      
+                      {/* Preview area */}
+                      <div className="w-full flex justify-center mt-auto opacity-90 group-hover:opacity-100 transition-opacity duration-500 transform group-hover:scale-[1.03]">
+                        <div className="w-full max-w-[95%]">
+                          <p.Preview />
+                        </div>
+                      </div>
+                    </div>
+                  </Link>
+                </motion.div>
+              );
+            })}
+          </div>
         </div>
 
         {/* Stats strip */}
