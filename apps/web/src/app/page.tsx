@@ -183,30 +183,30 @@ export default function LandingPage() {
             x: [0, 80, -80, 0],
             y: [0, -80, 80, 0],
             scale: [1, 1.2, 1],
-            opacity: [0.3, 0.5, 0.3] 
+            opacity: [0.6, 0.8, 0.6] 
           }}
           transition={{ duration: 15, repeat: Infinity, ease: "linear" }}
-          className="absolute -top-48 -left-48 w-[600px] h-[600px] rounded-full bg-indigo-600/30 blur-[150px]" 
+          className="absolute -top-48 -left-48 w-[600px] h-[600px] rounded-full bg-indigo-500/50 blur-[120px]" 
         />
         <motion.div 
           animate={{ 
             x: [0, -100, 100, 0],
             y: [0, 80, -80, 0],
             scale: [1, 1.3, 1],
-            opacity: [0.3, 0.4, 0.3] 
+            opacity: [0.5, 0.7, 0.5] 
           }}
           transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
-          className="absolute top-[20%] -right-48 w-[700px] h-[700px] rounded-full bg-fuchsia-600/20 blur-[150px]" 
+          className="absolute top-[20%] -right-48 w-[700px] h-[700px] rounded-full bg-fuchsia-500/40 blur-[120px]" 
         />
         <motion.div 
           animate={{ 
             x: [0, 120, -120, 0],
             y: [0, 60, -60, 0],
             scale: [1, 1.1, 1],
-            opacity: [0.3, 0.5, 0.3] 
+            opacity: [0.6, 0.8, 0.6] 
           }}
           transition={{ duration: 25, repeat: Infinity, ease: "linear" }}
-          className="absolute -bottom-48 left-[20%] w-[800px] h-[800px] rounded-full bg-cyan-600/20 blur-[150px]" 
+          className="absolute -bottom-48 left-[20%] w-[800px] h-[800px] rounded-full bg-cyan-500/40 blur-[120px]" 
         />
         
         {/* Modern Grid Background */}
@@ -232,26 +232,16 @@ export default function LandingPage() {
       </header>
 
       {/* ── Hero ─────────────────────────────────────────────────────────── */}
-      <main className="relative z-10 flex-1 flex flex-col items-center justify-start px-6 md:px-14 pt-16 md:pt-24 pb-20">
+      <main className="relative z-10 flex-1 flex flex-col items-center justify-start px-6 md:px-14 pt-8 md:pt-12 pb-20">
         <div className="w-full max-w-5xl flex flex-col items-center">
           
           <motion.div 
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6 }}
-            className="text-center mb-24"
+            className="text-center mb-12"
           >
-            <motion.div 
-              initial={{ opacity: 0, scale: 0.9 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ delay: 0.2, duration: 0.5 }}
-              className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-violet-500/10 border border-violet-500/20 text-violet-300 text-xs font-semibold uppercase tracking-wider mb-8 backdrop-blur-md shadow-[0_0_15px_rgba(139,92,246,0.3)]"
-            >
-              <Sparkles size={14} className="animate-pulse" />
-              <span>IA Jurídica Avançada</span>
-            </motion.div>
-            
-            <h1 className="text-5xl md:text-7xl font-black tracking-tight mb-8 leading-[1.1] drop-shadow-2xl">
+            <h1 className="text-5xl md:text-7xl font-black tracking-tight mb-6 leading-[1.1] drop-shadow-2xl">
               Suíte{" "}
               <span className="relative inline-block">
                 <span className="bg-gradient-to-r from-violet-400 via-indigo-400 to-purple-400 bg-clip-text text-transparent">
@@ -270,7 +260,7 @@ export default function LandingPage() {
             {/* Imagem da Themis Absoluta no Background (Removida do Grid) */}
             <motion.div
               initial={{ opacity: 0, x: 24 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.7, delay: 0.08 }}
-              className="hidden lg:block absolute -top-[450px] right-0 w-[550px] h-[750px] pointer-events-none -z-10 opacity-80"
+              className="hidden lg:block absolute -top-[350px] right-0 w-[550px] h-[750px] pointer-events-none -z-10 opacity-80"
             >
               <Image
                 src="/hero.png"
