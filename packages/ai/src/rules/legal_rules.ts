@@ -103,17 +103,47 @@ export const STRUCTURAL_REQUIREMENTS: Record<string, PieceStructuralRequirements
   },
   RECURSO: {
     required_text_patterns: [
-      { pattern: /decis[aã]o\s+recorrida|senten[cç]a\s+(de|recorrida)|acord[aã]o\s+recorrido|decis[aã]o\s+de\s+primeiro/i, label: "Identificação da decisão recorrida", fatal: false },
-      { pattern: /requer(-se)?|pedido\s+(recursal|de\s+reforma)|pede\s+(deferimento|provimento)|pede\-se/i, label: "Pedido recursal", fatal: false },
+      // Identificação da decisão recorrida — aceita "sentença objurgada", "v. acórdão", etc.
+      {
+        pattern:
+          /decis[aã]o\s+recorrida|senten[cç]a\s+(?:de|recorrida|objurgada|de\s+primeiro\s+grau)|acord[aã]o\s+recorrido|decis[aã]o\s+de\s+primeiro|v\.\s+senten[cç]a|r\.\s+senten[cç]a|senten[cç]a\s+(?:ora\s+)?recorrida|decis[aã]o\s+(?:ora\s+)?recorrida|ato\s+decisório\s+recorrido|julgado\s+(?:recorrido|a\s+quo)/i,
+        label: "Identificação da decisão recorrida (ou equivalente: v. sentença / acórdão recorrido)",
+        fatal: false,
+      },
+      // Pedido recursal — aceita "pugna pela reforma", "requer o provimento", etc.
+      {
+        pattern:
+          /requer(-se)?|pedido\s+(?:recursal|de\s+reforma)|pede\s+(?:deferimento|provimento)|pede-se|pugna[-\s]se|pugna\s+(?:pelo|pela)|requer-se\s+(?:o\s+)?(?:conhecimento|provimento)|provimento\s+do\s+recurso|reforma\s+(?:integral|parcial|total)\s+da/i,
+        label: "Pedido recursal (ou equivalente: pugna pelo provimento / reforma da decisão)",
+        fatal: false,
+      },
     ],
     required_structural_patterns: [],
     forbidden_patterns: [],
   },
   PETICAO_INICIAL: {
     required_text_patterns: [
-      { pattern: /dos\s+fatos|i\.?\s*[—\-]?\s*dos\s+fatos|dos\s+fatos\s+e/i, label: "Seção de Fatos", fatal: false },
-      { pattern: /dos\s+pedidos|iv\.?\s*[—\-]?\s*dos\s+pedidos|dos\s+requerimentos|v\.?\s*[—\-]?\s*dos\s+pedidos/i, label: "Seção de Pedidos", fatal: false },
-      { pattern: /valor\s+da\s+causa|d[ao]\s+valor\s+da\s+causa/i, label: "Valor da Causa", fatal: false },
+      // Seção de Fatos — aceita nomenclaturas equivalentes
+      {
+        pattern:
+          /dos\s+fatos|dos\s+fatos\s+e|da\s+narrativa\s+f[áa]tica|relato\s+f[áa]tico|da\s+ocorr[êe]ncia|dos\s+antecedentes|breve\s+relato|contextualiza[cç][aã]o\s+f[áa]tica|descri[cç][aã]o\s+dos\s+fatos|hist[oó]rico\s+dos\s+fatos|dos\s+elementos\s+f[áa]ticos/i,
+        label: "Seção de Fatos (ou equivalente: Relato Fático / Narrativa / Antecedentes)",
+        fatal: false,
+      },
+      // Seção de Pedidos — aceita "Requerimentos", "Pedido Final", "Conclusão"
+      {
+        pattern:
+          /dos\s+pedidos|dos\s+requerimentos|do\s+pedido\s+final|dos\s+pedidos\s+finais|requerimentos\s+finais|das\s+conclus[oõ]es\s+e\s+pedidos|do\s+requerimento\s+final|d[oa]\s+pedido\s+(?:principal|acess[oó]rio)/i,
+        label: "Seção de Pedidos (ou equivalente: Requerimentos / Pedido Final)",
+        fatal: false,
+      },
+      // Valor da Causa — aceita variantes com "atribuído" ou artigo
+      {
+        pattern:
+          /valor\s+da\s+causa|d[ao]\s+valor\s+da\s+causa|valor\s+atribu[íi]do\s+(?:à|a)\s+causa|d[ao]\s+valor\s+atribu[íi]do|fixação\s+do\s+valor\s+da\s+causa/i,
+        label: "Valor da Causa",
+        fatal: false,
+      },
     ],
     required_structural_patterns: [],
     forbidden_patterns: [],

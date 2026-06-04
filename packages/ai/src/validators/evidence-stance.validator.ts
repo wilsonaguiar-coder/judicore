@@ -1,28 +1,16 @@
 // EvidenceStanceValidator — verifica posicionamento de jurisprudências contrárias no draft.
 //
-// Regra central:
-//   Uma jurisprudência CONTRARIA pode ser citada em três situações legítimas:
+// FASE 4.5 — DISTINGUISHING_RE reescrito:
+//   Removidos: "embora", "não obstante", "em que pese", "apesar de"
+//   (palavras de transição que não constituem distinguishing real).
+//   Adicionados: regra de transição, hipótese dos autos distinta, peculiaridade fática,
+//   precedente inaplicável, legislação local específica.
 //
-//   1. REJEIÇÃO DO PEDIDO — o draft usa o precedente para NEGAR o direito pleiteado
-//      (ex: sentença que julga improcedente com base no precedente desfavorável ao autor).
-//      → Nenhuma violação. O precedente está sendo aplicado conforme sua própria tese.
-//
-//   2. DISTINGUISHING — o draft cita o precedente e explicita por que ele não se aplica
-//      (ex: petição que distingue a hipótese dos autos do precedente desfavorável).
-//      → Nenhuma violação. Uso técnico correto.
-//
-//   3. USO COMO FUNDAMENTO FAVORÁVEL SEM DISTINÇÃO — o draft cita o precedente contrário
-//      como se ele apoiasse o pedido, sem fazer distinguishing nem indicar improcedência.
-//      → EVIDENCE_STANCE_VIOLATION (fatal). Erro jurídico grave.
-//
-// Exemplo de uso correto (caso 1):
-//   "Conforme o STF no RE 590.260, o servidor que ingressou após a EC 41/2003 não faz
-//    jus à paridade. JULGO IMPROCEDENTE o pedido."
-//   → Nenhuma violação — o precedente contrário fundamenta a rejeição do pedido.
-//
-// Exemplo de violação (caso 3):
-//   "Conforme o STF no RE 590.260, o servidor faz jus à paridade. JULGO PROCEDENTE."
-//   → VIOLATION — precedente contrário usado como se favorável.
+// Score contextual de distinguishing (0-3):
+//   3 — distinguishing canônico com fundamento específico (distinguishing + razão explícita)
+//   2 — padrão semântico válido (regra de transição, hipótese distinta, etc.)
+//   1 — rejeição do pedido baseada no próprio precedente (uso correto caso 1)
+//   0 — ausência de distinguishing → EVIDENCE_STANCE_VIOLATION
 
 import type {
   ValidationError,
@@ -31,15 +19,30 @@ import type {
   ArgumentationMatrix,
 } from "../pipeline/types.js";
 
-// Linguagem que indica distinguishing / afastamento explícito do precedente
-const DISTINGUISHING_RE =
-  /\b(embora|não\s+se\s+aplic|distingue[\s-]se|distinguishing|diversamente|a\s+hipótese\s+dos\s+autos\s+dife|superado|não\s+guarda\s+identidade|em\s+sentido\s+contrário|entendimento\s+contrário|precedente\s+contrário|não\s+obstante|em\s+que\s+pese|apesar\s+de)\b/i;
+// ── Distinguishing VÁLIDO (score ≥ 2) ────────────────────────────────────────
+// Exige substância real — NÃO inclui "embora", "não obstante", "em que pese".
 
-// Linguagem de rejeição do pedido próxima à citação do precedente.
-// Indica que o precedente contrário está sendo usado CORRETAMENTE para negar o direito
-// pleiteado — não há violação de posicionamento.
+const STRONG_DISTINGUISHING_RE =
+  /\b(distinguishing|distingue[\s-]se|distinguindo-se|a\s+hipótese\s+dos\s+autos\s+(?:difere|é\s+distinta)|não\s+se\s+aplic[ao]\s+(?:ao\s+caso|aqui|à\s+hipótese)|(?:o\s+)?precedente\s+(?:foi\s+)?superado|superado[ao]?\s+(?:o\s+)?(?:entendimento|precedente)|não\s+guarda\s+identidade\s+com|inaplicável\s+(?:ao\s+caso|à\s+hipótese|aqui)|situação\s+fática\s+distinta|peculiaridade\s+(?:do\s+caso|fática)|caso\s+concreto\s+(?:difere|é\s+distinto\s+do\s+paradigma)|regras?\s+de\s+transição|ingresso\s+(?:anterior|antes)\s+(?:à|à\s+vigência|da\s+promulgação)|ingressou\s+antes|legislação\s+(?:local|estadual|municipal)\s+específica|hipótese\s+(?:dos\s+autos\s+)?(?:difere|é\s+distinta|não\s+se\s+amolda)|distinguível\s+do\s+precedente|precedente\s+(?:não\s+(?:é\s+)?aplicável|inaplicável))\b/i;
+
+// ── Rejeição do pedido (score 1 — uso correto do precedente contrário) ────────
+// Indica que o precedente fundamenta a NEGATIVA — não há violação.
+
 const REJECTION_NEAR_JUR_RE =
   /\b(?:não\s+(?:faz\s+jus|tem\s+direito|possui\s+direito|merece\s+(?:prosperar|acolhida)|há\s+(?:direito|amparo))|julgo\s+improcedente|improcedente|indefiro\s+o\s+pedido|nego\s+provimento|denego\s+a?\s*ordem|deve\s+ser\s+(?:negado|indeferido|julgado\s+improcedente)|sem\s+(?:direito|paridade|integralidade|amparo\s+legal)|razão\s+pela\s+qual.*?(?:improcede|indefiro|nego))\b/i;
+
+// ── Score contextual de distinguishing ───────────────────────────────────────
+
+function distinguishingScore(window: string): number {
+  // Score 2: distinguishing canônico ou padrão semântico válido
+  if (STRONG_DISTINGUISHING_RE.test(window)) return 2;
+  // Score 1: rejeição do pedido baseada no precedente (uso correto)
+  if (REJECTION_NEAR_JUR_RE.test(window)) return 1;
+  // Score 0: nenhum distinguishing identificado
+  return 0;
+}
+
+// ── EvidenceStanceValidator ───────────────────────────────────────────────────
 
 export class EvidenceStanceValidator {
   validate(
@@ -66,19 +69,19 @@ export class EvidenceStanceValidator {
         Math.min(draft.length, citationIdx + 400),
       );
 
-      // Caso 1 — Rejeição do pedido: o precedente fundamenta a improcedência/indeferimento.
-      // O resultado da análise coincide com a tese do precedente. Uso correto — sem violação.
-      if (REJECTION_NEAR_JUR_RE.test(window)) continue;
+      // Score contextual: 0 → violação; 1+ → uso correto (rejeição ou distinguishing)
+      if (distinguishingScore(window) >= 1) continue;
 
-      // Caso 2 — Distinguishing explícito: o draft afasta o precedente por distinção de hipóteses.
-      // Uso técnico correto — sem violação.
-      if (DISTINGUISHING_RE.test(window)) continue;
-
-      // Caso 3 — Violação: o precedente contrário é citado sem negar o pedido
-      // e sem distinguishing → possível uso indevido como fundamento favorável.
+      // Violação confirmada: precedente contrário citado sem distinguishing real
+      // e sem usar o precedente para fundamentar a negativa do pedido.
       errors.push({
         rule: "EVIDENCE_STANCE_VIOLATION",
-        message: `Jurisprudência contrária (${jur.tribunal}) citada sem distinguishing e sem indicar improcedência/indeferimento — use distinguishing para afastar o precedente, ou indique claramente que ele fundamenta a rejeição do pedido.`,
+        message:
+          `Jurisprudência contrária (${jur.tribunal} — ${jur.numero}) citada sem distinguishing ` +
+          `substancial e sem fundamentar a rejeição do pedido. ` +
+          `Padrões aceitos: distinguishing explícito (com fundamento específico), regra de transição, ` +
+          `hipótese fática distinta, precedente superado, inaplicabilidade ao caso, ` +
+          `ou uso do precedente para negar o pedido (improcedência/indeferimento).`,
         fatal: true,
       });
     }
@@ -101,7 +104,9 @@ export class EvidenceStanceValidator {
       if (analysis.use_mode !== "FOUNDATION") {
         errors.push({
           rule: "EVIDENCE_STANCE_MATRIX",
-          message: `Tese "${tese.pedido.slice(0, 60)}..." usa jurisprudência ${analysis.stance} (${analysis.use_mode}) como fundamento principal — apenas FOUNDATION permitido em jurisprudencia_id.`,
+          message:
+            `Tese "${tese.pedido.slice(0, 60)}..." usa jurisprudência ${analysis.stance} ` +
+            `(${analysis.use_mode}) como fundamento principal — apenas FOUNDATION permitido em jurisprudencia_id.`,
           fatal: true,
         });
       }
