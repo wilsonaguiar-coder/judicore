@@ -261,6 +261,21 @@ export default function LandingPage() {
             <p className="text-lg md:text-2xl text-white/60 max-w-xl font-light leading-relaxed mx-auto md:mx-0">
               Ferramentas inteligentes para operadores do direito. Escolha o módulo que deseja e deixe a IA te ajudar.
             </p>
+            
+            {/* Stats Pills */}
+            <motion.div 
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.2, duration: 0.5 }}
+              className="flex flex-wrap items-center justify-center md:justify-start gap-3 mt-8 relative z-20"
+            >
+              {STATS.map((s) => (
+                <div key={s.label} className="flex items-center gap-2 px-4 py-2 rounded-full bg-white/[0.04] border border-white/[0.08] backdrop-blur-md shadow-[0_0_15px_rgba(255,255,255,0.03)]">
+                  <span className="text-base font-black text-white tracking-tight">{s.value}</span>
+                  <span className="text-[11px] text-white/50 tracking-wider uppercase font-semibold">{s.label}</span>
+                </div>
+              ))}
+            </motion.div>
           </motion.div>
 
           {/* Imagem da Themis ancorada na direita/base (50% maior) */}
@@ -342,18 +357,7 @@ export default function LandingPage() {
           </div>
         </div>
 
-        {/* Stats strip */}
-        <motion.div
-          initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.18, duration: 0.5 }}
-          className="w-full max-w-3xl flex flex-wrap justify-center gap-x-12 gap-y-5 pt-16 mt-16 border-t border-white/[0.06]"
-        >
-          {STATS.map((s) => (
-            <div key={s.label} className="flex flex-col items-center gap-1">
-              <span className="text-3xl font-black text-white tracking-tight drop-shadow-md">{s.value}</span>
-              <span className="text-sm text-white/40 tracking-wide uppercase font-semibold">{s.label}</span>
-            </div>
-          ))}
-        </motion.div>
+
 
       </main>
 
