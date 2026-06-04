@@ -243,10 +243,10 @@ export default function LandingPage() {
             className="flex-1 text-center md:text-left"
           >
             <h1 className="text-5xl md:text-[64px] lg:text-[72px] font-black tracking-tight mb-6 leading-[1.05] drop-shadow-2xl">
-              Suíte{" "}
+              Inteligência que<br className="hidden md:block" /> transforma o{" "}
               <span className="relative inline-block">
                 <span className="bg-gradient-to-r from-violet-400 via-indigo-400 to-purple-400 bg-clip-text text-transparent">
-                  Judicore
+                  Direito.
                 </span>
                 <div className="absolute -inset-1 bg-gradient-to-r from-violet-600/30 to-purple-600/30 blur-2xl -z-10 opacity-70" />
               </span>
