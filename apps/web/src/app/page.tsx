@@ -234,16 +234,17 @@ export default function LandingPage() {
       </header>
 
       {/* ── Hero ─────────────────────────────────────────────────────────── */}
-      <main className="relative z-10 flex-1 flex flex-col items-center justify-start px-6 md:px-14 pt-10 pb-20">
+      <main className="relative z-10 flex-1 flex flex-col items-center justify-start px-6 md:px-14 pt-8 md:pt-12 pb-20">
         
-        {/* Usando items-end e mb-0 para que a Themis repouse perfeitamente em cima da linha dos cards */}
-        <div className="w-full max-w-6xl flex flex-col md:flex-row items-end gap-10 mb-0 relative z-0">
+        {/* Trocamos flex padrão por um grid/absoluto para ancorar a Themis e alinhar texto ao topo */}
+        <div className="w-full max-w-6xl relative mb-0 flex flex-col md:flex-row items-start justify-between min-h-[350px] lg:min-h-[480px]">
+          
           {/* Coluna de Texto (Esquerda) */}
           <motion.div 
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6 }}
-            className="flex-1 text-center md:text-left pb-8 md:pb-12"
+            className="w-full md:w-[60%] lg:w-[55%] text-center md:text-left relative z-10 pt-4 pb-12 md:pb-0"
           >
             <h1 className="text-5xl md:text-[64px] lg:text-[72px] font-black tracking-tight mb-6 leading-[1.05] drop-shadow-2xl">
               Inteligência que<br className="hidden md:block" /> transforma o{" "}
@@ -254,21 +255,21 @@ export default function LandingPage() {
                 <div className="absolute -inset-1 bg-gradient-to-r from-violet-600/30 to-purple-600/30 blur-2xl -z-10 opacity-70" />
               </span>
             </h1>
-            <p className="text-lg md:text-2xl text-white/60 max-w-2xl font-light leading-relaxed mx-auto md:mx-0">
+            <p className="text-lg md:text-2xl text-white/60 max-w-xl font-light leading-relaxed mx-auto md:mx-0">
               Ferramentas inteligentes para operadores do direito. Escolha o módulo que deseja e deixe a IA te ajudar.
             </p>
           </motion.div>
 
-          {/* Imagem da Themis (Direita) */}
+          {/* Imagem da Themis ancorada na direita/base (50% maior) */}
           <motion.div
             initial={{ opacity: 0, x: 24 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.7, delay: 0.08 }}
-            className="hidden md:block relative w-[380px] h-[450px] shrink-0"
+            className="hidden md:block absolute right-0 bottom-0 w-[570px] h-[675px] pointer-events-none z-0"
           >
             <Image
               src="/hero.png"
               alt="Themis"
               fill
-              sizes="380px"
+              sizes="570px"
               className="object-contain object-bottom drop-shadow-[0_0_50px_rgba(139,92,246,0.3)] filter contrast-[1.15] brightness-90"
               priority
             />
