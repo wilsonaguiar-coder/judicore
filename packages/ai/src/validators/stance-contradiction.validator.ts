@@ -53,7 +53,8 @@ const CONTRADICTION_SPECS: ContradictionSpec[] = [
     // Bar: reconhece EC 41/2003 como impedimento de paridade/integralidade
     barRe: new RegExp(
       // 1: EC 41 + verbo de vedação + paridade/integralidade
-      "(?:EC\\s*41|emenda\\s+constitucional\\s+41).{0,200}(?:não\\s+faz\\s+jus|afasta|veda|impede|suprime|elimina|não\\s+(?:tem|possui|assegura|garante)\\s+direito|não\\s+é\\s+(?:devida?|garantida?|assegurada?)).{0,120}(?:paridade|integralidade)" +
+      // [\s\S]{0,200} em vez de .{0,200} para cruzar quebras de linha
+      "(?:EC\\s*41|emenda\\s+constitucional\\s+41)[\\s\\S]{0,200}(?:não\\s+faz\\s+jus|afasta|veda|impede|suprime|elimina|não\\s+(?:tem|possui|assegura|garante)\\s+direito|não\\s+é\\s+(?:devida?|garantida?|assegurada?))[\\s\\S]{0,120}(?:paridade|integralidade)" +
       "|" +
       // 2: sem paridade / sem integralidade pós-EC 41
       "sem\\s+(?:paridade|integralidade)\\s+pós[-\\s]EC\\s*41" +
@@ -61,19 +62,25 @@ const CONTRADICTION_SPECS: ContradictionSpec[] = [
       // 3: não faz jus à paridade/integralidade (standalone)
       "não\\s+faz\\s+jus\\s+(?:à|a)\\s+(?:paridade|integralidade)" +
       "|" +
-      // 4: paridade/integralidade afastada/vedada EC 41
-      "(?:paridade|integralidade).{0,120}(?:afastada?|vedada?|suprimida?|extinta?|não\\s+(?:é\\s+)?(?:devida?|garantida?|assegurada?)).{0,80}(?:EC\\s*41|emenda\\s+constitucional\\s+41)" +
+      // 3b: não há direito à paridade/integralidade (CASO 1 — formulação vernacular)
+      "não\\s+h[aá]\\s+direito\\s+(?:à|a)\\s+(?:paridade|integralidade)" +
       "|" +
-      "(?:EC\\s*41|emenda\\s+constitucional\\s+41).{0,80}(?:paridade|integralidade).{0,80}(?:afastada?|vedada?|suprimida?)" +
+      // 3c: inexistência de direito à paridade
+      "inexist[eê]ncia\\s+(?:do|de)\\s+direito\\s+(?:à|a)\\s+(?:paridade|integralidade)" +
       "|" +
-      // 5: ingresso após EC 41 / 31/12/2003 + sem paridade
-      "ingressou?.{0,150}(?:após|posterior|depois\\s+d[ae]).{0,80}(?:EC\\s*41|31\\/12\\/2003|dezembro\\s+de\\s+2003).{0,200}(?:paridade|integralidade).{0,80}(?:afastada?|vedada?|não\\s+devida?|não\\s+(?:se\\s+)?aplica)" +
+      // 4: paridade/integralidade afastada/vedada EC 41 ([\s\S] para cruzar linhas)
+      "(?:paridade|integralidade)[\\s\\S]{0,120}(?:afastada?|vedada?|suprimida?|extinta?|não\\s+(?:é\\s+)?(?:devida?|garantida?|assegurada?))[\\s\\S]{0,80}(?:EC\\s*41|emenda\\s+constitucional\\s+41)" +
+      "|" +
+      "(?:EC\\s*41|emenda\\s+constitucional\\s+41)[\\s\\S]{0,80}(?:paridade|integralidade)[\\s\\S]{0,80}(?:afastada?|vedada?|suprimida?)" +
+      "|" +
+      // 5: ingresso após EC 41 / 31/12/2003 + sem paridade ([\s\S] para cruzar linhas)
+      "ingressou?[\\s\\S]{0,150}(?:após|posterior|depois\\s+d[ae])[\\s\\S]{0,80}(?:EC\\s*41|31\\/12\\/2003|dezembro\\s+de\\s+2003)[\\s\\S]{0,200}(?:paridade|integralidade)[\\s\\S]{0,80}(?:afastada?|vedada?|não\\s+devida?|não\\s+(?:se\\s+)?aplica)" +
       "|" +
       // 6: o texto literal do JUR_CONTRARIO_PARIDADE tese
       "sem\\s+paridade\\s+pós[-\\s]EC\\s*41" +
       "|" +
       // 7: ingresso posterior à EC 41 como fato impeditivo
-      "ingresso.{0,80}(?:após|posterior|depois).{0,80}(?:EC\\s*41|vigência\\s+da\\s+emenda).{0,80}(?:não\\s+(?:faz\\s+jus|tem\\s+direito)|paridade.{0,40}(?:afastada?|vedada?|não\\s+cabível))",
+      "ingresso[\\s\\S]{0,80}(?:após|posterior|depois)[\\s\\S]{0,80}(?:EC\\s*41|vigência\\s+da\\s+emenda)[\\s\\S]{0,80}(?:não\\s+(?:faz\\s+jus|tem\\s+direito|h[aá]\\s+direito)|paridade[\\s\\S]{0,40}(?:afastada?|vedada?|não\\s+cabível))",
       "i",
     ),
   },

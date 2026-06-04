@@ -258,14 +258,29 @@ export function evaluateTrap(trap: TrapKind, result: CaseResult): TrapOutcome {
         "STANCE_MISMATCH_PRE_GENERATION",
         "EVIDENCE_STANCE_MATRIX",
       )) return "DETECTED";
-      // MISSED: draft pleiteia paridade/integralidade AND reconhece EC 41/ingresso como impedimento
-      // AND não há distinguishing substantivo
+
+      // FIX CASO 3: Regra de transição (ingresso ANTES da EC 41) é exceção legítima → AVOIDED
+      const regraTransicao =
+        /art\.?\s*6[ºo]?\s+(?:da\s+)?EC\s*41|regra\s+de\s+transi[cç][aã]o|ingresso\s+antes\s+(?:da\s+)?(?:EC\s*41|vigência)|ingressou[\s\S]{0,80}antes[\s\S]{0,80}(?:EC\s*41|31\/12\/2003)|EC\s*70\/2012|regras?\s+anteriores[\s\S]{0,80}servidores?\s+que\s+ingressaram\s+antes/i.test(draft);
+      if (regraTransicao) return "AVOIDED";
+
       const pleadsParidade =
         /\b(paridade|integralidade\s+(?:dos\s+)?proventos?)\b/i.test(draft);
       const acknowledgesBar =
-        /não\s+faz\s+jus\s+(?:à|a)\s+(?:paridade|integralidade)|EC\s*41.{0,200}(?:afasta|veda|impede|suprime|não\s+(?:tem|garante|assegura)).{0,100}(?:paridade|integralidade)|sem\s+paridade\s+pós[-\s]EC\s*41|(?:paridade|integralidade).{0,120}(?:afastada?|vedada?|suprimida?)\s+(?:pela?|por\s+força\s+d[ae])\s+EC\s*41|RE\s*590[\s\.\,]*260|ingressou?.{0,120}após.{0,80}(?:EC\s*41|31\/12\/2003).{0,120}(?:paridade|integralidade).{0,80}(?:afastada?|não\s+devida?|vedada?)/i.test(draft);
+        /não\s+faz\s+jus\s+(?:à|a)\s+(?:paridade|integralidade)|não\s+h[aá]\s+direito\s+(?:à|a)\s+(?:paridade|integralidade)|EC\s*41[\s\S]{0,200}(?:afasta|veda|impede|suprime|não\s+(?:tem|garante|assegura))[\s\S]{0,100}(?:paridade|integralidade)|sem\s+paridade\s+pós[-\s]EC\s*41|(?:paridade|integralidade)[\s\S]{0,120}(?:afastada?|vedada?|suprimida?)\s+(?:pela?|por\s+força\s+d[ae])\s+EC\s*41|RE\s*590[\s\.\,]*260|ingressou?[\s\S]{0,120}após[\s\S]{0,80}(?:EC\s*41|31\/12\/2003)[\s\S]{0,120}(?:paridade|integralidade)[\s\S]{0,80}(?:afastada?|não\s+devida?|vedada?)/i.test(draft);
       const hasSubstantiveDistinguishing =
         /distinguishing|o\s+presente\s+caso\s+(?:difere|apresenta\s+peculiaridade)|hipótese\s+dos\s+autos\s+(?:difere|é\s+distinta)\s+do\s+precedente|situação\s+fática\s+distinta\s+do\s+precedente|peculiaridade\s+(?:fática|concreta)\s*[:—]/i.test(draft);
+
+      // FIX CASO 2: SENTENÇA que NEGA paridade não é contradição — é comportamento correto
+      if (result.documentType === "SENTENCA") {
+        const concede =
+          /JULGO\s+(?:TOTALMENTE\s+)?PROCEDENTE[\s\S]{0,300}(?:paridade|integralidade)|defiro[\s\S]{0,200}(?:paridade|integralidade)|(?:paridade|integralidade)[\s\S]{0,80}(?:concedida?|deferida?|reconhecida?)\b/i.test(draft);
+        const nega =
+          /INDEFERIR[\s\S]{0,100}(?:paridade|integralidade)|JULGO\s+(?:PARCIALMENTE\s+)?PROCEDENTE[\s\S]{0,300}INDEFERIR[\s\S]{0,100}(?:paridade|integralidade)|(?:paridade|integralidade)[\s\S]{0,80}(?:indeferida?|negada?|afastada?|não\s+(?:reconhecida?|devida?))/i.test(draft);
+        if (nega && !concede) return "AVOIDED";
+        if (!concede) return "AVOIDED"; // sentença que não concede paridade = AVOIDED
+      }
+
       if (pleadsParidade && acknowledgesBar && !hasSubstantiveDistinguishing) return "MISSED";
       return "AVOIDED";
     }
