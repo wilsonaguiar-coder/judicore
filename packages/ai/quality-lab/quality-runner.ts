@@ -34,6 +34,7 @@ import type {
   DocumentStatus,
   TipoPeca,
 } from "../src/pipeline/types.js";
+import type { AuditReport } from "../src/audit-report/audit-report.types.js";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const OUTPUT_DIR = join(__dirname, "output");
@@ -93,6 +94,7 @@ async function runOneCase(fx: SyntheticCase): Promise<CaseResult> {
   let documentStatus: DocumentStatus | undefined;
   let safeMessage: string | undefined;
   let audit: LegalAudit | undefined;
+  let auditReport: AuditReport | undefined;
   const validationErrors: ValidationError[] = [];
   let inputTokens = 0;
   let outputTokens = 0;
@@ -119,6 +121,7 @@ async function runOneCase(fx: SyntheticCase): Promise<CaseResult> {
       if (evt.event === "chunk") draft += evt.data;
       if (evt.event === "mode") mode = evt.data.mode;
       if (evt.event === "audit") audit = evt.data;
+      if (evt.event === "audit-report") auditReport = evt.data;
       if (evt.event === "done") {
         documentStatus = evt.data.status as DocumentStatus | undefined;
         safeMessage = evt.data.safe_message;
@@ -161,6 +164,7 @@ async function runOneCase(fx: SyntheticCase): Promise<CaseResult> {
     result.draft = draft;
     result.draftExcerpt = draft.slice(0, 600);
   }
+  if (auditReport) result.auditReport = auditReport;
   if (fx.trap) {
     result.trap = fx.trap;
     // Avalia outcome com o draft já preenchido em result

@@ -232,6 +232,8 @@ export interface CaseResult {
   outputTokens: number;
   estimatedCostUsd: number;
   durationMs: number;
+  /** AuditReport FASE 5.0 — consolidação dos validators em relatório estruturado. */
+  auditReport?: import("../src/audit-report/audit-report.types.js").AuditReport;
 }
 
 // ── Estatísticas ─────────────────────────────────────────────────────────────

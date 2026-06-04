@@ -223,6 +223,98 @@ function escapeHtml(s: string): string {
   return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
 }
 
+function renderAuditReport(r: CaseResult): string {
+  const ar = r.auditReport;
+  if (!ar) return "";
+
+  const clsCls = ar.classificacao === "EXCELENTE" ? "cls-excelente" :
+    ar.classificacao === "BOA" ? "cls-boa" :
+    ar.classificacao === "REGULAR" ? "cls-regular" : "cls-critica";
+
+  // Qualidade argumentativa — dims
+  const qa = ar.qualidadeArgumentativa;
+  const dimRows = qa.dimensoes
+    .map((d) => `<div class="dim-row"><span>${escapeHtml(d.label)}</span><span><b>${d.score}</b>/${d.max}</span></div>`)
+    .join("");
+
+  // Pontos fortes (top 3)
+  const pontosHtml = ar.pontosFortes.length
+    ? `<ul>${ar.pontosFortes.slice(0, 4).map((p) => `<li>${escapeHtml(p.titulo)}</li>`).join("")}</ul>`
+    : `<span class="muted">—</span>`;
+
+  // Problemas fatais
+  const fataisHtml = ar.problemasFatais.length
+    ? `<ul>${ar.problemasFatais.map((p) => `<li class="sev-fatal">${escapeHtml(p.titulo)}</li>`).join("")}</ul>`
+    : `<span class="muted" style="color:#16a34a">Nenhum</span>`;
+
+  // Riscos
+  const riscosHtml = ar.riscosProcessuais.length
+    ? `<ul>${ar.riscosProcessuais.map((p) => `<li class="sev-${(p.severidade ?? "importante").toLowerCase()}">${escapeHtml(p.titulo)}</li>`).join("")}</ul>`
+    : `<span class="muted">—</span>`;
+
+  // Sugestões (top 3)
+  const sugestoesHtml = ar.sugestoesMelhoria.length
+    ? `<ul>${ar.sugestoesMelhoria.slice(0, 3).map((s) => `<li>${escapeHtml(s.titulo)}</li>`).join("")}</ul>`
+    : `<span class="muted">—</span>`;
+
+  // Fundamentação — tipos
+  const artigos = ar.fundamentacaoJuridica.filter((f) => f.tipo === "ARTIGO").length;
+  const jurs    = ar.fundamentacaoJuridica.filter((f) => f.tipo === "JURISPRUDENCIA").length;
+  const dipl    = ar.fundamentacaoJuridica.filter((f) => f.tipo === "DIPLOMA").length;
+
+  return `
+<details class="judiaudit">
+  <summary>🔍 JudiAudit — Score: ${ar.scoreGeral}/100 &nbsp;<span class="${clsCls}">${escapeHtml(ar.classificacao)}</span></summary>
+  <div class="audit-grid">
+    <div class="audit-card">
+      <div class="albl">Score Geral</div>
+      <div class="act ${clsCls}">${ar.scoreGeral}/100</div>
+      <div>${escapeHtml(ar.classificacao)}</div>
+    </div>
+    <div class="audit-card">
+      <div class="albl">Argumentativa [${escapeHtml(qa.perfil)}]</div>
+      <div class="act">${qa.score}/100${qa.normalizedScore > qa.score ? ` <small>(norm:${qa.normalizedScore})</small>` : ""}</div>
+      ${dimRows}
+    </div>
+    <div class="audit-card">
+      <div class="albl">Consistência</div>
+      <div class="act">${ar.consistenciaArgumentativa.score}/100</div>
+      <div>${escapeHtml(ar.consistenciaArgumentativa.resultado)}</div>
+    </div>
+    <div class="audit-card">
+      <div class="albl">Estrutural</div>
+      <div class="act">${ar.qualidadeEstrutural.score}/100</div>
+      <div>${escapeHtml(ar.qualidadeEstrutural.label)}</div>
+    </div>
+    <div class="audit-card">
+      <div class="albl">Probatória</div>
+      <div class="act">${ar.qualidadeProbatoria.score}/100</div>
+      <div>${escapeHtml(ar.qualidadeProbatoria.label)}</div>
+    </div>
+    <div class="audit-card">
+      <div class="albl">Fundamentação jurídica</div>
+      <div>${artigos} artigos &nbsp;·&nbsp; ${jurs} precedentes &nbsp;·&nbsp; ${dipl} diplomas</div>
+    </div>
+    <div class="audit-card">
+      <div class="albl">Problemas fatais</div>
+      ${fataisHtml}
+    </div>
+    <div class="audit-card">
+      <div class="albl">Pontos fortes</div>
+      ${pontosHtml}
+    </div>
+    <div class="audit-card">
+      <div class="albl">Riscos processuais</div>
+      ${riscosHtml}
+    </div>
+    <div class="audit-card">
+      <div class="albl">Sugestões de melhoria</div>
+      ${sugestoesHtml}
+    </div>
+  </div>
+</details>`;
+}
+
 function renderHtml(s: RunSummary): string {
   const passRate = s.totalCases > 0 ? Math.round(((s.approved + s.approvedWithCaveats) / s.totalCases) * 100) : 0;
   const trapHandledRate = s.trapStats.totalWithTraps > 0
@@ -310,7 +402,7 @@ function renderHtml(s: RunSummary): string {
         <td>${escapeHtml(r.documentType)}</td>
         <td>${escapeHtml(r.mode ?? "—")}</td>
         <td>${r.score ?? "—"}</td>
-        <td>${errors}${excerpt}</td>
+        <td>${errors}${excerpt}${renderAuditReport(r)}</td>
         <td><small>${r.inputTokens + r.outputTokens}tok<br>$${r.estimatedCostUsd.toFixed(4)}<br>${r.durationMs}ms</small></td>
       </tr>`;
   }).join("");
@@ -353,6 +445,17 @@ function renderHtml(s: RunSummary): string {
   pre { background: #f8fafc; padding: 8px; border-radius: 4px; overflow-x: auto; font-size: 11px; max-height: 240px; white-space: pre-wrap; }
   details summary { cursor: pointer; color: #2563eb; font-size: 11px; }
   .muted { color: #999; }
+  /* ── JudiAudit ─────────────────────────────────────────────────── */
+  details.judiaudit > summary { color: #7c3aed; font-weight: 600; font-size: 12px; margin-top: 6px; }
+  .audit-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 8px; margin-top: 8px; }
+  .audit-card { background: #faf5ff; border: 1px solid #ddd6fe; border-radius: 6px; padding: 8px; font-size: 11px; }
+  .audit-card .act { font-weight: 700; font-size: 13px; margin: 2px 0; }
+  .audit-card .albl { font-size: 10px; color: #6b7280; font-weight: 600; text-transform: uppercase; letter-spacing: .5px; margin-bottom: 3px; }
+  .audit-card ul { margin: 2px 0; padding-left: 14px; }
+  .audit-card li { margin: 1px 0; }
+  .audit-card .dim-row { display: flex; justify-content: space-between; border-bottom: 1px solid #e9d5ff; padding: 1px 0; }
+  .cls-excelente { color: #166534; } .cls-boa { color: #1d4ed8; } .cls-regular { color: #ca8a04; } .cls-critica { color: #dc2626; }
+  .sev-fatal { color: #991b1b; } .sev-importante { color: #854d0e; } .sev-sugestao { color: #0369a1; }
 </style>
 </head>
 <body>
