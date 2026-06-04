@@ -224,6 +224,9 @@ export default function LandingPage() {
           </span>
         </div>
         <nav className="flex items-center gap-5 text-sm text-white/50 font-medium">
+          <Link href="/sobre"       className="hidden md:block hover:text-white/80 transition-colors">Sobre</Link>
+          <Link href="/privacidade" className="hidden md:block hover:text-white/80 transition-colors">Privacidade</Link>
+          <Link href="/termos"      className="hidden md:block hover:text-white/80 transition-colors">Termos</Link>
           <a
             href="/login"
             className="px-5 py-2 rounded-full bg-white text-black hover:bg-gray-200 text-xs font-bold transition-all shadow-[0_0_20px_rgba(255,255,255,0.15)] hover:scale-105"
