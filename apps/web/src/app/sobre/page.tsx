@@ -20,7 +20,7 @@ export default function SobrePage() {
       name: "JudiCalc",
       accent: "text-emerald-400",
       sub: "Automação Completa de Cálculos",
-      desc: "Conecte-se ao PJe, gere cálculos previdenciários, trabalhistas e cíveis, assine e protocole diretamente no processo em poucos cliques.",
+      desc: "Conecte-se ao PJe, consulte dados e gere cálculos previdenciários, assine e protocole diretamente no processo em poucos cliques.",
     },
     {
       icon: <ClipboardCheck size={20} className="text-amber-300" />,
@@ -93,7 +93,7 @@ export default function SobrePage() {
           <p className="text-white/60 leading-relaxed">
             Democratizar o acesso à tecnologia jurídica avançada, reduzindo o tempo gasto em
             tarefas repetitivas e aumentando a qualidade das peças e cálculos produzidos por
-            advogados, defensores e membros do Ministério Público em todo o Brasil.
+            operadores do direito.
           </p>
         </section>
 
@@ -151,14 +151,7 @@ export default function SobrePage() {
           </div>
         </section>
 
-        {/* Contato */}
-        <section className="bg-white/[0.03] border border-white/[0.06] rounded-2xl p-6">
-          <h2 className="text-lg font-bold text-white mb-3">Contato</h2>
-          <p className="text-white/60 leading-relaxed mb-2">
-            Para dúvidas, parcerias, suporte ou imprensa:
-          </p>
-          <p className="text-indigo-400 font-medium">contato@judicore.com.br</p>
-        </section>
+
 
       </main>
 

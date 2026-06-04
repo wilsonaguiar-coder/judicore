@@ -182,11 +182,7 @@ export default function TermosPage() {
           </p>
         </Section>
 
-        <Section title="13. Contato">
-          <p>
-            Para dúvidas sobre estes Termos: <span className="text-indigo-400">contato@judicore.com.br</span>
-          </p>
-        </Section>
+
 
       </main>
 

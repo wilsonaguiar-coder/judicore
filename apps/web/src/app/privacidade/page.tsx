@@ -74,7 +74,6 @@ export default function PrivacidadePage() {
             meio desta plataforma, responsável pelas decisões sobre o tratamento dos dados,
             em conformidade com a Lei Geral de Proteção de Dados (LGPD — Lei nº 13.709/2018).
           </p>
-          <p>Contato: <span className="text-indigo-400">privacidade@judicore.com.br</span></p>
         </Section>
 
         <Section title="2. Dados Coletados">
@@ -129,9 +128,6 @@ export default function PrivacidadePage() {
             <Li>Portabilidade dos dados a outro fornecedor de serviço</Li>
             <Li>Revogar o consentimento a qualquer momento</Li>
           </ul>
-          <p className="mt-3">
-            Para exercer seus direitos: <span className="text-indigo-400">privacidade@judicore.com.br</span>
-          </p>
         </Section>
 
         <Section title="8. Cookies">
@@ -158,11 +154,7 @@ export default function PrivacidadePage() {
           </p>
         </Section>
 
-        <Section title="11. Contato — DPO">
-          <p>
-            Encarregado de Proteção de Dados (DPO): <span className="text-indigo-400">privacidade@judicore.com.br</span>
-          </p>
-        </Section>
+
 
       </main>
 
