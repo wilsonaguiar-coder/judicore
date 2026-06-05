@@ -170,8 +170,9 @@ const RULE_TITLES: Record<string, string> = {
   MATRIX_GENERIC_FATO:                  "Fato genérico na argumentação — personalize ao caso concreto",
   MATRIX_GENERIC_NORMA:                 "Norma genérica na argumentação — cite o dispositivo específico",
   MATRIX_MISSING_FIELD:                 "Campo obrigatório ausente na estrutura argumentativa",
-  UNFILLED_TEMPLATE_PLACEHOLDERS:       "Campos de template não preenchidos",
-  EMPTY_OR_SKELETON_DRAFT:              "Minuta vazia ou insuficiente — estrutura de template sem conteúdo",
+  UNFILLED_TEMPLATE_PLACEHOLDERS:              "Campos de template não preenchidos",
+  EMPTY_OR_SKELETON_DRAFT:                    "Minuta vazia ou insuficiente — estrutura de template sem conteúdo",
+  SENTENCE_REASONING_DISPOSITIVE_CONTRADICTION: "Contradição entre fundamentação e dispositivo",
 };
 
 // ── Mapeamento de regras para sugestões de melhoria ──────────────────────────

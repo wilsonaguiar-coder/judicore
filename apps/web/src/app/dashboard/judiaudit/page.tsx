@@ -125,6 +125,7 @@ const PERFIL_LABEL: Record<string, string> = {
   JEF_ESTADUAL:         "Juizado Especial Estadual",
   CONSUMIDOR:           "Direito do Consumidor",
   EXECUCAO_CUMPRIMENTO: "Execução / Cumprimento",
+  TRABALHISTA:          "Direito do Trabalho",
 };
 const TIPO_PECA_LABEL: Record<string, string> = {
   PETICAO_INICIAL: "Petição Inicial",

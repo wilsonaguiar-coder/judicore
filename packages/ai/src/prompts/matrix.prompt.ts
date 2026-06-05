@@ -87,6 +87,17 @@ REGRAS OBRIGATÓRIAS:
 - jurisprudencia_id: use SOMENTE IDs de jurisprudências FOUNDATION. Nunca coloque ID de COUNTER_ARGUMENT neste campo.
 - counter_jurisprudencia_id: use apenas IDs de jurisprudências COUNTER_ARGUMENT para distinguishing. null se não houver.
 - norma: NUNCA invente artigos. Use apenas diplomas aplicáveis à ${classification.tipo_justica} / regime ${classification.regime_juridico ?? "geral"}
+${classification.tipo_justica === "TRABALHO" ? `
+TRABALHISTA — teses recorrentes que DEVEM ser geradas quando o contexto indicar:
+  • Da ausência de comprovação de falta grave (art. 482 CLT)
+  • Da ausência de gradação das penalidades (princípio da proporcionalidade)
+  • Da ausência de imediatidade (nexo temporal entre fato e punição)
+  • Da nulidade da justa causa e reconhecimento da dispensa imotivada
+  • Do direito às verbas rescisórias (art. 477 CLT)
+  • Do aviso prévio indenizado (art. 487 CLT)
+  • Da multa de 40% do FGTS (art. 18 §1º Lei 8.036/90)
+Se a peça tiver seção DO DIREITO com subtítulos numerados (1., 2., 3. ou I, II, III),
+CADA subtítulo argumentativo deve gerar pelo menos uma tese na matriz.` : ""}
 - fato: deve ser concreto e específico ao caso — jamais genérico
 - ratio: explique o nexo jurídico entre norma, fato e pedido
 - Se houver jurisprudência CONTRARIA relevante: crie tese de refutação com counter_jurisprudencia_id preenchido e distinguishing explicando por que o caso dos autos difere

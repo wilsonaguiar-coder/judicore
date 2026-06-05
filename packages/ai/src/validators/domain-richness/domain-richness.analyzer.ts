@@ -38,9 +38,10 @@ export class DomainRichnessAnalyzer {
     // Área explícita tem prioridade — permite override preciso
     if (area && isValidProfile(area)) return area;
 
-    // Regime jurídico resolve RPPS e RGPS diretamente
+    // Regime jurídico resolve RPPS, RGPS e CLT diretamente
     if (regimeJuridico === "RPPS") return "RPPS";
     if (regimeJuridico === "RGPS") return "RGPS";
+    if (regimeJuridico === "CLT")  return "TRABALHISTA";
 
     // Detecção textual para JEF, execução e consumidor
     if (assunto) {

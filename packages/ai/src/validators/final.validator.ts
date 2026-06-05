@@ -168,7 +168,22 @@ export class FinalValidator {
 
     // 6. Qualidade da matriz (emite avisos sem bloquear)
     const matrixResult = this.matrixQuality.validate(matrix, extraction);
-    allErrors.push(...matrixResult.errors);
+    let matrixErrors = matrixResult.errors;
+
+    // BLOCO 3 — guard trabalhista: se a peça contém teses trabalhistas reconhecíveis
+    // (nulidade de justa causa, gradação, imediatidade, verbas rescisórias) ou
+    // subtítulos numerados numa seção DO DIREITO, MATRIX_INSUFFICIENT_TESES
+    // não dispara — o extrator pode ter sub-contado os pedidos implícitos.
+    if (classification.tipo_justica === "TRABALHO") {
+      const TRABALHISTA_TESES_IMPLICITAS_RE =
+        /nulidade\s+d[ae]\s+justa\s+causa|aus[eê]ncia\s+de\s+(?:gradação|imediatidade|prova)|falta\s+grave\s+n[aã]o\s+comprovad[ao]|verbas?\s+rescis[oó]rias?|aviso\s+prévio|FGTS\s+(?:e\s+)?40\s*%/i;
+      const NUMBERED_DIREITO_RE = /DO\s+DIREITO[\s\S]{0,50}(?:\n\s*\d+\s*[\.\-\)—]|\n\s*[IVX]+\s*[\.\-\)—])/i;
+      if (TRABALHISTA_TESES_IMPLICITAS_RE.test(draft) || NUMBERED_DIREITO_RE.test(draft)) {
+        matrixErrors = matrixErrors.filter((e) => e.rule !== "MATRIX_INSUFFICIENT_TESES");
+      }
+    }
+
+    allErrors.push(...matrixErrors);
 
     // Validação de posicionamento de evidências (stance)
     allErrors.push(...this.evidenceStance.validateMatrix(matrix, evidenceAnalyses));

@@ -481,6 +481,82 @@ function scoreConsumidor(draft: string): DomainDimension[] {
   ];
 }
 
+// ── TRABALHISTA ───────────────────────────────────────────────────────────────
+// Calibrado para petição inicial trabalhista simples e correta → 75–85 pts.
+// Jurisprudência e objeções têm BASELINE não-zero — ausência não derruba a peça.
+
+const CLT_NORMAS_RE = [
+  /\bCLT\b|Consolidação\s+das\s+Leis\s+d[ao]\s+Trabalho/i,
+  /art\.?\s*482\b/i,                                           // justa causa
+  /art\.?\s*483\b/i,                                           // rescisão indireta
+  /art\.?\s*487\b/i,                                           // aviso prévio
+  /art\.?\s*477\b/i,                                           // verbas rescisórias
+  /art\.?\s*791[-–]A\b/i,                                      // honorários trabalhistas
+  /art\.?\s*7[°º]?\s*(?:d[ao]\s+)?(?:CF|Constitui[cç][aã]o)/i, // CF art. 7º
+  /\bFGTS\b|Lei\s+(?:n[.°º]?\s*)?8\.036/i,                    // FGTS
+  /art\.?\s*496\b|estabilidade/i,                              // estabilidade
+  /art\.?\s*394[-–]A\b|art\.?\s*396\b/i,                      // maternidade/amamentação
+  /art\.?\s*625[-–][A-Z]?\b|CEJUSC\b/i,                       // comissões conciliação
+  /adicional\s+(?:de\s+)?(?:insalubridade|periculosidade|noturno)/i,
+  /horas?\s+extras?\s+(?:habituais?|laboradas?)|hora\s+extra/i,
+  /NR[-–]\s*\d+|norma\s+regulamentadora/i,
+  /aviso\s+prévio\s+(?:proporcional|indenizado|trabalhado)/i,
+];
+
+const PEDIDOS_TRABALHISTAS_RE = [
+  /nulidade\s+d[ae]\s+justa\s+causa/i,
+  /dispensa\s+(?:sem\s+justa\s+causa|arbitrária|imotivada)/i,
+  /aviso\s+prévio(?:\s+indenizado)?/i,
+  /(?:multa\s+de?\s+)?40\s*%\s+(?:d[ao]\s+)?FGTS|multa\s+FGTS/i,
+  /verbas?\s+rescis[oó]rias?/i,
+  /saldo\s+de\s+salário/i,
+  /13[°º]\s+salário|décimo\s+terceiro/i,
+  /férias?\s+(?:proporcionais?|vencidas?)/i,
+  /horas?\s+extras?/i,
+  /adicional\s+(?:noturno|de\s+insalubridade|de\s+periculosidade)/i,
+  /reintegração|readmissão/i,
+  /reconhecimento\s+de\s+vínculo\s+empregatício/i,
+  /danos?\s+morais?\s+(?:trabalhista|d[ao]\s+reclamante)/i,
+  /indenização\s+(?:por\s+danos?\s+morais?|rescisória)/i,
+  /liberação\s+(?:d[ao]\s+)?FGTS/i,
+  /seguro[-\s]desemprego/i,
+];
+
+function scoreTrabalhista(draft: string): DomainDimension[] {
+  // Normas Trabalhistas (30) — tiers generosos; CLT + CF + leis especiais
+  const matchedNormas = CLT_NORMAS_RE.filter((re) => re.test(draft)).length;
+  const normasScore = tiered3(matchedNormas, 3, 6, 9, 30);
+
+  // Estrutura Processual (25)
+  const secScore = tiered4(countSections(draft), 1, 3, 5, 7, 25);
+
+  // Pedidos Trabalhistas (20) — dimensão central
+  const matchedPedidos = PEDIDOS_TRABALHISTAS_RE.filter((re) => re.test(draft)).length;
+  const pedidosScore = tiered3(matchedPedidos, 2, 5, 8, 20);
+
+  // Jurisprudência Trabalhista (10) — BASELINE 2: ausência não zera a dimensão
+  const trtTstMatches = (draft.match(/\bTST\b/ig) ?? []).length + (draft.match(/\bTRT\b/ig) ?? []).length;
+  const jc = jurCount(draft) + (trtTstMatches > 0 ? 1 : 0);
+  const jurScore = jc >= 3 ? 10 : jc >= 2 ? 7 : jc >= 1 ? 4 : 2;
+
+  // Enfrentamento de Objeções (10) — BASELINE 3
+  const objScore = OBJECTION_HANDLING_RE.test(draft) ? 10 : 3;
+
+  // Ausência de Expressões Genéricas (5)
+  const lower = draft.toLowerCase();
+  const bannedCount = BANNED_EXPRESSIONS.filter((e) => lower.includes(e)).length;
+  const genericScore = bannedCount === 0 ? 5 : bannedCount === 1 ? 3 : 0;
+
+  return [
+    { key: "normas",        label: "Normas Trabalhistas",             score: normasScore,  max: 30 },
+    { key: "estrutura",     label: "Estrutura Processual",            score: secScore,     max: 25 },
+    { key: "pedidos",       label: "Pedidos Trabalhistas",            score: pedidosScore, max: 20 },
+    { key: "jurisprudencia",label: "Jurisprudência Trabalhista",      score: jurScore,     max: 10 },
+    { key: "objecoes",      label: "Enfrentamento de Objeções",       score: objScore,     max: 10 },
+    { key: "expressoes",    label: "Ausência de Expressões Genéricas",score: genericScore, max:  5 },
+  ];
+}
+
 // ── CIVEL_GERAL — modelo atual ─────────────────────────────────────────────────
 
 function scoreCivelGeral(draft: string, isSentenca?: boolean): DomainDimension[] {
@@ -535,6 +611,7 @@ export const VALID_PROFILES: DomainProfile[] = [
   "JEF_ESTADUAL",
   "JEF_FEDERAL",
   "CONSUMIDOR",
+  "TRABALHISTA",
   "CIVEL_GERAL",
 ];
 
@@ -558,6 +635,7 @@ export function scoreDomainProfile(
     case "JEF_ESTADUAL":         dimensions = scoreJefEstadual(draft);            break;
     case "JEF_FEDERAL":          dimensions = scoreJefFederal(draft);             break;
     case "CONSUMIDOR":           dimensions = scoreConsumidor(draft);             break;
+    case "TRABALHISTA":          dimensions = scoreTrabalhista(draft);            break;
     case "CIVEL_GERAL":
     default:                     dimensions = scoreCivelGeral(draft, isSentenca); break;
   }

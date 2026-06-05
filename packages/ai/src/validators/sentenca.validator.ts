@@ -26,6 +26,15 @@ const RECURSO_RE = /(recurso\s+(ord[ií]n[aá]rio|cab[ií]vel|inominado|de\s+rev
 // Dispositivo genérico sem detalhamento de pedido ou benefício
 const DISPOSITIVO_VAGUE_RE = /julgo\s+(procedente|improcedente|parcialmente\s+procedente)\s+o\s+pedido[.\s]*$/i;
 
+// ── BLOCO 1: Contradição fundamentação × dispositivo ─────────────────────────
+// Fundamentação com predominância de elementos favoráveis ao autor
+const FUND_PRO_AUTOR_RE =
+  /nulidad[e\s]+d[ae]\s+justa\s+causa|aus[eê]ncia\s+de\s+prova\s+(?:robusta|suficiente)?|falta\s+grave\s+n[aã]o\s+comprovad[ao]|insuficiência\s+probatória|revers[aã]o\s+d[ae]\s+(?:justa\s+causa|dispen[sc]a)|procedência\s+do\s+pedido|n[aã]o\s+(?:comprovou?|ficou\s+comprovad[ao]|restou\s+comprovad[ao])\s+a?\s*(?:falta|justa\s+causa)|aus[eê]ncia\s+de\s+gradação\s+d[ae]s?\s+penalidades?|aus[eê]ncia\s+de\s+imediatidade|gradação\s+(?:de\s+penalidades?\s+)?n[aã]o\s+(?:observad[ao]|comprovad[ao]|demonstrad[ao])|imediatidade\s+n[aã]o\s+(?:observad[ao]|comprovad[ao]|demonstrad[ao])|justa\s+causa\s+n[aã]o\s+(?:comprovad[ao]|configurad[ao]|demonstrad[ao])/i;
+
+// Dispositivo julgando improcedente / mantendo a justa causa
+const DISP_IMPROCEDENTE_RE =
+  /julgo\s+(?:totalmente\s+)?improcedente[s]?\s+(?:os\s+)?pedidos?|indefiro\s+os\s+pedidos?|mantenho\s+a\s+justa\s+causa|rejeito\s+o\s+pedido|julgo\s+improcedente\s+a\s+reclamatória/i;
+
 // Comprimentos mínimos das seções (mais rigorosos que antes)
 const MIN_RELATORIO = 350;
 const MIN_FUNDAMENTACAO = 600;
@@ -57,8 +66,19 @@ export class SentencaValidator {
       });
     }
 
-    // Dispositivo genérico sem identificar pedido ou benefício específico
+    // ── BLOCO 1: Contradição fundamentação × dispositivo (trabalhista) ──────────
     const sections = splitSections(draft);
+    if (sections.fundamentacao && sections.dispositivo) {
+      if (FUND_PRO_AUTOR_RE.test(sections.fundamentacao) && DISP_IMPROCEDENTE_RE.test(sections.dispositivo)) {
+        errors.push({
+          rule: "SENTENCE_REASONING_DISPOSITIVE_CONTRADICTION",
+          message: "Possível contradição entre fundamentação e dispositivo: a fundamentação contém elementos favoráveis ao autor (nulidade da justa causa / ausência de prova / insuficiência probatória) mas o dispositivo julga improcedente. Verifique a coerência da sentença.",
+          fatal: true,
+        });
+      }
+    }
+
+    // Dispositivo genérico sem identificar pedido ou benefício específico
     if (sections.dispositivo && DISPOSITIVO_VAGUE_RE.test(sections.dispositivo.trim())) {
       errors.push({
         rule: "SENTENCA_DISPOSITIVO_VAGUE",

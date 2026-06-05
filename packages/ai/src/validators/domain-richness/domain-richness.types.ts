@@ -5,6 +5,7 @@ export type DomainProfile =
   | "JEF_ESTADUAL"
   | "JEF_FEDERAL"
   | "CONSUMIDOR"
+  | "TRABALHISTA"
   | "CIVEL_GERAL";
 
 export interface DomainDimension {
