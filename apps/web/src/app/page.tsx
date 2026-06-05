@@ -25,7 +25,7 @@ function PreviewJudiCore() {
         <div className="w-2.5 h-2.5 rounded-full bg-yellow-500/60" />
         <div className="w-2.5 h-2.5 rounded-full bg-green-500/60" />
       </div>
-      <div className="text-sm text-white/70 font-semibold mb-4 leading-none">Petição Inicial</div>
+      <div className="text-xs text-white/70 font-semibold mb-4 leading-none">Petição Inicial</div>
       <div className="space-y-3 flex-1">
         <div className="h-2 bg-white/15 rounded-full w-full" />
         <div className="h-2 bg-white/10 rounded-full w-4/5" />
@@ -52,15 +52,15 @@ function PreviewJudiAudit() {
   return (
     <div className="w-full h-[160px] flex flex-col rounded-xl bg-[#100a02] border border-amber-900/40 p-5 overflow-hidden shadow-2xl group-hover:shadow-amber-500/20 transition-all">
       <div className="flex items-start justify-between mb-1">
-        <div className="text-xs text-amber-400/70 font-bold uppercase tracking-wider leading-none mt-1.5">SCORE DE RISCO</div>
-        <div className="text-[44px] font-black text-amber-400 leading-none drop-shadow-md">97</div>
+        <div className="text-[10px] text-amber-400/70 font-bold uppercase tracking-wider leading-none mt-1">SCORE DE RISCO</div>
+        <div className="text-[26px] font-black text-amber-400 leading-none">97</div>
       </div>
-      <div className="text-xs text-white/40 mb-auto leading-none">/100</div>
-      <div className="space-y-3 mt-4">
+      <div className="text-[10px] text-white/40 mb-2 leading-none">/100</div>
+      <div className="space-y-1 mt-1">
         {items.map(([label, color]) => (
-          <div key={label} className="flex items-center gap-3">
-            <div className={`w-2.5 h-2.5 rounded-full shrink-0 ${color === "green" ? "bg-green-400 shadow-[0_0_10px_rgba(74,222,128,0.6)]" : "bg-amber-400 shadow-[0_0_10px_rgba(251,191,36,0.6)]"}`} />
-            <div className="text-sm text-white/75 font-medium leading-none">{label}</div>
+          <div key={label} className="flex items-center gap-2">
+            <div className={`w-2 h-2 rounded-full shrink-0 ${color === "green" ? "bg-green-400 shadow-[0_0_8px_rgba(74,222,128,0.6)]" : "bg-amber-400 shadow-[0_0_8px_rgba(251,191,36,0.6)]"}`} />
+            <div className="text-xs text-white/75 font-medium leading-none">{label}</div>
           </div>
         ))}
       </div>
@@ -69,24 +69,24 @@ function PreviewJudiAudit() {
 }
 
 function PreviewPJE() {
-  const docs = ["Petição Inicial", "Contestação", "Decisão", "Acórdão"];
+  const docs = ["Petição Inicial", "Contestação", "Decisão", "Impugnação"];
   return (
     <div className="w-full h-[160px] flex flex-col rounded-xl bg-[#020c14] border border-cyan-900/40 p-4 overflow-hidden shadow-2xl group-hover:shadow-cyan-500/20 transition-all">
       <div className="flex items-center gap-2 mb-3">
         <div className="w-1.5 h-1.5 rounded-full bg-cyan-400 shadow-[0_0_6px_rgba(34,211,238,0.8)]" />
-        <div className="text-[9px] text-cyan-400/80 font-mono leading-none truncate">0001234-56.2024.5.04.0101</div>
+        <div className="text-[10px] text-cyan-400/80 font-mono leading-none truncate">0001234-56.2024.5.04.0101</div>
       </div>
       <div className="flex-1 space-y-1.5">
         {docs.map((doc, i) => (
           <div key={doc} className="flex items-center gap-2">
             <div className={`w-1.5 h-1.5 rounded-sm ${i === docs.length - 1 ? "bg-cyan-500" : "bg-white/20"}`} />
-            <span className={`text-[11px] leading-none ${i === docs.length - 1 ? "text-cyan-300" : "text-white/45"}`}>{doc}</span>
+            <span className={`text-xs leading-none ${i === docs.length - 1 ? "text-cyan-300" : "text-white/45"}`}>{doc}</span>
           </div>
         ))}
       </div>
       <div className="flex items-center justify-between pt-2 border-t border-white/[0.07] mt-1">
-        <span className="text-[9px] text-white/30">{docs.length} documentos</span>
-        <span className="px-2 py-0.5 rounded bg-cyan-600/25 border border-cyan-500/30 text-[9px] text-cyan-400 font-semibold">+ Incluir Peça</span>
+        <span className="text-[10px] text-white/30">{docs.length} documentos</span>
+        <span className="px-2 py-0.5 rounded bg-cyan-600/25 border border-cyan-500/30 text-[10px] text-cyan-400 font-semibold">+ Incluir Peça</span>
       </div>
     </div>
   );
@@ -233,41 +233,57 @@ export default function LandingPage() {
       {/* ── Hero ─────────────────────────────────────────────────────────── */}
       <main className="relative z-10 flex-1 flex flex-col items-center justify-start px-6 md:px-14 pt-8 md:pt-12 pb-20">
         
-        <div className="w-full max-w-6xl relative overflow-visible">
+        <div className="w-full max-w-6xl">
 
-          {/* Texto hero — coluna esquerda */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
-            className="w-full md:w-[54%] lg:w-[50%] text-center md:text-left relative z-[2] pt-4 pb-10"
-          >
-            <h1 className="text-5xl md:text-[64px] lg:text-[72px] font-black tracking-tight mb-6 leading-[1.05] drop-shadow-2xl">
-              Inteligência que<br className="hidden md:block" /> transforma o{" "}
-              <span className="relative inline-block">
-                <span className="bg-gradient-to-r from-violet-400 via-indigo-400 to-purple-400 bg-clip-text text-transparent">
-                  Direito.
-                </span>
-                <div className="absolute -inset-1 bg-gradient-to-r from-violet-600/30 to-purple-600/30 blur-2xl -z-10 opacity-70" />
-              </span>
-            </h1>
-            <p className="text-lg md:text-2xl text-white/60 max-w-xl font-light leading-relaxed mx-auto md:mx-0">
-              Ferramentas inteligentes para operadores do direito. Escolha o módulo que deseja e deixe a IA te ajudar.
-            </p>
+          {/* Hero: texto + Themis. bottom-0 da Themis = topo dos cards */}
+          <div className="relative">
             <motion.div
-              initial={{ opacity: 0, y: 10 }}
+              initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.2, duration: 0.5 }}
-              className="flex flex-wrap items-center justify-center md:justify-start gap-3 mt-8 relative z-20"
+              transition={{ duration: 0.6 }}
+              className="w-full md:w-[54%] lg:w-[50%] text-center md:text-left relative z-[2] pt-4 pb-10"
             >
-              {STATS.map((s) => (
-                <div key={s.label} className="flex flex-col items-center justify-center gap-1 px-4 py-2.5 rounded-2xl bg-white/[0.04] border border-white/[0.08] backdrop-blur-md shadow-[0_0_15px_rgba(255,255,255,0.03)] text-center">
-                  <span className="text-xl font-black text-white tracking-tight leading-none">{s.value}</span>
-                  <span className="text-[10px] text-white/50 tracking-wider uppercase font-bold leading-none">{s.label}</span>
-                </div>
-              ))}
+              <h1 className="text-5xl md:text-[64px] lg:text-[72px] font-black tracking-tight mb-6 leading-[1.05] drop-shadow-2xl">
+                Inteligência que<br className="hidden md:block" /> transforma o{" "}
+                <span className="relative inline-block">
+                  <span className="bg-gradient-to-r from-violet-400 via-indigo-400 to-purple-400 bg-clip-text text-transparent">
+                    Direito.
+                  </span>
+                  <div className="absolute -inset-1 bg-gradient-to-r from-violet-600/30 to-purple-600/30 blur-2xl -z-10 opacity-70" />
+                </span>
+              </h1>
+              <p className="text-lg md:text-2xl text-white/60 max-w-xl font-light leading-relaxed mx-auto md:mx-0">
+                Ferramentas inteligentes para operadores do direito. Escolha o módulo que deseja e deixe a IA te ajudar.
+              </p>
+              <motion.div
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.2, duration: 0.5 }}
+                className="flex flex-wrap items-center justify-center md:justify-start gap-3 mt-8 relative z-20"
+              >
+                {STATS.map((s) => (
+                  <div key={s.label} className="flex flex-col items-center justify-center gap-1 px-4 py-2.5 rounded-2xl bg-white/[0.04] border border-white/[0.08] backdrop-blur-md shadow-[0_0_15px_rgba(255,255,255,0.03)] text-center">
+                    <span className="text-xl font-black text-white tracking-tight leading-none">{s.value}</span>
+                    <span className="text-[10px] text-white/50 tracking-wider uppercase font-bold leading-none">{s.label}</span>
+                  </div>
+                ))}
+              </motion.div>
             </motion.div>
-          </motion.div>
+
+            <motion.div
+              initial={{ opacity: 0, x: 24 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.7, delay: 0.08 }}
+              className="hidden md:block absolute right-0 bottom-0 w-[530px] h-[640px] pointer-events-none z-[5]"
+            >
+              <Image
+                src="/hero.png"
+                alt="Themis"
+                fill
+                sizes="530px"
+                className="object-contain object-bottom drop-shadow-[0_0_50px_rgba(139,92,246,0.3)] filter contrast-[1.15] brightness-90"
+                priority
+              />
+            </motion.div>
+          </div>
 
           {/* 3 Cards — largura total, abaixo do texto */}
           <div className="grid md:grid-cols-3 gap-5 relative z-[2]">
@@ -319,21 +335,6 @@ export default function LandingPage() {
               );
             })}
           </div>
-
-          {/* Themis — pés apoiados na borda superior dos cards */}
-          <motion.div
-            initial={{ opacity: 0, x: 24 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.7, delay: 0.08 }}
-            className="hidden md:block absolute right-0 bottom-[400px] w-[530px] h-[640px] pointer-events-none z-[5]"
-          >
-            <Image
-              src="/hero.png"
-              alt="Themis"
-              fill
-              sizes="530px"
-              className="object-contain object-bottom drop-shadow-[0_0_50px_rgba(139,92,246,0.3)] filter contrast-[1.15] brightness-90"
-              priority
-            />
-          </motion.div>
         </div>
 
       </main>
