@@ -76,7 +76,9 @@ const TRIGGER_FAMILY_GUARDA =
 const COVERAGE_MELHOR_INTERESSE =
   /melhor\s+interesse|interesse\s+(?:superior\s+)?d[ae]\s+(?:crian[cç]a|adolescente)|prote[cç][aã]o\s+integral|prioridade\s+absoluta|bem[-\s]estar\s+(?:d[ae]\s+)?(?:crian[cç]a|menor)|desenvolvimento\s+(?:integral|d[ae]\s+(?:crian[cç]a|menor))/i;
 const COVERAGE_CONDICOES_GENITORES =
-  /genitor|genitora|\bcapacidade\s+parental\b|\bcond[ií](?:ç[oõ]es|c[ãa]o)\s+(?:de\s+)?(?:vida|criar|cuidar|moradia)\b|rotina\s+d[ae]\s+(?:crian[cç]a|menor)|v[ií]nculo\s+afetivo|afeto\s+(?:com\s+)?(?:a\s+)?(?:crian[cç]a|filho|menor)|cuidado\s+(?:com\s+)?(?:o?\s+)?(?:filho|menor|crian[cç]a)|ambiente\s+familiar\s+(?:saud[aá]vel|prop[ií]cio)/i;
+  // Nota: não inclui "genitor/genitora" isolados — aparecem em qualquer texto de guarda
+  // como referência à outra parte, sem discutir condições.
+  /\bcapacidade\s+parental\b|cond[ií](?:ç[oõ]es|c[ãa]o)\s+(?:de\s+)?(?:vida|criar|cuidar|moradia)|rotina\s+d[ae]\s+(?:crian[cç]a|menor)|v[ií]nculo\s+afetivo|afeto\s+(?:com\s+)?(?:a\s+)?(?:crian[cç]a|filho|menor)|cuidado\s+(?:com\s+)?(?:o?\s+)?(?:filho|menor|crian[cç]a)|ambiente\s+familiar\s+(?:saud[aá]vel|prop[ií]cio)/i;
 
 function validateFamiliaGuarda(draft: string): ValidationError | null {
   if (!TRIGGER_FAMILY_GUARDA.test(draft)) return null;
@@ -96,7 +98,9 @@ function validateFamiliaGuarda(draft: string): ValidationError | null {
 const TRIGGER_CONSUMIDOR_COBERTURA =
   /cobran[cç]a\s+indevida|restitui[cç][aã]o\s+(?:de\s+)?valores?|repeti[cç][aã]o\s+d[ao]\s+ind[eé]bito|dano\s+moral\s+(?:(?:ao?\s+)?consumidor|consumerista)|vício\s+d[ao]\s+produto|defeito\s+d[ao]\s+servi[cç]o/i;
 const COVERAGE_FALHA =
-  /falha\s+na\s+presta[cç][aã]o|defeito\s+d[ao]\s+servi[cç]o|v[ií]cio\s+d[ao]\s+produto|servi[cç]o\s+defeituoso|produto\s+defeituoso|cobran[cç]a\s+indevida|conduta\s+il[ií]cita|pr[aá]tica\s+abusiva/i;
+  // Nota: não inclui "cobrança indevida" — está no TRIGGER, gerando auto-satisfação.
+  // Cobertura requer EXPLICAÇÃO da falha, não apenas nomeação da pretensão.
+  /falha\s+na\s+presta[cç][aã]o|defeito\s+d[ao]\s+servi[cç]o|v[ií]cio\s+d[ao]\s+produto|servi[cç]o\s+defeituoso|produto\s+defeituoso|conduta\s+il[ií]cita|pr[aá]tica\s+abusiva|irregularidade\s+(?:na\s+presta[cç][aã]o|do\s+servi[cç]o)/i;
 const COVERAGE_NEXO_DANO =
   /nexo\s+causal|dano(?:\s+moral|\s+material|\s+sofrido)?|preju[ií]zo|abalo\s+moral|transtorno|restitui[cç][aã]o|ind[eé]bito|pagamento\s+indevido/i;
 
