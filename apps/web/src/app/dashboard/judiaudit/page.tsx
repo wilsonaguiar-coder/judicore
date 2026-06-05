@@ -117,6 +117,15 @@ const FUND_COLOR: Record<string, string> = {
   DIPLOMA: "bg-emerald-50 text-emerald-700 border-emerald-100",
 };
 const FUND_LABEL: Record<string, string> = { ARTIGO: "Art.", JURISPRUDENCIA: "Prec.", DIPLOMA: "Lei" };
+const PERFIL_LABEL: Record<string, string> = {
+  CIVEL_GERAL:          "Cível Geral",
+  RPPS:                 "Previdência — RPPS",
+  RGPS:                 "Previdência — RGPS",
+  JEF_FEDERAL:          "Juizado Especial Federal",
+  JEF_ESTADUAL:         "Juizado Especial Estadual",
+  CONSUMIDOR:           "Direito do Consumidor",
+  EXECUCAO_CUMPRIMENTO: "Execução / Cumprimento",
+};
 const TIPO_PECA_LABEL: Record<string, string> = {
   PETICAO_INICIAL: "Petição Inicial",
   RECURSO:         "Recurso",
@@ -376,7 +385,7 @@ export default function JudiAuditPage() {
               { icon: <Scale size={13} />, label: "Consistência", score: r.consistenciaArgumentativa.score, sub: r.consistenciaArgumentativa.resultado },
               { icon: <FileText size={13} />, label: "Estrutural", score: r.qualidadeEstrutural.score, sub: r.qualidadeEstrutural.label },
               { icon: <Gavel size={13} />, label: "Probatória", score: r.qualidadeProbatoria.score, sub: r.qualidadeProbatoria.label },
-              { icon: <BarChart3 size={13} />, label: "Argumentativa", score: r.qualidadeArgumentativa.score, sub: r.qualidadeArgumentativa.perfil },
+              { icon: <BarChart3 size={13} />, label: "Argumentativa", score: r.qualidadeArgumentativa.score, sub: PERFIL_LABEL[r.qualidadeArgumentativa.perfil] ?? r.qualidadeArgumentativa.perfil },
             ].map(({ icon, label, score, sub }) => (
               <div key={label} className="bg-white border border-border rounded-xl p-4 shadow-sm">
                 <div className="flex items-center gap-1.5 mb-2 text-slate-400">{icon}<p className="text-[10px] font-bold uppercase tracking-wider text-slate-500">{label}</p></div>
@@ -411,7 +420,7 @@ export default function JudiAuditPage() {
           <div className="flex items-center gap-2 mb-4">
             <BarChart3 size={15} className="text-violet-500" />
             <h3 className="font-semibold text-slate-800 text-sm">Qualidade Argumentativa</h3>
-            <span className="ml-auto text-xs bg-slate-100 text-slate-500 px-2 py-0.5 rounded-full">{r.qualidadeArgumentativa.perfil}</span>
+            <span className="ml-auto text-xs bg-slate-100 text-slate-500 px-2 py-0.5 rounded-full">{PERFIL_LABEL[r.qualidadeArgumentativa.perfil] ?? r.qualidadeArgumentativa.perfil}</span>
             {r.qualidadeArgumentativa.normalizedScore > r.qualidadeArgumentativa.score && (
               <span className="text-xs text-blue-600 font-semibold">norm. {r.qualidadeArgumentativa.normalizedScore}</span>
             )}
