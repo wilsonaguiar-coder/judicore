@@ -181,7 +181,7 @@ export class FinalValidator {
     if (mode === "FINAL_DRAFT" && genericityScore >= 3) {
       allErrors.push({
         rule: "FINAL_DRAFT_GENERIC_LANGUAGE",
-        message: "A peça FINAL_DRAFT contém linguagem genérica demais — revise a fundamentação.",
+        message: "A minuta contém linguagem genérica demais — revise a fundamentação com argumentos específicos ao caso.",
         fatal: false,
       });
     }

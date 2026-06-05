@@ -428,7 +428,7 @@ export default function JudiAuditPage() {
               <div className="flex items-center gap-2 mb-3"><AlertCircle size={14} className="text-red-600" /><h3 className="font-semibold text-red-800 text-sm">Problemas Fatais</h3><span className="ml-auto bg-red-200 text-red-900 text-xs font-bold px-2 py-0.5 rounded-full">{r.problemasFatais.length}</span></div>
               <div className="space-y-2">
                 {r.problemasFatais.map((p, i) => (
-                  <div key={i} className="bg-white/70 rounded-xl p-3"><p className="text-xs font-semibold text-red-900">{p.titulo}</p><p className="text-xs text-red-700 mt-0.5 line-clamp-2">{p.descricao}</p></div>
+                  <div key={i} className="bg-white/70 rounded-xl p-3"><p className="text-xs font-semibold text-red-900">{p.titulo}</p><p className="text-xs text-red-700 mt-0.5 leading-relaxed">{p.descricao}</p></div>
                 ))}
               </div>
             </div>
@@ -443,7 +443,7 @@ export default function JudiAuditPage() {
             {r.problemasNaoFatais.length > 0 ? (
               <div className="space-y-2">
                 {r.problemasNaoFatais.slice(0, 5).map((p, i) => (
-                  <div key={i} className="bg-white/70 rounded-xl p-3"><p className="text-xs font-semibold text-amber-900">{p.titulo}</p><p className="text-xs text-amber-700 mt-0.5 line-clamp-2">{p.descricao}</p></div>
+                  <div key={i} className="bg-white/70 rounded-xl p-3"><p className="text-xs font-semibold text-amber-900">{p.titulo}</p><p className="text-xs text-amber-700 mt-0.5 leading-relaxed">{p.descricao}</p></div>
                 ))}
                 {r.problemasNaoFatais.length > 5 && <p className="text-xs text-amber-600 text-center">+{r.problemasNaoFatais.length - 5} adicionais</p>}
               </div>
@@ -471,7 +471,7 @@ export default function JudiAuditPage() {
                 {r.riscosProcessuais.map((rk, i) => (
                   <div key={i} className={`rounded-xl p-2.5 border ${rk.severidade === "FATAL" ? "bg-red-50 border-red-100" : "bg-orange-50 border-orange-100"}`}>
                     <p className={`text-xs font-semibold ${rk.severidade === "FATAL" ? "text-red-800" : "text-orange-800"}`}>{rk.titulo}</p>
-                    <p className="text-xs text-slate-500 mt-0.5 line-clamp-2">{rk.descricao}</p>
+                    <p className="text-xs text-slate-500 mt-0.5 leading-relaxed">{rk.descricao}</p>
                   </div>
                 ))}
               </div>

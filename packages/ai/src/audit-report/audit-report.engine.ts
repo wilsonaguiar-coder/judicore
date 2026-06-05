@@ -356,10 +356,24 @@ export class AuditReportEngine {
     return map[final];
   }
 
+  private sanitizeMessage(msg: string): string {
+    return msg
+      .replace(/\bFINAL_DRAFT\b/g, "minuta")
+      .replace(/\bPETICAO_INICIAL\b/g, "Petição Inicial")
+      .replace(/\bRECURSO\b/g, "Recurso")
+      .replace(/\bSENTENCA\b/g, "Sentença")
+      .replace(/\bDECISAO\b/g, "Decisão")
+      .replace(/\bDESPACHO\b/g, "Despacho")
+      .replace(/\btipo_peca\b/g, "tipo de peça")
+      .replace(/\btipo_justica\b/g, "tipo de justiça")
+      .replace(/\bregime_juridico\b/g, "regime jurídico")
+      .replace(/\bassunto_principal\b/g, "assunto principal");
+  }
+
   private errorToItem(e: ValidationError, severidade: "FATAL" | "IMPORTANTE"): AuditItem {
     return {
       titulo: RULE_TITLES[e.rule] ?? e.rule,
-      descricao: e.message,
+      descricao: this.sanitizeMessage(e.message),
       regra: e.rule,
       severidade,
     };
@@ -585,7 +599,7 @@ export class AuditReportEngine {
       score -= 30;
       detalhes.push({
         titulo: RULE_TITLES[e.rule] ?? e.rule,
-        descricao: e.message,
+        descricao: this.sanitizeMessage(e.message),
         regra: e.rule,
         severidade: "FATAL",
       });
@@ -597,7 +611,7 @@ export class AuditReportEngine {
       score -= 20;
       detalhes.push({
         titulo: "Jurisprudência contrária não tratada",
-        descricao: e.message,
+        descricao: this.sanitizeMessage(e.message),
         regra: e.rule,
         severidade: "FATAL",
       });

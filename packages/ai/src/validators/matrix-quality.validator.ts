@@ -21,7 +21,7 @@ export class MatrixQualityValidator {
     if (matrix.teses.length < extraction.pedidos.length) {
       errors.push({
         rule: "MATRIX_INSUFFICIENT_TESES",
-        message: `Matriz tem ${matrix.teses.length} tese(s) para ${extraction.pedidos.length} pedido(s) — FINAL_DRAFT rebaixado`,
+        message: `Número de teses insuficiente: ${matrix.teses.length} tese(s) elaboradas para ${extraction.pedidos.length} pedido(s) formulados.`,
         fatal: false,
       });
     }

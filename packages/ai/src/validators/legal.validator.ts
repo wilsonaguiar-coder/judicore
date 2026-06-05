@@ -7,10 +7,10 @@ export class LegalRulesValidator {
     const errors: ValidationError[] = [];
 
     if (!classification.tipo_justica) {
-      errors.push({ rule: "REQUIRED_FIELD", message: "tipo_justica é obrigatório", fatal: true });
+      errors.push({ rule: "REQUIRED_FIELD", message: "Tipo de justiça não identificado — verifique o caso", fatal: true });
     }
     if (!classification.tipo_peca) {
-      errors.push({ rule: "REQUIRED_FIELD", message: "tipo_peca é obrigatório", fatal: true });
+      errors.push({ rule: "REQUIRED_FIELD", message: "Tipo de peça não identificado — verifique o documento", fatal: true });
     }
     if (
       !classification.regime_juridico &&
@@ -20,7 +20,7 @@ export class LegalRulesValidator {
       errors.push({ rule: "REQUIRED_FIELD", message: "regime_juridico não identificado — verifique o caso", fatal: false });
     }
     if (classification.confianca < 0.5) {
-      errors.push({ rule: "LOW_CONFIDENCE", message: `Confiança muito baixa na classificação: ${classification.confianca}`, fatal: false });
+      errors.push({ rule: "LOW_CONFIDENCE", message: "Documento com baixa confiança de classificação — os resultados podem ser menos precisos", fatal: false });
     }
 
     for (const combo of FORBIDDEN_COMBINATIONS) {
@@ -155,7 +155,7 @@ export class LegalRulesValidator {
     };
     for (const term of (pieceProhibitions[classification.tipo_peca] ?? [])) {
       if (lowerDraft.includes(term)) {
-        errors.push({ rule: "PROHIBITED_TERM", message: `"${term}" proibido em ${classification.tipo_peca}`, fatal: true });
+        errors.push({ rule: "PROHIBITED_TERM", message: `Termo "${term}" não é adequado para este tipo de peça`, fatal: true });
       }
     }
 
