@@ -2,8 +2,26 @@ import type { DomainDimension, DomainProfile } from "./domain-richness.types.js"
 
 // ── Shared constants ──────────────────────────────────────────────────────────
 
-const SECTION_MARKERS_RE =
-  /\bTese\s+\d+|^\s*\d+\.\s+\S|^\s*[IVX]+\s*[.—\-\):;]|^\s*D[AO]S?\s+[A-ZÁÀÂÃÉÊÍÓÔÕÚ]{3}/gim;
+const SECTION_MARKERS_RE = new RegExp(
+  // 1. "Tese 1", "Tese 2" etc.
+  "\\bTese\\s+\\d+" +
+  // 2. Seções numeradas no início de linha ("1. ", "2. "...)
+  "|^\\s*\\d+\\.\\s+\\S" +
+  // 3. Numerais romanos no início de linha — inclui en dash (U+2013) e em dash (U+2014)
+  "|^\\s*[IVX]+\\s*[.\\u2014\\u2013\\-\\):;]" +
+  // 4. Numerais romanos inline (para quando extrator DOCX perde quebras de linha)
+  //    Ex: "I – DOS FATOS" no meio do texto
+  "|\\b[IVX]{1,4}\\s*[\\u2014\\u2013\\-\\.\\)]\\s+[A-ZÁÀÂÃÉÊÍÓÔÕÚa-záàâãéêíóôõú]" +
+  // 5. Seções com DO/DA/DOS/DAS no início de linha
+  "|^\\s*D[AO]S?\\s+[A-Z\\u00C0-\\u00D6\\u00D8-\\u00DE]{3}" +
+  // 6. Keywords explícitos de seções jurídicas ao início de linha
+  //    (sem necessidade de prefixo DO/DA — cobre RELATÓRIO, FUNDAMENTAÇÃO, etc.)
+  "|^\\s*(?:RELAT[OÓ]RIO|FUNDAMENTA[CÇ][AÃ]O|DISPOSITIVO|PEDIDOS?|CONCLUS[AÃ]O" +
+  "|S[IÍ]NTESE|PRE[AÂ]MBULO|CABE[CÇ]ALHO|HIST[OÓ]RICO|PROVAS?|DIREITO|M[EÉ]RITO" +
+  "|MOTIVA[CÇ][AÃ]O|DO\\s+M[EÉ]RITO|DA\\s+CAUSA|DOS\\s+FATOS?|DO\\s+DIREITO" +
+  "|DA\\s+FUNDAMENTA|DOS\\s+PEDIDOS?|DOS\\s+FUNDAMENTOS?|DA\\s+CONCLUS[AÃ]O)\\b",
+  "gim",
+);
 
 const OBJECTION_HANDLING_RE =
   /(?:poder[-\s]se[-\s]ia\s+(?:alegar|sustentar|objetar|arguir)|eventual\s+(?:alegação|objeção|argumento|sustentação)|argumento\s+(?:em\s+contrário|contrário|da\s+(?:parte\s+)?ré|do\s+réu)|tese\s+(?:contrária|da\s+defesa|adversa)|em\s+resposta\s+(?:a\s+eventual|ao\s+argumento)|pode[-\s]se\s+(?:alegar|objetar)|a\s+(?:parte\s+)?(?:ré|recorrida|requerida)\s+(?:poderá?|poderão|argumentará?|sustentará?)|n[ãa]o\s+(?:é|será)\s+suficiente\s+(?:alegar|arguir)|ainda\s+que\s+se\s+alegue|mesmo\s+que\s+(?:se\s+)?(?:invoque|sustente|alegue)|contrarrazões?\s+(?:que\s+)?(?:podem|deverão?\s+ser))/i;
@@ -21,6 +39,7 @@ function countSections(draft: string): number {
   const re = new RegExp(SECTION_MARKERS_RE.source, SECTION_MARKERS_RE.flags);
   return (draft.match(re) ?? []).length;
 }
+
 
 function countCourts(draft: string): number {
   const s = new Set<string>();

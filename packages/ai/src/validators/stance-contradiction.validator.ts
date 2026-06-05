@@ -19,16 +19,72 @@ const ADVOCACY_RE =
   /\b(requer(?:-se)?|pleiteia?|postula?|pede(?:-se)?|pugna(?:-se)?|propõe?\s+(?:a\s+presente\s+)?ação|interpõe?\s+(?:o\s+presente\s+)?recurso|o\s+(?:autor|recorrente|reclamante|impetrante|requerente)\s+(?:pede|requer|pleiteia|postula|pugna)|em\s+face\s+do\s+exposto.{0,60}requer|diante\s+do\s+exposto.{0,60}requer|dos\s+fundamentos\s+expostos.{0,60}requer)\b/i;
 
 /**
- * Distinguishing VÁLIDO — exige substância real (diferença fática explicada),
- * NÃO apenas palavras de transição como "embora", "não obstante", "em que pese".
- * Verificado em janela de ±400 chars ao redor do impedimento.
+ * Distinguishing VÁLIDO — exige substância real (diferença fática explicada).
+ * FASE 5.3.3: ampliado para aceitar distinguishing sem exigir "precedente"/"paradigma".
  */
-const VALID_DISTINGUISHING_RE =
-  /\b(distinguishing|o\s+(?:presente\s+)?caso\s+(?:em\s+tela\s+)?(?:difere\s+do\s+precedente|apresenta\s+peculiaridade\s+que\s+o\s+distingue|é\s+distinto\s+do\s+paradigma)|hipótese\s+dos\s+autos\s+(?:difere|é\s+distinta)\s+(?:do\s+precedente|do\s+caso\s+paradigma)|situação\s+fática\s+(?:é\s+)?distinta\s+(?:do\s+precedente|do\s+caso)|peculiaridade\s+(?:fática|concreta)\s*[:—]\s*|inaplicabilidade\s+do\s+precedente\s+(?:ao\s+caso\s+concreto|pela\s+diferença\s+fática)|o\s+presente\s+(?:caso|processo)\s+(?:possui|apresenta|tem)\s+(?:peculiaridade|característica)\s+(?:fática\s+)?distinta\s+que)\b/i;
+const VALID_DISTINGUISHING_RE = new RegExp(
+  "\\b(" +
+  "distinguishing" +
+  "|o\\s+(?:presente\\s+)?caso\\s+(?:em\\s+tela\\s+)?(?:difere\\s+do\\s+precedente|apresenta\\s+peculiaridade\\s+que\\s+o\\s+distingue|é\\s+distinto\\s+do\\s+paradigma)" +
+  "|hipótese\\s+dos\\s+autos\\s+(?:difere|é\\s+distinta)\\s+(?:do\\s+precedente|do\\s+caso\\s+paradigma)" +
+  "|situação\\s+fática\\s+(?:é\\s+)?distinta\\s+(?:do\\s+precedente|do\\s+caso)" +
+  "|peculiaridade\\s+(?:fática|concreta)\\s*[:—]\\s*" +
+  "|inaplicabilidade\\s+do\\s+precedente\\s+(?:ao\\s+caso\\s+concreto|pela\\s+diferença\\s+fática)" +
+  "|o\\s+presente\\s+(?:caso|processo)\\s+(?:possui|apresenta|tem)\\s+(?:peculiaridade|característica)\\s+(?:fática\\s+)?distinta\\s+que" +
+  // FASE 5.3.3 — sem exigir "precedente" / "paradigma"
+  "|o\\s+caso\\s+(?:em\\s+tela\\s+)?difere\\s+pois" +
+  "|o\\s+presente\\s+caso\\s+difere\\s+porque" +
+  "|diferentemente\\s+(?:da\\s+situação|daquele\\s+julgado|do\\s+precedente\\s+citado|do\\s+caso\\s+paradigma)" +
+  "|data\\s+de\\s+ingresso\\s+(?:é|foi|era)\\s+anterior" +
+  "|ingressou\\s+antes\\s+da\\s+(?:EC\\s*41|emenda\\s+constitucional\\s*41|vigência\\s+da\\s+emenda)" +
+  "|ingresso\\s+anterior\\s+(?:à|a)\\s+(?:EC\\s*41|emenda\\s+constitucional\\s*41|31\\/12\\/2003)" +
+  "|preenchimento\\s+dos\\s+requisitos\\s+cumulativos" +
+  "|art\\.\\s*3[°º]?\\s+da\\s+EC\\s*47" +
+  "|art\\.\\s*7[°º]?\\s+da\\s+EC\\s*41" +
+  "|regra\\s+de\\s+transi[cç][aã]o\\s+(?:prevista|da\\s+EC)" +
+  ")\\b",
+  "i",
+);
+
+/**
+ * FASE 5.3.3 — Guarda de recurso: barRe na janela que cita a decisão recorrida.
+ * Impede falso positivo quando o recorrente transcreve a fundamentação adversa
+ * para impugná-la (voz do juiz a quo, não do recorrente).
+ */
+const QUOTING_CHALLENGED_DECISION_RE =
+  /senten[cç]a\s+recorrida|decis[aã]o\s+recorrida|acord[aã]o\s+recorrido|julgado\s+recorrido|ato\s+decis[oó]rio\s+recorrido|v\.\s+senten[cç]a|r\.\s+senten[cç]a/i;
+
+/**
+ * FASE 5.3.3 — Regras de transição RPPS que tornam a tese de paridade válida.
+ * EC 47/2005 art. 3º e EC 41/2003 art. 7º criam exceções legítimas à vedação geral.
+ */
+const RPPS_TRANSITION_RULE_RE =
+  /art\.\s*3[°º]?\s+da\s+(?:EC\s*47|emenda\s+constitucional\s*47)|art\.\s*7[°º]?\s+da\s+(?:EC\s*41|emenda\s+constitucional\s*41)|regra\s+de\s+transi[cç][aã]o\s+(?:prevista\s+(?:no|na)|da)\s+(?:EC|emenda)|servidor\s+que\s+ingressou\s+antes\s+(?:da\s+vigência\s+da\s+)?(?:EC\s*41|emenda\s+constitucional\s*41|31\/12\/2003)/i;
 
 /** Tese subsidiária válida — há pedido alternativo. */
 const SUBSIDIARY_RE =
   /\b(alternativamente|subsidiariamente|pedido\s+subsidiário|tese\s+subsidiária|em\s+caso\s+de\s+(?:não\s+)?(?:provimento|procedência)|ou,\s+caso\s+(?:assim|não)\s+(?:entenda|seja))\b/i;
+
+/**
+ * FASE 5.3.3 — Detecta raciocínio normal de sentença de improcedência RPPS:
+ * claimRe no relatório (voz do autor) + barRe na fundamentação (voz do juiz negando).
+ * Não é contradição — é a estrutura lógica de uma sentença correta.
+ */
+function isSentencaReasoning(draft: string, barIdx: number): boolean {
+  // Só aplica se houver dispositivo de sentença
+  if (!/\bjulgo\s+(?:procedente|improcedente|extinto|parcialmente)/i.test(draft)) return false;
+  // Encontra o início da fundamentação (fronteira relatório → fundamentação)
+  const fundIdx = Math.max(
+    draft.search(/\bfundamenta[cç][aã]o\b/i),
+    draft.search(/\bdo\s+direito\b/i),
+    draft.search(/\bmotiva[cç][aã]o\b/i),
+  );
+  if (fundIdx <= 0) return false;
+  // barRe deve estar na fundamentação (após a fronteira) e haver improcedência depois
+  if (barIdx < fundIdx) return false;
+  const afterFund = draft.slice(fundIdx);
+  return /\bjulgo\s+improcedente|\bnão\s+(?:tem|possui|faz)\s+jus\s+(?:à|a)\s+(?:paridade|integralidade)/i.test(afterFund);
+}
 
 // ── Padrões de contradição por domínio ───────────────────────────────────────
 
@@ -201,22 +257,33 @@ export class StanceContradictionValidator {
     const errors: ValidationError[] = [];
 
     for (const spec of CONTRADICTION_SPECS) {
-      // 1. Verificar se o draft contém a afirmação do pedido (claim)
+      // 1. Claim presente no draft
       if (!spec.claimRe.test(draft)) continue;
 
-      // 2. Verificar se o draft contém o impedimento legal (bar)
+      // 2. Bar (impedimento) presente no draft
       const barMatch = spec.barRe.exec(draft);
       if (!barMatch) continue;
 
-      // 3. Verificar distinguishing VÁLIDO em janela de ±400 chars ao redor do impedimento.
-      //    "embora", "não obstante", "em que pese" NÃO contam — exige substância real.
-      const windowStart = Math.max(0, barMatch.index - 400);
-      const windowEnd = Math.min(draft.length, barMatch.index + barMatch[0].length + 400);
+      const barIdx = barMatch.index;
+      const windowStart = Math.max(0, barIdx - 400);
+      const windowEnd = Math.min(draft.length, barIdx + barMatch[0].length + 400);
       const window = draft.slice(windowStart, windowEnd);
 
+      // 3. Distinguishing válido em janela ±400 chars
       if (VALID_DISTINGUISHING_RE.test(window)) continue;
 
-      // 4. Contradição confirmada → emitir erro fatal
+      // 4. FASE 5.3.3 — Guard de recurso: bar é voz do juiz a quo sendo impugnado
+      if (QUOTING_CHALLENGED_DECISION_RE.test(window)) continue;
+
+      // 5. FASE 5.3.3 — Guard de sentença RPPS: bar na fundamentação, claim no relatório,
+      //    dispositivo nega a tese → estrutura normal de sentença de improcedência
+      if (spec.rule === "STANCE_CONTRADICTION_RPPS" && isSentencaReasoning(draft, barIdx)) continue;
+
+      // 6. FASE 5.3.3 — Regra de transição RPPS (EC 47/2005 art. 3º, EC 41/2003 art. 7º):
+      //    paridade/integralidade pode ser válida para servidores cobertos pelas exceções
+      if (spec.rule === "STANCE_CONTRADICTION_RPPS" && RPPS_TRANSITION_RULE_RE.test(draft)) continue;
+
+      // 7. Contradição confirmada → erro fatal
       errors.push({
         rule: spec.rule,
         message:
