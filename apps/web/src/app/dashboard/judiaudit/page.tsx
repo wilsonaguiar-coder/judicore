@@ -385,14 +385,11 @@ export default function JudiAuditPage() {
           </div>
         </div>
 
-        {/* Motivo da classificação (erros fatais) */}
+        {/* Alerta de problema crítico */}
         {r.motivoClassificacao && (
-          <div className="bg-red-50 border border-red-200 rounded-xl px-4 py-3 flex items-start gap-2.5">
-            <AlertCircle size={14} className="text-red-500 mt-0.5 flex-shrink-0" />
-            <div>
-              <p className="text-xs font-semibold text-red-800 mb-0.5">Motivo da Classificação</p>
-              <p className="text-xs text-red-700 leading-relaxed line-clamp-3">{r.motivoClassificacao}</p>
-            </div>
+          <div className="bg-red-50 border border-red-200 rounded-xl px-4 py-3 flex items-center gap-2.5">
+            <AlertCircle size={14} className="text-red-500 flex-shrink-0" />
+            <p className="text-xs font-semibold text-red-800">Problema crítico: {r.motivoClassificacao}</p>
           </div>
         )}
 
@@ -608,7 +605,7 @@ export default function JudiAuditPage() {
               </div>
 
               <p className="text-xs text-slate-400">
-                {mode === "RAPIDA" ? "Validators determinísticos · sem IA · instantâneo" : "Classificação + extração + auditoria com IA"}
+                {mode === "RAPIDA" ? "Verificação rápida sem IA · resultado imediato" : "Classificação + extração + auditoria com IA"}
               </p>
 
               <button onClick={handleAnalyze} disabled={analyzing}
@@ -632,7 +629,7 @@ export default function JudiAuditPage() {
               <div className="lg:col-span-1 space-y-2">
                 <div className="flex items-baseline gap-2 px-1">
                   <h3 className="text-xs font-bold text-slate-500 uppercase tracking-wide">Histórico</h3>
-                  <span className="text-[9px] text-slate-400">T=Técnica · J=Jurídica</span>
+                  <span className="text-[9px] text-slate-400">Tec. · Jur.</span>
                 </div>
                 {history.map((entry) => {
                   const cls = CLS[entry.classificacao];

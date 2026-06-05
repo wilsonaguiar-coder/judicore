@@ -299,9 +299,9 @@ export class AuditReportEngine {
     // classificacaoFinal: derivada da viabilidade jurídica
     const classificacaoFinal = this.computeClassificacaoFinal(viabilidadeJuridica);
 
-    // motivoClassificacao: primeiro erro fatal como motivo
+    // motivoClassificacao: título amigável resumido (sem repetir o detalhe já exibido em problemasFatais)
     const motivoClassificacao = fatalErrors.length > 0
-      ? `${RULE_TITLES[fatalErrors[0]!.rule] ?? fatalErrors[0]!.rule}: ${fatalErrors[0]!.message.slice(0, 200)}`
+      ? `${RULE_TITLES[fatalErrors[0]!.rule] ?? fatalErrors[0]!.rule}${fatalErrors.length > 1 ? ` (+${fatalErrors.length - 1} problema${fatalErrors.length - 1 > 1 ? "s" : ""} fatal${fatalErrors.length - 1 > 1 ? "is" : ""})` : ""}`
       : undefined;
 
     // Compat. legado: scoreGeral = qualidadeTecnica (sem cap), classificacao mapeada
@@ -414,7 +414,7 @@ export class AuditReportEngine {
     if (richnessScore >= 80) {
       strengths.push({
         titulo: "Fundamentação jurídica robusta",
-        descricao: `Score de riqueza argumentativa: ${richnessScore}/100 — variedade normativa e jurisprudencial acima do mínimo.`,
+        descricao: "A peça apresenta boa variedade de artigos de lei e precedentes jurisprudenciais.",
       });
     }
 
@@ -468,10 +468,10 @@ export class AuditReportEngine {
       for (const dim of weakDims) {
         const key = `richness_${dim.key}`;
         if (!seen.has(key)) {
-          seen.has(key);
+          seen.add(key);
           suggestions.push({
             titulo: `Reforçar: ${dim.label}`,
-            descricao: `Dimensão ${dim.label} com ${dim.score}/${dim.max} pontos. Ampliar citações e argumentos nesta área.`,
+            descricao: `Ampliar argumentação com mais citações de artigos de lei, precedentes e fundamentação específica nesta área.`,
             severidade: "SUGESTAO",
           });
         }
@@ -551,8 +551,11 @@ export class AuditReportEngine {
   private computeRiscos(errors: ValidationError[]): AuditItem[] {
     const risks: AuditItem[] = [];
     const seen = new Set<string>();
+    // Stance/evidence rules are already captured in consistênciaArgumentativa — skip to avoid duplication
+    const coveredByConsistencia = new Set([...STANCE_RULES, "EVIDENCE_STANCE_VIOLATION"]);
 
     for (const e of errors) {
+      if (coveredByConsistencia.has(e.rule)) continue;
       const risk = RULE_RISKS[e.rule];
       if (risk && !seen.has(e.rule)) {
         seen.add(e.rule);
