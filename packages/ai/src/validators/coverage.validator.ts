@@ -218,6 +218,173 @@ function validateConsumidorPretensao(norm: string): ValidationError | null {
   );
 }
 
+// ── 5. RPPS — Benefício Estatutário ──────────────────────────────────────────
+
+const TRIGGER_RPPS_COV_N = /rpps|regime\s+proprio|servidor\s+publico|cargo\s+efetivo|aposentadoria\s+(?:de\s+servidor|voluntaria|por\s+incapacidade\s+permanente)|pensao\s+por\s+morte\s+de\s+servidor|paridade|integralidade|abono\s+de\s+permanencia/i;
+// Cobertura: requisitos específicos do benefício (paridade/integralidade NÃO inclusa — estão no trigger)
+const COV_RPPS_REQUISITOS_N = /tempo\s+de\s+contribuicao|tempo\s+de\s+servico|idade\s+minima|requisito|incapacidade\s+permanente|laudo\s+medico|dependencia\s+economica|obito\s+do\s+instituidor|cargo\s+efetivo|vinculo\s+estatutario|art\.?\s*40/i;
+
+function validateRpps(norm: string): ValidationError | null {
+  const triggerMatch = firstMatch(TRIGGER_RPPS_COV_N, norm);
+  if (!triggerMatch) return null;
+  if (COV_RPPS_REQUISITOS_N.test(norm)) return null;
+  return makeIssue(
+    "A peça trata de benefício no regime próprio (RPPS), mas não enfrenta minimamente os requisitos específicos do benefício estatutário.",
+    { topic: "beneficio_rpps", missing: ["requisitos_beneficio_rpps"], matchedTriggers: [triggerMatch], checkedBlocks: ["requisitos_beneficio_rpps"], skipped: false },
+  );
+}
+
+// ── 6. TRABALHISTA — Vínculo / Rescisão / Horas Extras ────────────────────────
+
+// A — Vínculo de emprego
+const TRIGGER_TRAB_VINCULO_N = /vinculo\s+de\s+emprego|reconhecimento\s+de\s+vinculo|relacao\s+de\s+emprego|configuracao\s+d[ao]\s+(?:vinculo|relacao)/i;
+const COV_TRAB_VINCULO_N     = /subordinacao|pessoalidade|habitualidade|nao\s+eventualidade|onerosidade|\bsalario\s+(?:mensal|fixo|base)\b/i;
+
+function validateTrabVinculo(norm: string): ValidationError | null {
+  const triggerMatch = firstMatch(TRIGGER_TRAB_VINCULO_N, norm);
+  if (!triggerMatch) return null;
+  if (COV_TRAB_VINCULO_N.test(norm)) return null;
+  return makeIssue(
+    "A peça trata de vínculo de emprego, mas não enfrenta minimamente os requisitos da relação empregatícia.",
+    { topic: "vinculo_emprego", missing: ["subordinacao_pessoalidade_habitualidade_onerosidade"], matchedTriggers: [triggerMatch], checkedBlocks: ["requisitos_vinculo_emprego"], skipped: false },
+  );
+}
+
+// B — Verbas rescisórias
+// TRIGGER usa itens de pagamento; COV_MODALIDADE usa o TIPO de rescisão (evita auto-satisfação)
+const TRIGGER_TRAB_RESCISAO_N = /verbas\s+rescisorias|aviso\s+previo\s+indenizado|multa\s+de\s+40\s*%|multa\s+do\s+fgts|saldo\s+de\s+salario|ferias\s+proporcionais|decimo\s+terceiro\s+proporcional/i;
+const COV_TRAB_MODALIDADE_N   = /dispensa\s+sem\s+justa\s+causa|justa\s+causa|pedido\s+de\s+demissao|rescisao\s+indireta|termino\s+do\s+contrato\s+a\s+prazo|modalidade\s+d[ae]\s+rescisao|tipo\s+d[ae]\s+rescisao/i;
+
+function validateTrabRescisao(norm: string): ValidationError | null {
+  const triggerMatch = firstMatch(TRIGGER_TRAB_RESCISAO_N, norm);
+  if (!triggerMatch) return null;
+  if (COV_TRAB_MODALIDADE_N.test(norm)) return null;
+  return makeIssue(
+    "A peça trata de verbas rescisórias, mas não enfrenta minimamente a modalidade da rescisão contratual.",
+    { topic: "verbas_rescisorias", missing: ["modalidade_rescisao"], matchedTriggers: [triggerMatch], checkedBlocks: ["modalidade_rescisao"], skipped: false },
+  );
+}
+
+// C — Horas extras
+const TRIGGER_TRAB_HORAS_N = /horas\s+extras\b/i;
+const COV_TRAB_JORNADA_N   = /jornada|horario|controle\s+de\s+ponto|cartao\s+de\s+ponto|extrapolacao\s+(?:da\s+)?jornada|intervalo\s+intrajornada|banco\s+de\s+horas|sobrejornada|periodo\s+d[ae]\s+trabalho/i;
+
+function validateTrabHoras(norm: string): ValidationError | null {
+  const triggerMatch = firstMatch(TRIGGER_TRAB_HORAS_N, norm);
+  if (!triggerMatch) return null;
+  if (COV_TRAB_JORNADA_N.test(norm)) return null;
+  return makeIssue(
+    "A peça trata de horas extras, mas não enfrenta minimamente a jornada alegada, extrapolação ou controle de ponto.",
+    { topic: "horas_extras", missing: ["jornada_controle_extrapolacao"], matchedTriggers: [triggerMatch], checkedBlocks: ["jornada_controle_extrapolacao"], skipped: false },
+  );
+}
+
+// ── 7. AMBIENTAL — Dano / Nexo / Reparação ────────────────────────────────────
+
+const TRIGGER_AMB_COV_N = /dano\s+ambiental|\bapp\b|area\s+de\s+preservacao\s+permanente|supressao\s+de\s+vegetacao|desmatamento|degradacao\s+ambiental|poluicao|licenca\s+ambiental|\bibama\b|\bsemace\b|multa\s+ambiental|auto\s+de\s+infracao\s+ambiental/i;
+const COV_AMB_DANO_N       = /dano|degradacao|supressao|desmatamento|poluicao|area\s+degradada|impacto\s+ambiental/i;
+const COV_AMB_NEXO_N       = /conduta|nexo\s+causal|responsavel|causador|atividade\s+(?:poluidora|degradadora)|intervencao|exploracao|obra|empreendimento/i;
+const COV_AMB_REPARACAO_N  = /reparacao|recuperacao|\bprad\b|obrigacao\s+de\s+(?:fazer|reparar)|indenizacao\s+ambiental|restauracao|compensacao\s+ambiental/i;
+
+function validateAmbiental(norm: string): ValidationError | null {
+  const triggerMatch = firstMatch(TRIGGER_AMB_COV_N, norm);
+  if (!triggerMatch) return null;
+  const hasDano      = COV_AMB_DANO_N.test(norm);
+  const hasNexo      = COV_AMB_NEXO_N.test(norm);
+  const hasReparacao = COV_AMB_REPARACAO_N.test(norm);
+  const missing: string[] = [];
+  if (!hasDano)      missing.push("dano_degradacao_ambiental");
+  if (!hasNexo)      missing.push("nexo_conduta_causador");
+  if (!hasReparacao) missing.push("reparacao_recuperacao_area");
+  if (missing.length < 2) return null;
+  return makeIssue(
+    "A peça trata de matéria ambiental, mas não enfrenta minimamente dano/degradação, nexo com a conduta ou reparação da área.",
+    { topic: "responsabilidade_ambiental", missing, matchedTriggers: [triggerMatch], checkedBlocks: ["dano_degradacao_ambiental", "nexo_conduta_causador", "reparacao_recuperacao_area"], skipped: false },
+  );
+}
+
+// ── 8. CRIMINAL — Tipicidade / Autoria / Materialidade / Dosimetria ───────────
+
+const TRIGGER_CRIM_N       = /\bcrime\b|denuncia\s+criminal|\breu\b|\bacusado\b|materialidade|autoria\s+(?:d[ao]\s+crime|delitiva)|tipicidade|dolo|culpa|absolvicao|condenacao\s+(?:criminal|penal)|\bpena\b|dosimetria|codigo\s+penal|\bcpp\b|art\.?\s*155\b|art\.?\s*157\b|art\.?\s*129\b/i;
+const COV_CRIM_MATERIAL_N  = /materialidade|laudo\s+pericial|boletim\s+de\s+ocorrencia|auto\s+de\s+apreensao|exame\s+pericial|prova\s+material|corpo\s+de\s+delito/i;
+const COV_CRIM_AUTORIA_N   = /autoria|depoimento|testemunha|confissao|reconhecimento\s+(?:pessoal|fotografico)|relato\s+d[ae]\s+(?:vitima|testemunha)/i;
+const COV_CRIM_TIPICI_N    = /tipicidade|conduta\s+tipica|elemento\s+subjetivo|adequacao\s+tipica|tipo\s+penal|dolo|culpa|imprudencia|negligencia|imperiecia/i;
+
+function validateCriminalFundamentos(norm: string): ValidationError | null {
+  const triggerMatch = firstMatch(TRIGGER_CRIM_N, norm);
+  if (!triggerMatch) return null;
+  const hasM = COV_CRIM_MATERIAL_N.test(norm);
+  const hasA = COV_CRIM_AUTORIA_N.test(norm);
+  const hasT = COV_CRIM_TIPICI_N.test(norm);
+  const missing: string[] = [];
+  if (!hasM) missing.push("materialidade");
+  if (!hasA) missing.push("autoria");
+  if (!hasT) missing.push("tipicidade");
+  if (missing.length < 2) return null;
+  return makeIssue(
+    "A peça criminal não enfrenta minimamente materialidade, autoria ou tipicidade.",
+    { topic: "fundamentos_penais_essenciais", missing, matchedTriggers: [triggerMatch], checkedBlocks: ["materialidade", "autoria", "tipicidade"], skipped: false },
+  );
+}
+
+// Trigger separado para dosimetria (mais específico — "condeno" não aparece em petições comuns)
+const TRIGGER_CRIM_CONDENA_N = /\bcondeno\b|\bcondenacao\s+(?:criminal|penal|d[ao]\s+reu)\b|fixo\s+a\s+pena|pena\s+privativa\s+de\s+liberdade/i;
+const COV_CRIM_DOSIMETRIA_N  = /dosimetria|pena.?base|circunstancias\s+judiciais|agravante|atenuante|causa\s+de\s+aumento|causa\s+de\s+diminuicao|regime\s+inicial/i;
+
+function validateCriminalDosimetria(norm: string): ValidationError | null {
+  const triggerMatch = firstMatch(TRIGGER_CRIM_CONDENA_N, norm);
+  if (!triggerMatch) return null;
+  if (COV_CRIM_DOSIMETRIA_N.test(norm)) return null;
+  return makeIssue(
+    "A peça indica condenação penal, mas não enfrenta minimamente a dosimetria da pena.",
+    { topic: "dosimetria_da_pena", missing: ["dosimetria_pena_base_regime"], matchedTriggers: [triggerMatch], checkedBlocks: ["dosimetria_pena_base_regime"], skipped: false },
+  );
+}
+
+// ── 9. FAZENDA PÚBLICA — Ato Administrativo / Concurso / Mandado de Segurança ──
+
+// A — Ato administrativo genérico
+const TRIGGER_FAZ_ATO_N     = /ato\s+administrativo|administracao\s+publica|ente\s+publico|fazenda\s+publica|licenca\s+administrativa|autorizacao\s+administrativa|anulacao\s+de\s+ato\s+administrativo/i;
+const COV_FAZ_LEGALIDADE_N  = /legalidade|motivacao|competencia|finalidade\s+(?:do\s+ato|publica)|razoabilidade|proporcionalidade|vicio\s+(?:formal|material|do\s+ato)|nulidade\s+(?:do\s+ato|administrativa)|controle\s+judicial/i;
+
+function validateFazAto(norm: string): ValidationError | null {
+  const triggerMatch = firstMatch(TRIGGER_FAZ_ATO_N, norm);
+  if (!triggerMatch) return null;
+  if (COV_FAZ_LEGALIDADE_N.test(norm)) return null;
+  return makeIssue(
+    "A peça trata de ato administrativo, mas não enfrenta minimamente legalidade, motivação, competência ou vício do ato.",
+    { topic: "ato_administrativo", missing: ["legalidade_motivacao_competencia_vicio"], matchedTriggers: [triggerMatch], checkedBlocks: ["legalidade_motivacao_competencia_vicio"], skipped: false },
+  );
+}
+
+// B — Concurso público / nomeação (trigger específico — evita overlap com ato administrativo)
+const TRIGGER_FAZ_CONCURSO_N  = /concurso\s+publico|nomeacao\s+(?:ao|em|para)\s+cargo|posse\s+(?:em|ao)\s+cargo|candidato\s+aprovado|aprovado\s+em\s+concurso/i;
+const COV_FAZ_DIREITO_SUBJ_N  = /direito\s+subjetivo|aprovacao\s+dentro\s+das\s+vagas|pretericao|contratacao\s+temporaria|ordem\s+de\s+classificacao|edital|prazo\s+de\s+validade\s+do\s+concurso|reserva\s+de\s+vagas/i;
+
+function validateFazConcurso(norm: string): ValidationError | null {
+  const triggerMatch = firstMatch(TRIGGER_FAZ_CONCURSO_N, norm);
+  if (!triggerMatch) return null;
+  if (COV_FAZ_DIREITO_SUBJ_N.test(norm)) return null;
+  return makeIssue(
+    "A peça trata de concurso público/nomeação, mas não enfrenta minimamente direito subjetivo, vagas, preterição ou edital.",
+    { topic: "concurso_publico_nomeacao", missing: ["direito_subjetivo_vagas_pretericao_edital"], matchedTriggers: [triggerMatch], checkedBlocks: ["direito_subjetivo_vagas_pretericao_edital"], skipped: false },
+  );
+}
+
+// C — Mandado de segurança (trigger = apenas "mandado de seguranca"; coverage = elementos substantivos)
+const TRIGGER_FAZ_MS_N = /mandado\s+de\s+seguranca/i;
+const COV_FAZ_MS_N     = /direito\s+liquido\s+e\s+certo|prova\s+pre.constituida|autoridade\s+coatora|ato\s+coator|prazo\s+decadencial|120\s+dias/i;
+
+function validateFazMs(norm: string): ValidationError | null {
+  const triggerMatch = firstMatch(TRIGGER_FAZ_MS_N, norm);
+  if (!triggerMatch) return null;
+  if (COV_FAZ_MS_N.test(norm)) return null;
+  return makeIssue(
+    "A peça trata de mandado de segurança, mas não enfrenta minimamente direito líquido e certo, autoridade coatora, prova pré-constituída ou prazo decadencial.",
+    { topic: "mandado_de_seguranca", missing: ["direito_liquido_autoridade_coatora_prazo"], matchedTriggers: [triggerMatch], checkedBlocks: ["direito_liquido_autoridade_coatora_prazo"], skipped: false },
+  );
+}
+
 // ── API pública ───────────────────────────────────────────────────────────────
 
 export function validateCoverage(
@@ -277,6 +444,54 @@ export function validateCoverage(
       /consumidor|cdc\b|fornecedor/i.test(normalizeForCoverage(draft.slice(0, 2000))));
   if (isConsumidor) {
     push("CONSUMIDOR", "pretensao_consumerista", validateConsumidorPretensao(norm));
+  }
+
+  // 5. RPPS (FASE 5.6.2)
+  if (classification.regime_juridico === "RPPS") {
+    push("RPPS", "beneficio_rpps", validateRpps(norm));
+  }
+
+  // 6. TRABALHISTA (FASE 5.6.2)
+  const isTrabalhista = classification.regime_juridico === "CLT" || classification.tipo_justica === "TRABALHO";
+  if (isTrabalhista) {
+    push("TRABALHISTA", "vinculo_emprego",    validateTrabVinculo(norm));
+    push("TRABALHISTA", "verbas_rescisorias", validateTrabRescisao(norm));
+    push("TRABALHISTA", "horas_extras",       validateTrabHoras(norm));
+  }
+
+  // 7. AMBIENTAL (FASE 5.6.2)
+  const isAmbientalCov =
+    /ambiental|app\b|preservacao\s+permanente|supressao\s+de\s+vegetacao|dano\s+ambiental|ibama/i.test(
+      normalizeForCoverage(classification.assunto_principal ?? ""),
+    ) ||
+    /dano\s+ambiental|\bapp\b|supressao\s+de\s+vegetacao|\bibama\b|poluicao|desmatamento/i.test(
+      normalizeForCoverage(draft.slice(0, 3000)),
+    );
+  if (isAmbientalCov) {
+    push("AMBIENTAL", "responsabilidade_ambiental", validateAmbiental(norm));
+  }
+
+  // 8. CRIMINAL (FASE 5.6.2)
+  const isCriminal =
+    classification.tipo_justica === "CRIMINAL" ||
+    (classification.regime_juridico as string) === "CRIMINAL";
+  if (isCriminal) {
+    push("CRIMINAL", "fundamentos_penais_essenciais", validateCriminalFundamentos(norm));
+    push("CRIMINAL", "dosimetria_da_pena",             validateCriminalDosimetria(norm));
+  }
+
+  // 9. FAZENDA PÚBLICA (FASE 5.6.2)
+  const isFazenda =
+    /fazenda\s+publica|servidor\s+publico|concurso\s+publico|ato\s+administrativo|mandado\s+de\s+seguranca|administracao\s+publica/i.test(
+      normalizeForCoverage(classification.assunto_principal ?? ""),
+    ) ||
+    /mandado\s+de\s+seguranca|concurso\s+publico|nomeacao\s+ao\s+cargo|ato\s+administrativo/i.test(
+      normalizeForCoverage(draft.slice(0, 3000)),
+    );
+  if (isFazenda) {
+    push("FAZENDA_PUBLICA", "ato_administrativo",        validateFazAto(norm));
+    push("FAZENDA_PUBLICA", "concurso_publico_nomeacao", validateFazConcurso(norm));
+    push("FAZENDA_PUBLICA", "mandado_de_seguranca",      validateFazMs(norm));
   }
 
   return results;
