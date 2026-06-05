@@ -14,6 +14,7 @@ import {
 // ── Tipos (espelho de packages/ai/src/audit-report/audit-report.types.ts) ─────
 
 type AuditClassificacao = "EXCELENTE" | "BOA" | "REGULAR" | "CRITICA";
+type AuditClassificacaoFinal = "VIAVEL" | "ATENCAO" | "RISCO_ELEVADO" | "CRITICA";
 type AuditOrigem = "JUDICORE" | "UPLOAD" | "TEXTO_COLADO";
 type AuditMode = "RAPIDA" | "COMPLETA";
 
@@ -39,6 +40,10 @@ interface QualidadeArgumentativa {
   dimensoes: Array<{ label: string; score: number; max: number }>;
 }
 interface AuditReport {
+  qualidadeTecnica: number;
+  viabilidadeJuridica: number;
+  classificacaoFinal: AuditClassificacaoFinal;
+  motivoClassificacao?: string;
   scoreGeral: number; classificacao: AuditClassificacao;
   problemasFatais: AuditItem[]; problemasNaoFatais: AuditItem[];
   pontosFortes: AuditItem[]; sugestoesMelhoria: AuditItem[];
@@ -81,6 +86,21 @@ const ORIGEM_COLOR: Record<AuditOrigem, string> = {
 function scoreTextCls(s: number) {
   return s >= 85 ? "text-emerald-700" : s >= 70 ? "text-blue-700" : s >= 50 ? "text-amber-700" : "text-red-700";
 }
+function viabilidadeRingColor(v: number): string {
+  return v >= 85 ? "#10b981" : v >= 70 ? "#f59e0b" : v >= 40 ? "#f97316" : "#ef4444";
+}
+function scoreRingColor(s: number): string {
+  return s >= 85 ? "#10b981" : s >= 70 ? "#3b82f6" : s >= 50 ? "#f59e0b" : "#ef4444";
+}
+function qualidadeTecnicaLabel(s: number): string {
+  return s >= 85 ? "Excelente" : s >= 70 ? "Boa" : s >= 50 ? "Regular" : "Fraca";
+}
+const CLS_FINAL: Record<AuditClassificacaoFinal, { text: string; badge: string; badgeText: string; label: string }> = {
+  VIAVEL:        { text: "text-emerald-700", badge: "bg-emerald-100", badgeText: "text-emerald-800", label: "Viável" },
+  ATENCAO:       { text: "text-amber-700",   badge: "bg-amber-100",   badgeText: "text-amber-800",   label: "Atenção" },
+  RISCO_ELEVADO: { text: "text-orange-700",  badge: "bg-orange-100",  badgeText: "text-orange-800",  label: "Risco Elevado" },
+  CRITICA:       { text: "text-red-700",     badge: "bg-red-100",     badgeText: "text-red-800",     label: "Crítica" },
+};
 function dimBarColor(pct: number) {
   return pct >= 0.8 ? "bg-emerald-500" : pct >= 0.6 ? "bg-blue-500" : pct >= 0.4 ? "bg-amber-500" : "bg-red-400";
 }
@@ -98,18 +118,22 @@ const FUND_LABEL: Record<string, string> = { ARTIGO: "Art.", JURISPRUDENCIA: "Pr
 
 // ── Score Circle ──────────────────────────────────────────────────────────────
 
-function ScoreCircle({ score, color }: { score: number; color: string }) {
-  const r = 54, circ = 2 * Math.PI * r, dash = (score / 100) * circ;
+function ScoreCircle({ score, color, size = "lg" }: { score: number; color: string; size?: "sm" | "lg" }) {
+  const cfg = size === "sm"
+    ? { r: 40, cx: 48, cy: 48, vb: "0 0 96 96", wh: "w-24 h-24", textCls: "text-3xl", sw: 8 }
+    : { r: 54, cx: 64, cy: 64, vb: "0 0 128 128", wh: "w-36 h-36", textCls: "text-4xl", sw: 10 };
+  const circ = 2 * Math.PI * cfg.r;
+  const dash  = (score / 100) * circ;
   return (
-    <div className="relative w-36 h-36 flex items-center justify-center">
-      <svg className="absolute inset-0 -rotate-90" viewBox="0 0 128 128" aria-hidden>
-        <circle cx="64" cy="64" r={r} fill="none" stroke="#f1f5f9" strokeWidth="10" />
-        <circle cx="64" cy="64" r={r} fill="none" stroke={color} strokeWidth="10"
+    <div className={`relative ${cfg.wh} flex items-center justify-center`}>
+      <svg className="absolute inset-0 -rotate-90" viewBox={cfg.vb} aria-hidden>
+        <circle cx={cfg.cx} cy={cfg.cy} r={cfg.r} fill="none" stroke="#f1f5f9" strokeWidth={cfg.sw} />
+        <circle cx={cfg.cx} cy={cfg.cy} r={cfg.r} fill="none" stroke={color} strokeWidth={cfg.sw}
           strokeLinecap="round" strokeDasharray={`${dash} ${circ}`}
           style={{ transition: "stroke-dasharray 1.2s cubic-bezier(.4,0,.2,1)" }} />
       </svg>
       <div className="relative flex flex-col items-center select-none">
-        <span className="text-4xl font-bold text-slate-900 leading-none tabular-nums">{score}</span>
+        <span className={`${cfg.textCls} font-bold text-slate-900 leading-none tabular-nums`}>{score}</span>
         <span className="text-xs text-slate-400 mt-0.5">/ 100</span>
       </div>
     </div>
@@ -307,11 +331,35 @@ export default function JudiAuditPage() {
 
         {/* Score + Quality Grid */}
         <div className="grid grid-cols-1 md:grid-cols-5 gap-3">
-          <div className={`md:col-span-2 bg-white border ${cls.border} rounded-2xl p-6 flex flex-col items-center justify-center gap-4 shadow-sm`}>
-            <ScoreCircle score={r.scoreGeral} color={cls.ring} />
-            <div className="text-center">
-              <span className={`inline-block px-3 py-1 rounded-full text-sm font-bold ${cls.badge} ${cls.badgeText}`}>{r.classificacao}</span>
-              <p className="text-xs text-slate-400 mt-1.5">Score Geral de Qualidade</p>
+          {/* ── Dois scores separados — FASE 5.0.2 ─────────────────── */}
+          <div className="md:col-span-2 grid grid-cols-2 gap-3">
+
+            {/* Qualidade Técnica */}
+            <div className="bg-white border border-border rounded-2xl p-4 flex flex-col items-center gap-3 shadow-sm">
+              <ScoreCircle score={r.qualidadeTecnica ?? r.scoreGeral} color={scoreRingColor(r.qualidadeTecnica ?? r.scoreGeral)} size="sm" />
+              <div className="text-center">
+                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Qualidade Técnica</p>
+                <span className={`text-xs font-semibold ${scoreTextCls(r.qualidadeTecnica ?? r.scoreGeral)}`}>
+                  {qualidadeTecnicaLabel(r.qualidadeTecnica ?? r.scoreGeral)}
+                </span>
+              </div>
+            </div>
+
+            {/* Viabilidade Jurídica */}
+            <div className="bg-white border border-border rounded-2xl p-4 flex flex-col items-center gap-3 shadow-sm">
+              <ScoreCircle score={r.viabilidadeJuridica ?? 100} color={viabilidadeRingColor(r.viabilidadeJuridica ?? 100)} size="sm" />
+              <div className="text-center">
+                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Viabilidade Jurídica</p>
+                {(() => {
+                  const cf = (r.classificacaoFinal ?? (r.problemasFatais.length > 0 ? "CRITICA" : "VIAVEL")) as AuditClassificacaoFinal;
+                  const cfCls = CLS_FINAL[cf];
+                  return (
+                    <span className={`text-xs px-2 py-0.5 rounded-full font-bold ${cfCls.badge} ${cfCls.badgeText}`}>
+                      {cfCls.label}
+                    </span>
+                  );
+                })()}
+              </div>
             </div>
           </div>
           <div className="md:col-span-3 grid grid-cols-2 gap-2.5">
@@ -329,6 +377,17 @@ export default function JudiAuditPage() {
             ))}
           </div>
         </div>
+
+        {/* Motivo da classificação (erros fatais) */}
+        {r.motivoClassificacao && (
+          <div className="bg-red-50 border border-red-200 rounded-xl px-4 py-3 flex items-start gap-2.5">
+            <AlertCircle size={14} className="text-red-500 mt-0.5 flex-shrink-0" />
+            <div>
+              <p className="text-xs font-semibold text-red-800 mb-0.5">Motivo da Classificação</p>
+              <p className="text-xs text-red-700 leading-relaxed line-clamp-3">{r.motivoClassificacao}</p>
+            </div>
+          </div>
+        )}
 
         {/* Argumentativa bars */}
         <div className="bg-white border border-border rounded-2xl p-5 shadow-sm">
@@ -573,9 +632,13 @@ export default function JudiAuditPage() {
                       className={`w-full text-left px-3 py-2.5 rounded-xl border transition-all ${
                         isActive ? "border-violet-200 bg-violet-50" : "border-transparent bg-white hover:bg-slate-50 hover:border-slate-200"
                       }`}>
-                      <div className="flex items-center gap-2 mb-1">
-                        <span className={`text-xs font-bold tabular-nums ${cls.text}`}>{entry.scoreGeral}</span>
-                        <span className={`text-[10px] px-1.5 py-0.5 rounded-full font-medium ${cls.badge} ${cls.badgeText}`}>{entry.classificacao}</span>
+                      <div className="flex items-center gap-1.5 mb-1 flex-wrap">
+                        <span className={`text-xs font-bold tabular-nums ${scoreTextCls(entry.report?.qualidadeTecnica ?? entry.scoreGeral)}`}>
+                          T:{entry.report?.qualidadeTecnica ?? entry.scoreGeral}
+                        </span>
+                        <span className={`text-xs font-bold tabular-nums ${scoreTextCls(entry.report?.viabilidadeJuridica ?? 100)}`}>
+                          J:{entry.report?.viabilidadeJuridica ?? "—"}
+                        </span>
                         <span className={`ml-auto text-[9px] px-1.5 py-0.5 rounded-full ${ORIGEM_COLOR[entry.origem]}`}>{ORIGEM_LABEL[entry.origem]}</span>
                       </div>
                       <p className="text-[10px] text-slate-500 line-clamp-1">{entry.assuntoPrincipal ?? entry.tipoPeca ?? "—"}</p>

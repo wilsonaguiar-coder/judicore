@@ -14,6 +14,7 @@ import type {
   AuditReport,
   AuditItem,
   AuditClassificacao,
+  AuditClassificacaoFinal,
   FundamentacaoJuridicaItem,
   QualidadeScore,
   ConsistenciaArgumentativa,
@@ -236,9 +237,10 @@ export class AuditReportEngine {
       classification.tipo_peca,
     );
 
-    // ── 1 & 2: Score Geral + Classificação ───────────────────────────────────
-    const scoreGeral = this.computeScoreGeral(audit, fatalErrors, nonFatalErrors);
-    const classificacao = this.computeClassificacao(scoreGeral, fatalErrors.length > 0);
+    // ── FASE 5.0.2: score temporário (será recalculado após as dimensões) ────
+    // Os valores reais dependem de qualidadeEstrutural/Probatória/Argumentativa/Consistência
+    // calculados adiante — mantemos placeholder para as seções que não dependem deles.
+    const _scoreGeral_placeholder = 0; void _scoreGeral_placeholder;
 
     // ── 3: Problemas Fatais ───────────────────────────────────────────────────
     const problemasFatais = fatalErrors.map((e) => this.errorToItem(e, "FATAL"));
@@ -275,7 +277,36 @@ export class AuditReportEngine {
       dimensoes: richness.dimensions.map((d) => ({ label: d.label, score: d.score, max: d.max })),
     };
 
+    // ── FASE 5.0.2: Separação Qualidade Técnica / Viabilidade Jurídica ───────
+
+    // qualidadeTecnica: média ponderada das 4 dimensões técnicas, sem cap
+    const qualidadeTecnica = Math.round(
+      qualidadeEstrutural.score          * 0.25 +
+      qualidadeProbatoria.score          * 0.25 +
+      qualidadeArgumentativa.score       * 0.30 +
+      consistenciaArgumentativa.score    * 0.20,
+    );
+
+    // viabilidadeJuridica: baseada nos erros fatais dos validators
+    const viabilidadeJuridica = this.computeViabilidadeJuridica(fatalErrors.length);
+
+    // classificacaoFinal: derivada da viabilidade jurídica
+    const classificacaoFinal = this.computeClassificacaoFinal(viabilidadeJuridica);
+
+    // motivoClassificacao: primeiro erro fatal como motivo
+    const motivoClassificacao = fatalErrors.length > 0
+      ? `${RULE_TITLES[fatalErrors[0]!.rule] ?? fatalErrors[0]!.rule}: ${fatalErrors[0]!.message.slice(0, 200)}`
+      : undefined;
+
+    // Compat. legado: scoreGeral = qualidadeTecnica (sem cap), classificacao mapeada
+    const scoreGeral   = qualidadeTecnica;
+    const classificacao = this.mapToLegacyClassificacao(classificacaoFinal);
+
     return {
+      qualidadeTecnica,
+      viabilidadeJuridica,
+      classificacaoFinal,
+      ...(motivoClassificacao !== undefined && { motivoClassificacao }),
       scoreGeral,
       classificacao,
       problemasFatais,
@@ -293,22 +324,30 @@ export class AuditReportEngine {
 
   // ── Métodos privados ────────────────────────────────────────────────────────
 
-  private computeScoreGeral(
-    audit: LegalAudit,
-    fatal: ValidationError[],
-    nonFatal: ValidationError[],
-  ): number {
-    let score = audit.score ?? 70;
-    if (fatal.length > 0) score = Math.min(score, 49);
-    else if (nonFatal.length >= 5) score = Math.min(score, 74);
-    return Math.max(0, Math.min(100, Math.round(score)));
+  // ── FASE 5.0.2 — novos métodos de classificação ────────────────────────────
+
+  private computeViabilidadeJuridica(fatalCount: number): number {
+    if (fatalCount === 0) return 100;
+    if (fatalCount === 1) return 40;
+    if (fatalCount === 2) return 20;
+    return 0;
   }
 
-  private computeClassificacao(score: number, hasFatal: boolean): AuditClassificacao {
-    if (hasFatal || score < 50) return "CRITICA";
-    if (score < 70) return "REGULAR";
-    if (score < 85) return "BOA";
-    return "EXCELENTE";
+  private computeClassificacaoFinal(viabilidade: number): AuditClassificacaoFinal {
+    if (viabilidade >= 85) return "VIAVEL";
+    if (viabilidade >= 70) return "ATENCAO";
+    if (viabilidade >= 40) return "RISCO_ELEVADO";
+    return "CRITICA";
+  }
+
+  private mapToLegacyClassificacao(final: AuditClassificacaoFinal): AuditClassificacao {
+    const map: Record<AuditClassificacaoFinal, AuditClassificacao> = {
+      VIAVEL:        "EXCELENTE",
+      ATENCAO:       "BOA",
+      RISCO_ELEVADO: "REGULAR",
+      CRITICA:       "CRITICA",
+    };
+    return map[final];
   }
 
   private errorToItem(e: ValidationError, severidade: "FATAL" | "IMPORTANTE"): AuditItem {
