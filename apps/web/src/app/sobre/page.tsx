@@ -1,6 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
-import { ArrowLeft, Gavel, Calculator, ClipboardCheck, Sparkles, Shield, Zap, Lock, Link2 } from "lucide-react";
+import { ArrowLeft, Gavel, ClipboardCheck, Scale, Sparkles, Shield, Zap, Lock, Link2 } from "lucide-react";
 
 export const metadata = { title: "Sobre — JudiCore" };
 
@@ -9,26 +9,26 @@ export default function SobrePage() {
     {
       icon: <Gavel size={20} className="text-indigo-300" />,
       bg: "from-indigo-600/30 to-violet-600/30 border-indigo-500/20",
-      name: "JudiCore",
+      name: "Pesquisa de Jurisprudência",
       accent: "text-indigo-400",
-      sub: "Geração Inteligente de Peças",
-      desc: "Gere petições, decisões, sentenças e recursos com IA especializada, fundamentadas em jurisprudência real do STJ, STF e TRFs.",
-    },
-    {
-      icon: <Calculator size={20} className="text-emerald-300" />,
-      bg: "from-emerald-600/30 to-teal-600/30 border-emerald-500/20",
-      name: "JudiCalc",
-      accent: "text-emerald-400",
-      sub: "Automação Completa de Cálculos",
-      desc: "Conecte-se ao PJe, consulte dados e gere cálculos previdenciários, assine e protocole diretamente no processo em poucos cliques.",
+      sub: "Pesquisa e Geração Inteligente de Peças",
+      desc: "Busque em mais de 1 milhão de acórdãos dos principais tribunais e gere petições, decisões e recursos com IA especializada em direito brasileiro.",
     },
     {
       icon: <ClipboardCheck size={20} className="text-amber-300" />,
       bg: "from-amber-600/30 to-orange-600/30 border-amber-500/20",
-      name: "JudiAudit",
+      name: "Análise de Peças Judiciais",
       accent: "text-amber-400",
       sub: "Auditoria Inteligente de Peças",
-      desc: "Envie sua peça e receba uma análise completa com score de qualidade, pontos de melhoria e sugestões fundamentadas em jurisprudência.",
+      desc: "Envie sua peça e receba análise completa com score de qualidade (0–100), pontos de melhoria e sugestões fundamentadas em jurisprudência.",
+    },
+    {
+      icon: <Scale size={20} className="text-cyan-300" />,
+      bg: "from-cyan-600/30 to-teal-600/30 border-cyan-500/20",
+      name: "Integração com o PJE",
+      accent: "text-cyan-400",
+      sub: "Leia e adicione peças diretamente no PJE",
+      desc: "Consulte processos, obtenha resumos e análises de documentos, receba dicas processuais e inclua peças diretamente no PJe com IA.",
     },
   ];
 
@@ -92,7 +92,7 @@ export default function SobrePage() {
           <h2 className="text-lg font-bold text-white mb-3">Nossa Missão</h2>
           <p className="text-white/60 leading-relaxed">
             Democratizar o acesso à tecnologia jurídica avançada, reduzindo o tempo gasto em
-            tarefas repetitivas e aumentando a qualidade das peças e cálculos produzidos por
+            tarefas repetitivas e aumentando a qualidade das peças produzidas por
             operadores do direito.
           </p>
         </section>
@@ -108,7 +108,7 @@ export default function SobrePage() {
                 </div>
                 <div>
                   <p className="font-bold text-base leading-none mb-0.5">
-                    Judi<span className={p.accent}>{p.name.slice(4)}</span>
+                    <span className={p.accent}>{p.name}</span>
                     <span className="ml-2 text-xs font-normal text-white/35">{p.sub}</span>
                   </p>
                   <p className="text-sm text-white/55 leading-relaxed mt-1">{p.desc}</p>

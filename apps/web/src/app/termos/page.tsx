@@ -79,9 +79,9 @@ export default function TermosPage() {
         <Section title="2. Descrição dos Serviços">
           <p>A JudiCore oferece uma suíte de ferramentas jurídicas baseadas em IA:</p>
           <ul className="space-y-1.5 list-none mt-2">
-            <Li><strong className="text-white/85">JudiCore:</strong> geração assistida de peças jurídicas (petições, decisões, sentenças, recursos) com base em jurisprudência dos principais tribunais brasileiros.</Li>
-            <Li><strong className="text-white/85">JudiCalc:</strong> automação de cálculos previdenciários, trabalhistas e cíveis com integração ao PJe via SOAP.</Li>
-            <Li><strong className="text-white/85">JudiAudit:</strong> auditoria e análise de qualidade de documentos jurídicos com pontuação e sugestões de melhoria.</Li>
+            <Li><strong className="text-white/85">Pesquisa de Jurisprudência:</strong> busca em mais de 1 milhão de acórdãos e geração assistida de peças jurídicas (petições, decisões, sentenças, recursos) fundamentadas em jurisprudência real dos principais tribunais brasileiros.</Li>
+            <Li><strong className="text-white/85">Análise de Peças Judiciais:</strong> auditoria inteligente de documentos jurídicos com score de qualidade (0–100), identificação de riscos, inconsistências e sugestões de melhoria fundamentadas em jurisprudência.</Li>
+            <Li><strong className="text-white/85">Integração com o PJE:</strong> consulta processual, resumo e análise de documentos do processo, dicas processuais e inclusão de peças diretamente no Processo Judicial Eletrônico.</Li>
           </ul>
         </Section>
 
