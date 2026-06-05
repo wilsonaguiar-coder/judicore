@@ -29,6 +29,7 @@ interface CoverageDetails {
 // Usado apenas internamente — não altera o draft original nem o relatório.
 
 export function normalizeForCoverage(text: string): string {
+  // ̀-ͯ = combining diacritical marks (NFD decomposition → remove → ASCII)
   return text.normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase();
 }
 
@@ -221,8 +222,9 @@ function validateConsumidorPretensao(norm: string): ValidationError | null {
 // ── 5. RPPS — Benefício Estatutário ──────────────────────────────────────────
 
 const TRIGGER_RPPS_COV_N = /rpps|regime\s+proprio|servidor\s+publico|cargo\s+efetivo|aposentadoria\s+(?:de\s+servidor|voluntaria|por\s+incapacidade\s+permanente)|pensao\s+por\s+morte\s+de\s+servidor|paridade|integralidade|abono\s+de\s+permanencia/i;
-// Cobertura: requisitos específicos do benefício (paridade/integralidade NÃO inclusa — estão no trigger)
-const COV_RPPS_REQUISITOS_N = /tempo\s+de\s+contribuicao|tempo\s+de\s+servico|idade\s+minima|requisito|incapacidade\s+permanente|laudo\s+medico|dependencia\s+economica|obito\s+do\s+instituidor|cargo\s+efetivo|vinculo\s+estatutario|art\.?\s*40/i;
+// Cobertura: requisitos específicos do benefício
+// art. 40 NÃO incluso — citação genérica em todo texto RPPS, não indica cobertura de requisito
+const COV_RPPS_REQUISITOS_N = /tempo\s+de\s+contribuicao|tempo\s+de\s+servico|idade\s+minima|requisito\s+(?:legal|d[ao]\s+beneficio)|incapacidade\s+permanente|laudo\s+medico|dependencia\s+economica|obito\s+do\s+instituidor|vinculo\s+estatutario\s+comprovado|cargo\s+efetivo\s+(?:ha|por)/i;
 
 function validateRpps(norm: string): ValidationError | null {
   const triggerMatch = firstMatch(TRIGGER_RPPS_COV_N, norm);
