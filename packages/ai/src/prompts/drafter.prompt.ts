@@ -130,6 +130,7 @@ REGRA CRÍTICA — POSICIONAMENTO DE JURISPRUDÊNCIAS:
 - Jamais escreva "conforme entendimento do [tribunal]" usando decisão classificada como CONTRÁRIA
 - Use SOMENTE os dados reais dos tribunais/números/relatores listados acima
 - NUNCA escreva "[JUR-1]", "[JUR-N]" ou qualquer rótulo no texto final
+- NUNCA use colchetes em qualquer outra parte da peça: [NOME], [CPF], [DATA], [VALOR], [INSERIR], [A DETERMINAR], [PREENCHER] são proibidos absolutamente — use dado genérico plausível se o dado real não foi fornecido
 
 ${instruction ? `INSTRUÇÃO ADICIONAL DO USUÁRIO: ${instruction}` : ""}`;
 }

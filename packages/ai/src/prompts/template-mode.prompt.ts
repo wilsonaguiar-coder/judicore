@@ -4,33 +4,41 @@ import { TEMPLATE_MODEL_PROHIBITIONS } from "../rules/legal_rules.js";
 export function buildModeBlock(mode: GenerationMode): string {
   if (mode === "TEMPLATE_MODEL") {
     return `
-⚠ MODO MODELO DE PEÇA — LEIA ANTES DE REDIGIR:
-Esta geração não possui fatos suficientemente identificados para uma peça definitiva.
-Gere um MODELO ESTRUTURADO com marcações de placeholder onde faltam dados concretos.
+⚡ MODO GENÉRICO DESENVOLVIDO — dados parciais disponíveis
 
-REGRAS ABSOLUTAS PARA ESTE MODO:
-1. Use [INSERIR FATO ESPECÍFICO], [INSERIR NOME DA PARTE], [IDENTIFICAR TRIBUNAL], [DATA DO FATO], etc. onde não houver dados reais.
-2. PROIBIDO usar qualquer linguagem decisória. NUNCA escreva:
-   ${TEMPLATE_MODEL_PROHIBITIONS.map((p) => `"${p}"`).join(" | ")}
-3. Substitua decisões por: "[INSERIR FUNDAMENTAÇÃO ESPECÍFICA]", "[ANALISAR PEDIDO CONCRETO]", "[PREENCHER CONFORME O CASO]"
-4. O objetivo é gerar um MODELO REUTILIZÁVEL — não uma decisão aparentemente válida sobre fatos inexistentes.
-5. Inclua no início da peça a seguinte nota: "⚠ MODELO ESTRUTURAL — Preencha os campos entre colchetes com os dados reais do caso antes de usar."
+O caso forneceu informações parciais. Gere uma peça JURIDICAMENTE COMPLETA usando dados genéricos plausíveis onde necessário.
+
+REGRAS ABSOLUTAS:
+1. PROIBIDO COMPLETAMENTE: colchetes, placeholders, marcadores de ausência.
+   Nunca escreva: [INSERIR], [NOME], [A DETERMINAR], [PREENCHER], [DATA], [VALOR], [VERIFICAR].
+2. Onde faltarem dados concretos, use dados genéricos plausíveis:
+   — Nomes: "João da Silva" (autor), "Empresa Ré Ltda." ou órgão público pertinente (réu)
+   — Datas: datas aproximadas coerentes com o tipo de caso (ex: "em março de 2024")
+   — Valores: valores redondos estimados (ex: "R$ 15.000,00")
+3. Desenvolva fundamentação jurídica completa: norma → aplicação → conclusão.
+4. Estrutura completa com todas as seções do tipo de peça.
+5. AO FINAL DA PEÇA, após o fechamento e assinatura, inclua obrigatoriamente esta nota literal:
+   "⚠ Peça gerada com dados genéricos por insuficiência de informações. Substitua nomes, datas, valores e fatos específicos pelos dados reais do caso antes de qualquer uso."
 
 `;
   }
 
   if (mode === "SAFE_SKELETON") {
     return `
-⚠ MODO ESQUELETO SEGURO — LEIA ANTES DE REDIGIR:
-A classificação do caso tem baixa confiança ou o caso está incompleto.
-Gere apenas um ESQUELETO ESTRUTURAL — sem conteúdo jurídico afirmativo.
+⚡ MODO GENÉRICO SIMPLIFICADO — informações mínimas
 
-REGRAS ABSOLUTAS PARA ESTE MODO:
-1. Cada seção deve conter apenas o título e um placeholder explicativo entre colchetes.
-2. NUNCA use linguagem decisória, afirmativa ou conclusiva.
-3. Use apenas: [A DETERMINAR], [VERIFICAR COMPETÊNCIA], [INSERIR FATOS DO CASO CONCRETO], [PREENCHER COM DADOS REAIS]
-4. Inclua no início: "⚠ ATENÇÃO: Esta peça foi gerada sem informações suficientes para uma minuta real. Complete todos os campos antes de qualquer uso."
-5. NÃO invente fatos, normas ou jurisprudência para preencher lacunas.
+O caso tem informações mínimas. Gere uma peça JURIDICAMENTE DESENVOLVIDA, simples, com dados genéricos plausíveis.
+
+REGRAS ABSOLUTAS:
+1. PROIBIDO COMPLETAMENTE: colchetes, placeholders, marcadores de ausência.
+   Nunca escreva: [INSERIR], [NOME], [A DETERMINAR], [PREENCHER], [VERIFICAR].
+2. Use dados genéricos plausíveis para o tipo de caso identificado:
+   — Nomes de partes fictícias mas verossímeis
+   — Fatos genéricos típicos do assunto jurídico
+   — Fundamentação baseada nas normas aplicáveis ao tipo de caso
+3. Peça completa: abertura, fatos genéricos coerentes, direito desenvolvido, pedidos concretos.
+4. AO FINAL DA PEÇA, após o fechamento e assinatura, inclua obrigatoriamente esta nota literal:
+   "⚠ Peça gerada com dados genéricos por insuficiência de informações. Substitua nomes, datas, valores e fatos específicos pelos dados reais do caso antes de qualquer uso."
 
 `;
   }
@@ -39,6 +47,11 @@ REGRAS ABSOLUTAS PARA ESTE MODO:
 ⚡ MODO FINAL_DRAFT — PEÇA JURIDICAMENTE DENSA E PERSUASIVA
 
 Você está em FINAL_DRAFT. Produza peça juridicamente robusta, densa e persuasiva. Não faça resumo. Não seja sintético. Desenvolva as teses em profundidade.
+
+PROIBIÇÃO ABSOLUTA — PLACEHOLDERS (FASE 5.4):
+NUNCA use colchetes ou marcadores de ausência: [INSERIR], [A DETERMINAR], [NOME], [CPF], [VALOR], [DATA], [PREENCHER].
+Se um dado específico não foi fornecido: use dado genérico plausível (nome fictício, data aproximada, valor estimado).
+EXCEÇÃO: jurisprudência — cite APENAS decisões fornecidas pelo sistema. Não invente números de processo.
 
 Para PETICAO_INICIAL, a seção DO DIREITO deve conter no mínimo 6 subtópicos jurídicos, salvo impossibilidade material:
   I — competência e fundamento jurisdicional;
@@ -67,8 +80,6 @@ PROIBIÇÕES ABSOLUTAS NESTE MODO (nunca escreva estas expressões):
 — "direito alegado" | "matéria cível" | "pretensão da parte"
 — "caso concreto" | "legislação aplicável" | "normas pertinentes"
 — "reconhecimento do direito" | "direito material postulado"
-
-Se algum dado específico faltar (nome, data, valor), use marcador SOMENTE naquele ponto — mas NÃO empobreça a fundamentação jurídica das teses disponíveis.
 
 `;
 }
