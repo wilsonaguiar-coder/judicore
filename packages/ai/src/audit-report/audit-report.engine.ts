@@ -177,6 +177,7 @@ const RULE_TITLES: Record<string, string> = {
   RGPS_REQUIREMENTS_INCONSISTENCY:               "Inconsistência de requisitos RGPS",
   POSSIBLE_DECADENCE_PRESCRIPTION_CONFUSION:     "Possível confusão entre decadência e prescrição tributária",
   ENVIRONMENTAL_LIABILITY_WARNING:               "Inconsistência com responsabilidade civil ambiental objetiva",
+  MISSING_ESSENTIAL_TOPIC:                       "Tema essencial não enfrentado",
 };
 
 // ── Mapeamento de regras para sugestões de melhoria ──────────────────────────

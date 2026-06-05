@@ -24,6 +24,7 @@ import { ConsumerValidator } from "./consumer.validator.js";
 import { ExecutionValidator } from "./execution.validator.js";
 import { JefCivelValidator } from "./jef-civel.validator.js";
 import { StanceContradictionValidator } from "./stance-contradiction.validator.js";
+import { validateCoverage } from "./coverage.validator.js";
 
 export interface FinalValidationResult {
   valid: boolean;
@@ -239,6 +240,9 @@ export class FinalValidator {
         fatal: true,
       });
     }
+
+    // ── FASE 5.6 — Coverage validator (omissão de tema essencial) ────────────────
+    allErrors.push(...validateCoverage(draft, classification));
 
     // ── FASE 5.5 — alertas materiais específicos por domínio ─────────────────────
 
