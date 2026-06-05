@@ -124,6 +124,8 @@ export interface ValidationError {
   rule: string;
   message: string;
   fatal: boolean;
+  /** Campo opcional para auditabilidade — usado pelo CoverageValidator (FASE 5.6.1). */
+  details?: Record<string, unknown>;
 }
 
 export interface ValidationResult {

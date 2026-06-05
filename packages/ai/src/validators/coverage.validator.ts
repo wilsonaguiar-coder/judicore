@@ -1,119 +1,221 @@
-// coverage.validator.ts — FASE 5.6
+// coverage.validator.ts — FASE 5.6 / hardening 5.6.1
+//
 // Detecta omissão de tema essencial em peças de domínio específico.
+// Alerta: MISSING_ESSENTIAL_TOPIC — não fatal, severidade ATENCAO.
 //
-// Tipo de alerta: MISSING_ESSENTIAL_TOPIC — não fatal, severidade ATENCAO.
-// Isolado dos validators existentes; não altera score nem classificação.
+// Hardenings 5.6.1:
+//   - normalizeForCoverage(): funciona com texto sem acento
+//   - looksLikeOnlyJurisprudence(): skip em ementas coladas
+//   - hasTemplateMarkers(): skip em templates com {{, ____, etc.
+//   - Deduplicação por chave domain:topic
+//   - details auditável em cada alerta
 //
-// Domínios cobertos nesta fase: RGPS, TRIBUTÁRIO, FAMÍLIA, CONSUMIDOR.
-// Não cobre: RPPS, Trabalhista, Ambiental, Criminal, Fazenda, Cível Geral.
+// Domínios: RGPS, TRIBUTÁRIO, FAMÍLIA, CONSUMIDOR.
+// Não altera score, classificação, RPPS, Trabalhista ou validators existentes.
 
 import type { LegalClassification, ValidationError } from "../pipeline/types.js";
 
-// ── Guards globais ────────────────────────────────────────────────────────────
+// ── Interfaces de details ─────────────────────────────────────────────────────
 
-const MIN_USEFUL_LENGTH = 800; // textos muito curtos → skip
+interface CoverageDetails {
+  topic: string;
+  missing: string[];
+  matchedTriggers: string[];
+  checkedBlocks: string[];
+  skipped: boolean;
+}
 
-/** Verifica se o draft deve ser ignorado (curto demais ou repleto de placeholders). */
+// ── Helper: normalização leve (remove diacríticos, lowercase) ─────────────────
+// Usado apenas internamente — não altera o draft original nem o relatório.
+
+export function normalizeForCoverage(text: string): string {
+  return text.normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase();
+}
+
+// ── Helper: detecta texto que parece só jurisprudência colada ─────────────────
+
+function looksLikeOnlyJurisprudence(text: string): boolean {
+  const lower = text.toLowerCase();
+  const JUR_SIGNALS = [
+    /\bementa\b/, /\bacordao\b|\bacórdão\b/, /\brelator\b/, /\bturma\b/,
+    /julgado\s+em/, /\bdje\b/, /\bstj\b/, /\bstf\b/, /\btrf\b/, /\btst\b/, /\bprecedente\b/,
+  ];
+  const PIECE_SIGNALS = [
+    /dos\s+fatos/, /do\s+direito/, /fundamenta/, /dispositivo/,
+    /ante\s+o\s+exposto/, /diante\s+do\s+exposto/, /\brequer\b/,
+    /\bjulgo\b/, /\bdefiro\b/, /\bindefiro\b/, /\bcondeno\b/,
+  ];
+  const jurCount   = JUR_SIGNALS.filter((re) => re.test(lower)).length;
+  const pieceCount = PIECE_SIGNALS.filter((re) => re.test(lower)).length;
+  return jurCount >= 4 && pieceCount <= 1;
+}
+
+// ── Helper: detecta markers de template incompleto ────────────────────────────
+
+function hasTemplateMarkers(text: string): boolean {
+  return /\{\{|}}\s*|^\s*_{4,}\s*$|\[PREENCHER\]|\[NOME\s|\[DATA\s|\[CPF\s|\bXXX\b/im.test(text);
+}
+
+// ── Guard global ─────────────────────────────────────────────────────────────
+
+const MIN_USEFUL_LENGTH = 800;
+
 function shouldSkip(draft: string): boolean {
+  // Texto útil muito curto (remove placeholders e whitespace extra antes de medir)
   const useful = draft.replace(/\[[^\]]{3,}\]/g, "").replace(/\s+/g, " ").trim();
   if (useful.length < MIN_USEFUL_LENGTH) return true;
 
-  // Template com muitos placeholders já é tratado por UNFILLED_TEMPLATE_PLACEHOLDERS
+  // Template com markers explícitos ({{, ____, [PREENCHER], etc.)
+  if (hasTemplateMarkers(draft)) return true;
+
+  // Alta proporção de placeholders entre colchetes → já tratado por UNFILLED_TEMPLATE_PLACEHOLDERS
   const lines = draft.split(/\n/);
-  const placeholderLines = lines.filter((l) => /\[[A-ZÁÀÂÃÉÊÍÓÔÕÚÇa-záàâãéêíóôõúç0-9\s.,;:!?/_-]{3,}\]/i.test(l)).length;
+  const placeholderLines = lines.filter((l) =>
+    /\[[A-ZÁÀÂÃÉÊÍÓÔÕÚÇa-záàâãéêíóôõúç0-9\s.,;:!?/_-]{3,}\]/i.test(l),
+  ).length;
   if (lines.length > 0 && placeholderLines / lines.length > 0.15) return true;
+
+  // Parece apenas jurisprudência colada (sem estrutura de peça)
+  if (looksLikeOnlyJurisprudence(draft)) return true;
 
   return false;
 }
 
+// ── Helper: extrai primeiro match visível de um regex ────────────────────────
+
+function firstMatch(re: RegExp, text: string): string | null {
+  const m = re.exec(text);
+  return m ? m[0].trim().slice(0, 40) : null;
+}
+
+// ── Helper: cria ValidationError com details auditável ───────────────────────
+
+function makeIssue(message: string, details: CoverageDetails): ValidationError {
+  return { rule: "MISSING_ESSENTIAL_TOPIC", message, fatal: false, details: details as unknown as Record<string, unknown> };
+}
+
 // ── 1. RGPS — Aposentadoria Especial ─────────────────────────────────────────
+// Regexes sobre texto NORMALIZADO (sem acentos, lowercase)
 
-const TRIGGER_RGPS_ESPECIAL =
-  /aposentadoria\s+especial|tempo\s+especial|atividade\s+especial|agente\s+nocivo|\bPPP\b|\bLTCAT\b|enquadramento\s+especial/i;
-const COVERAGE_EXPOSICAO =
-  /exposi[cç][aã]o|agente\s+nocivo|insalubridade|periculosidade|ru[ií]do|calor\s+excessivo|qu[ií]mico|biol[oó]gico|nocivo/i;
-const COVERAGE_HABITUAL_PERMANENTE =
-  /habitual|permanente|n[aã]o\s+ocasional|n[aã]o\s+intermitente/i;
-const COVERAGE_PROVA_TECNICA =
-  /\bPPP\b|\bLTCAT\b|laudo\s+t[eé]cnico|perfil\s+profissiogr[aá]fico/i;
+const TRIGGER_RGPS_N    = /aposentadoria\s+especial|tempo\s+especial|atividade\s+especial|agente\s+nocivo|\bppp\b|\bltcat\b|enquadramento\s+especial/i;
+const COV_EXPOSICAO_N   = /exposicao|agente\s+nocivo|insalubridade|periculosidade|ruido|calor\s+excessivo|quimico|biologico|nocivo/i;
+const COV_HABITUAL_N    = /habitual|permanente|nao\s+ocasional|nao\s+intermitente/i;
+const COV_PROVA_N       = /\bppp\b|\bltcat\b|laudo\s+tecnico|perfil\s+profissiografico/i;
 
-function validateRgpsEspecial(draft: string): ValidationError | null {
-  if (!TRIGGER_RGPS_ESPECIAL.test(draft)) return null;
-  const hasExposicao   = COVERAGE_EXPOSICAO.test(draft);
-  const hasHabitual    = COVERAGE_HABITUAL_PERMANENTE.test(draft);
-  const hasProva       = COVERAGE_PROVA_TECNICA.test(draft);
-  // Dispara se faltar pelo menos 2 dos 3 blocos de cobertura
-  const missing = [!hasExposicao, !hasHabitual, !hasProva].filter(Boolean).length;
-  if (missing < 2) return null;
-  return {
-    rule: "MISSING_ESSENTIAL_TOPIC",
-    message: "A peça trata de aposentadoria especial/tempo especial, mas não enfrenta de forma mínima a exposição habitual e permanente a agente nocivo.",
-    fatal: false,
-  };
+function validateRgpsEspecial(norm: string): ValidationError | null {
+  const triggerMatch = firstMatch(TRIGGER_RGPS_N, norm);
+  if (!triggerMatch) return null;
+
+  const hasExposicao = COV_EXPOSICAO_N.test(norm);
+  const hasHabitual  = COV_HABITUAL_N.test(norm);
+  const hasProva     = COV_PROVA_N.test(norm);
+
+  const missingBlocks: string[] = [];
+  if (!hasExposicao) missingBlocks.push("exposicao_agente_nocivo");
+  if (!hasHabitual)  missingBlocks.push("habitualidade_permanencia");
+  if (!hasProva)     missingBlocks.push("prova_tecnica_ppp_ltcat");
+
+  if (missingBlocks.length < 2) return null;
+
+  return makeIssue(
+    "A peça trata de aposentadoria especial/tempo especial, mas não enfrenta de forma mínima a exposição habitual e permanente a agente nocivo.",
+    {
+      topic: "aposentadoria_especial",
+      missing: missingBlocks,
+      matchedTriggers: [triggerMatch],
+      checkedBlocks: ["exposicao_agente_nocivo", "habitualidade_permanencia", "prova_tecnica_ppp_ltcat"],
+      skipped: false,
+    },
+  );
 }
 
 // ── 2. TRIBUTÁRIO — Anulação de Débito Fiscal ─────────────────────────────────
 
-const TRIGGER_TRIB_DEBITO =
-  /d[eé]bito\s+fiscal|cr[eé]dito\s+tribut[aá]rio|auto\s+de\s+infra[cç][aã]o|\bCDA\b|lan[cç]amento\s+tribut[aá]rio|execu[cç][aã]o\s+fiscal/i;
-const COVERAGE_LANCAMENTO =
-  /lan[cç]amento|constitui[cç][aã]o\s+d[ao]\s+cr[eé]dito|constitui[cç][aã]o\s+definitiva|notifica[cç][aã]o\s+fiscal|auto\s+de\s+infra[cç][aã]o/i;
+const TRIGGER_TRIB_N   = /debito\s+fiscal|credito\s+tributario|auto\s+de\s+infracao|\bcda\b|lancamento\s+tributario|execucao\s+fiscal/i;
+const COV_LANCAMENTO_N = /lancamento|constituicao\s+d[ao]\s+credito|constituicao\s+definitiva|notificacao\s+fiscal|auto\s+de\s+infracao/i;
 
-function validateTribDebito(draft: string): ValidationError | null {
-  if (!TRIGGER_TRIB_DEBITO.test(draft)) return null;
-  if (COVERAGE_LANCAMENTO.test(draft)) return null;
-  return {
-    rule: "MISSING_ESSENTIAL_TOPIC",
-    message: "A peça trata de anulação de débito fiscal, mas não enfrenta minimamente o lançamento ou a constituição do crédito tributário.",
-    fatal: false,
-  };
+function validateTribDebito(norm: string): ValidationError | null {
+  const triggerMatch = firstMatch(TRIGGER_TRIB_N, norm);
+  if (!triggerMatch) return null;
+  if (COV_LANCAMENTO_N.test(norm)) return null;
+
+  return makeIssue(
+    "A peça trata de anulação de débito fiscal, mas não enfrenta minimamente o lançamento ou a constituição do crédito tributário.",
+    {
+      topic: "anulacao_debito_fiscal",
+      missing: ["lancamento_constituicao_credito"],
+      matchedTriggers: [triggerMatch],
+      checkedBlocks: ["lancamento_constituicao_credito"],
+      skipped: false,
+    },
+  );
 }
 
 // ── 3. FAMÍLIA — Guarda ───────────────────────────────────────────────────────
 
-const TRIGGER_FAMILY_GUARDA =
-  /\bguarda\s+(?:unilateral|compartilhada|provisória|definitiva)\b|disputa\s+de\s+guarda|regulamentar\s+(?:a\s+)?guarda/i;
-const COVERAGE_MELHOR_INTERESSE =
-  /melhor\s+interesse|interesse\s+(?:superior\s+)?d[ae]\s+(?:crian[cç]a|adolescente)|prote[cç][aã]o\s+integral|prioridade\s+absoluta|bem[-\s]estar\s+(?:d[ae]\s+)?(?:crian[cç]a|menor)|desenvolvimento\s+(?:integral|d[ae]\s+(?:crian[cç]a|menor))/i;
-const COVERAGE_CONDICOES_GENITORES =
-  // Nota: não inclui "genitor/genitora" isolados — aparecem em qualquer texto de guarda
-  // como referência à outra parte, sem discutir condições.
-  /\bcapacidade\s+parental\b|cond[ií](?:ç[oõ]es|c[ãa]o)\s+(?:de\s+)?(?:vida|criar|cuidar|moradia)|rotina\s+d[ae]\s+(?:crian[cç]a|menor)|v[ií]nculo\s+afetivo|afeto\s+(?:com\s+)?(?:a\s+)?(?:crian[cç]a|filho|menor)|cuidado\s+(?:com\s+)?(?:o?\s+)?(?:filho|menor|crian[cç]a)|ambiente\s+familiar\s+(?:saud[aá]vel|prop[ií]cio)/i;
+const TRIGGER_GUARDA_N  = /\bguarda\s+(?:unilateral|compartilhada|provisoria|definitiva)\b|disputa\s+de\s+guarda|regulamentar\s+(?:a\s+)?guarda/i;
+const COV_INTERESSE_N   = /melhor\s+interesse|interesse\s+(?:superior\s+)?d[ae]\s+(?:crianca|adolescente)|protecao\s+integral|prioridade\s+absoluta|bem.?estar\s+(?:d[ae]\s+)?(?:crianca|menor)|desenvolvimento\s+(?:integral|d[ae]\s+(?:crianca|menor))/i;
+const COV_CONDICOES_N   =
+  // Não inclui "genitor/genitora" isolados — aparecem em qualquer texto sem discutir condições
+  /capacidade\s+parental|condicoes\s+(?:de\s+)?(?:vida|criar|cuidar|moradia)|rotina\s+d[ae]\s+(?:crianca|menor)|vinculo\s+afetivo|afeto\s+(?:com\s+)?(?:a\s+)?(?:crianca|filho|menor)|cuidado\s+(?:com\s+)?(?:o\s+)?(?:filho|menor|crianca)|ambiente\s+familiar\s+(?:saudavel|propicio)/i;
 
-function validateFamiliaGuarda(draft: string): ValidationError | null {
-  if (!TRIGGER_FAMILY_GUARDA.test(draft)) return null;
-  const hasMelhorInteresse = COVERAGE_MELHOR_INTERESSE.test(draft);
-  const hasCondicoes       = COVERAGE_CONDICOES_GENITORES.test(draft);
+function validateFamiliaGuarda(norm: string): ValidationError | null {
+  const triggerMatch = firstMatch(TRIGGER_GUARDA_N, norm);
+  if (!triggerMatch) return null;
+
+  const hasMelhorInteresse = COV_INTERESSE_N.test(norm);
+  const hasCondicoes       = COV_CONDICOES_N.test(norm);
+
   // Só dispara se AMBOS ausentes (regra conservadora)
   if (hasMelhorInteresse || hasCondicoes) return null;
-  return {
-    rule: "MISSING_ESSENTIAL_TOPIC",
-    message: "A peça trata de guarda, mas não enfrenta minimamente o melhor interesse da criança/adolescente ou as condições concretas dos genitores.",
-    fatal: false,
-  };
+
+  const missing = ["melhor_interesse_crianca", "condicoes_genitores"];
+
+  return makeIssue(
+    "A peça trata de guarda, mas não enfrenta minimamente o melhor interesse da criança/adolescente ou as condições concretas dos genitores.",
+    {
+      topic: "guarda_crianca",
+      missing,
+      matchedTriggers: [triggerMatch],
+      checkedBlocks: ["melhor_interesse_crianca", "condicoes_genitores"],
+      skipped: false,
+    },
+  );
 }
 
 // ── 4. CONSUMIDOR — Dano Moral / Restituição ──────────────────────────────────
 
-const TRIGGER_CONSUMIDOR_COBERTURA =
-  /cobran[cç]a\s+indevida|restitui[cç][aã]o\s+(?:de\s+)?valores?|repeti[cç][aã]o\s+d[ao]\s+ind[eé]bito|dano\s+moral\s+(?:(?:ao?\s+)?consumidor|consumerista)|vício\s+d[ao]\s+produto|defeito\s+d[ao]\s+servi[cç]o/i;
-const COVERAGE_FALHA =
-  // Nota: não inclui "cobrança indevida" — está no TRIGGER, gerando auto-satisfação.
-  // Cobertura requer EXPLICAÇÃO da falha, não apenas nomeação da pretensão.
-  /falha\s+na\s+presta[cç][aã]o|defeito\s+d[ao]\s+servi[cç]o|v[ií]cio\s+d[ao]\s+produto|servi[cç]o\s+defeituoso|produto\s+defeituoso|conduta\s+il[ií]cita|pr[aá]tica\s+abusiva|irregularidade\s+(?:na\s+presta[cç][aã]o|do\s+servi[cç]o)/i;
-const COVERAGE_NEXO_DANO =
-  /nexo\s+causal|dano(?:\s+moral|\s+material|\s+sofrido)?|preju[ií]zo|abalo\s+moral|transtorno|restitui[cç][aã]o|ind[eé]bito|pagamento\s+indevido/i;
+const TRIGGER_CONSUMIDOR_N =
+  /cobranca\s+indevida|restituicao\s+(?:de\s+)?valores?|repeticao\s+d[ao]\s+indebito|dano\s+moral\s+(?:(?:ao?\s+)?consumidor|consumerista)|vicio\s+d[ao]\s+produto|defeito\s+d[ao]\s+servico/i;
+const COV_FALHA_N =
+  // Não inclui "cobrança indevida" (está no trigger — auto-satisfação)
+  /falha\s+na\s+prestacao|defeito\s+d[ao]\s+servico|vicio\s+d[ao]\s+produto|servico\s+defeituoso|produto\s+defeituoso|conduta\s+ilicita|pratica\s+abusiva|irregularidade\s+(?:na\s+prestacao|do\s+servico)/i;
+const COV_NEXO_N =
+  /nexo\s+causal|dano(?:\s+moral|\s+material|\s+sofrido)?|prejuizo|abalo\s+moral|transtorno|restituicao|indebito|pagamento\s+indevido/i;
 
-function validateConsumidorPretensao(draft: string): ValidationError | null {
-  if (!TRIGGER_CONSUMIDOR_COBERTURA.test(draft)) return null;
-  const hasFalha = COVERAGE_FALHA.test(draft);
-  const hasNexo  = COVERAGE_NEXO_DANO.test(draft);
+function validateConsumidorPretensao(norm: string): ValidationError | null {
+  const triggerMatch = firstMatch(TRIGGER_CONSUMIDOR_N, norm);
+  if (!triggerMatch) return null;
+
+  const hasFalha = COV_FALHA_N.test(norm);
+  const hasNexo  = COV_NEXO_N.test(norm);
+
   if (hasFalha && hasNexo) return null;
-  return {
-    rule: "MISSING_ESSENTIAL_TOPIC",
-    message: "A peça trata de pretensão consumerista, mas não enfrenta minimamente a falha do serviço/vício do produto ou o nexo causal.",
-    fatal: false,
-  };
+
+  const missing: string[] = [];
+  if (!hasFalha) missing.push("falha_servico_vicio_produto");
+  if (!hasNexo)  missing.push("nexo_causal_dano");
+
+  return makeIssue(
+    "A peça trata de pretensão consumerista, mas não enfrenta minimamente a falha do serviço/vício do produto ou o nexo causal.",
+    {
+      topic: "pretensao_consumerista",
+      missing,
+      matchedTriggers: [triggerMatch],
+      checkedBlocks: ["falha_servico_vicio_produto", "nexo_causal_dano"],
+      skipped: false,
+    },
+  );
 }
 
 // ── API pública ───────────────────────────────────────────────────────────────
@@ -124,40 +226,57 @@ export function validateCoverage(
 ): ValidationError[] {
   if (shouldSkip(draft)) return [];
 
-  const results: ValidationError[] = [];
+  // Normaliza uma única vez — usada por todos os validators de cobertura
+  const norm = normalizeForCoverage(draft);
 
-  // 1. RGPS — detectado via regime_juridico (confiável mesmo no modo RAPIDA)
+  const results: ValidationError[] = [];
+  const seen = new Set<string>(); // deduplicação por domain:topic
+
+  const push = (domain: string, topic: string, err: ValidationError | null) => {
+    if (!err) return;
+    const key = `MISSING_ESSENTIAL_TOPIC:${domain}:${topic}`;
+    if (seen.has(key)) return;
+    seen.add(key);
+    results.push(err);
+  };
+
+  // 1. RGPS
   if (classification.regime_juridico === "RGPS") {
-    const r = validateRgpsEspecial(draft);
-    if (r) results.push(r);
+    push("RGPS", "aposentadoria_especial", validateRgpsEspecial(norm));
   }
 
-  // 2. TRIBUTÁRIO — detectado via tipo_justica ou assunto ou fallback no draft
+  // 2. TRIBUTÁRIO
   const isTributario =
     classification.tipo_justica === "EXECUCAO_FISCAL" ||
     (classification.regime_juridico as string) === "TRIBUTARIO" ||
-    /tribut[aá]rio|CTN\b|d[eé]bito\s+fiscal|lan[cç]amento\s+fiscal|execu[cç][aã]o\s+fiscal/i.test(classification.assunto_principal ?? "") ||
-    /CTN\b|lan[cç]amento\s+tribut[aá]rio|d[eé]bito\s+fiscal|execu[cç][aã]o\s+fiscal|\bCDA\b/i.test(draft.slice(0, 3000));
+    /tributario|ctn\b|debito\s+fiscal|lancamento\s+fiscal|execucao\s+fiscal/i.test(
+      normalizeForCoverage(classification.assunto_principal ?? ""),
+    ) ||
+    /ctn\b|lancamento\s+tributario|debito\s+fiscal|execucao\s+fiscal|\bcda\b/i.test(
+      normalizeForCoverage(draft.slice(0, 3000)),
+    );
   if (isTributario) {
-    const r = validateTribDebito(draft);
-    if (r) results.push(r);
+    push("TRIBUTARIO", "anulacao_debito_fiscal", validateTribDebito(norm));
   }
 
-  // 3. FAMÍLIA — detectado via assunto
+  // 3. FAMÍLIA
   const isFamilia =
-    /alimentos?|guarda|divórcio|uni[aã]o\s+estável|parti[lh]a|famil(?:ia|iar)|interdição|curatela|adoção/i.test(classification.assunto_principal ?? "");
+    /alimentos?|guarda|divorcio|uniao\s+estavel|partilha|famil(?:ia|iar)|interdicao|curatela|adocao/i.test(
+      normalizeForCoverage(classification.assunto_principal ?? ""),
+    );
   if (isFamilia) {
-    const r = validateFamiliaGuarda(draft);
-    if (r) results.push(r);
+    push("FAMILIA", "guarda_crianca", validateFamiliaGuarda(norm));
   }
 
-  // 4. CONSUMIDOR — detectado via assunto ou tipo_justica JEC com CDC no draft
+  // 4. CONSUMIDOR
   const isConsumidor =
-    /consumidor|CDC\b|fornecedor|produto\s+defeituoso|servi[cç]o\s+defeituoso|cobran[cç]a\s+indevida/i.test(classification.assunto_principal ?? "") ||
-    (classification.tipo_justica === "JEC" && /consumidor|CDC\b|fornecedor/i.test(draft.slice(0, 2000)));
+    /consumidor|cdc\b|fornecedor|produto\s+defeituoso|servico\s+defeituoso|cobranca\s+indevida/i.test(
+      normalizeForCoverage(classification.assunto_principal ?? ""),
+    ) ||
+    (classification.tipo_justica === "JEC" &&
+      /consumidor|cdc\b|fornecedor/i.test(normalizeForCoverage(draft.slice(0, 2000))));
   if (isConsumidor) {
-    const r = validateConsumidorPretensao(draft);
-    if (r) results.push(r);
+    push("CONSUMIDOR", "pretensao_consumerista", validateConsumidorPretensao(norm));
   }
 
   return results;
