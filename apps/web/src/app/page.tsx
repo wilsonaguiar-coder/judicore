@@ -19,7 +19,7 @@ const fadeUp = {
 
 function PreviewJudiCore() {
   return (
-    <div className="relative w-full h-[220px] flex flex-col rounded-xl bg-[#0d1117] border border-white/[0.07] p-5 overflow-hidden shadow-2xl group-hover:shadow-indigo-500/20 transition-all">
+    <div className="relative w-full h-[160px] flex flex-col rounded-xl bg-[#0d1117] border border-white/[0.07] p-5 overflow-hidden shadow-2xl group-hover:shadow-indigo-500/20 transition-all">
       <div className="flex gap-2 mb-5">
         <div className="w-2.5 h-2.5 rounded-full bg-red-500/60" />
         <div className="w-2.5 h-2.5 rounded-full bg-yellow-500/60" />
@@ -50,7 +50,7 @@ function PreviewJudiAudit() {
     ["Pedidos Finais", "green"],
   ];
   return (
-    <div className="w-full h-[220px] flex flex-col rounded-xl bg-[#100a02] border border-amber-900/40 p-5 overflow-hidden shadow-2xl group-hover:shadow-amber-500/20 transition-all">
+    <div className="w-full h-[160px] flex flex-col rounded-xl bg-[#100a02] border border-amber-900/40 p-5 overflow-hidden shadow-2xl group-hover:shadow-amber-500/20 transition-all">
       <div className="flex items-start justify-between mb-1">
         <div className="text-xs text-amber-400/70 font-bold uppercase tracking-wider leading-none mt-1.5">SCORE DE RISCO</div>
         <div className="text-[44px] font-black text-amber-400 leading-none drop-shadow-md">97</div>
@@ -85,8 +85,8 @@ type Product = {
 const PRODUCTS: Product[] = [
   {
     icon: Gavel,
-    name: "JudiCore",
-    tagline: "Geração Inteligente de Peças",
+    name: "Pesquisa de Jurisprudência",
+    tagline: "Pesquisa e Geração Inteligente de Peças",
     features: [
       "Mais de 1 milhão de acórdãos",
       "Fundamentação automática",
@@ -101,7 +101,7 @@ const PRODUCTS: Product[] = [
   },
   {
     icon: ClipboardCheck,
-    name: "JudiAudit",
+    name: "Análise de Peças Judiciais",
     tagline: "Auditoria Inteligente de Peças",
     features: [
       "Score de qualidade (0–100)",
@@ -192,15 +192,14 @@ export default function LandingPage() {
       {/* ── Hero ─────────────────────────────────────────────────────────── */}
       <main className="relative z-10 flex-1 flex flex-col items-center justify-start px-6 md:px-14 pt-8 md:pt-12 pb-20">
         
-        {/* Trocamos flex padrão por um grid/absoluto para ancorar a Themis e alinhar texto ao topo */}
-        <div className="w-full max-w-6xl relative mb-0 flex flex-col md:flex-row items-start justify-between min-h-[350px] lg:min-h-[480px]">
-          
-          {/* Coluna de Texto (Esquerda) */}
-          <motion.div 
+        <div className="w-full max-w-6xl relative mb-0 min-h-[675px]">
+
+          {/* Coluna de Texto + Cards (Esquerda) */}
+          <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6 }}
-            className="w-full md:w-[60%] lg:w-[55%] text-center md:text-left relative z-10 pt-4 pb-12 md:pb-0"
+            className="w-full md:w-[58%] lg:w-[56%] text-center md:text-left relative z-10 pt-4 flex flex-col"
           >
             <h1 className="text-5xl md:text-[64px] lg:text-[72px] font-black tracking-tight mb-6 leading-[1.05] drop-shadow-2xl">
               Inteligência que<br className="hidden md:block" /> transforma o{" "}
@@ -214,9 +213,9 @@ export default function LandingPage() {
             <p className="text-lg md:text-2xl text-white/60 max-w-xl font-light leading-relaxed mx-auto md:mx-0">
               Ferramentas inteligentes para operadores do direito. Escolha o módulo que deseja e deixe a IA te ajudar.
             </p>
-            
+
             {/* Stats Pills */}
-            <motion.div 
+            <motion.div
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.2, duration: 0.5 }}
@@ -229,9 +228,62 @@ export default function LandingPage() {
                 </div>
               ))}
             </motion.div>
+
+            {/* Cards */}
+            <div className="grid grid-cols-2 gap-4 mt-6 flex-1">
+              {PRODUCTS.map((p, idx) => {
+                const colorClasses = {
+                  indigo: "from-indigo-600/20 hover:shadow-indigo-500/30 group-hover:border-indigo-500/40",
+                  amber: "from-amber-600/20 hover:shadow-amber-500/30 group-hover:border-amber-500/40",
+                }[p.colorName];
+
+                return (
+                  <motion.div
+                    key={p.name}
+                    custom={idx * 0.08}
+                    variants={fadeUp}
+                    initial="hidden"
+                    animate="visible"
+                    className="h-full"
+                  >
+                    <Link
+                      href={p.link}
+                      className={`group relative flex flex-col h-full rounded-3xl bg-white/[0.04] border border-white/[0.08] overflow-hidden transition-all duration-500 hover:-translate-y-2 hover:bg-white/[0.06] shadow-2xl backdrop-blur-xl ${colorClasses}`}
+                    >
+                      <div className={`absolute inset-0 bg-gradient-to-br ${colorClasses.split(' ')[0]} via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500`} />
+                      <div className="absolute -inset-px bg-gradient-to-b from-white/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 rounded-3xl pointer-events-none" />
+                      <div className="flex-1 p-5 relative z-10 flex flex-col">
+                        <div className="flex items-center gap-3 mb-4">
+                          <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${p.iconBg} shadow-lg group-hover:scale-110 group-hover:rotate-3 transition-transform duration-500`}>
+                            <p.icon size={20} className="text-white" />
+                          </div>
+                          <div>
+                            <div className="text-sm font-bold text-white leading-snug group-hover:text-gray-200 transition-colors">{p.name}</div>
+                            <div className="text-[11px] text-white/50 tracking-wide leading-tight mt-0.5 font-light">{p.tagline}</div>
+                          </div>
+                        </div>
+                        <ul className="space-y-2 mb-4">
+                          {p.features.map((f) => (
+                            <li key={f} className="flex items-start gap-2">
+                              <Check size={12} className={`mt-0.5 shrink-0 ${p.checkColor}`} />
+                              <span className="text-xs text-white/70 leading-tight">{f}</span>
+                            </li>
+                          ))}
+                        </ul>
+                        <div className="w-full flex justify-center mt-auto opacity-90 group-hover:opacity-100 transition-opacity duration-500 transform group-hover:scale-[1.03]">
+                          <div className="w-full">
+                            <p.Preview />
+                          </div>
+                        </div>
+                      </div>
+                    </Link>
+                  </motion.div>
+                );
+              })}
+            </div>
           </motion.div>
 
-          {/* Imagem da Themis ancorada na direita/base (50% maior) */}
+          {/* Imagem da Themis ancorada na direita/base */}
           <motion.div
             initial={{ opacity: 0, x: 24 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.7, delay: 0.08 }}
             className="hidden md:block absolute right-0 bottom-0 w-[570px] h-[675px] pointer-events-none z-0"
@@ -245,68 +297,6 @@ export default function LandingPage() {
               priority
             />
           </motion.div>
-        </div>
-
-        <div className="w-full max-w-6xl relative">
-          <div className="grid md:grid-cols-2 gap-6 relative z-10 max-w-4xl mx-auto">
-            {PRODUCTS.map((p, idx) => {
-              // Determina as cores do hover baseadas no card
-              const colorClasses = {
-                indigo: "from-indigo-600/20 hover:shadow-indigo-500/30 group-hover:border-indigo-500/40",
-                amber: "from-amber-600/20 hover:shadow-amber-500/30 group-hover:border-amber-500/40",
-              }[p.colorName];
-
-              return (
-                <motion.div
-                  key={p.name}
-                  custom={idx * 0.08}
-                  variants={fadeUp}
-                  initial="hidden"
-                  animate="visible"
-                >
-                  <Link
-                    href={p.link}
-                    className={`group relative flex flex-col h-full rounded-3xl bg-white/[0.04] border border-white/[0.08] overflow-hidden transition-all duration-500 hover:-translate-y-2 hover:bg-white/[0.06] shadow-2xl backdrop-blur-xl ${colorClasses}`}
-                  >
-                    {/* Efeito Glow Interno */}
-                    <div className={`absolute inset-0 bg-gradient-to-br ${colorClasses.split(' ')[0]} via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500`} />
-                    <div className="absolute -inset-px bg-gradient-to-b from-white/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 rounded-3xl pointer-events-none" />
-
-                    {/* Body */}
-                    <div className="flex-1 p-6 relative z-10 flex flex-col">
-                      {/* Icon + name + tagline */}
-                      <div className="flex items-center gap-4 mb-6">
-                        <div className={`w-12 h-12 rounded-xl flex items-center justify-center shrink-0 ${p.iconBg} shadow-lg group-hover:scale-110 group-hover:rotate-3 transition-transform duration-500`}>
-                          <p.icon size={22} className="text-white" />
-                        </div>
-                        <div>
-                          <div className="text-lg font-bold text-white leading-tight group-hover:text-gray-200 transition-colors">{p.name}</div>
-                          <div className="text-xs text-white/50 tracking-wide leading-tight mt-1 font-light">{p.tagline}</div>
-                        </div>
-                      </div>
-
-                      {/* Features */}
-                      <ul className="space-y-3 mb-8">
-                        {p.features.map((f) => (
-                          <li key={f} className="flex items-start gap-2">
-                            <Check size={14} className={`mt-0.5 shrink-0 ${p.checkColor}`} />
-                            <span className="text-sm text-white/70 leading-tight">{f}</span>
-                          </li>
-                        ))}
-                      </ul>
-                      
-                      {/* Preview area */}
-                      <div className="w-full flex justify-center mt-auto opacity-90 group-hover:opacity-100 transition-opacity duration-500 transform group-hover:scale-[1.03]">
-                        <div className="w-full">
-                          <p.Preview />
-                        </div>
-                      </div>
-                    </div>
-                  </Link>
-                </motion.div>
-              );
-            })}
-          </div>
         </div>
 
 
