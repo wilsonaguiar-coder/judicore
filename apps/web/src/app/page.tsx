@@ -3,7 +3,7 @@
 import { motion } from "framer-motion";
 import Link from "next/link";
 import Image from "next/image";
-import { Gavel, ClipboardCheck, Check } from "lucide-react";
+import { Gavel, ClipboardCheck, Check, Scale } from "lucide-react";
 
 // ── Animations ───────────────────────────────────────────────────────────────
 
@@ -68,6 +68,30 @@ function PreviewJudiAudit() {
   );
 }
 
+function PreviewPJE() {
+  const docs = ["Petição Inicial", "Contestação", "Decisão", "Acórdão"];
+  return (
+    <div className="w-full h-[160px] flex flex-col rounded-xl bg-[#020c14] border border-cyan-900/40 p-4 overflow-hidden shadow-2xl group-hover:shadow-cyan-500/20 transition-all">
+      <div className="flex items-center gap-2 mb-3">
+        <div className="w-1.5 h-1.5 rounded-full bg-cyan-400 shadow-[0_0_6px_rgba(34,211,238,0.8)]" />
+        <div className="text-[9px] text-cyan-400/80 font-mono leading-none truncate">0001234-56.2024.5.04.0101</div>
+      </div>
+      <div className="flex-1 space-y-1.5">
+        {docs.map((doc, i) => (
+          <div key={doc} className="flex items-center gap-2">
+            <div className={`w-1.5 h-1.5 rounded-sm ${i === docs.length - 1 ? "bg-cyan-500" : "bg-white/20"}`} />
+            <span className={`text-[11px] leading-none ${i === docs.length - 1 ? "text-cyan-300" : "text-white/45"}`}>{doc}</span>
+          </div>
+        ))}
+      </div>
+      <div className="flex items-center justify-between pt-2 border-t border-white/[0.07] mt-1">
+        <span className="text-[9px] text-white/30">{docs.length} documentos</span>
+        <span className="px-2 py-0.5 rounded bg-cyan-600/25 border border-cyan-500/30 text-[9px] text-cyan-400 font-semibold">+ Incluir Peça</span>
+      </div>
+    </div>
+  );
+}
+
 // ── Data ─────────────────────────────────────────────────────────────────────
 
 type Product = {
@@ -79,7 +103,7 @@ type Product = {
   checkColor: string;
   Preview: () => React.ReactElement;
   link: string;
-  colorName: "indigo" | "amber";
+  colorName: "indigo" | "amber" | "cyan";
 };
 
 const PRODUCTS: Product[] = [
@@ -115,6 +139,23 @@ const PRODUCTS: Product[] = [
     Preview: PreviewJudiAudit,
     link: "/login",
     colorName: "amber",
+  },
+  {
+    icon: Scale,
+    name: "Integração com o PJE",
+    tagline: "Leia e adicione peças diretamente no PJE",
+    features: [
+      "Consulta processual",
+      "Resumo de documento",
+      "Análise de documento",
+      "Dicas processuais",
+      "Inclusão de peças",
+    ],
+    iconBg: "bg-cyan-600",
+    checkColor: "text-cyan-400",
+    Preview: PreviewPJE,
+    link: "/login",
+    colorName: "cyan",
   },
 ];
 
@@ -192,14 +233,14 @@ export default function LandingPage() {
       {/* ── Hero ─────────────────────────────────────────────────────────── */}
       <main className="relative z-10 flex-1 flex flex-col items-center justify-start px-6 md:px-14 pt-8 md:pt-12 pb-20">
         
-        <div className="w-full max-w-6xl relative mb-0 min-h-[675px]">
+        <div className="w-full max-w-6xl relative overflow-visible">
 
-          {/* Coluna de Texto + Cards (Esquerda) */}
+          {/* Texto hero — coluna esquerda */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6 }}
-            className="w-full md:w-[58%] lg:w-[56%] text-center md:text-left relative z-10 pt-4 flex flex-col"
+            className="w-full md:w-[54%] lg:w-[50%] text-center md:text-left relative z-[2] pt-4 pb-10"
           >
             <h1 className="text-5xl md:text-[64px] lg:text-[72px] font-black tracking-tight mb-6 leading-[1.05] drop-shadow-2xl">
               Inteligência que<br className="hidden md:block" /> transforma o{" "}
@@ -213,8 +254,6 @@ export default function LandingPage() {
             <p className="text-lg md:text-2xl text-white/60 max-w-xl font-light leading-relaxed mx-auto md:mx-0">
               Ferramentas inteligentes para operadores do direito. Escolha o módulo que deseja e deixe a IA te ajudar.
             </p>
-
-            {/* Stats Pills */}
             <motion.div
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
@@ -228,78 +267,74 @@ export default function LandingPage() {
                 </div>
               ))}
             </motion.div>
-
-            {/* Cards */}
-            <div className="grid grid-cols-2 gap-4 mt-6 flex-1">
-              {PRODUCTS.map((p, idx) => {
-                const colorClasses = {
-                  indigo: "from-indigo-600/20 hover:shadow-indigo-500/30 group-hover:border-indigo-500/40",
-                  amber: "from-amber-600/20 hover:shadow-amber-500/30 group-hover:border-amber-500/40",
-                }[p.colorName];
-
-                return (
-                  <motion.div
-                    key={p.name}
-                    custom={idx * 0.08}
-                    variants={fadeUp}
-                    initial="hidden"
-                    animate="visible"
-                    className="h-full"
-                  >
-                    <Link
-                      href={p.link}
-                      className={`group relative flex flex-col h-full rounded-3xl bg-white/[0.04] border border-white/[0.08] overflow-hidden transition-all duration-500 hover:-translate-y-2 hover:bg-white/[0.06] shadow-2xl backdrop-blur-xl ${colorClasses}`}
-                    >
-                      <div className={`absolute inset-0 bg-gradient-to-br ${colorClasses.split(' ')[0]} via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500`} />
-                      <div className="absolute -inset-px bg-gradient-to-b from-white/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 rounded-3xl pointer-events-none" />
-                      <div className="flex-1 p-5 relative z-10 flex flex-col">
-                        <div className="flex items-center gap-3 mb-4">
-                          <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${p.iconBg} shadow-lg group-hover:scale-110 group-hover:rotate-3 transition-transform duration-500`}>
-                            <p.icon size={20} className="text-white" />
-                          </div>
-                          <div>
-                            <div className="text-sm font-bold text-white leading-snug group-hover:text-gray-200 transition-colors">{p.name}</div>
-                            <div className="text-[11px] text-white/50 tracking-wide leading-tight mt-0.5 font-light">{p.tagline}</div>
-                          </div>
-                        </div>
-                        <ul className="space-y-2 mb-4">
-                          {p.features.map((f) => (
-                            <li key={f} className="flex items-start gap-2">
-                              <Check size={12} className={`mt-0.5 shrink-0 ${p.checkColor}`} />
-                              <span className="text-xs text-white/70 leading-tight">{f}</span>
-                            </li>
-                          ))}
-                        </ul>
-                        <div className="w-full flex justify-center mt-auto opacity-90 group-hover:opacity-100 transition-opacity duration-500 transform group-hover:scale-[1.03]">
-                          <div className="w-full">
-                            <p.Preview />
-                          </div>
-                        </div>
-                      </div>
-                    </Link>
-                  </motion.div>
-                );
-              })}
-            </div>
           </motion.div>
 
-          {/* Imagem da Themis ancorada na direita/base */}
+          {/* 3 Cards — largura total, abaixo do texto */}
+          <div className="grid md:grid-cols-3 gap-5 relative z-[2]">
+            {PRODUCTS.map((p, idx) => {
+              const colorClasses = {
+                indigo: "from-indigo-600/20 hover:shadow-indigo-500/30 group-hover:border-indigo-500/40",
+                amber:  "from-amber-600/20 hover:shadow-amber-500/30 group-hover:border-amber-500/40",
+                cyan:   "from-cyan-600/20 hover:shadow-cyan-500/30 group-hover:border-cyan-500/40",
+              }[p.colorName] ?? "";
+
+              return (
+                <motion.div
+                  key={p.name}
+                  custom={idx * 0.08}
+                  variants={fadeUp}
+                  initial="hidden"
+                  animate="visible"
+                >
+                  <Link
+                    href={p.link}
+                    className={`group relative flex flex-col h-full rounded-3xl bg-white/[0.04] border border-white/[0.08] overflow-hidden transition-all duration-500 hover:-translate-y-2 hover:bg-white/[0.06] shadow-2xl backdrop-blur-xl ${colorClasses}`}
+                  >
+                    <div className={`absolute inset-0 bg-gradient-to-br ${colorClasses.split(" ")[0]} via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500`} />
+                    <div className="absolute -inset-px bg-gradient-to-b from-white/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 rounded-3xl pointer-events-none" />
+                    <div className="flex-1 p-6 relative z-10 flex flex-col">
+                      <div className="flex items-center gap-4 mb-5">
+                        <div className={`w-11 h-11 rounded-xl flex items-center justify-center shrink-0 ${p.iconBg} shadow-lg group-hover:scale-110 group-hover:rotate-3 transition-transform duration-500`}>
+                          <p.icon size={20} className="text-white" />
+                        </div>
+                        <div>
+                          <div className="text-sm font-bold text-white leading-snug group-hover:text-gray-200 transition-colors">{p.name}</div>
+                          <div className="text-[11px] text-white/50 tracking-wide leading-tight mt-0.5 font-light">{p.tagline}</div>
+                        </div>
+                      </div>
+                      <ul className="space-y-2.5 mb-6">
+                        {p.features.map((f) => (
+                          <li key={f} className="flex items-start gap-2">
+                            <Check size={13} className={`mt-0.5 shrink-0 ${p.checkColor}`} />
+                            <span className="text-sm text-white/70 leading-tight">{f}</span>
+                          </li>
+                        ))}
+                      </ul>
+                      <div className="mt-auto opacity-90 group-hover:opacity-100 transition-opacity duration-500 group-hover:scale-[1.02] transform">
+                        <p.Preview />
+                      </div>
+                    </div>
+                  </Link>
+                </motion.div>
+              );
+            })}
+          </div>
+
+          {/* Themis — pés apoiados na borda superior dos cards */}
           <motion.div
             initial={{ opacity: 0, x: 24 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.7, delay: 0.08 }}
-            className="hidden md:block absolute right-0 bottom-0 w-[570px] h-[675px] pointer-events-none z-0"
+            className="hidden md:block absolute right-0 bottom-[400px] w-[530px] h-[640px] pointer-events-none z-[5]"
           >
             <Image
               src="/hero.png"
               alt="Themis"
               fill
-              sizes="570px"
+              sizes="530px"
               className="object-contain object-bottom drop-shadow-[0_0_50px_rgba(139,92,246,0.3)] filter contrast-[1.15] brightness-90"
               priority
             />
           </motion.div>
         </div>
-
-
 
       </main>
 
