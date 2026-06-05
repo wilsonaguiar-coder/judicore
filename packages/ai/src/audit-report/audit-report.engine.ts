@@ -48,7 +48,7 @@ const STANCE_RULES = new Set([
 
 const ARGUMENTATIVE_RULES = new Set([
   "FINAL_DRAFT_WEAK_ARGUMENTATION", "FINAL_DRAFT_GENERIC_LANGUAGE",
-  "MATRIX_MISSING_RATIO", "MATRIX_NO_CONTRAPONTO", "MATRIX_WEAK_TESE",
+  "MATRIX_MISSING_RATIO", "MATRIX_NO_CONTRAPONTO", "MATRIX_WEAK_TESE", "MATRIX_INSUFFICIENT_TESES",
 ]);
 
 // ── Mapeamento de regras para títulos humanizados ─────────────────────────────
@@ -96,6 +96,10 @@ const RULE_TITLES: Record<string, string> = {
   EXECUTION_MISSING_CPC_BASIS: "Base legal CPC da execução ausente",
   EXECUTION_MISSING_MODALITY: "Modalidade executiva não especificada",
   EXECUTION_SISBAJUD_MISSING: "Pedido de SISBAJUD ausente na execução",
+  MATRIX_INSUFFICIENT_TESES: "Número de teses insuficiente na matriz argumentativa",
+  MATRIX_MISSING_RATIO: "Ratio decidendi ausente em uma ou mais teses",
+  MATRIX_NO_CONTRAPONTO: "Tese sem contraponto identificado",
+  MATRIX_WEAK_TESE: "Tese argumentativa fraca ou incompleta",
 };
 
 // ── Mapeamento de regras para sugestões de melhoria ──────────────────────────
@@ -119,6 +123,8 @@ const RULE_SUGGESTIONS: Record<string, string> = {
   CDC_APPLICATION_MISSING: "Fundamentar expressamente a aplicação do CDC, identificando fornecedor, consumidor e relação de consumo.",
   EXECUTION_MISSING_SECTION: "Incluir seção específica sobre a modalidade executiva e os meios de satisfação do crédito.",
   EXECUTION_SISBAJUD_MISSING: "Requerer expressamente a penhora via SISBAJUD como primeira medida executiva (art. 854 CPC).",
+  MATRIX_INSUFFICIENT_TESES: "Desenvolver uma tese argumentativa completa para cada pedido formulado na peça.",
+  MATRIX_WEAK_TESE: "Aprimorar a ratio decidendi das teses, conectando fato, norma e consequência jurídica.",
 };
 
 // ── Mapeamento de regras para riscos processuais ──────────────────────────────

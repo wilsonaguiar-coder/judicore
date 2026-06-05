@@ -115,6 +115,13 @@ const FUND_COLOR: Record<string, string> = {
   DIPLOMA: "bg-emerald-50 text-emerald-700 border-emerald-100",
 };
 const FUND_LABEL: Record<string, string> = { ARTIGO: "Art.", JURISPRUDENCIA: "Prec.", DIPLOMA: "Lei" };
+const TIPO_PECA_LABEL: Record<string, string> = {
+  PETICAO_INICIAL: "Petição Inicial",
+  RECURSO:         "Recurso",
+  SENTENCA:        "Sentença",
+  DECISAO:         "Decisão",
+  DESPACHO:        "Despacho",
+};
 
 // ── Score Circle ──────────────────────────────────────────────────────────────
 
@@ -324,7 +331,7 @@ export default function JudiAuditPage() {
           <span>{new Date(entry.createdAt).toLocaleString("pt-BR", { day: "2-digit", month: "short", hour: "2-digit", minute: "2-digit" })}</span>
           <span>·</span>
           <span className={`px-2 py-0.5 rounded-full font-medium ${ORIGEM_COLOR[entry.origem]}`}>{ORIGEM_LABEL[entry.origem]}</span>
-          {entry.tipoPeca && <span className="bg-violet-100 text-violet-700 px-2 py-0.5 rounded-full">{entry.tipoPeca}</span>}
+          {entry.tipoPeca && <span className="bg-violet-100 text-violet-700 px-2 py-0.5 rounded-full">{TIPO_PECA_LABEL[entry.tipoPeca] ?? entry.tipoPeca}</span>}
           {entry.originalFilename && <span className="bg-slate-100 text-slate-600 px-2 py-0.5 rounded-full truncate max-w-[200px]">{entry.originalFilename}</span>}
           {entry.mode === "RAPIDA" && <span className="bg-amber-100 text-amber-700 px-2 py-0.5 rounded-full flex items-center gap-1"><Zap size={10} />Rápida</span>}
         </div>
@@ -623,7 +630,10 @@ export default function JudiAuditPage() {
             {/* Histórico — coluna lateral */}
             {history.length > 0 && (
               <div className="lg:col-span-1 space-y-2">
-                <h3 className="text-xs font-bold text-slate-500 uppercase tracking-wide px-1">Histórico</h3>
+                <div className="flex items-baseline gap-2 px-1">
+                  <h3 className="text-xs font-bold text-slate-500 uppercase tracking-wide">Histórico</h3>
+                  <span className="text-[9px] text-slate-400">T=Técnica · J=Jurídica</span>
+                </div>
                 {history.map((entry) => {
                   const cls = CLS[entry.classificacao];
                   const isActive = active?.entry.id === entry.id;
