@@ -41,12 +41,18 @@ export interface AuditReport {
   // ── FASE 5.0.2 — separação qualidade técnica / viabilidade jurídica ──────
   /** Média ponderada das 4 dimensões técnicas. Nunca sofre cap por erros. */
   qualidadeTecnica: number;
-  /** Baseada exclusivamente no número de erros fatais dos validators. */
+  /** Baseada exclusivamente no número de erros jurídicos fatais (exclui completude). */
   viabilidadeJuridica: number;
   /** Classificação derivada da viabilidade jurídica. */
   classificacaoFinal: AuditClassificacaoFinal;
-  /** Motivo da classificação (primeiro erro fatal, quando presente). */
+  /** Motivo da classificação (primeiro erro jurídico fatal, quando presente). */
   motivoClassificacao?: string;
+
+  // ── FASE 5.4 — completude documental (separada da qualidade jurídica) ─────
+  /** true quando há campos de template não preenchidos na minuta. */
+  minutaIncompleta: boolean;
+  /** Descrição do problema de completude, quando presente. */
+  motivoIncompleta?: string;
 
   // ── Compat. legado (mantidos para quality-lab e histórico) ────────────────
   /** = qualidadeTecnica (sem cap). Mantido para compatibilidade. */

@@ -44,6 +44,8 @@ interface AuditReport {
   viabilidadeJuridica: number;
   classificacaoFinal: AuditClassificacaoFinal;
   motivoClassificacao?: string;
+  minutaIncompleta: boolean;
+  motivoIncompleta?: string;
   scoreGeral: number; classificacao: AuditClassificacao;
   problemasFatais: AuditItem[]; problemasNaoFatais: AuditItem[];
   pontosFortes: AuditItem[]; sugestoesMelhoria: AuditItem[];
@@ -385,19 +387,19 @@ export default function JudiAuditPage() {
           </div>
         </div>
 
-        {/* Banner de template não preenchido — aparece antes de qualquer outro conteúdo */}
-        {r.problemasFatais.some((p) => p.regra === "UNFILLED_TEMPLATE_PLACEHOLDERS" || p.regra === "EMPTY_OR_SKELETON_DRAFT") && (
-          <div className="bg-red-50 border border-red-300 rounded-xl px-4 py-4 flex items-start gap-3">
-            <AlertCircle size={16} className="text-red-600 mt-0.5 flex-shrink-0" />
+        {/* Banner MINUTA INCOMPLETA — completude documental, separado da qualidade jurídica */}
+        {r.minutaIncompleta && (
+          <div className="bg-amber-50 border border-amber-300 rounded-xl px-4 py-3 flex items-start gap-3">
+            <AlertTriangle size={15} className="text-amber-600 mt-0.5 flex-shrink-0" />
             <div>
-              <p className="text-sm font-bold text-red-900">Documento incompleto</p>
-              <p className="text-xs text-red-700 mt-1 leading-relaxed">Esta minuta contém campos não preenchidos e estrutura de template. Complete os dados essenciais antes de qualquer uso.</p>
+              <p className="text-sm font-bold text-amber-900">Minuta Incompleta</p>
+              <p className="text-xs text-amber-700 mt-0.5 leading-relaxed">Esta minuta contém campos não preenchidos. Substitua os dados genéricos pelos dados reais do caso antes de qualquer uso. A qualidade jurídica avaliada abaixo reflete a estrutura da peça, não os dados específicos.</p>
             </div>
           </div>
         )}
 
-        {/* Alerta de problema crítico */}
-        {r.motivoClassificacao && !r.problemasFatais.some((p) => p.regra === "UNFILLED_TEMPLATE_PLACEHOLDERS" || p.regra === "EMPTY_OR_SKELETON_DRAFT") && (
+        {/* Alerta de problema jurídico crítico */}
+        {r.motivoClassificacao && (
           <div className="bg-red-50 border border-red-200 rounded-xl px-4 py-3 flex items-center gap-2.5">
             <AlertCircle size={14} className="text-red-500 flex-shrink-0" />
             <p className="text-xs font-semibold text-red-800">Problema crítico: {r.motivoClassificacao}</p>

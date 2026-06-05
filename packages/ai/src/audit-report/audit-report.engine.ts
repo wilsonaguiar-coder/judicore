@@ -303,8 +303,15 @@ export class AuditReportEngine {
     stanceAnalysis?: StanceAnalysis,
   ): AuditReport {
     const errors = validationResult.errors;
-    const fatalErrors = errors.filter((e) => e.fatal);
-    const nonFatalErrors = errors.filter((e) => !e.fatal);
+
+    // ── FASE 5.4: separar erros de completude documental de erros jurídicos ──────
+    // Campos não preenchidos ≠ risco jurídico ≠ tese inviável.
+    // Afetam apenas a completude da minuta, não a viabilidade nem a classificação.
+    const COMPLETENESS_RULES = new Set(["UNFILLED_TEMPLATE_PLACEHOLDERS", "EMPTY_OR_SKELETON_DRAFT"]);
+    const legalErrors    = errors.filter((e) => !COMPLETENESS_RULES.has(e.rule));
+    const completenessErrors = errors.filter((e) => COMPLETENESS_RULES.has(e.rule));
+    const fatalErrors    = legalErrors.filter((e) => e.fatal);
+    const nonFatalErrors = legalErrors.filter((e) => !e.fatal);
 
     // Richness score (re-executado deterministicamente — sem nova IA)
     const richness = this.richnessAnalyzer.analyze(
@@ -376,24 +383,23 @@ export class AuditReportEngine {
       ? `${RULE_TITLES[fatalErrors[0]!.rule] ?? fatalErrors[0]!.rule}${fatalErrors.length > 1 ? ` (+${fatalErrors.length - 1} problema${fatalErrors.length - 1 > 1 ? "s" : ""} fatal${fatalErrors.length - 1 > 1 ? "is" : ""})` : ""}`
       : undefined;
 
-    // ── TEMPLATE CAP: scores máximos quando há placeholders não preenchidos ──────
-    const TEMPLATE_RULES = new Set(["UNFILLED_TEMPLATE_PLACEHOLDERS", "EMPTY_OR_SKELETON_DRAFT"]);
-    const hasTemplateError = errors.some((e) => TEMPLATE_RULES.has(e.rule));
-    const qualidadeTecnicaFinal  = hasTemplateError ? Math.min(qualidadeTecnica, 49)  : qualidadeTecnica;
-    const viabilidadeJuridicaFinal = hasTemplateError ? Math.min(viabilidadeJuridica, 40) : viabilidadeJuridica;
-    const classificacaoFinalFinal  = hasTemplateError
-      ? this.computeClassificacaoFinal(viabilidadeJuridicaFinal)
-      : classificacaoFinal;
+    // ── FASE 5.4: completude documental — separado dos scores jurídicos ──────────
+    const minutaIncompleta = completenessErrors.length > 0;
+    const motivoIncompleta = completenessErrors.length > 0
+      ? completenessErrors[0]!.message.slice(0, 200)
+      : undefined;
 
-    // Compat. legado: scoreGeral = qualidadeTecnica (sem cap), classificacao mapeada
-    const scoreGeral    = qualidadeTecnicaFinal;
-    const classificacao = this.mapToLegacyClassificacao(classificacaoFinalFinal);
+    // Compat. legado: scoreGeral = qualidadeTecnica, classificacao mapeada
+    const scoreGeral    = qualidadeTecnica;
+    const classificacao = this.mapToLegacyClassificacao(classificacaoFinal);
 
     return {
-      qualidadeTecnica:  qualidadeTecnicaFinal,
-      viabilidadeJuridica: viabilidadeJuridicaFinal,
-      classificacaoFinal: classificacaoFinalFinal,
-      ...(motivoClassificacao !== undefined && { motivoClassificacao }),
+      qualidadeTecnica,
+      viabilidadeJuridica,
+      classificacaoFinal,
+      ...(motivoClassificacao !== undefined ? { motivoClassificacao } : {}),
+      minutaIncompleta,
+      ...(motivoIncompleta !== undefined ? { motivoIncompleta } : {}),
       scoreGeral,
       classificacao,
       problemasFatais,
