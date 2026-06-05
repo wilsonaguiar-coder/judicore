@@ -54,52 +54,122 @@ const ARGUMENTATIVE_RULES = new Set([
 // ── Mapeamento de regras para títulos humanizados ─────────────────────────────
 
 const RULE_TITLES: Record<string, string> = {
-  MISSING_STRUCTURE: "Estrutura incompleta",
-  DESPACHO_WITH_DECISION_LANGUAGE: "Linguagem decisória em despacho",
-  FORBIDDEN_STRUCTURE: "Elemento proibido para o tipo de peça",
-  SENTENCA_MISSING_RELATORIO: "Relatório ausente na sentença",
-  SENTENCA_MISSING_FUNDAMENTACAO: "Fundamentação ausente na sentença",
-  SENTENCA_MISSING_DISPOSITIVO: "Dispositivo ausente na sentença",
-  SENTENCA_DISPOSITIVO_VAGUE: "Dispositivo vago — resultado não identificável",
-  INCOMPATIBLE_APPEAL: "Recurso incompatível com o rito",
-  WRONG_SUPERIOR_COURT: "Tribunal superior incorreto",
-  JEF_JEC_WRONG_APPEAL: "Via recursal incorreta no JEF/JEC",
-  JUR_MARKER_IN_DRAFT: "Marcadores de jurisprudência não substituídos",
-  GENERIC_JURISPRUDENCE: "Citação jurisprudencial genérica",
-  TRIBUNAL_MISMATCH: "Tribunal citado incompatível com a competência",
-  EVIDENCE_STANCE_VIOLATION: "Jurisprudência contrária sem distinguishing",
-  EVIDENCE_STANCE_MATRIX: "Uso indevido de jurisprudência contrária como fundamento",
-  STANCE_CONTRADICTION_RPPS: "Contradição com entendimento consolidado — RPPS",
-  STANCE_CONTRADICTION_RGPS: "Contradição com entendimento consolidado — RGPS",
-  STANCE_CONTRADICTION_JEF: "Contradição com entendimento consolidado — JEF",
-  STANCE_MISMATCH_PRE_GENERATION: "Contradição posicional detectada antes da geração",
-  FINAL_DRAFT_WEAK_ARGUMENTATION: "Riqueza argumentativa abaixo do mínimo",
-  FINAL_DRAFT_GENERIC_LANGUAGE: "Linguagem excessivamente genérica",
-  RPPS_WRONG_ARTICLE: "Artigo incorreto para o regime RPPS",
-  RGPS_WRONG_ARTICLE: "Artigo incorreto para o regime RGPS",
-  WRONG_HONORARIOS: "Base de cálculo dos honorários incorreta",
-  BLOCKED_ARTICLE: "Dispositivo revogado ou inaplicável citado",
-  PROHIBITED_TERM: "Termo proibido identificado",
-  JEF_VALOR_EXCEDENTE: "Valor da causa supera o limite de competência do JEF",
-  JEF_RECURSO_ERRADO: "Via recursal incorreta — JEF exige Recurso Inominado",
-  JEF_PERICIA_COMPLEXA: "Perícia complexa incompatível com o rito dos Juizados",
-  JEF_ENDERECAMENTO_ERRADO: "Endereçamento do recurso incorreto",
-  JEF_PRAZO_ERRADO: "Prazo recursal incorreto para o JEF",
-  JEF_PREPARO_ERRADO: "Preparo recursal desnecessário no JEF",
-  JEF_PEDIDO_INCOMPATIVEL: "Pedido incompatível com o rito dos Juizados",
-  TUTELA_MISSING_ART300: "Tutela de urgência sem fundamento no art. 300 CPC",
-  TUTELA_MISSING_PERICULUM_MORA: "Periculum in mora não demonstrado na tutela",
-  CDC_APPLICATION_MISSING: "Aplicação do CDC não fundamentada",
-  INVERSAO_ONUS_SEM_FUNDAMENTO: "Inversão do ônus da prova sem fundamento",
-  DANO_MORAL_SEM_ANALISE_CONCRETA: "Dano moral sem análise concreta do caso",
-  EXECUTION_MISSING_SECTION: "Seção obrigatória ausente na execução",
-  EXECUTION_MISSING_CPC_BASIS: "Base legal CPC da execução ausente",
-  EXECUTION_MISSING_MODALITY: "Modalidade executiva não especificada",
-  EXECUTION_SISBAJUD_MISSING: "Pedido de SISBAJUD ausente na execução",
-  MATRIX_INSUFFICIENT_TESES: "Número de teses insuficiente na matriz argumentativa",
-  MATRIX_MISSING_RATIO: "Ratio decidendi ausente em uma ou mais teses",
-  MATRIX_NO_CONTRAPONTO: "Tese sem contraponto identificado",
-  MATRIX_WEAK_TESE: "Tese argumentativa fraca ou incompleta",
+  // Estrutura geral
+  MISSING_STRUCTURE:                    "Estrutura incompleta",
+  DESPACHO_WITH_DECISION_LANGUAGE:      "Linguagem decisória em despacho",
+  FORBIDDEN_STRUCTURE:                  "Elemento proibido para o tipo de peça",
+  REQUIRED_FIELD:                       "Informação obrigatória não identificada",
+  LOW_CONFIDENCE:                       "Classificação do documento com baixa confiança",
+
+  // Sentença — seções e conteúdo
+  SENTENCA_MISSING_RELATORIO:           "Relatório ausente na sentença",
+  SENTENCA_MISSING_FUNDAMENTACAO:       "Fundamentação ausente na sentença",
+  SENTENCA_MISSING_DISPOSITIVO:         "Dispositivo ausente na sentença",
+  SENTENCA_MISSING_DECISION_VERB:       "Verbo dispositivo ausente na sentença",
+  SENTENCA_DISPOSITIVO_VAGUE:           "Dispositivo vago — resultado não identificável",
+  SENTENCA_DISPOSITIVO_TOO_SHORT:       "Dispositivo da sentença muito curto",
+  SENTENCA_FUNDAMENTACAO_TOO_SHORT:     "Fundamentação da sentença muito curta",
+  SENTENCA_RELATORIO_TOO_SHORT:         "Relatório da sentença muito curto",
+  SENTENCA_MISSING_APPEAL_REF:          "Recurso cabível não indicado na sentença",
+  SENTENCA_MISSING_HONORARIOS:          "Honorários advocatícios não fixados na sentença",
+  SENTENCA_MISSING_CUSTAS:              "Custas processuais não fixadas na sentença",
+
+  // Recursos e vias recursais
+  INCOMPATIBLE_APPEAL:                  "Recurso incompatível com o rito",
+  WRONG_SUPERIOR_COURT:                 "Tribunal superior incorreto",
+  JEF_JEC_WRONG_APPEAL:                 "Via recursal incorreta no JEF/JEC",
+  CRIMINAL_WRONG_APPEAL:                "Via recursal incompatível com matéria criminal",
+  CRIMINAL_MISSING_APPEAL_REF:          "Recurso cabível não indicado na sentença criminal",
+
+  // Jurisprudência e stance
+  JUR_MARKER_IN_DRAFT:                  "Marcadores de jurisprudência não substituídos",
+  GENERIC_JURISPRUDENCE:                "Citação jurisprudencial genérica",
+  TRIBUNAL_MISMATCH:                    "Tribunal citado incompatível com a competência",
+  EVIDENCE_STANCE_VIOLATION:            "Jurisprudência contrária sem distinguishing",
+  EVIDENCE_STANCE_MATRIX:               "Uso indevido de jurisprudência contrária como fundamento",
+  STANCE_CONTRADICTION_RPPS:            "Contradição com entendimento consolidado — RPPS",
+  STANCE_CONTRADICTION_RGPS:            "Contradição com entendimento consolidado — RGPS",
+  STANCE_CONTRADICTION_JEF:             "Contradição com entendimento consolidado — JEF",
+  STANCE_MISMATCH_PRE_GENERATION:       "Contradição posicional detectada antes da geração",
+
+  // Qualidade argumentativa
+  FINAL_DRAFT_WEAK_ARGUMENTATION:       "Riqueza argumentativa abaixo do mínimo",
+  FINAL_DRAFT_GENERIC_LANGUAGE:         "Linguagem excessivamente genérica",
+  PECA_GENERICA:                        "Peça com linguagem genérica — não personalizada ao caso",
+
+  // Artigos e normas
+  RPPS_WRONG_ARTICLE:                   "Artigo incorreto para o regime RPPS",
+  RGPS_WRONG_ARTICLE:                   "Artigo incorreto para o regime RGPS",
+  WRONG_HONORARIOS:                     "Base de cálculo dos honorários incorreta",
+  WRONG_HONORARIOS_CRIMINAL:            "Honorários advocatícios não cabem em matéria criminal",
+  BLOCKED_ARTICLE:                      "Dispositivo revogado ou inaplicável citado",
+  PROHIBITED_TERM:                      "Termo proibido identificado",
+
+  // JEF / JEC
+  JEF_VALOR_EXCEDENTE:                  "Valor da causa supera o limite de competência do JEF",
+  JEF_RECURSO_ERRADO:                   "Via recursal incorreta — JEF exige Recurso Inominado",
+  JEF_PERICIA_COMPLEXA:                 "Perícia complexa incompatível com o rito dos Juizados",
+  JEF_ENDERECAMENTO_ERRADO:             "Endereçamento do recurso incorreto",
+  JEF_PRAZO_ERRADO:                     "Prazo recursal incorreto para o JEF",
+  JEF_PREPARO_ERRADO:                   "Preparo recursal desnecessário no JEF",
+  JEF_PEDIDO_INCOMPATIVEL:              "Pedido incompatível com o rito dos Juizados",
+  JEF_COMPETENCIA:                      "Possível incompetência do Juizado Especial Federal",
+  JEF_TUTELA_SEM_FUMUS:                 "Tutela de urgência sem demonstração do fumus boni iuris",
+  JEF_TUTELA_SEM_PERICULUM:             "Tutela de urgência sem demonstração do periculum in mora",
+  JEF_TUTELA_DESPROPORCIONAL:           "Tutela de urgência desproporcional ao caso",
+  JEF_TUTELA_ARTIFICIAL:                "Pedido de tutela de urgência possivelmente inadequado",
+
+  // Tutela e civil
+  TUTELA_MISSING_ART300:                "Tutela de urgência sem fundamento no art. 300 CPC",
+  TUTELA_MISSING_PERICULUM_MORA:        "Periculum in mora não demonstrado na tutela",
+  CDC_APPLICATION_MISSING:              "Aplicação do CDC não fundamentada",
+  INVERSAO_ONUS_SEM_FUNDAMENTO:         "Inversão do ônus da prova sem fundamento",
+  DANO_MORAL_SEM_ANALISE_CONCRETA:      "Dano moral sem análise concreta do caso",
+  REPETICAO_DOBRO_SEM_MAE_FE:           "Repetição em dobro sem demonstração de má-fé",
+
+  // Execução
+  EXECUTION_MISSING_SECTION:            "Seção obrigatória ausente na petição de execução",
+  EXECUTION_MISSING_CPC_BASIS:          "Fundamento legal CPC da execução ausente",
+  EXECUTION_MISSING_MODALITY:           "Modalidade executiva não especificada",
+  EXECUTION_SISBAJUD_MISSING:           "Pedido de penhora via SISBAJUD ausente",
+  EXECUTION_MISSING_OBJECTION:          "Matéria de defesa do executado não apreciada",
+  EC_RITO_FAZENDA_IGNORADO:             "Rito especial da Fazenda Pública não observado",
+  EC_BEM_FAMILIA_PENHORADO:             "Possível penhora de bem de família — verificar impenhorabilidade",
+  EC_PRESCRICAO_INTERCORRENTE_IGNORADA: "Possível prescrição intercorrente não apreciada",
+  EC_SISBAJUD_SEM_GRADACAO:             "Penhora eletrônica sem observar ordem de preferência",
+  EC_RENAJUD_SEM_AVALIACAO:             "Restrição de veículo sem avaliação prévia",
+  EC_PRAZO_FAZENDA_INCORRETO:           "Prazo para pagamento pela Fazenda Pública incorreto",
+  EC_REMESSA_NECESSARIA_FAZENDA:        "Remessa necessária não mencionada em condenação contra Fazenda",
+  EC_HONORARIOS_FASE_EXECUCAO:          "Honorários da fase de execução não fixados",
+  EC_PENHORA_SALARIO_TOTAL:             "Penhora total de salário — impenhorabilidade não analisada",
+  EC_PENHORA_FATURAMENTO_SEM_LIMITE:    "Penhora de faturamento sem limite percentual definido",
+  EC_ASTREINTES_SEM_PARAMETRO:          "Multa coercitiva sem parâmetros definidos",
+  EC_JUROS_ILEGAIS:                     "Taxa de juros aplicada pode ser indevida",
+  EC_CORRECAO_INDICE_INADEQUADO:        "Índice de correção monetária inadequado para a fase",
+  EC_TITULO_INEXIGIVEL_IGNORADO:        "Título possivelmente inexigível não analisado",
+  EC_EXCESSO_EXECUCAO_IGNORADO:         "Excesso de execução não apreciado",
+  EC_EXTINCAO_SEM_CANCELAMENTO:         "Extinção sem baixa das restrições sobre o executado",
+  EC_IMPUGNACAO_SEM_EFEITO_SUSPENSIVO:  "Impugnação sem análise do efeito suspensivo",
+
+  // Criminal
+  CRIMINAL_WRONG_TERM:                  "Termo processual civil incompatível com matéria criminal",
+  CRIMINAL_WRONG_CIVIL_VERB:            "Linguagem civil em decisão criminal",
+  CRIMINAL_MISSING_DISPOSITIVO:         "Dispositivo ausente na sentença criminal",
+  CRIMINAL_MISSING_DOSIMETRIA:          "Dosimetria da pena ausente ou incompleta",
+  CRIMINAL_MISSING_REGIME:              "Regime inicial de cumprimento de pena não fixado",
+  CRIMINAL_PRESCRICAO_MISSING_ART:      "Prescrição declarada sem indicação dos artigos aplicáveis",
+  CRIMINAL_DESCLASSIFICACAO_MISSING_TIPO: "Desclassificação sem indicação do novo tipo penal",
+  HC_MISSING_ORDER_VERB:                "Habeas corpus sem verbo dispositivo correto (concedo/denego a ordem)",
+  HC_WRONG_DISPOSITIVO:                 "Dispositivo de habeas corpus com linguagem incorreta",
+
+  // Matriz argumentativa
+  MATRIX_INSUFFICIENT_TESES:            "Número de teses insuficiente na matriz argumentativa",
+  MATRIX_MISSING_RATIO:                 "Ratio decidendi ausente em uma ou mais teses",
+  MATRIX_NO_CONTRAPONTO:                "Tese sem contraponto identificado",
+  MATRIX_WEAK_TESE:                     "Tese argumentativa fraca ou incompleta",
+  MATRIX_GENERIC_FATO:                  "Fato genérico na argumentação — personalize ao caso concreto",
+  MATRIX_GENERIC_NORMA:                 "Norma genérica na argumentação — cite o dispositivo específico",
+  MATRIX_MISSING_FIELD:                 "Campo obrigatório ausente na estrutura argumentativa",
 };
 
 // ── Mapeamento de regras para sugestões de melhoria ──────────────────────────
@@ -371,8 +441,11 @@ export class AuditReportEngine {
   }
 
   private errorToItem(e: ValidationError, severidade: "FATAL" | "IMPORTANTE"): AuditItem {
+    const titulo = RULE_TITLES[e.rule]
+      ?? this.sanitizeMessage(e.message).split(/[—\-.:]/)[0]?.trim().slice(0, 60)
+      ?? "Problema identificado";
     return {
-      titulo: RULE_TITLES[e.rule] ?? e.rule,
+      titulo,
       descricao: this.sanitizeMessage(e.message),
       regra: e.rule,
       severidade,
