@@ -338,6 +338,28 @@ export function DocumentPanel({ caseId, token, userRole, jurisprudencias, caseDe
           setAudit(data);
           setCompletedPhases((prev) => new Set([...prev, "auditing"]));
           setPipelinePhase(null);
+        } else if (evt === "audit-report") {
+          // Persiste o AuditReport no localStorage para a página JudiAudit (FASE 5.0)
+          try {
+            const pending = localStorage.getItem("judiaudit_pending_meta");
+            const meta = pending ? (JSON.parse(pending) as Record<string, string>) : {};
+            localStorage.setItem("judiaudit_last_report", JSON.stringify({
+              report: parsed["data"],
+              generatedAt: new Date().toISOString(),
+              tipoPeca: meta["tipoPeca"],
+              assuntoPrincipal: meta["assuntoPrincipal"],
+            }));
+            localStorage.removeItem("judiaudit_pending_meta");
+          } catch {}
+        } else if (evt === "classification") {
+          // Salva metadata temporária para enriquecer o audit-report
+          try {
+            const data = parsed["data"] as Record<string, string>;
+            localStorage.setItem("judiaudit_pending_meta", JSON.stringify({
+              tipoPeca: data["tipo_peca"],
+              assuntoPrincipal: data["assunto_principal"],
+            }));
+          } catch {}
         } else if (evt === "evidence") {
           // noop — classificação de precedentes registrada no backend
         } else if (evt === "error") {
