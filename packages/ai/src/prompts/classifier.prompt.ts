@@ -2,23 +2,27 @@ import type { TipoPeca, JurisprudenciaInput } from "../pipeline/types.js";
 
 export function buildClassificationPrompt(
   caseDescription: string,
-  documentTypeHint: TipoPeca,
+  documentTypeHint: TipoPeca | null,
   jurisprudencias: JurisprudenciaInput[],
 ): string {
   const jurCtx = jurisprudencias.length > 0
     ? `\nJurisprudências fornecidas (use apenas os tribunais para inferir jurisdição):\n${jurisprudencias.slice(0, 3).map((j) => `- ${j.tribunal}: ${j.tema}`).join("\n")}`
     : "";
 
-  return `Analise o caso jurídico abaixo e retorne um JSON de classificação. O tipo de peça solicitado pelo usuário é "${documentTypeHint}".
+  const hintCtx = documentTypeHint
+    ? `\nSugestão de tipo de peça: "${documentTypeHint}" — confirme ou corrija com base no texto real.`
+    : "";
 
-CASO:
+  return `Analise o texto jurídico abaixo e classifique-o. Identifique o tipo de peça com base no conteúdo real do documento.${hintCtx}
+
+TEXTO:
 ${caseDescription}
 ${jurCtx}
 
 Retorne SOMENTE um JSON válido com esta estrutura exata:
 {
   "tipo_justica": "TRABALHO" | "FEDERAL" | "ESTADUAL" | "JEF" | "JEC" | "CRIMINAL" | "EXECUCAO_FISCAL" | "INDETERMINADA",
-  "tipo_peca": "${documentTypeHint}",
+  "tipo_peca": "PETICAO_INICIAL" | "RECURSO" | "SENTENCA" | "DECISAO" | "DESPACHO",
   "regime_juridico": "CLT" | "RPPS" | "RGPS" | "ESTATUTARIO" | "CIVIL" | "CRIMINAL" | "TRIBUTARIO" | "INDETERMINADO" | null,
   "grau": "PRIMEIRO" | "SEGUNDO" | "SUPERIOR",
   "tribunal_competente": "nome do tribunal (ex: TRT-15, TRF-3, TJSP) ou [A DETERMINAR]",

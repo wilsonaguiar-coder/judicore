@@ -7,7 +7,7 @@ const CLASSIFIER_MODEL = "gpt-4.1";
 export class LegalClassifierService {
   async classify(
     caseDescription: string,
-    documentTypeHint: TipoPeca,
+    documentTypeHint: TipoPeca | null,
     jurisprudencias: JurisprudenciaInput[],
   ): Promise<{ classification: LegalClassification; usage: ServiceUsage }> {
     const client = getOpenAIClient();

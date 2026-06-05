@@ -29,11 +29,11 @@ const auditorSvc      = new LegalAuditService();
 
 function heuristicClassify(text: string): LegalClassification {
   let tipo_peca: TipoPeca = "PETICAO_INICIAL";
-  if (/\brecurso\s+(?:de\s+)?(?:apela[cç][aã]o|especial|ordin[aá]rio|inominado|agravo|extraordin[aá]rio)\b/i.test(text))
+  if (/\b(?:raz[õo]es?\s+(?:de\s+)?recurs|recurs(?:o|ais?)\s+(?:inominado|ordin[aá]rio|de\s+apela[cç][aã]o|especial|extraordin[aá]rio|agrav|apelaç)|apela[cç][aã]o\s+c[íi]vel|agrav(?:o|ando)\s+(?:de\s+instrumento|regiment|regimental)|embargos?\s+(?:de\s+(?:declara[cç][aã]o|divergência)|infring))\b/i.test(text))
     tipo_peca = "RECURSO";
-  else if (/\b(?:decido|decisão\s+interlocut[oó]ria)\b/i.test(text))
+  else if (/\b(?:decido|decisão\s+interlocut[oó]ria|E\s+o\s+relatório\.\s+Decido)\b/i.test(text))
     tipo_peca = "DECISAO";
-  else if (/\b(?:julgo\s+(?:procedente|improcedente|procedentes?)|condeno\s+o\s+(?:r[eé]u|executado)|absolvo\s+o\s+r[eé]u)\b/i.test(text))
+  else if (/\b(?:julgo\s+(?:procedente|improcedente|parcialmente)|condeno\s+o\s+(?:r[eé]u|executado)|absolvo\s+o\s+r[eé]u|DISPOSITIVO)\b/i.test(text))
     tipo_peca = "SENTENCA";
   else if (/\bdespacho\b/i.test(text))
     tipo_peca = "DESPACHO";
@@ -146,7 +146,7 @@ async function runCompleta(draft: string) {
   // 1. Classificação
   let classification: LegalClassification;
   try {
-    const { classification: cls } = await classifierSvc.classify(draft.slice(0, 8_000), "PETICAO_INICIAL", []);
+    const { classification: cls } = await classifierSvc.classify(draft.slice(0, 8_000), null, []);
     classification = cls;
   } catch {
     classification = heuristicClassify(draft);
