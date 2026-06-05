@@ -51,12 +51,14 @@ function PreviewJudiAudit() {
   ];
   return (
     <div className="w-full h-[160px] flex flex-col rounded-xl bg-[#100a02] border border-amber-900/40 p-5 overflow-hidden shadow-2xl group-hover:shadow-amber-500/20 transition-all">
-      <div className="flex items-start justify-between mb-1">
-        <div className="text-[10px] text-amber-400/70 font-bold uppercase tracking-wider leading-none mt-1">SCORE DE RISCO</div>
-        <div className="text-[26px] font-black text-amber-400 leading-none">97</div>
+      <div className="flex items-center justify-between mb-3">
+        <div className="text-[10px] text-amber-400/70 font-bold uppercase tracking-wider leading-none">SCORE DE RISCO</div>
+        <div className="flex items-baseline gap-0.5">
+          <span className="text-[26px] font-black text-amber-400 leading-none">97</span>
+          <span className="text-[12px] font-bold text-white/40 leading-none">/100</span>
+        </div>
       </div>
-      <div className="text-[10px] text-white/40 mb-2 leading-none">/100</div>
-      <div className="space-y-1 mt-1">
+      <div className="space-y-1 mt-0">
         {items.map(([label, color]) => (
           <div key={label} className="flex items-center gap-2">
             <div className={`w-2 h-2 rounded-full shrink-0 ${color === "green" ? "bg-green-400 shadow-[0_0_8px_rgba(74,222,128,0.6)]" : "bg-amber-400 shadow-[0_0_8px_rgba(251,191,36,0.6)]"}`} />
