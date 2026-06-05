@@ -126,6 +126,11 @@ const PERFIL_LABEL: Record<string, string> = {
   CONSUMIDOR:           "Direito do Consumidor",
   EXECUCAO_CUMPRIMENTO: "Execução / Cumprimento",
   TRABALHISTA:          "Direito do Trabalho",
+  CRIMINAL:             "Direito Criminal",
+  FAMILIA:              "Direito de Família",
+  FAZENDA_PUBLICA:      "Fazenda Pública",
+  TRIBUTARIO:           "Direito Tributário",
+  AMBIENTAL:            "Direito Ambiental",
 };
 const TIPO_PECA_LABEL: Record<string, string> = {
   PETICAO_INICIAL: "Petição Inicial",

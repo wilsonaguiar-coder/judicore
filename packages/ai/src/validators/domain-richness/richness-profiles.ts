@@ -547,13 +547,355 @@ function scoreTrabalhista(draft: string): DomainDimension[] {
   const bannedCount = BANNED_EXPRESSIONS.filter((e) => lower.includes(e)).length;
   const genericScore = bannedCount === 0 ? 5 : bannedCount === 1 ? 3 : 0;
 
+  // Provas e ônus probatório (10) — ônus do empregador na dispensa, docs, etc.
+  const PROVAS_TRAB_RE = [
+    /ônus\s+(?:da\s+)?prova|encargo\s+probatório/i,
+    /súmula\s+(?:n[.°º]?\s*)?212\s+(?:d[ao]\s+)?TST/i,
+    /cartão\s+de\s+ponto|ponto\s+eletrônico/i,
+    /TRCT|termo\s+de\s+(?:rescisão|quitação)/i,
+    /art\.?\s*818\s+(?:d[ao]\s+)?CLT/i,
+    /prova\s+documental|registro\s+(?:de\s+)?emprego/i,
+  ];
+  const provasScore = tiered3(PROVAS_TRAB_RE.filter((re) => re.test(draft)).length, 1, 3, 5, 10);
+
   return [
-    { key: "normas",        label: "Normas Trabalhistas",             score: normasScore,  max: 30 },
-    { key: "estrutura",     label: "Estrutura Processual",            score: secScore,     max: 25 },
-    { key: "pedidos",       label: "Pedidos Trabalhistas",            score: pedidosScore, max: 20 },
-    { key: "jurisprudencia",label: "Jurisprudência Trabalhista",      score: jurScore,     max: 10 },
-    { key: "objecoes",      label: "Enfrentamento de Objeções",       score: objScore,     max: 10 },
-    { key: "expressoes",    label: "Ausência de Expressões Genéricas",score: genericScore, max:  5 },
+    { key: "normas",        label: "Normas Trabalhistas",              score: normasScore,  max: 30 },
+    { key: "estrutura",     label: "Estrutura Processual",             score: secScore,     max: 20 },
+    { key: "pedidos",       label: "Pedidos Trabalhistas",             score: pedidosScore, max: 25 },
+    { key: "jurisprudencia",label: "Jurisprudência Trabalhista",       score: jurScore,     max: 10 },
+    { key: "provas",        label: "Provas e Ônus Probatório",         score: provasScore,  max: 10 },
+    { key: "expressoes",    label: "Ausência de Expressões Genéricas", score: genericScore, max:  5 },
+  ];
+}
+
+// ── CRIMINAL ──────────────────────────────────────────────────────────────────
+function scoreCriminal(draft: string): DomainDimension[] {
+  const NORMAS_PENAIS_RE = [
+    /\bCP\b|Código\s+Penal\b/i,
+    /\bCPP\b|Código\s+de\s+Processo\s+Penal\b/i,
+    /art\.?\s*386\b/i,
+    /art\.?\s*312\b|art\.?\s*313\b/i,
+    /art\.?\s*68\s+(?:d[ao]\s+)?CP|dosimetria\s+(?:d[ae]\s+)?pena/i,
+    /cadeia\s+de\s+custódia|art\.?\s*158[-–]/i,
+    /Lei\s+(?:n[.°º]?\s*)?11\.343/i,
+    /Lei\s+(?:n[.°º]?\s*)?8\.072|crimes?\s+hediondos?/i,
+    /Lei\s+(?:n[.°º]?\s*)?11\.340|Maria\s+da\s+Penha/i,
+    /LEP\b|Lei\s+(?:n[.°º]?\s*)?7\.210/i,
+    /art\.?\s*5[°º]?\s*(?:LV|LVII|LXIII|LXIV)\b.*CF|CF.*(?:LV|LVII|LXIII)/i,
+  ];
+  const normasScore = tiered3(NORMAS_PENAIS_RE.filter((re) => re.test(draft)).length, 2, 5, 8, 30);
+
+  const TIPICIDADE_RE = [
+    /\bdolo\b|\bculpa\b|\bimprudência\b|\bnegligência\b|\bimperícia\b/i,
+    /elemento\s+subjetivo|elemento\s+objetivo|tipo\s+penal|tipicidade/i,
+    /autoria|co[-\s]autoria|partícipe|domínio\s+do\s+fato/i,
+    /nexo\s+causal|resultado\s+(?:naturalístico|jurídico)/i,
+    /tentativa\s+(?:punível)?|consumação/i,
+    /exclu[ía]\s+a?\s*(?:tipicidade|ilicitude|culpabilidade)/i,
+  ];
+  const tipScore = tiered3(TIPICIDADE_RE.filter((re) => re.test(draft)).length, 1, 3, 5, 20);
+
+  const MATERIALIDADE_RE = [
+    /materialidade\s+(?:d[ao]\s+crime)?/i,
+    /laudo\s+pericial|exame\s+de\s+corpo\s+de\s+delito/i,
+    /corpo\s+de\s+delito/i,
+    /boletim\s+de\s+ocorrência|\bBO\b/i,
+    /inquérito\s+policial|\bIP\b/i,
+    /auto\s+de\s+(?:prisão\s+em\s+)?flagrante/i,
+  ];
+  const materialScore = tiered3(MATERIALIDADE_RE.filter((re) => re.test(draft)).length, 1, 3, 5, 20);
+
+  const PROVAS_RE = [
+    /testemunha|depoimento|oitiva/i,
+    /interceptação\s+(?:telefônica|ambiental)|escuta/i,
+    /prova\s+ilícita|ilicitude\s+(?:d[ae]\s+)?prova/i,
+    /reconhecimento\s+(?:pessoal|fotográfico)/i,
+    /câmera|vídeo|filmagem|gravação/i,
+    /confissão|declarações?\s+(?:d[ao]\s+)?réu/i,
+  ];
+  const provasScore = tiered3(PROVAS_RE.filter((re) => re.test(draft)).length, 1, 3, 5, 15);
+
+  const TESES_RE = [
+    /absolvição|absolv/i,
+    /nulidade\s+(?:processual|d[ao]\s+processo|d[ao]\s+inquérito)/i,
+    /prescrição\s+(?:penal|d[ae]\s+pretensão\s+punitiva)/i,
+    /atipicidade|fato\s+atípico/i,
+    /excludente\s+de\s+ilicitude|legítima\s+defesa|estado\s+de\s+necessidade/i,
+    /substituição\s+(?:d[ae]\s+)?pena|sursis/i,
+    /regime\s+(?:aberto|semiaberto|fechado)/i,
+  ];
+  const tesScore = tiered3(TESES_RE.filter((re) => re.test(draft)).length, 1, 3, 5, 10);
+
+  const lower = draft.toLowerCase();
+  const bannedCount = BANNED_EXPRESSIONS.filter((e) => lower.includes(e)).length;
+  const genericScore = bannedCount === 0 ? 5 : bannedCount === 1 ? 3 : 0;
+
+  return [
+    { key: "normas",        label: "Normas Penais e Processuais",      score: normasScore,   max: 30 },
+    { key: "tipicidade",    label: "Tipicidade e Autoria",             score: tipScore,      max: 20 },
+    { key: "materialidade", label: "Materialidade",                    score: materialScore, max: 20 },
+    { key: "provas",        label: "Provas",                           score: provasScore,   max: 15 },
+    { key: "teses",         label: "Teses Defensivas",                 score: tesScore,      max: 10 },
+    { key: "expressoes",    label: "Ausência de Expressões Genéricas", score: genericScore,  max:  5 },
+  ];
+}
+
+// ── FAMÍLIA ───────────────────────────────────────────────────────────────────
+function scoreFamilia(draft: string): DomainDimension[] {
+  const NORMAS_FAMILIA_RE = [
+    /CC\/2002|Código\s+Civil\b/i,
+    /art\.?\s*1\.[5-9]\d{2}\b/i,
+    /\bECA\b|Estatuto\s+d[ae]\s+Crian[cç]a|Lei\s+(?:n[.°º]?\s*)?8\.069/i,
+    /Lei\s+(?:n[.°º]?\s*)?5\.478|lei\s+de\s+alimentos/i,
+    /Lei\s+(?:n[.°º]?\s*)?11\.804|alimentos\s+gravídicos/i,
+    /Lei\s+(?:n[.°º]?\s*)?12\.318|aliena[cç][aã]o\s+parental/i,
+    /Lei\s+(?:n[.°º]?\s*)?13\.058|guarda\s+compartilhada/i,
+    /Lei\s+(?:n[.°º]?\s*)?11\.340|Maria\s+da\s+Penha/i,
+    /art\.?\s*1\.694|art\.?\s*1\.695|art\.?\s*1\.701/i,
+  ];
+  const normasScore = tiered3(NORMAS_FAMILIA_RE.filter((re) => re.test(draft)).length, 2, 5, 7, 25);
+
+  const FATOS_RE = [
+    /casamento|matrimônio|nupcial/i,
+    /divórcio|separação\s+(?:judicial|extrajudicial|consensual)/i,
+    /uni[aã]o\s+estável/i,
+    /filho[s]?|filiação|paternidade|maternidade/i,
+    /partilha\s+de\s+bens|meação/i,
+    /violência\s+doméstica/i,
+    /conviv[eê]ncia\s+familiar|afastamento\s+d[ao]s?\s+filhos?/i,
+  ];
+  const fatosScore = tiered3(FATOS_RE.filter((re) => re.test(draft)).length, 1, 3, 5, 20);
+
+  const PEDIDOS_RE = [
+    /alimentos\s+(?:provisórios?|definitivos?|gravídicos?)/i,
+    /guarda\s+(?:compartilhada|unilateral|alternada)/i,
+    /visitas?|convivência|regime\s+de\s+visitação/i,
+    /divórcio|dissolu[cç][aã]o\s+do\s+(?:casamento|vínculo)/i,
+    /partilha|bens\s+(?:comuns?|conjugais?)/i,
+    /interdição|curatela/i,
+    /tutela\s+(?:especial|provisória|d[ao]\s+menor)/i,
+    /reconhecimento\s+de\s+(?:paternidade|filiação|uni[aã]o\s+estável)/i,
+    /adoção/i,
+  ];
+  const pedidosScore = tiered3(PEDIDOS_RE.filter((re) => re.test(draft)).length, 2, 5, 7, 25);
+
+  const PROVAS_RE = [
+    /certidão\s+(?:de\s+)?(?:casamento|nascimento|óbito)/i,
+    /declaração\s+de\s+imposto\s+de\s+renda|holerite|comprovante\s+de\s+renda/i,
+    /laudo\s+(?:psicológico|psicossocial|social)/i,
+    /estudo\s+social/i,
+    /extrato\s+bancário|conta\s+bancária/i,
+    /binômio\s+necessidade.{0,20}possibilidade|possibilidade.{0,20}necessidade/i,
+  ];
+  const provasScore = tiered3(PROVAS_RE.filter((re) => re.test(draft)).length, 1, 3, 5, 15);
+
+  const menorScore =
+    /melhor\s+interesse\s+(?:d[ao]\s+(?:menor|crian[cç]a)|da\s+criança)|interesse\s+(?:superior\s+)?d[ao]\s+menor|prioridade\s+absoluta|proteção\s+integral/i.test(draft) ? 10 : 3;
+
+  const lower = draft.toLowerCase();
+  const bannedCount = BANNED_EXPRESSIONS.filter((e) => lower.includes(e)).length;
+  const genericScore = bannedCount === 0 ? 5 : bannedCount === 1 ? 3 : 0;
+
+  return [
+    { key: "normas",   label: "Normas de Família e Menores",      score: normasScore,  max: 25 },
+    { key: "fatos",    label: "Fatos Familiares",                  score: fatosScore,   max: 20 },
+    { key: "pedidos",  label: "Pedidos Familiares",               score: pedidosScore, max: 25 },
+    { key: "provas",   label: "Provas",                           score: provasScore,  max: 15 },
+    { key: "menor",    label: "Interesse do Menor",               score: menorScore,   max: 10 },
+    { key: "expressoes",label: "Ausência de Expressões Genéricas",score: genericScore, max:  5 },
+  ];
+}
+
+// ── FAZENDA PÚBLICA ───────────────────────────────────────────────────────────
+function scoreFazendaPublica(draft: string): DomainDimension[] {
+  const NORMAS_ADM_RE = [
+    /art\.?\s*37\b/i,
+    /Lei\s+(?:n[.°º]?\s*)?9\.784/i,
+    /Decreto\s+(?:n[.°º]?\s*)?20\.910/i,
+    /Lei\s+(?:n[.°º]?\s*)?4\.717/i,
+    /Lei\s+(?:n[.°º]?\s*)?8\.429/i,
+    /Lei\s+(?:n[.°º]?\s*)?12\.016/i,
+    /Lei\s+(?:n[.°º]?\s*)?8\.112/i,
+    /Lei\s+(?:n[.°º]?\s*)?14\.133|Lei\s+(?:n[.°º]?\s*)?8\.666/i,
+    /responsabilidade\s+civil\s+do\s+Estado|art\.?\s*37\s*§\s*6[°º]?/i,
+    /prescrição\s+quinquenal|prazo\s+quinquenal/i,
+  ];
+  const normasScore = tiered3(NORMAS_ADM_RE.filter((re) => re.test(draft)).length, 2, 5, 8, 30);
+
+  const ATOS_ADM_RE = [
+    /ato\s+administrativo/i,
+    /discricionariedade|poder\s+discricionário/i,
+    /proporcionalidade|razoabilidade/i,
+    /legalidade\s+(?:administrativa|estrita)/i,
+    /moralidade\s+administrativa/i,
+    /nulidade\s+d[ao]\s+ato\s+administrativo/i,
+    /desvio\s+de\s+(?:poder|finalidade)|abuso\s+de\s+poder|excesso\s+de\s+poder/i,
+    /anulação|revogação\s+d[ao]\s+ato/i,
+  ];
+  const atosScore = tiered3(ATOS_ADM_RE.filter((re) => re.test(draft)).length, 1, 3, 5, 20);
+
+  const PROVAS_ADM_RE = [
+    /documento[s]?\s+(?:público[s]?|oficial[is]?)|certidão/i,
+    /portaria|decreto|edital|ato\s+normativo/i,
+    /diário\s+oficial/i,
+    /processo\s+administrativo/i,
+    /perícia|laudo\s+técnico/i,
+  ];
+  const provasScore = tiered3(PROVAS_ADM_RE.filter((re) => re.test(draft)).length, 1, 3, 4, 15);
+
+  const ENTE_RE = [
+    /Município|municipalidade|poder\s+público\s+municipal/i,
+    /Estado\s+do|Governo\s+(?:do\s+)?Estado/i,
+    /Uni[aã]o\s+Federal|Fazenda\s+Nacional|poder\s+público\s+federal/i,
+    /autarquia|fundação\s+pública|empresa\s+pública|administração\s+(?:pública|indireta)/i,
+    /servidor\s+público|funcionalismo|estatutário/i,
+    /concurso\s+público|processo\s+seletivo/i,
+  ];
+  const enteScore = tiered3(ENTE_RE.filter((re) => re.test(draft)).length, 1, 3, 5, 15);
+
+  const jc = jurCount(draft);
+  const jurScore = jc >= 3 ? 15 : jc >= 2 ? 10 : jc >= 1 ? 6 : 2;
+
+  const lower = draft.toLowerCase();
+  const bannedCount = BANNED_EXPRESSIONS.filter((e) => lower.includes(e)).length;
+  const genericScore = bannedCount === 0 ? 5 : bannedCount === 1 ? 3 : 0;
+
+  return [
+    { key: "normas",  label: "Normas Administrativas",            score: normasScore,  max: 30 },
+    { key: "atos",    label: "Atos Administrativos",              score: atosScore,    max: 20 },
+    { key: "provas",  label: "Provas e Documentos",               score: provasScore,  max: 15 },
+    { key: "ente",    label: "Ente Público",                      score: enteScore,    max: 15 },
+    { key: "jur",     label: "Jurisprudência",                    score: jurScore,     max: 15 },
+    { key: "expressoes",label: "Ausência de Expressões Genéricas",score: genericScore, max:  5 },
+  ];
+}
+
+// ── TRIBUTÁRIO ────────────────────────────────────────────────────────────────
+function scoreTributario(draft: string): DomainDimension[] {
+  const NORMAS_TRIB_RE = [
+    /\bCTN\b|Código\s+Tributário\s+Nacional|Lei\s+(?:n[.°º]?\s*)?5\.172/i,
+    /\bICMS\b/i,
+    /\bISS\b|imposto\s+sobre\s+serviços/i,
+    /\bIPTU\b|\bIPVA\b/i,
+    /\bIRPF\b|\bIRPJ\b|imposto\s+de\s+renda/i,
+    /\bPIS\b|\bCOFINS\b|\bCSLL\b/i,
+    /\bIOF\b|\bITBI\b|\bITCMD\b/i,
+    /imunidade\s+tributária/i,
+    /isenção\s+(?:fiscal|tributária)/i,
+    /não[-\s]incidência/i,
+    /legalidade\s+tributária|princípio\s+da\s+legalidade\s+(?:fiscal|tributária)/i,
+  ];
+  const normasScore = tiered3(NORMAS_TRIB_RE.filter((re) => re.test(draft)).length, 2, 5, 8, 30);
+
+  const LANCAMENTO_RE = [
+    /crédito\s+tributário/i,
+    /lançamento\s+(?:tributário|fiscal|por\s+(?:declaração|arbitramento|homologação))/i,
+    /auto\s+de\s+infração/i,
+    /decadência\s+(?:tributária|do\s+crédito)/i,
+    /prescrição\s+(?:tributária|do\s+crédito\s+tributário)/i,
+    /extinção\s+do\s+crédito\s+tributário/i,
+    /CDA\b|certidão\s+de\s+dívida\s+ativa/i,
+  ];
+  const lancScore = tiered3(LANCAMENTO_RE.filter((re) => re.test(draft)).length, 1, 3, 5, 20);
+
+  const TESES_TRIB_RE = [
+    /repetição\s+de\s+indébito|restituição\s+(?:de\s+)?tributo/i,
+    /compensação\s+tributária/i,
+    /mandado\s+de\s+segurança\s+(?:tributário|fiscal)/i,
+    /inconstitucionalidade\s+(?:da\s+(?:cobran[cç]a|exigência|lei)|do\s+tributo)/i,
+    /base\s+de\s+cálculo/i,
+    /alíquota\s+(?:aplicável|correta|indevida)/i,
+    /impugnação\s+(?:administrativa|ao\s+auto\s+de\s+infração)/i,
+    /execução\s+fiscal|embargos?\s+à\s+execução\s+fiscal/i,
+  ];
+  const tesScore = tiered3(TESES_TRIB_RE.filter((re) => re.test(draft)).length, 1, 4, 6, 20);
+
+  const PROVAS_DOC_RE = [
+    /DCTF|GFIP|SPED|EFD/i,
+    /nota\s+fiscal|NF[-–]e\b/i,
+    /escrituração\s+(?:contábil|fiscal)/i,
+    /comprovante\s+de\s+(?:recolhimento|pagamento)\s+(?:de\s+)?tributo/i,
+    /declaração\s+(?:de\s+imposto\s+de\s+renda|fiscal)/i,
+  ];
+  const provasScore = tiered3(PROVAS_DOC_RE.filter((re) => re.test(draft)).length, 1, 2, 4, 15);
+
+  const jc = jurCount(draft);
+  const jurScore = jc >= 3 ? 10 : jc >= 2 ? 7 : jc >= 1 ? 4 : 2;
+
+  const lower = draft.toLowerCase();
+  const bannedCount = BANNED_EXPRESSIONS.filter((e) => lower.includes(e)).length;
+  const genericScore = bannedCount === 0 ? 5 : bannedCount === 1 ? 3 : 0;
+
+  return [
+    { key: "normas",   label: "Normas Tributárias",                score: normasScore, max: 30 },
+    { key: "lancamento",label: "Lançamento e Crédito Tributário",  score: lancScore,   max: 20 },
+    { key: "teses",    label: "Teses Tributárias",                 score: tesScore,    max: 20 },
+    { key: "provas",   label: "Provas Documentais",                score: provasScore, max: 15 },
+    { key: "jur",      label: "Jurisprudência",                    score: jurScore,    max: 10 },
+    { key: "expressoes",label: "Ausência de Expressões Genéricas", score: genericScore, max: 5 },
+  ];
+}
+
+// ── AMBIENTAL ─────────────────────────────────────────────────────────────────
+function scoreAmbiental(draft: string): DomainDimension[] {
+  const NORMAS_AMB_RE = [
+    /Lei\s+(?:n[.°º]?\s*)?6\.938/i,
+    /Lei\s+(?:n[.°º]?\s*)?9\.605/i,
+    /Lei\s+(?:n[.°º]?\s*)?12\.651|Código\s+Florestal/i,
+    /art\.?\s*225\b/i,
+    /CONAMA|Resolu[cç][aã]o\s+CONAMA/i,
+    /Lei\s+(?:n[.°º]?\s*)?9\.433|recursos?\s+hídricos/i,
+    /Lei\s+(?:n[.°º]?\s*)?6\.766|parcelamento\s+do\s+solo/i,
+    /Lei\s+(?:n[.°º]?\s*)?9\.985|SNUC/i,
+  ];
+  const normasScore = tiered3(NORMAS_AMB_RE.filter((re) => re.test(draft)).length, 2, 4, 6, 30);
+
+  const DANO_RE = [
+    /dano\s+ambiental/i,
+    /degradação\s+(?:ambiental|do\s+meio\s+ambiente)/i,
+    /\bAPP\b|área\s+de\s+preservação\s+permanente/i,
+    /reserva\s+legal/i,
+    /poluição|poluente/i,
+    /desmatamento|supressão\s+de\s+vegetação/i,
+    /impacto\s+ambiental/i,
+  ];
+  const danoScore = tiered3(DANO_RE.filter((re) => re.test(draft)).length, 1, 3, 5, 20);
+
+  const RESP_RE = [
+    /responsabilidade\s+objetiva\s+(?:ambiental|d[ao]\s+poluidor)/i,
+    /poluidor[-\s]pagador/i,
+    /solidariedade\s+(?:ambiental|d[ao]s?\s+poluidores?)/i,
+    /reparação\s+(?:integral\s+)?d[ao]\s+dano\s+ambiental/i,
+    /princípio\s+d[ae]\s+(?:prevenção|precaução)/i,
+    /TAC\b|termo\s+de\s+ajustamento\s+de\s+conduta/i,
+  ];
+  const respScore = tiered3(RESP_RE.filter((re) => re.test(draft)).length, 1, 3, 5, 20);
+
+  const PROVAS_TEC_RE = [
+    /laudo\s+(?:pericial|técnico|ambiental)/i,
+    /EIA\b|estudo\s+de\s+impacto\s+ambiental/i,
+    /RIMA\b/i,
+    /licença\s+(?:ambiental|prévia|de\s+instalação|de\s+operação)/i,
+    /licenciamento\s+ambiental/i,
+    /auto\s+de\s+infração\s+ambiental|\bIBAMA\b|\bICMBio\b/i,
+    /perícia\s+ambiental/i,
+  ];
+  const provasScore = tiered3(PROVAS_TEC_RE.filter((re) => re.test(draft)).length, 1, 3, 5, 15);
+
+  const jc = jurCount(draft);
+  const jurScore = jc >= 3 ? 10 : jc >= 2 ? 7 : jc >= 1 ? 4 : 2;
+
+  const lower = draft.toLowerCase();
+  const bannedCount = BANNED_EXPRESSIONS.filter((e) => lower.includes(e)).length;
+  const genericScore = bannedCount === 0 ? 5 : bannedCount === 1 ? 3 : 0;
+
+  return [
+    { key: "normas",       label: "Normas Ambientais",                score: normasScore, max: 30 },
+    { key: "dano",         label: "Dano Ambiental",                   score: danoScore,   max: 20 },
+    { key: "responsab",    label: "Responsabilidade Ambiental",       score: respScore,   max: 20 },
+    { key: "provas",       label: "Provas Técnicas",                  score: provasScore, max: 15 },
+    { key: "jur",          label: "Jurisprudência",                   score: jurScore,    max: 10 },
+    { key: "expressoes",   label: "Ausência de Expressões Genéricas", score: genericScore, max: 5 },
   ];
 }
 
@@ -612,6 +954,11 @@ export const VALID_PROFILES: DomainProfile[] = [
   "JEF_FEDERAL",
   "CONSUMIDOR",
   "TRABALHISTA",
+  "CRIMINAL",
+  "FAMILIA",
+  "FAZENDA_PUBLICA",
+  "TRIBUTARIO",
+  "AMBIENTAL",
   "CIVEL_GERAL",
 ];
 
@@ -636,6 +983,11 @@ export function scoreDomainProfile(
     case "JEF_FEDERAL":          dimensions = scoreJefFederal(draft);             break;
     case "CONSUMIDOR":           dimensions = scoreConsumidor(draft);             break;
     case "TRABALHISTA":          dimensions = scoreTrabalhista(draft);            break;
+    case "CRIMINAL":             dimensions = scoreCriminal(draft);               break;
+    case "FAMILIA":              dimensions = scoreFamilia(draft);                break;
+    case "FAZENDA_PUBLICA":      dimensions = scoreFazendaPublica(draft);         break;
+    case "TRIBUTARIO":           dimensions = scoreTributario(draft);             break;
+    case "AMBIENTAL":            dimensions = scoreAmbiental(draft);              break;
     case "CIVEL_GERAL":
     default:                     dimensions = scoreCivelGeral(draft, isSentenca); break;
   }

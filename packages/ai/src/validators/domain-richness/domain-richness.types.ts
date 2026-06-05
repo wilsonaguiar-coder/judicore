@@ -6,6 +6,11 @@ export type DomainProfile =
   | "JEF_FEDERAL"
   | "CONSUMIDOR"
   | "TRABALHISTA"
+  | "CRIMINAL"
+  | "FAMILIA"
+  | "FAZENDA_PUBLICA"
+  | "TRIBUTARIO"
+  | "AMBIENTAL"
   | "CIVEL_GERAL";
 
 export interface DomainDimension {

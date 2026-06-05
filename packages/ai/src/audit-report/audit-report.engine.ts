@@ -273,17 +273,31 @@ function qualidadeLabel(score: number): string {
 // ── Derivação de área de riqueza ──────────────────────────────────────────────
 
 function deriveRichnessArea(c: LegalClassification): string {
-  if (c.regime_juridico === "RPPS") return "RPPS";
-  if (c.regime_juridico === "RGPS") return "RGPS";
+  // Regime jurídico tem prioridade absoluta
+  if (c.regime_juridico === "RPPS")     return "RPPS";
+  if (c.regime_juridico === "RGPS")     return "RGPS";
+  if (c.regime_juridico === "CLT")      return "TRABALHISTA";
+  if (c.regime_juridico === "CRIMINAL") return "CRIMINAL";
+
+  // tipo_justica determina área quando não há regime explícito
+  if (c.tipo_justica === "TRABALHO")   return "TRABALHISTA";
+  if (c.tipo_justica === "CRIMINAL")   return "CRIMINAL";
   if (c.tipo_justica === "JEF" || c.tipo_justica === "JEC") {
-    const assunto = c.assunto_principal ?? "";
-    return /lei\s+10\.259|JEF\s+[Ff]ederal|Turma\s+Recursal\s+[Ff]ederal|TRF\d?|INSS|Uni[aã]o\s+Federal/i.test(assunto)
+    const a = c.assunto_principal ?? "";
+    return /lei\s+10\.259|JEF\s+[Ff]ederal|Turma\s+Recursal\s+[Ff]ederal|TRF\d?|INSS|Uni[aã]o\s+Federal/i.test(a)
       ? "JEF_FEDERAL" : "JEF_ESTADUAL";
   }
-  if (c.tipo_justica === "EXECUCAO_FISCAL") return "EXECUCAO_CUMPRIMENTO";
-  const assunto = c.assunto_principal ?? "";
-  if (/execu[cç][aã]o|cumprimento\s+de\s+senten[cç]a|penhora|SISBAJUD/i.test(assunto)) return "EXECUCAO_CUMPRIMENTO";
-  if (/consumidor|CDC|rela[cç][aã]o\s+de\s+consumo|c[oó]digo\s+de\s+defesa/i.test(assunto)) return "CONSUMIDOR";
+  // EXECUCAO_FISCAL → TRIBUTARIO (trata como matéria fiscal, não apenas executiva)
+  if (c.tipo_justica === "EXECUCAO_FISCAL") return "TRIBUTARIO";
+
+  // Detecção por assunto (da mais específica para a mais genérica)
+  const a = c.assunto_principal ?? "";
+  if (/ambiental|IBAMA|licenciamento\s+ambiental|APP\b|reserva\s+legal|dano\s+ambiental/i.test(a)) return "AMBIENTAL";
+  if (/tribut|CTN\b|ICMS|ISS\b|IPTU|IPVA|IRPF|IRPJ|PIS\b|COFINS|execução\s+fiscal|CDA\b|dívida\s+ativa|repetição\s+de\s+indébito/i.test(a)) return "TRIBUTARIO";
+  if (/execu[cç][aã]o|cumprimento\s+de\s+senten[cç]a|penhora|SISBAJUD/i.test(a)) return "EXECUCAO_CUMPRIMENTO";
+  if (/alimentos?|guarda|divórcio|uni[aã]o\s+estável|parti[lh]a\s+de\s+bens|interdição|curatela|adoção|famil(?:ia|iar)/i.test(a)) return "FAMILIA";
+  if (/servidor\s+público|concurso\s+público|ato\s+administrativo|fazenda\s+p[úu]blica|responsabilidade\s+do\s+Estado|improbidade|mandado\s+de\s+segurança/i.test(a)) return "FAZENDA_PUBLICA";
+  if (/consumidor|CDC\b|rela[cç][aã]o\s+de\s+consumo|c[oó]digo\s+de\s+defesa/i.test(a)) return "CONSUMIDOR";
   return "CIVEL_GERAL";
 }
 
