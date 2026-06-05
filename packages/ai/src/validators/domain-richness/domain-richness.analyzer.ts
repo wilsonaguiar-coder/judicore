@@ -46,6 +46,11 @@ export class DomainRichnessAnalyzer {
 
     // Detecção por assunto (da mais específica para a mais genérica)
     if (assunto) {
+      // BLOCO 2: CONSUMIDOR prevalece sobre JEC quando há indicadores CDC fortes
+      const isJECorJEF = /JEF|JEC|juizado\s+especial/i.test(assunto);
+      const hasConsumidorForte = /consumidor|CDC\b|fornecedor|produto\s+defeituoso|serviço\s+defeituoso|vício\s+(?:d[ao]\s+produto|d[ae]\s+serviço)|inversão\s+(?:d[ao]\s+)?ônus|relação\s+de\s+consumo/i.test(assunto);
+      if (isJECorJEF && hasConsumidorForte) return "CONSUMIDOR";
+
       // JEF (alta especificidade — antes de tributário/criminal)
       if (/lei\s+10\.259|JEF\s+[Ff]ederal|Turma\s+Recursal\s+Federal|TRF\d?|INSS|Uni[aã]o\s+Federal/i.test(assunto)) {
         return "JEF_FEDERAL";
@@ -79,8 +84,8 @@ export class DomainRichnessAnalyzer {
         return "FAMILIA";
       }
 
-      // Fazenda pública / direito administrativo
-      if (/servidor\s+público|concurso\s+público|ato\s+administrativo|fazenda\s+p[úu]blica|responsabilidade\s+(?:civil\s+)?do\s+Estado|improbidade\s+administrativa|mandado\s+de\s+segurança/i.test(assunto)) {
+      // BLOCO 1: Fazenda Pública — detectores expandidos (concurso, nomeação, posse, etc.)
+      if (/servidor\s+público|concurso\s+público|nomeação|posse\s+(?:em\s+cargo|ao\s+cargo)|cadastro\s+de\s+reserva|aprovado\s+em\s+concurso|cargo\s+público|investidura|edital\s+(?:do\s+)?concurso|banca\s+examinadora|administração\s+pública|ato\s+administrativo|fazenda\s+p[úu]blica|responsabilidade\s+(?:civil\s+)?do\s+Estado|improbidade|mandado\s+de\s+segurança/i.test(assunto)) {
         return "FAZENDA_PUBLICA";
       }
 

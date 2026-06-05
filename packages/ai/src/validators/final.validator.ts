@@ -240,6 +240,72 @@ export class FinalValidator {
       });
     }
 
+    // ── FASE 5.5 — alertas materiais específicos por domínio ─────────────────────
+
+    // BLOCO 4 — RGPS: peça admite ausência de qualidade E carência mas pede benefício
+    if (classification.regime_juridico === "RGPS") {
+      const QUALIDADE_AUSENTE_RE = /n[aã]o\s+possui\s+(?:a\s+)?qualidade\s+de\s+segurado|sem\s+qualidade\s+de\s+segurado|perdeu\s+(?:a\s+)?qualidade\s+de\s+segurado/i;
+      const CARENCIA_AUSENTE_RE  = /n[aã]o\s+cumpriu\s+(?:a\s+)?car[eê]ncia|sem\s+car[eê]ncia|car[eê]ncia\s+insuficiente|car[eê]ncia\s+n[aã]o\s+(?:cumprida|atingida)/i;
+      const PEDIDO_BENEFICIO_RE  = /auxílio[-\s]|aposentadoria|benefício\s+previdenci[aá]rio|pensão\s+por\s+morte/i;
+      const EXCECOES_RE = /período\s+de\s+graça|art\.?\s*15\b|dispensa\s+de\s+car[eê]ncia|acidente\s+de\s+qualquer\s+natureza|doen[cç]a\s+grave|recuperação\s+da\s+qualidade/i;
+      if (QUALIDADE_AUSENTE_RE.test(draft) && CARENCIA_AUSENTE_RE.test(draft) && PEDIDO_BENEFICIO_RE.test(draft) && !EXCECOES_RE.test(draft)) {
+        allErrors.push({
+          rule: "RGPS_REQUIREMENTS_INCONSISTENCY",
+          message: "Peça admite ausência de qualidade de segurado e carência insuficiente mas requer benefício RGPS sem indicar exceção legal aplicável (período de graça, art. 15 Lei 8.213/91, dispensa de carência, acidente de qualquer natureza).",
+          fatal: false,
+        });
+      }
+    }
+
+    // BLOCO 5 — TRIBUTÁRIO: possível confusão decadência x prescrição
+    const isTributario = classification.tipo_justica === "EXECUCAO_FISCAL" ||
+      (classification.regime_juridico as string) === "TRIBUTARIO" ||
+      /tribut|CTN\b|crédito\s+tributário/i.test(classification.assunto_principal ?? "");
+    if (isTributario) {
+      const PRESCRICAO_CONSTITUIR_RE = /prescri[cç][aã]o.{0,100}constituir\s+(?:o\s+)?crédito|constituir\s+(?:o\s+)?crédito.{0,100}prescri[cç][aã]o/i;
+      const ART174_RE = /art\.?\s*174\s+(?:d[ao]\s+)?CTN/i;
+      const LANCAMENTO_RE = /\blançamento\b/i;
+      if (PRESCRICAO_CONSTITUIR_RE.test(draft) && ART174_RE.test(draft) && LANCAMENTO_RE.test(draft)) {
+        allErrors.push({
+          rule: "POSSIBLE_DECADENCE_PRESCRIPTION_CONFUSION",
+          message: "Possível confusão entre decadência e prescrição tributária. Revisar a aplicação dos arts. 173, 150 §4º e 174 do CTN.",
+          fatal: false,
+        });
+      }
+    }
+
+    // BLOCO 6 — AMBIENTAL: responsabilidade subjetiva em ACP ambiental
+    const isAmbiental = /ambiental|dano\s+ambiental|poluição\s+ambiental/i.test(classification.assunto_principal ?? "");
+    if (isAmbiental) {
+      const ACP_DANO_RE = /ação\s+civil\s+p[úu]blica|\bACP\b/i;
+      const DANO_AMB_RE = /dano\s+ambiental/i;
+      const RESP_SUBJ_RE = /responsabilidade\s+subjetiva|necessidade\s+de\s+(?:demonstrar\s+)?culpa|culpa\s+(?:comprovada|d[ao]s?\s+(?:réu|poluidor))|\bculpa\s+(?:grave|leve|levíssima)\b/i;
+      if (ACP_DANO_RE.test(draft) && DANO_AMB_RE.test(draft) && RESP_SUBJ_RE.test(draft)) {
+        allErrors.push({
+          rule: "ENVIRONMENTAL_LIABILITY_WARNING",
+          message: "Possível inconsistência com o regime objetivo de responsabilidade civil ambiental. A responsabilidade por dano ambiental independe de culpa (art. 14 §1º Lei 6.938/81).",
+          fatal: false,
+        });
+      }
+    }
+
+    // BLOCO 7 — EXECUÇÃO FISCAL: excluir regras de cumprimento/execução civil comum
+    const EXECUCAO_FISCAL_RE = /execução\s+fiscal|embargos?\s+(?:à|a)\s+execução\s+fiscal|Lei\s+(?:n[.°º]?\s*)?6\.830|\bLEF\b/i;
+    if (EXECUCAO_FISCAL_RE.test(draft)) {
+      // Regras de execução civil comum que NÃO se aplicam à execução fiscal
+      const CIVIL_EXEC_ONLY = new Set([
+        "EC_RITO_FAZENDA_IGNORADO",   // espera precatório/RPV — fiscal usa LEF
+        "EXECUTION_MISSING_SECTION",   // seções de cumprimento de sentença
+        "EXECUTION_MISSING_CPC_BASIS", // base legal CPC — fiscal usa LEF
+        "EXECUTION_MISSING_MODALITY",  // modalidades de execução civil
+      ]);
+      const before = allErrors.length;
+      const filtered = allErrors.filter((e) => !CIVIL_EXEC_ONLY.has(e.rule));
+      allErrors.length = 0;
+      allErrors.push(...filtered);
+      void before; // para linting
+    }
+
     // document_confidence — para display e ranking (não drive o status final)
     let confidence = this.calculateConfidence(classification, extraction, matrix, audit, mode, genericityScore);
     if (mode === "FINAL_DRAFT") {

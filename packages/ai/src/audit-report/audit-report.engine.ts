@@ -172,7 +172,11 @@ const RULE_TITLES: Record<string, string> = {
   MATRIX_MISSING_FIELD:                 "Campo obrigatório ausente na estrutura argumentativa",
   UNFILLED_TEMPLATE_PLACEHOLDERS:              "Campos de template não preenchidos",
   EMPTY_OR_SKELETON_DRAFT:                    "Minuta vazia ou insuficiente — estrutura de template sem conteúdo",
-  SENTENCE_REASONING_DISPOSITIVE_CONTRADICTION: "Contradição entre fundamentação e dispositivo",
+  SENTENCE_REASONING_DISPOSITIVE_CONTRADICTION:  "Contradição entre fundamentação e dispositivo",
+  FAMILY_REASONING_DISPOSITIVE_CONTRADICTION:    "Contradição entre fundamentação e dispositivo — Guarda",
+  RGPS_REQUIREMENTS_INCONSISTENCY:               "Inconsistência de requisitos RGPS",
+  POSSIBLE_DECADENCE_PRESCRIPTION_CONFUSION:     "Possível confusão entre decadência e prescrição tributária",
+  ENVIRONMENTAL_LIABILITY_WARNING:               "Inconsistência com responsabilidade civil ambiental objetiva",
 };
 
 // ── Mapeamento de regras para sugestões de melhoria ──────────────────────────
@@ -282,8 +286,16 @@ function deriveRichnessArea(c: LegalClassification): string {
   // tipo_justica determina área quando não há regime explícito
   if (c.tipo_justica === "TRABALHO")   return "TRABALHISTA";
   if (c.tipo_justica === "CRIMINAL")   return "CRIMINAL";
+
+  const a = c.assunto_principal ?? "";
+
+  // BLOCO 2: CONSUMIDOR prevalece sobre JEC quando há indicadores CDC fortes
+  const CONSUMIDOR_FORTE_RE = /consumidor|CDC\b|fornecedor|produto\s+defeituoso|serviço\s+defeituoso|vício\s+(?:d[ao]\s+produto|d[ae]\s+serviço)|inversão\s+(?:d[ao]\s+)?ônus|relação\s+de\s+consumo/i;
+  if ((c.tipo_justica === "JEF" || c.tipo_justica === "JEC") && CONSUMIDOR_FORTE_RE.test(a)) {
+    return "CONSUMIDOR";
+  }
+
   if (c.tipo_justica === "JEF" || c.tipo_justica === "JEC") {
-    const a = c.assunto_principal ?? "";
     return /lei\s+10\.259|JEF\s+[Ff]ederal|Turma\s+Recursal\s+[Ff]ederal|TRF\d?|INSS|Uni[aã]o\s+Federal/i.test(a)
       ? "JEF_FEDERAL" : "JEF_ESTADUAL";
   }
@@ -291,12 +303,12 @@ function deriveRichnessArea(c: LegalClassification): string {
   if (c.tipo_justica === "EXECUCAO_FISCAL") return "TRIBUTARIO";
 
   // Detecção por assunto (da mais específica para a mais genérica)
-  const a = c.assunto_principal ?? "";
   if (/ambiental|IBAMA|licenciamento\s+ambiental|APP\b|reserva\s+legal|dano\s+ambiental/i.test(a)) return "AMBIENTAL";
   if (/tribut|CTN\b|ICMS|ISS\b|IPTU|IPVA|IRPF|IRPJ|PIS\b|COFINS|execução\s+fiscal|CDA\b|dívida\s+ativa|repetição\s+de\s+indébito/i.test(a)) return "TRIBUTARIO";
   if (/execu[cç][aã]o|cumprimento\s+de\s+senten[cç]a|penhora|SISBAJUD/i.test(a)) return "EXECUCAO_CUMPRIMENTO";
   if (/alimentos?|guarda|divórcio|uni[aã]o\s+estável|parti[lh]a\s+de\s+bens|interdição|curatela|adoção|famil(?:ia|iar)/i.test(a)) return "FAMILIA";
-  if (/servidor\s+público|concurso\s+público|ato\s+administrativo|fazenda\s+p[úu]blica|responsabilidade\s+do\s+Estado|improbidade|mandado\s+de\s+segurança/i.test(a)) return "FAZENDA_PUBLICA";
+  // BLOCO 1: detectores Fazenda Pública expandidos (concurso, nomeação, posse, etc.)
+  if (/servidor\s+público|concurso\s+público|nomeação|posse\s+(?:em\s+cargo|ao\s+cargo)|cadastro\s+de\s+reserva|aprovado\s+em\s+concurso|cargo\s+público|investidura|edital\s+(?:do\s+)?concurso|banca\s+examinadora|administração\s+pública|ato\s+administrativo|fazenda\s+p[úu]blica|responsabilidade\s+(?:civil\s+)?do\s+Estado|improbidade|mandado\s+de\s+segurança/i.test(a)) return "FAZENDA_PUBLICA";
   if (/consumidor|CDC\b|rela[cç][aã]o\s+de\s+consumo|c[oó]digo\s+de\s+defesa/i.test(a)) return "CONSUMIDOR";
   return "CIVEL_GERAL";
 }

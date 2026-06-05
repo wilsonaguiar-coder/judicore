@@ -67,12 +67,39 @@ export class SentencaValidator {
     }
 
     // ── BLOCO 1: Contradição fundamentação × dispositivo (trabalhista) ──────────
+    // ── BLOCO 3 (FASE 5.5): Contradição fundamentação × dispositivo — Família ─
     const sections = splitSections(draft);
     if (sections.fundamentacao && sections.dispositivo) {
       if (FUND_PRO_AUTOR_RE.test(sections.fundamentacao) && DISP_IMPROCEDENTE_RE.test(sections.dispositivo)) {
         errors.push({
           rule: "SENTENCE_REASONING_DISPOSITIVE_CONTRADICTION",
           message: "Possível contradição entre fundamentação e dispositivo: a fundamentação contém elementos favoráveis ao autor (nulidade da justa causa / ausência de prova / insuficiência probatória) mas o dispositivo julga improcedente. Verifique a coerência da sentença.",
+          fatal: true,
+        });
+      }
+    }
+
+    // FAMÍLIA: contradição entre fundamentação favorável a um genitor e dispositivo que concede a outro
+    if (sections.fundamentacao && sections.dispositivo) {
+      // Indicadores que a fundamentação aponta para a MÃE/GENITORA
+      const FUND_FAV_MAE_RE = /laudo\s+(?:psicológico|psicossocial|social)\s+favorável\s+(?:à|a)\s*(?:mãe|genitora)|vínculo\s+afetivo\s+(?:com|pela?)\s+a?\s*(?:mãe|genitora)|ausência\s+de\s+incapacidade\s+(?:materna|d[ae]\s+(?:mãe|genitora))|adaptação\s+d[ae]\s+crian[cç]a\s+(?:com|junto|à)\s+(?:mãe|genitora)|melhor\s+interesse\s+d[ae]\s+crian[cç]a.{0,150}(?:mãe|genitora)/i;
+      // Dispositivo concedendo guarda ao PAI
+      const DISP_GUARDA_PAI_RE = /guarda\s+(?:unilateral\s+|compartilhada\s+)?(?:ao?\s+)?(?:pai\b|genitor\b|requerente\s*\(?pai\)?)/i;
+
+      // Indicadores que a fundamentação aponta para o PAI/GENITOR
+      const FUND_FAV_PAI_RE = /laudo\s+(?:psicológico|psicossocial|social)\s+favorável\s+ao?\s*(?:pai|genitor)|vínculo\s+afetivo\s+(?:com|pelo?)\s+o?\s*(?:pai|genitor)|melhor\s+interesse\s+d[ae]\s+crian[cç]a.{0,150}(?:pai\b|genitor\b)/i;
+      // Dispositivo concedendo guarda à MÃE
+      const DISP_GUARDA_MAE_RE = /guarda\s+(?:unilateral\s+|compartilhada\s+)?(?:(?:à|para)\s+)?(?:mãe\b|genitora\b)/i;
+
+      const fundFavMae = FUND_FAV_MAE_RE.test(sections.fundamentacao);
+      const fundFavPai = FUND_FAV_PAI_RE.test(sections.fundamentacao);
+      const dispPai    = DISP_GUARDA_PAI_RE.test(sections.dispositivo);
+      const dispMae    = DISP_GUARDA_MAE_RE.test(sections.dispositivo);
+
+      if ((fundFavMae && dispPai) || (fundFavPai && dispMae)) {
+        errors.push({
+          rule: "FAMILY_REASONING_DISPOSITIVE_CONTRADICTION",
+          message: "Possível contradição em questão de guarda: a fundamentação aponta predominantemente para um genitor mas o dispositivo concede a guarda ao outro. Verificar coerência da sentença com o melhor interesse da criança.",
           fatal: true,
         });
       }
