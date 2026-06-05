@@ -583,7 +583,7 @@ export default function JudiAuditPage() {
                   isDragging ? "border-violet-400 bg-violet-50" : selectedFile ? "border-emerald-300 bg-emerald-50" : "border-slate-200 hover:border-slate-300 hover:bg-slate-50"
                 }`}
               >
-                <input ref={fileInputRef} type="file" className="hidden" accept=".pdf,.docx,.odt,.txt,.html,.htm,.rtf"
+                <input ref={fileInputRef} type="file" className="hidden" accept=".pdf,.docx,.doc,.odt,.txt,.html,.htm,.rtf"
                   onChange={(e) => onFileChange(e.target.files?.[0] ?? null)} />
                 {selectedFile ? (
                   <div className="flex items-center justify-center gap-3">
@@ -601,8 +601,7 @@ export default function JudiAuditPage() {
                   <>
                     <Upload size={24} className="mx-auto text-slate-300 mb-2" />
                     <p className="text-sm font-medium text-slate-600">Arraste ou clique para selecionar</p>
-                    <p className="text-xs text-slate-400 mt-1">PDF · DOCX · ODT · TXT · HTML · RTF</p>
-                    <p className="text-xs text-slate-300 mt-0.5">.doc (Word antigo): salve como DOCX primeiro</p>
+                    <p className="text-xs text-slate-400 mt-1">PDF · DOCX · DOC · ODT · TXT · HTML · RTF</p>
                   </>
                 )}
               </div>

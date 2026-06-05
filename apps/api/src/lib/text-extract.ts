@@ -1,5 +1,6 @@
 import { inflateRaw } from "node:zlib";
 import { promisify } from "node:util";
+import WordExtractor from "word-extractor";
 import { extractPdfText } from "./pdf-extract.js";
 
 const inflateRawAsync = promisify(inflateRaw);
@@ -58,6 +59,16 @@ async function extractZipEntry(buf: Buffer, target: string): Promise<Buffer | nu
     pos += 46 + fnLen + extraLen + commentLen;
   }
   return null;
+}
+
+// ── DOC (Word 97-2003 — formato binário OLE2) ─────────────────────────────────
+
+const wordExtractor = new WordExtractor();
+
+async function extractDocText(buf: Buffer): Promise<string> {
+  const doc = await wordExtractor.extract(buf);
+  const body = doc.getBody() ?? "";
+  return body.replace(/\r\n/g, "\n").replace(/\n{3,}/g, "\n\n").trim();
 }
 
 // ── DOCX — word/document.xml ──────────────────────────────────────────────────
@@ -176,12 +187,10 @@ export async function extractText(
     return { text: stripRtf(buffer.toString("latin1")), format: "RTF" };
   }
 
-  // DOC (formato binário antigo) — complexo demais sem biblioteca
+  // DOC (Word 97-2003 — formato binário OLE2)
   if (mt.includes("msword") || ext === "doc") {
-    throw new Error(
-      "Formato .doc (Word 97-2003) não suportado. " +
-      "Abra no Word → Salvar como → DOCX ou PDF.",
-    );
+    const text = await extractDocText(buffer);
+    return { text, format: "DOC" };
   }
 
   // Texto simples / fallback
