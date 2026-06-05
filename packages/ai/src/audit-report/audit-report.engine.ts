@@ -170,6 +170,8 @@ const RULE_TITLES: Record<string, string> = {
   MATRIX_GENERIC_FATO:                  "Fato genérico na argumentação — personalize ao caso concreto",
   MATRIX_GENERIC_NORMA:                 "Norma genérica na argumentação — cite o dispositivo específico",
   MATRIX_MISSING_FIELD:                 "Campo obrigatório ausente na estrutura argumentativa",
+  UNFILLED_TEMPLATE_PLACEHOLDERS:       "Campos de template não preenchidos",
+  EMPTY_OR_SKELETON_DRAFT:              "Minuta vazia ou insuficiente — estrutura de template sem conteúdo",
 };
 
 // ── Mapeamento de regras para sugestões de melhoria ──────────────────────────
@@ -374,14 +376,23 @@ export class AuditReportEngine {
       ? `${RULE_TITLES[fatalErrors[0]!.rule] ?? fatalErrors[0]!.rule}${fatalErrors.length > 1 ? ` (+${fatalErrors.length - 1} problema${fatalErrors.length - 1 > 1 ? "s" : ""} fatal${fatalErrors.length - 1 > 1 ? "is" : ""})` : ""}`
       : undefined;
 
+    // ── TEMPLATE CAP: scores máximos quando há placeholders não preenchidos ──────
+    const TEMPLATE_RULES = new Set(["UNFILLED_TEMPLATE_PLACEHOLDERS", "EMPTY_OR_SKELETON_DRAFT"]);
+    const hasTemplateError = errors.some((e) => TEMPLATE_RULES.has(e.rule));
+    const qualidadeTecnicaFinal  = hasTemplateError ? Math.min(qualidadeTecnica, 49)  : qualidadeTecnica;
+    const viabilidadeJuridicaFinal = hasTemplateError ? Math.min(viabilidadeJuridica, 40) : viabilidadeJuridica;
+    const classificacaoFinalFinal  = hasTemplateError
+      ? this.computeClassificacaoFinal(viabilidadeJuridicaFinal)
+      : classificacaoFinal;
+
     // Compat. legado: scoreGeral = qualidadeTecnica (sem cap), classificacao mapeada
-    const scoreGeral   = qualidadeTecnica;
-    const classificacao = this.mapToLegacyClassificacao(classificacaoFinal);
+    const scoreGeral    = qualidadeTecnicaFinal;
+    const classificacao = this.mapToLegacyClassificacao(classificacaoFinalFinal);
 
     return {
-      qualidadeTecnica,
-      viabilidadeJuridica,
-      classificacaoFinal,
+      qualidadeTecnica:  qualidadeTecnicaFinal,
+      viabilidadeJuridica: viabilidadeJuridicaFinal,
+      classificacaoFinal: classificacaoFinalFinal,
       ...(motivoClassificacao !== undefined && { motivoClassificacao }),
       scoreGeral,
       classificacao,

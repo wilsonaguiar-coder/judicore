@@ -197,6 +197,34 @@ export class FinalValidator {
       }));
     }
 
+    // 9. Template não preenchido — FATAL independente de modo
+    // Detecta placeholders literais com 3+ chars: [ENDEREÇAMENTO], [A DETERMINAR], etc.
+    const PLACEHOLDER_RE = /\[[A-ZÁÀÂÃÉÊÍÓÔÕÚÇ0-9\s.,;:!?\/_\-]{3,}\]/gi;
+    const placeholders = [...draft.matchAll(PLACEHOLDER_RE)];
+    if (placeholders.length >= 3) {
+      allErrors.push({
+        rule: "UNFILLED_TEMPLATE_PLACEHOLDERS",
+        message: `Minuta contém ${placeholders.length} campo(s) de template não preenchido(s) — exemplo: "${placeholders[0]![0]}"`,
+        fatal: true,
+      });
+    }
+
+    // 10. Minuta vazia ou esqueleto — FATAL quando o conteúdo útil é insuficiente
+    const SKELETON_PHRASES_RE = /peça gerada sem informações suficientes|completar todos os campos|preencher com dados reais|inserir fatos do caso concreto|a determinar/i;
+    const usefulText = draft.replace(/\[[^\]]{3,}\]/g, "").replace(/\s+/g, " ").trim();
+    const isSkeletonByLength = usefulText.length < 1500;
+    const isSkeletonByPhrase = SKELETON_PHRASES_RE.test(draft);
+    const placeholderRatio = placeholders.length > 0
+      ? placeholders.length / Math.max(1, draft.split(/\n/).length)
+      : 0;
+    if ((isSkeletonByLength || isSkeletonByPhrase || placeholderRatio > 0.3) && placeholders.length >= 2) {
+      allErrors.push({
+        rule: "EMPTY_OR_SKELETON_DRAFT",
+        message: "Minuta insuficiente: estrutura de template sem conteúdo substantivo. Preencha todos os campos antes de usar.",
+        fatal: true,
+      });
+    }
+
     // document_confidence — para display e ranking (não drive o status final)
     let confidence = this.calculateConfidence(classification, extraction, matrix, audit, mode, genericityScore);
     if (mode === "FINAL_DRAFT") {
@@ -207,7 +235,7 @@ export class FinalValidator {
     // Status final baseado no score do auditor
     const resolved = resolveDocumentStatus(audit.score, allErrors, mode);
 
-    const safe_message = this.buildSafeMessage(resolved.status, mode, hasFatalErrors);
+    const safe_message = this.buildSafeMessage(resolved.status, mode, hasFatalErrors, allErrors);
 
     return {
       valid: !hasFatalErrors,
@@ -221,7 +249,10 @@ export class FinalValidator {
     };
   }
 
-  private buildSafeMessage(status: DocumentStatus, mode: GenerationMode, hasFatalErrors: boolean): string | undefined {
+  private buildSafeMessage(status: DocumentStatus, mode: GenerationMode, hasFatalErrors: boolean, errors?: { rule: string }[]): string | undefined {
+    if (errors?.some((e) => e.rule === "UNFILLED_TEMPLATE_PLACEHOLDERS" || e.rule === "EMPTY_OR_SKELETON_DRAFT")) {
+      return "A minuta contém campos não preenchidos e não deve ser utilizada sem complementação substancial.";
+    }
     if (hasFatalErrors) return "A minuta contém erros jurídicos graves e exige revisão antes de qualquer uso.";
     if (mode !== "FINAL_DRAFT") return "A minuta é um modelo estruturado. Preencha os campos entre colchetes com os dados reais do caso antes de usar.";
     if (status === "APROVADA COM RESSALVAS") return "A minuta foi aprovada com ressalvas. Revise os pontos indicados antes de usar.";

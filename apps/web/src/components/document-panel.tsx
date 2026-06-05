@@ -236,6 +236,16 @@ function DocumentModal({
         {/* Rodapé — auditoria */}
         {showPipeline && audit && !isStreaming && (
           <div className="flex-shrink-0 border-t px-5 py-3 space-y-2 bg-muted/20">
+            {/* Banner de template não preenchido */}
+            {audit.blocked && audit.ressalvas?.some((r) => /campo.*template\s*não\s*preenchido|minuta.*insuficiente|campos\s+não\s+preenchidos/i.test(r)) && (
+              <div className="flex items-start gap-2.5 bg-red-50 border border-red-200 rounded-xl px-4 py-3">
+                <XCircle size={14} className="text-red-600 mt-0.5 flex-shrink-0" />
+                <div>
+                  <p className="text-xs font-bold text-red-900">Documento incompleto</p>
+                  <p className="text-[11px] text-red-700 mt-0.5 leading-snug">Esta minuta contém campos não preenchidos e estrutura de template. Complete os dados essenciais antes de qualquer uso.</p>
+                </div>
+              </div>
+            )}
             <AuditBadge audit={audit} />
             {audit.status_minuta !== "MINUTA APROVADA" && (
               <details className="group">
