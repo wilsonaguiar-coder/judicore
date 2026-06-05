@@ -334,9 +334,9 @@ export class AuditReportEngine {
 
   private computeViabilidadeJuridica(fatalCount: number): number {
     if (fatalCount === 0) return 100;
-    if (fatalCount === 1) return 40;
-    if (fatalCount === 2) return 20;
-    return 0;
+    if (fatalCount === 1) return 70;  // ATENCAO — 1 erro fatal isolado
+    if (fatalCount === 2) return 40;  // RISCO_ELEVADO — 2 erros fatais
+    return 0;                          // CRITICA — 3+ erros fatais
   }
 
   private computeClassificacaoFinal(viabilidade: number): AuditClassificacaoFinal {

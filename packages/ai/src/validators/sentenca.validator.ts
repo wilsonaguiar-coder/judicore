@@ -37,29 +37,9 @@ export class SentencaValidator {
 
     const errors: ValidationError[] = [];
 
-    if (!RELATORIO_RE.test(draft)) {
-      errors.push({
-        rule: "SENTENCA_MISSING_RELATORIO",
-        message: "Sentença deve conter seção de Relatório",
-        fatal: true,
-      });
-    }
-
-    if (!FUNDAMENTACAO_RE.test(draft)) {
-      errors.push({
-        rule: "SENTENCA_MISSING_FUNDAMENTACAO",
-        message: "Sentença deve conter seção de Fundamentação",
-        fatal: true,
-      });
-    }
-
-    if (!DISPOSITIVO_RE.test(draft)) {
-      errors.push({
-        rule: "SENTENCA_MISSING_DISPOSITIVO",
-        message: "Sentença deve conter fórmula de Dispositivo (\"Ante o exposto\", \"Pelo exposto\", \"Dispositivo\")",
-        fatal: true,
-      });
-    }
+    // Presença de Relatório, Fundamentação e Dispositivo é verificada pelo StructuralValidator
+    // via STRUCTURAL_REQUIREMENTS["SENTENCA"] — duplicar aqui geraria double-fatal para o mesmo erro.
+    // SentencaValidator foca nas verificações adicionais: verbo, recurso, comprimento, vaguidade.
 
     if (!DECISION_VERB_RE.test(draft)) {
       errors.push({

@@ -67,17 +67,6 @@ const FATAL_RULES: Array<{
     },
   },
   {
-    rule: "EC_BEM_FAMILIA_PENHORADO",
-    description: "Penhora de imóvel residencial único do executado — bem de família (Lei 8.009/90) é impenhorável (art. 833, VIII, CPC), salvo exceções taxativas.",
-    detect: (draft, _ctx) => {
-      const penhoraImovel =
-        /penhora[^.]{0,60}im[oó]vel/i.test(draft) ||
-        /im[oó]vel[^.]{0,60}penhor/i.test(draft);
-      const temProtecao = /bem\s+de\s+fam[ií]lia|lei\s+8\.009|impenhor[aá]vel|art\.\s*833/i.test(draft);
-      return penhoraImovel && !temProtecao;
-    },
-  },
-  {
     rule: "EC_PRESCRICAO_INTERCORRENTE_IGNORADA",
     description: "Processo paralisado há mais de 5 anos sem movimentação útil do exequente — prescrição intercorrente não declarada (art. 921 §4º CPC).",
     detect: (draft, _ctx) => {
@@ -138,6 +127,17 @@ const NON_FATAL_RULES: Array<{
   description: string;
   detect: (draft: string, ctx: ExecutionContext) => boolean;
 }> = [
+  {
+    rule: "EC_BEM_FAMILIA_PENHORADO",
+    description: "Penhora de imóvel sem menção à proteção do bem de família — verificar se o imóvel é residencial único do executado (Lei 8.009/90, art. 833, VIII, CPC). Se for, a penhora é inválida salvo exceções taxativas.",
+    detect: (draft, _ctx) => {
+      const penhoraImovel =
+        /penhora[^.]{0,60}im[oó]vel/i.test(draft) ||
+        /im[oó]vel[^.]{0,60}penhor/i.test(draft);
+      const temProtecao = /bem\s+de\s+fam[ií]lia|lei\s+8\.009|impenhor[aá]vel|art\.\s*833/i.test(draft);
+      return penhoraImovel && !temProtecao;
+    },
+  },
   {
     rule: "EC_SISBAJUD_SEM_GRADACAO",
     description: "Penhora eletrônica deferida sem observar a ordem de preferência do art. 835 CPC.",

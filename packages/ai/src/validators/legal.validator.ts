@@ -53,12 +53,20 @@ export class LegalRulesValidator {
     }
 
     // Bloquear honorários do CPC em matéria trabalhista
-    if (classification.tipo_justica === "TRABALHO" && lowerDraft.includes("art. 85 cpc")) {
-      errors.push({
-        rule: "WRONG_HONORARIOS",
-        message: "Honorários trabalhistas regidos pelo art. 791-A CLT, não pelo art. 85 CPC",
-        fatal: true,
-      });
+    // Janela contextual: não disparar se o art. 85 CPC é mencionado para distinguir/negar sua aplicação
+    if (classification.tipo_justica === "TRABALHO") {
+      const idx85 = lowerDraft.indexOf("art. 85 cpc");
+      if (idx85 !== -1) {
+        const window85 = lowerDraft.slice(Math.max(0, idx85 - 200), idx85 + 150);
+        const isDistincao = /n[ãa]o\s+(?:se\s+)?(?:aplica|incide|cab[eê])|ao\s+contr[áa]rio|diferent|distinção|distinguindo|inaplic[áa]vel|ao\s+inv[eé]s|inobst/i.test(window85);
+        if (!isDistincao) {
+          errors.push({
+            rule: "WRONG_HONORARIOS",
+            message: "Honorários trabalhistas regidos pelo art. 791-A CLT, não pelo art. 85 CPC",
+            fatal: true,
+          });
+        }
+      }
     }
 
     // Bloquear honorários do CPC em matéria criminal

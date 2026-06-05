@@ -29,17 +29,7 @@ export class AppealValidator {
       });
     }
 
-    // JEF/JEC não devem usar apelação
-    if (
-      (classification.tipo_justica === "JEF" || classification.tipo_justica === "JEC") &&
-      /\bapela[cç][aã]o\b/i.test(draft)
-    ) {
-      errors.push({
-        rule: "JEF_JEC_WRONG_APPEAL",
-        message: `${classification.tipo_justica} usa Recurso Inominado (art. 42 Lei 9.099/95), não apelação`,
-        fatal: true,
-      });
-    }
+    // JEF/JEC — coberto pelo JefCivelValidator com mais precisão contextual
 
     // Criminal: não deve usar art. 895 CLT nem apelação cível
     if (
