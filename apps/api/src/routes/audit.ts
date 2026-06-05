@@ -33,7 +33,7 @@ function heuristicClassify(text: string): LegalClassification {
     tipo_peca = "RECURSO";
   else if (/\b(?:decido|decisão\s+interlocut[oó]ria|E\s+o\s+relatório\.\s+Decido)\b/i.test(text))
     tipo_peca = "DECISAO";
-  else if (/\b(?:julgo\s+(?:procedente|improcedente|parcialmente)|condeno\s+o\s+(?:r[eé]u|executado)|absolvo\s+o\s+r[eé]u|DISPOSITIVO)\b/i.test(text))
+  else if (/\b(?:julgo\s+(?:procedente|improcedente|parcialmente)|condeno\s+o\s+(?:r[eé]u|executado)|absolvo\s+o\s+r[eé]u|DISPOSITIVO|defiro\s+(?:a\s+)?guarda|concedo\s+(?:a\s+)?guarda|fixo\s+(?:a\s+)?guarda\s+(?:unilateral|compartilhada)?)\b/i.test(text))
     tipo_peca = "SENTENCA";
   else if (/\bdespacho\b/i.test(text))
     tipo_peca = "DESPACHO";

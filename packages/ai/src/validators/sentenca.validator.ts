@@ -13,8 +13,8 @@
 import type { LegalClassification, ValidationError, ValidationResult } from "../pipeline/types.js";
 
 const RELATORIO_RE = /relat[oó]rio/i;
-const FUNDAMENTACAO_RE = /fundamenta[cç][aã]o/i;
-const DISPOSITIVO_RE = /(dispositivo|ante\s+o\s+exposto|isso\s+posto|isto\s+posto|pelo\s+exposto)/i;
+const FUNDAMENTACAO_RE = /fundamenta[cç][aã]o|do\s+m[eé]rito|an[aá]lise\s+do\s+(?:caso|pedido)|da\s+guarda|da\s+situa[cç][aã]o/i;
+const DISPOSITIVO_RE = /(dispositivo|ante\s+o\s+exposto|isso\s+posto|isto\s+posto|pelo\s+exposto|diante\s+do\s+exposto|(?:defiro|concedo|fixo)\s+a\s+guarda)/i;
 // Verbos dispositivos reconhecidos em SENTENÇA:
 //   cível/trabalhista/previdenciário: julgo procedente/improcedente/extinto
 //   penal de mérito: absolvo, condeno, declaro extinta a punibilidade, desclassifico
@@ -82,14 +82,31 @@ export class SentencaValidator {
     // FAMÍLIA: contradição entre fundamentação favorável a um genitor e dispositivo que concede a outro
     if (sections.fundamentacao && sections.dispositivo) {
       // Indicadores que a fundamentação aponta para a MÃE/GENITORA
-      const FUND_FAV_MAE_RE = /laudo\s+(?:psicológico|psicossocial|social)\s+favorável\s+(?:à|a)\s*(?:mãe|genitora)|vínculo\s+afetivo\s+(?:com|pela?)\s+a?\s*(?:mãe|genitora)|ausência\s+de\s+incapacidade\s+(?:materna|d[ae]\s+(?:mãe|genitora))|adaptação\s+d[ae]\s+crian[cç]a\s+(?:com|junto|à)\s+(?:mãe|genitora)|melhor\s+interesse\s+d[ae]\s+crian[cç]a.{0,150}(?:mãe|genitora)/i;
-      // Dispositivo concedendo guarda ao PAI
-      const DISP_GUARDA_PAI_RE = /guarda\s+(?:unilateral\s+|compartilhada\s+)?(?:ao?\s+)?(?:pai\b|genitor\b|requerente\s*\(?pai\)?)/i;
+      const FUND_FAV_MAE_RE = new RegExp(
+        "laudo\\s+(?:psicológico|psicossocial|social)\\s+favorável\\s+(?:à|a)\\s*(?:mãe|genitora)" +
+        "|vínculo\\s+afetivo\\s+(?:com|pela?)\\s+a?\\s*(?:mãe|genitora)" +
+        "|ausência\\s+de\\s+incapacidade\\s+(?:materna|d[ae]\\s+(?:mãe|genitora))" +
+        "|adaptação\\s+d[ae]\\s+crian[cç]a\\s+(?:com|junto|à)\\s+(?:mãe|genitora)" +
+        // [\s\S] cruza quebras de linha; janela ampliada para 300 chars
+        "|melhor\\s+interesse\\s+d[ae]\\s+crian[cç]a[\\s\\S]{0,300}(?:mãe|genitora)" +
+        // Padrões sem "favorável": adaptação, vínculo, laudo aponta
+        "|crian[cç]a\\s+(?:está|se\\s+encontra)\\s+(?:bem\\s+)?(?:adaptada?|vinculada?)[\\s\\S]{0,80}(?:mãe|genitora)" +
+        "|laudo[\\s\\S]{0,100}(?:mãe|genitora)[\\s\\S]{0,100}(?:mais\\s+adequada?|mais\\s+apta?|melhor\\s+condição)",
+        "i",
+      );
+      // Dispositivo concedendo guarda ao PAI — ambas as ordens (guarda...pai e pai...guarda)
+      const DISP_GUARDA_PAI_RE = /(?:guarda[\s\S]{0,80}(?:pai\b|genitor\b)|(?:pai\b|genitor\b)[\s\S]{0,80}guarda)/i;
 
       // Indicadores que a fundamentação aponta para o PAI/GENITOR
-      const FUND_FAV_PAI_RE = /laudo\s+(?:psicológico|psicossocial|social)\s+favorável\s+ao?\s*(?:pai|genitor)|vínculo\s+afetivo\s+(?:com|pelo?)\s+o?\s*(?:pai|genitor)|melhor\s+interesse\s+d[ae]\s+crian[cç]a.{0,150}(?:pai\b|genitor\b)/i;
-      // Dispositivo concedendo guarda à MÃE
-      const DISP_GUARDA_MAE_RE = /guarda\s+(?:unilateral\s+|compartilhada\s+)?(?:(?:à|para)\s+)?(?:mãe\b|genitora\b)/i;
+      const FUND_FAV_PAI_RE = new RegExp(
+        "laudo\\s+(?:psicológico|psicossocial|social)\\s+favorável\\s+ao?\\s*(?:pai|genitor)" +
+        "|vínculo\\s+afetivo\\s+(?:com|pelo?)\\s+o?\\s*(?:pai|genitor)" +
+        "|melhor\\s+interesse\\s+d[ae]\\s+crian[cç]a[\\s\\S]{0,300}(?:pai\\b|genitor\\b)" +
+        "|crian[cç]a\\s+(?:está|se\\s+encontra)\\s+(?:bem\\s+)?(?:adaptada?|vinculada?)[\\s\\S]{0,80}(?:pai\\b|genitor\\b)",
+        "i",
+      );
+      // Dispositivo concedendo guarda à MÃE — ambas as ordens
+      const DISP_GUARDA_MAE_RE = /(?:guarda[\s\S]{0,80}(?:mãe\b|genitora\b)|(?:mãe\b|genitora\b)[\s\S]{0,80}guarda)/i;
 
       const fundFavMae = FUND_FAV_MAE_RE.test(sections.fundamentacao);
       const fundFavPai = FUND_FAV_PAI_RE.test(sections.fundamentacao);

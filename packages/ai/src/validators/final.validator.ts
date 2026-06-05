@@ -245,7 +245,7 @@ export class FinalValidator {
     // BLOCO 4 — RGPS: peça admite ausência de qualidade E carência mas pede benefício
     if (classification.regime_juridico === "RGPS") {
       const QUALIDADE_AUSENTE_RE = /n[aã]o\s+possui\s+(?:a\s+)?qualidade\s+de\s+segurado|sem\s+qualidade\s+de\s+segurado|perdeu\s+(?:a\s+)?qualidade\s+de\s+segurado/i;
-      const CARENCIA_AUSENTE_RE  = /n[aã]o\s+cumpriu\s+(?:a\s+)?car[eê]ncia|sem\s+car[eê]ncia|car[eê]ncia\s+insuficiente|car[eê]ncia\s+n[aã]o\s+(?:cumprida|atingida)/i;
+      const CARENCIA_AUSENTE_RE  = /(?:n[aã]o|nem)\s+(?:cumpriu|completou|atingiu)\s+(?:a\s+)?car[eê]ncia|sem\s+car[eê]ncia|car[eê]ncia\s+(?:insuficiente|n[aã]o\s+(?:cumprida|atingida|completada))/i;
       const PEDIDO_BENEFICIO_RE  = /auxílio[-\s]|aposentadoria|benefício\s+previdenci[aá]rio|pensão\s+por\s+morte/i;
       const EXCECOES_RE = /período\s+de\s+graça|art\.?\s*15\b|dispensa\s+de\s+car[eê]ncia|acidente\s+de\s+qualquer\s+natureza|doen[cç]a\s+grave|recuperação\s+da\s+qualidade/i;
       if (QUALIDADE_AUSENTE_RE.test(draft) && CARENCIA_AUSENTE_RE.test(draft) && PEDIDO_BENEFICIO_RE.test(draft) && !EXCECOES_RE.test(draft)) {
@@ -260,9 +260,10 @@ export class FinalValidator {
     // BLOCO 5 — TRIBUTÁRIO: possível confusão decadência x prescrição
     const isTributario = classification.tipo_justica === "EXECUCAO_FISCAL" ||
       (classification.regime_juridico as string) === "TRIBUTARIO" ||
-      /tribut|CTN\b|crédito\s+tributário/i.test(classification.assunto_principal ?? "");
+      /tribut|CTN\b|crédito\s+tributário/i.test(classification.assunto_principal ?? "") ||
+      /CTN\b|crédito\s+tributário|lançamento\s+(?:fiscal|tributário)|art\.?\s*17[34]\b/i.test(draft.slice(0, 4000));
     if (isTributario) {
-      const PRESCRICAO_CONSTITUIR_RE = /prescri[cç][aã]o.{0,100}constituir\s+(?:o\s+)?crédito|constituir\s+(?:o\s+)?crédito.{0,100}prescri[cç][aã]o/i;
+      const PRESCRICAO_CONSTITUIR_RE = /prescri[cç][aã]o[\s\S]{0,100}constituir\s+(?:o\s+)?crédito|constituir\s+(?:o\s+)?crédito[\s\S]{0,100}prescri[cç][aã]o/i;
       const ART174_RE = /art\.?\s*174\s+(?:d[ao]\s+)?CTN/i;
       const LANCAMENTO_RE = /\blançamento\b/i;
       if (PRESCRICAO_CONSTITUIR_RE.test(draft) && ART174_RE.test(draft) && LANCAMENTO_RE.test(draft)) {
@@ -275,11 +276,12 @@ export class FinalValidator {
     }
 
     // BLOCO 6 — AMBIENTAL: responsabilidade subjetiva em ACP ambiental
-    const isAmbiental = /ambiental|dano\s+ambiental|poluição\s+ambiental/i.test(classification.assunto_principal ?? "");
+    const isAmbiental = /ambiental|dano\s+ambiental|poluição\s+ambiental/i.test(classification.assunto_principal ?? "") ||
+      /\bAPP\b|reserva\s+legal|supressão\s+de\s+vegetação|dano\s+ambiental|licenciamento\s+ambiental|\bIBAMA\b/i.test(draft.slice(0, 3000));
     if (isAmbiental) {
-      const ACP_DANO_RE = /ação\s+civil\s+p[úu]blica|\bACP\b/i;
-      const DANO_AMB_RE = /dano\s+ambiental/i;
-      const RESP_SUBJ_RE = /responsabilidade\s+subjetiva|necessidade\s+de\s+(?:demonstrar\s+)?culpa|culpa\s+(?:comprovada|d[ao]s?\s+(?:réu|poluidor))|\bculpa\s+(?:grave|leve|levíssima)\b/i;
+      const ACP_DANO_RE = /ação\s+civil\s+p[úu]blica|\bACP\b|\bAPP\b|supressão\s+de\s+vegetação|dano\s+ambiental|área\s+de\s+preservação\s+permanente/i;
+      const DANO_AMB_RE = /dano\s+ambiental|\bAPP\b|supressão\s+de\s+vegetação|degrada[cç][aã]o\s+ambiental|poluição/i;
+      const RESP_SUBJ_RE = /responsabilidade\s+subjetiva|necessidade\s+de\s+(?:demonstrar\s+)?culpa|culpa\s+(?:comprovada|d[ao]s?\s+(?:réu|poluidor))|\bculpa\s+(?:grave|leve|levíssima)\b|n[aã]o\s+existe\s+responsabilidade\s+(?:civil|ambiental)|multa\s+administrativa\s+[eé]\s+suficiente|sem\s+responsabilidade\s+(?:de\s+)?recuperar/i;
       if (ACP_DANO_RE.test(draft) && DANO_AMB_RE.test(draft) && RESP_SUBJ_RE.test(draft)) {
         allErrors.push({
           rule: "ENVIRONMENTAL_LIABILITY_WARNING",
