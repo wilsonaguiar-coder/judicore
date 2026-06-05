@@ -3,7 +3,7 @@
 import { motion } from "framer-motion";
 import Link from "next/link";
 import Image from "next/image";
-import { Gavel, Calculator, ClipboardCheck, Sparkles, Check, ArrowRight } from "lucide-react";
+import { Gavel, ClipboardCheck, Check } from "lucide-react";
 
 // ── Animations ───────────────────────────────────────────────────────────────
 
@@ -41,36 +41,6 @@ function PreviewJudiCore() {
   );
 }
 
-function PreviewJudiCalc() {
-  const rows = [
-    ["7","8","9","×"],
-    ["4","5","6","−"],
-    ["1","2","3","+"],
-    ["0",".","","="],
-  ];
-  return (
-    <div className="w-full h-[220px] flex flex-col rounded-xl bg-[#071410] border border-emerald-900/40 p-5 overflow-hidden shadow-2xl group-hover:shadow-emerald-500/20 transition-all">
-      <div className="mb-auto">
-        <div className="text-xs text-emerald-400/70 font-medium leading-none mb-2">Total Atualizado</div>
-        <div className="text-[22px] font-bold text-emerald-400 leading-tight">R$ 125.430,87</div>
-      </div>
-      <div className="grid grid-cols-4 gap-1.5 mt-4">
-        {rows.map((row, ri) =>
-          row.map((n, ci) => (
-            <div
-              key={`${ri}-${ci}`}
-              className={`text-center text-sm py-2 rounded leading-none flex items-center justify-center ${
-                n === "=" ? "bg-emerald-600 text-white font-bold shadow-lg shadow-emerald-600/40" : "bg-white/[0.06] text-white/70"
-              }`}
-            >
-              {n}
-            </div>
-          ))
-        )}
-      </div>
-    </div>
-  );
-}
 
 function PreviewJudiAudit() {
   const items: [string, "green" | "amber"][] = [
@@ -109,7 +79,7 @@ type Product = {
   checkColor: string;
   Preview: () => React.ReactElement;
   link: string;
-  colorName: "indigo" | "emerald" | "amber";
+  colorName: "indigo" | "amber";
 };
 
 const PRODUCTS: Product[] = [
@@ -128,23 +98,6 @@ const PRODUCTS: Product[] = [
     Preview: PreviewJudiCore,
     link: "/login",
     colorName: "indigo",
-  },
-  {
-    icon: Calculator,
-    name: "JudiCalc",
-    tagline: "Automação Completa de Cálculos",
-    features: [
-      "Acesso via SOAP ao PJe",
-      "Cálculos automáticos precisos",
-      "Geração de memória e PDF",
-      "Assinatura com PJeOffice",
-      "Envio automático ao processo",
-    ],
-    iconBg: "bg-emerald-600",
-    checkColor: "text-emerald-400",
-    Preview: PreviewJudiCalc,
-    link: process.env.NEXT_PUBLIC_JUDICALC_URL || "#",
-    colorName: "emerald",
   },
   {
     icon: ClipboardCheck,
@@ -295,12 +248,11 @@ export default function LandingPage() {
         </div>
 
         <div className="w-full max-w-6xl relative">
-          <div className="grid md:grid-cols-3 gap-6 relative z-10">
+          <div className="grid md:grid-cols-2 gap-6 relative z-10 max-w-4xl mx-auto">
             {PRODUCTS.map((p, idx) => {
               // Determina as cores do hover baseadas no card
               const colorClasses = {
                 indigo: "from-indigo-600/20 hover:shadow-indigo-500/30 group-hover:border-indigo-500/40",
-                emerald: "from-emerald-600/20 hover:shadow-emerald-500/30 group-hover:border-emerald-500/40",
                 amber: "from-amber-600/20 hover:shadow-amber-500/30 group-hover:border-amber-500/40",
               }[p.colorName];
 
