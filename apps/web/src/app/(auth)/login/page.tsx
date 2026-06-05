@@ -32,110 +32,104 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center bg-slate-100 px-4">
+    <div className="min-h-screen bg-[#030014] text-white flex flex-col items-center justify-center px-4 relative overflow-hidden">
 
-      {/* Voltar */}
-      <div className="mb-6 self-center">
-        <Link
-          href="/"
-          className="inline-flex items-center gap-1.5 text-xs text-slate-400 hover:text-slate-600 transition-colors"
-        >
-          <ArrowLeft size={13} />
-          Página principal
-        </Link>
+      {/* Ambient glow */}
+      <div className="pointer-events-none fixed inset-0 overflow-hidden" aria-hidden>
+        <div className="absolute -top-48 left-1/2 -translate-x-1/2 w-[700px] h-[700px] rounded-full bg-indigo-500/30 blur-[120px]" />
+        <div className="absolute bottom-0 right-0 w-[500px] h-[500px] rounded-full bg-violet-600/20 blur-[120px]" />
+        <div className="absolute inset-0 bg-[linear-gradient(to_right,#ffffff0a_1px,transparent_1px),linear-gradient(to_bottom,#ffffff0a_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_60%_60%_at_50%_50%,#000_70%,transparent_100%)]" />
       </div>
 
-      {/* Card */}
-      <div className="w-full max-w-sm bg-white rounded-2xl border border-slate-200 shadow-lg shadow-slate-200/60 overflow-hidden">
+      {/* Back link */}
+      <Link
+        href="/"
+        className="absolute top-6 left-6 flex items-center gap-1.5 text-xs text-white/35 hover:text-white/70 transition-colors z-10"
+      >
+        <ArrowLeft size={13} />
+        Página principal
+      </Link>
 
-        {/* Faixa escura com logo */}
-        <div className="bg-[#1a2035] flex flex-col items-center justify-center py-8 px-8">
-          <Image
-            src="/logo.png"
-            alt="Judicore"
-            width={96}
-            height={96}
-            className="rounded-xl"
-          />
+      {/* Card */}
+      <div className="relative z-10 w-full max-w-sm">
+
+        {/* Logo */}
+        <div className="flex justify-center mb-8">
+          <Image src="/logo.png" alt="JudiCore" width={120} height={40} className="object-contain" priority />
         </div>
 
-        {/* Título + formulário */}
-        <div className="p-8">
+        {/* Form */}
+        <div className="bg-white/[0.04] border border-white/[0.08] rounded-3xl p-8 backdrop-blur-xl shadow-2xl">
+
           <div className="text-center mb-7">
-            <h1 className="text-xl font-semibold text-slate-800 leading-tight">
+            <h1 className="text-xl font-bold text-white leading-tight">
               Bem-vindo de volta
             </h1>
-            <p className="text-sm text-slate-400 mt-1">
+            <p className="text-sm text-white/40 mt-1">
               Acesse sua conta para continuar
             </p>
           </div>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="space-y-1.5">
-            <label
-              className="block text-[11px] font-semibold text-slate-500 uppercase tracking-widest"
-              htmlFor="email"
-            >
-              E-mail
-            </label>
-            <input
-              id="email"
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className="w-full px-3.5 py-2.5 rounded-lg border border-slate-200 bg-slate-50 text-slate-800 text-sm placeholder-slate-300 focus:outline-none focus:ring-2 focus:ring-violet-500/30 focus:border-violet-400 transition-all"
-              placeholder="seu@email.gov.br"
-              required
-              autoComplete="email"
-            />
-          </div>
-
-          <div className="space-y-1.5">
-            <label
-              className="block text-[11px] font-semibold text-slate-500 uppercase tracking-widest"
-              htmlFor="password"
-            >
-              Senha
-            </label>
-            <input
-              id="password"
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              className="w-full px-3.5 py-2.5 rounded-lg border border-slate-200 bg-slate-50 text-slate-800 text-sm placeholder-slate-300 focus:outline-none focus:ring-2 focus:ring-violet-500/30 focus:border-violet-400 transition-all"
-              placeholder="••••••••"
-              required
-              autoComplete="current-password"
-            />
-          </div>
-
-          {error && (
-            <div className="rounded-lg bg-red-50 border border-red-200 px-3.5 py-2.5">
-              <p className="text-xs text-red-600">{error}</p>
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <div className="space-y-1.5">
+              <label className="block text-[11px] font-semibold text-white/35 uppercase tracking-widest" htmlFor="email">
+                E-mail
+              </label>
+              <input
+                id="email"
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                className="w-full px-3.5 py-2.5 rounded-xl border border-white/[0.08] bg-white/[0.05] text-white text-sm placeholder-white/20 focus:outline-none focus:ring-2 focus:ring-violet-500/40 focus:border-violet-500/40 transition-all"
+                placeholder="seu@email.gov.br"
+                required
+                autoComplete="email"
+              />
             </div>
-          )}
 
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full py-2.5 px-4 rounded-lg bg-violet-600 hover:bg-violet-500 active:bg-violet-700 text-white text-sm font-medium disabled:opacity-50 transition-colors mt-1"
-          >
-            {loading ? (
-              <span className="flex items-center justify-center gap-2">
-                <span className="w-3.5 h-3.5 rounded-full border-2 border-white/40 border-t-white animate-spin" />
-                Entrando...
-              </span>
-            ) : (
-              "Entrar"
+            <div className="space-y-1.5">
+              <label className="block text-[11px] font-semibold text-white/35 uppercase tracking-widest" htmlFor="password">
+                Senha
+              </label>
+              <input
+                id="password"
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                className="w-full px-3.5 py-2.5 rounded-xl border border-white/[0.08] bg-white/[0.05] text-white text-sm placeholder-white/20 focus:outline-none focus:ring-2 focus:ring-violet-500/40 focus:border-violet-500/40 transition-all"
+                placeholder="••••••••"
+                required
+                autoComplete="current-password"
+              />
+            </div>
+
+            {error && (
+              <div className="rounded-xl bg-red-500/10 border border-red-500/20 px-3.5 py-2.5">
+                <p className="text-xs text-red-400">{error}</p>
+              </div>
             )}
-          </button>
-        </form>
-        </div>
-      </div>
 
-      <p className="text-center text-[11px] text-slate-400 mt-6">
-        Judicore · Apoio à Decisão Judicial
-      </p>
+            <button
+              type="submit"
+              disabled={loading}
+              className="w-full py-2.5 px-4 rounded-xl bg-violet-600 hover:bg-violet-500 active:bg-violet-700 text-white text-sm font-semibold disabled:opacity-50 transition-all shadow-lg shadow-violet-600/30 mt-1"
+            >
+              {loading ? (
+                <span className="flex items-center justify-center gap-2">
+                  <span className="w-3.5 h-3.5 rounded-full border-2 border-white/40 border-t-white animate-spin" />
+                  Entrando...
+                </span>
+              ) : (
+                "Entrar"
+              )}
+            </button>
+          </form>
+        </div>
+
+        <p className="text-center text-[11px] text-white/20 mt-6">
+          JudiCore · Suíte de Inteligência Jurídica
+        </p>
+      </div>
     </div>
   );
 }
