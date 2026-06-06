@@ -11,19 +11,23 @@ export async function POST(req: Request, { params }: { params: { id: string } })
   }
 
   const body = await req.json();
-  const { taskId, decision } = body;
+  const { taskId, ruleCode, decision, status } = body;
 
-  if (!taskId || !decision) {
+  // Accept both `decision` and `status` field names
+  const resolvedDecision: string | undefined = decision ?? status;
+  const resolvedRuleCode: string = ruleCode ?? "UNKNOWN";
+
+  if (!taskId || !resolvedDecision) {
     return NextResponse.json({ error: "taskId and decision are required" }, { status: 400 });
   }
 
   const service = new HumanReviewService();
-  let baseDecision = service.createDecision(taskId, "UNKNOWN");
-  
+  const baseDecision = service.createDecision(taskId, resolvedRuleCode);
+
   let result;
-  if (decision === "APPROVED") {
+  if (resolvedDecision === "APPROVED") {
     result = service.approve(baseDecision, "usuario-mock-ui", "Aprovado pela UI");
-  } else if (decision === "REJECTED") {
+  } else if (resolvedDecision === "REJECTED") {
     result = service.reject(baseDecision, "usuario-mock-ui", "Rejeitado pela UI");
   } else {
     result = service.skip(baseDecision, "usuario-mock-ui", "Pulado pela UI");
@@ -32,11 +36,18 @@ export async function POST(req: Request, { params }: { params: { id: string } })
   await repo.saveDecision(
     session.id,
     taskId,
-    result.ruleCode,
-    result.status || "APPROVED",
-    result.reviewedBy || "system",
-    result.notes || undefined
+    result.ruleCode ?? resolvedRuleCode,
+    result.status ?? resolvedDecision,
+    result.reviewedBy ?? "system",
+    result.notes ?? undefined
   );
 
-  return NextResponse.json(result);
+  return NextResponse.json({
+    decision: {
+      status: result.status ?? resolvedDecision,
+      taskId,
+      ruleCode: result.ruleCode ?? resolvedRuleCode,
+      reviewedAt: new Date().toISOString(),
+    },
+  });
 }

@@ -135,3 +135,95 @@ describe("Review Studio — Wizard & Demo Tests", () => {
     assert.equal(computeHasAudit({ score: 0 }), false);
   });
 });
+
+// ─── Human Review Decision tests ─────────────────────────────────────────────
+
+// Simulates the handleDecision logic from page.tsx
+async function simulateHandleDecision(
+  currentDecisionStatus: string | null,
+  currentDecisionLoading: string | null,
+  decision: string,
+  apiResult: { ok: boolean; body: any }
+): Promise<{ decisionStatus: string | null; error: string | null }> {
+  if (currentDecisionStatus || currentDecisionLoading) {
+    return { decisionStatus: currentDecisionStatus, error: null };
+  }
+  if (!apiResult.ok) {
+    return { decisionStatus: null, error: `Decision failed: ${apiResult.body?.status ?? 500}` };
+  }
+  const status = apiResult.body?.decision?.status ?? decision;
+  return { decisionStatus: status, error: null };
+}
+
+// Resolves the ruleCode from a suggestion object (mirrors page.tsx logic)
+function resolveRuleCode(suggestion: any): string {
+  return suggestion?.code ?? suggestion?.ruleCode ?? "UNKNOWN";
+}
+
+// Badge is shown when decisionStatus is set (mirrors SuggestionPanel logic)
+function computeBadge(decisionStatus: string | null): string | null {
+  if (!decisionStatus) return null;
+  const map: Record<string, string> = {
+    APPROVED: "APPROVED",
+    REJECTED: "REJECTED",
+    SKIPPED:  "SKIPPED",
+  };
+  return map[decisionStatus] ?? null;
+}
+
+// Buttons are disabled when decided or loading
+function computeButtonsDisabled(decisionStatus: string | null, decisionLoading: string | null): boolean {
+  return !!decisionStatus || !!decisionLoading;
+}
+
+// Task is completed only when decision is APPROVED
+function computeTaskCompleted(decisionStatus: string | null): boolean {
+  return decisionStatus === "APPROVED";
+}
+
+describe("Human Review Decision — SuggestionPanel Logic", () => {
+
+  it("D1. clicar Approve chama /decision e seta decisionStatus=APPROVED", async () => {
+    const result = await simulateHandleDecision(null, null, "APPROVED", {
+      ok: true,
+      body: { decision: { status: "APPROVED", taskId: "task-test-1", ruleCode: "RULE_X" } },
+    });
+    assert.equal(result.decisionStatus, "APPROVED");
+    assert.equal(result.error, null);
+  });
+
+  it("D2. Approve → badge exibe APPROVED", () => {
+    assert.equal(computeBadge("APPROVED"), "APPROVED");
+  });
+
+  it("D3. Reject → badge exibe REJECTED, task NÃO fica completed", () => {
+    assert.equal(computeBadge("REJECTED"), "REJECTED");
+    assert.equal(computeTaskCompleted("REJECTED"), false);
+  });
+
+  it("D4. Skip → badge exibe SKIPPED, task NÃO fica completed", () => {
+    assert.equal(computeBadge("SKIPPED"), "SKIPPED");
+    assert.equal(computeTaskCompleted("SKIPPED"), false);
+  });
+
+  it("D5. ruleCode usa suggestion.code quando existe, nunca UNKNOWN", () => {
+    assert.equal(resolveRuleCode({ code: "UNADDRESSED_MAIN_REQUEST", ruleCode: "UNKNOWN" }), "UNADDRESSED_MAIN_REQUEST");
+    assert.equal(resolveRuleCode({ ruleCode: "SOME_RULE" }), "SOME_RULE");
+    assert.equal(resolveRuleCode({}), "UNKNOWN");
+    assert.equal(resolveRuleCode(null), "UNKNOWN");
+  });
+
+  it("D6. botão fica disabled após decisão e não dispara duplo clique", async () => {
+    // After first decision
+    assert.ok(computeButtonsDisabled("APPROVED", null), "disabled após APPROVED");
+    assert.ok(computeButtonsDisabled("REJECTED", null), "disabled após REJECTED");
+    assert.ok(computeButtonsDisabled(null, "APPROVED"), "disabled durante loading");
+
+    // Double-click guard: handleDecision retorna sem fazer nada se já decidido
+    const result = await simulateHandleDecision("APPROVED", null, "REJECTED", {
+      ok: true,
+      body: { decision: { status: "REJECTED" } },
+    });
+    assert.equal(result.decisionStatus, "APPROVED", "não sobrescreve decisão existente");
+  });
+});

@@ -132,6 +132,8 @@ export default function ReviewStudioPage({ params }: { params: { id: string } })
   const [loadingAction, setLoadingAction] = useState(false);
   const [timeline, setTimeline] = useState<any>(null);
   const [selectedVersion, setSelectedVersion] = useState<any>(null);
+  const [decisionStatus, setDecisionStatus] = useState<string | null>(null);
+  const [decisionLoading, setDecisionLoading] = useState<string | null>(null);
 
   // ─── Derived state ────────────────────────────────────────────────────────
 
@@ -227,14 +229,22 @@ export default function ReviewStudioPage({ params }: { params: { id: string } })
   };
 
   const handleDecision = async (decision: string) => {
+    if (decisionStatus || decisionLoading) return;
+    setDecisionLoading(decision);
     try {
-      await fetch(`/api/review-studio/${params.id}/decision`, {
+      const ruleCode = suggestion?.code ?? suggestion?.ruleCode ?? "UNKNOWN";
+      const res = await fetch(`/api/review-studio/${params.id}/decision`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ taskId: "task-test-1", decision }),
+        body: JSON.stringify({ taskId: "task-test-1", ruleCode, decision }),
       });
+      if (!res.ok) throw new Error(`Decision failed: ${res.status}`);
+      const d = await res.json();
+      setDecisionStatus(d?.decision?.status ?? decision);
     } catch (e) {
       console.error("Decision error:", e);
+    } finally {
+      setDecisionLoading(null);
     }
   };
 
@@ -498,15 +508,17 @@ export default function ReviewStudioPage({ params }: { params: { id: string } })
                     {
                       id: "task-test-1",
                       instruction: "Corrigir contradição entre fundamentação e dispositivo.",
-                      completed: hasSuggestion,
+                      completed: decisionStatus === "APPROVED",
                     },
                   ]}
                 />
                 {hasSuggestion && (
                   <SuggestionPanel
-                    ruleCode={suggestion?.ruleCode ?? "UNKNOWN"}
+                    ruleCode={suggestion?.code ?? suggestion?.ruleCode ?? "UNKNOWN"}
                     suggestion={suggestion?.suggestion ?? "Nenhuma sugestão"}
                     provider={suggestion?.provider ?? "DEEPSEEK"}
+                    decisionStatus={decisionStatus}
+                    decisionLoading={decisionLoading}
                     onApprove={() => handleDecision("APPROVED")}
                     onReject={() => handleDecision("REJECTED")}
                     onSkip={() => handleDecision("SKIPPED")}
