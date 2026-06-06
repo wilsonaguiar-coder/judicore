@@ -227,3 +227,129 @@ describe("Human Review Decision — SuggestionPanel Logic", () => {
     assert.equal(result.decisionStatus, "APPROVED", "não sobrescreve decisão existente");
   });
 });
+
+// ─── Rewrite flow tests ───────────────────────────────────────────────────────
+
+interface MockSuggestion {
+  taskId: string;
+  code: string;
+  instruction: string;
+  suggestion: string;
+  riskLevel: string;
+  requiresHumanReview: boolean;
+}
+
+interface RewriteResult {
+  originalDraft: string;
+  rewrittenDraft: string;
+  taskId: string;
+  provider: string;
+  generatedAt: string;
+  requiresHumanReview: boolean;
+}
+
+// Mirrors handleGenerateRewrite logic from page.tsx
+async function simulateHandleGenerateRewrite(
+  suggestion: MockSuggestion | null,
+  decisionStatus: string | null,
+  apiResult: { ok: boolean; contentType: string; body: any }
+): Promise<{ rewrite: RewriteResult | null; error: string | null }> {
+  if (!suggestion || decisionStatus !== "APPROVED") {
+    return { rewrite: null, error: null };
+  }
+  if (!apiResult.contentType.includes("application/json")) {
+    const text = typeof apiResult.body === "string" ? apiResult.body : JSON.stringify(apiResult.body);
+    return { rewrite: null, error: `Resposta inesperada do servidor: ${text.slice(0, 120)}` };
+  }
+  if (!apiResult.ok) {
+    return { rewrite: null, error: apiResult.body?.error ?? `Erro ${500}` };
+  }
+  return { rewrite: apiResult.body as RewriteResult, error: null };
+}
+
+const MOCK_SUGGESTION: MockSuggestion = {
+  taskId: "task-test-1",
+  code: "UNADDRESSED_MAIN_REQUEST",
+  instruction: "Resolver a contradição entre fundamentação e dispositivo.",
+  suggestion: "Adicionar nexo causal entre os fatos narrados e o dano moral.",
+  riskLevel: "HIGH",
+  requiresHumanReview: true,
+};
+
+const MOCK_REWRITE_RESULT: RewriteResult = {
+  originalDraft: "Original text...",
+  rewrittenDraft: "Rewritten text with fix...",
+  taskId: "task-test-1",
+  provider: "DEEPSEEK",
+  generatedAt: new Date().toISOString(),
+  requiresHumanReview: true,
+};
+
+describe("Rewrite Flow — handleGenerateRewrite Logic", () => {
+
+  it("R1. clicar Gerar Reescrita chama /rewrite e retorna RewriteResult válido", async () => {
+    const { rewrite, error } = await simulateHandleGenerateRewrite(
+      MOCK_SUGGESTION,
+      "APPROVED",
+      { ok: true, contentType: "application/json", body: MOCK_REWRITE_RESULT }
+    );
+    assert.ok(rewrite, "rewrite deve ser definido");
+    assert.equal(rewrite?.originalDraft, "Original text...");
+    assert.equal(rewrite?.rewrittenDraft, "Rewritten text with fix...");
+    assert.equal(rewrite?.provider, "DEEPSEEK");
+    assert.equal(error, null);
+  });
+
+  it("R2. sem sugestão aprovada (decisionStatus !== APPROVED), botão fica bloqueado e retorna null", async () => {
+    const { rewrite, error } = await simulateHandleGenerateRewrite(
+      MOCK_SUGGESTION,
+      null,
+      { ok: true, contentType: "application/json", body: MOCK_REWRITE_RESULT }
+    );
+    assert.equal(rewrite, null, "não deve gerar reescrita sem aprovação");
+    assert.equal(error, null);
+  });
+
+  it("R3. sem sugestão alguma, não dispara reescrita", async () => {
+    const { rewrite, error } = await simulateHandleGenerateRewrite(
+      null,
+      "APPROVED",
+      { ok: true, contentType: "application/json", body: MOCK_REWRITE_RESULT }
+    );
+    assert.equal(rewrite, null);
+    assert.equal(error, null);
+  });
+
+  it("R4. sucesso habilita Re-Audit (hasRewrite=true)", async () => {
+    const { rewrite } = await simulateHandleGenerateRewrite(
+      MOCK_SUGGESTION,
+      "APPROVED",
+      { ok: true, contentType: "application/json", body: MOCK_REWRITE_RESULT }
+    );
+    const hasRewrite = !!rewrite;
+    assert.ok(hasRewrite, "hasRewrite deve ser true após sucesso");
+
+    const reAuditDisabled = !hasRewrite;
+    assert.equal(reAuditDisabled, false, "Re-Audit deve ficar habilitado");
+  });
+
+  it("R5. erro da API (ok=false) mostra mensagem visível", async () => {
+    const { rewrite, error } = await simulateHandleGenerateRewrite(
+      MOCK_SUGGESTION,
+      "APPROVED",
+      { ok: false, contentType: "application/json", body: { error: "Rewrite service failed" } }
+    );
+    assert.equal(rewrite, null);
+    assert.equal(error, "Rewrite service failed");
+  });
+
+  it("R6. resposta não-JSON mostra erro legível (não trava)", async () => {
+    const { rewrite, error } = await simulateHandleGenerateRewrite(
+      MOCK_SUGGESTION,
+      "APPROVED",
+      { ok: false, contentType: "text/html", body: "<html>Internal Server Error</html>" }
+    );
+    assert.equal(rewrite, null);
+    assert.ok(error?.startsWith("Resposta inesperada do servidor:"), `Esperado erro sobre HTML, recebido: ${error}`);
+  });
+});

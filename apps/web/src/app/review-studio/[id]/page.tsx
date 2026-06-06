@@ -61,6 +61,7 @@ function StepButton({
   disabledReason,
   colorClass,
   loading,
+  loadingLabel,
 }: {
   id: string;
   label: string;
@@ -69,6 +70,7 @@ function StepButton({
   disabledReason?: string | undefined;
   colorClass: string;
   loading?: boolean | undefined;
+  loadingLabel?: string | undefined;
 }) {
   return (
     <div className="relative group inline-block">
@@ -85,7 +87,7 @@ function StepButton({
         {loading ? (
           <span className="flex items-center gap-2">
             <span className="w-3.5 h-3.5 border-2 border-current border-t-transparent rounded-full animate-spin" />
-            Processando...
+            {loadingLabel ?? "Processando..."}
           </span>
         ) : label}
       </button>
@@ -134,6 +136,8 @@ export default function ReviewStudioPage({ params }: { params: { id: string } })
   const [selectedVersion, setSelectedVersion] = useState<any>(null);
   const [decisionStatus, setDecisionStatus] = useState<string | null>(null);
   const [decisionLoading, setDecisionLoading] = useState<string | null>(null);
+  const [rewriteLoading, setRewriteLoading] = useState(false);
+  const [rewriteError, setRewriteError] = useState<string | null>(null);
 
   // ─── Derived state ────────────────────────────────────────────────────────
 
@@ -249,18 +253,50 @@ export default function ReviewStudioPage({ params }: { params: { id: string } })
   };
 
   const handleGenerateRewrite = async () => {
-    setLoadingAction(true);
+    if (!suggestion || decisionStatus !== "APPROVED") return;
+    setRewriteLoading(true);
+    setRewriteError(null);
     try {
       const res = await fetch(`/api/review-studio/${params.id}/rewrite`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ taskId: "task-test-1", suggestionStr: suggestion?.suggestion }),
+        body: JSON.stringify({
+          taskId: suggestion.taskId ?? "task-test-1",
+          provider: "DEEPSEEK",
+          task: {
+            id: suggestion.taskId ?? "task-test-1",
+            code: suggestion.code ?? suggestion.ruleCode ?? "UNADDRESSED_MAIN_REQUEST",
+            priority: "HIGH",
+            area: "MÉRITO",
+            instruction: suggestion.instruction ?? "Resolver a contradição",
+          },
+          suggestion: {
+            taskId: suggestion.taskId ?? "task-test-1",
+            code: suggestion.code ?? suggestion.ruleCode ?? "UNADDRESSED_MAIN_REQUEST",
+            instruction: suggestion.instruction ?? "",
+            suggestion: suggestion.suggestion ?? "",
+            riskLevel: suggestion.riskLevel ?? "HIGH",
+            requiresHumanReview: true,
+          },
+        }),
       });
-      setRewrite((await res.json()) ?? null);
-    } catch (e) {
-      console.error("Rewrite error:", e);
+      const ct = res.headers.get("content-type") ?? "";
+      if (!ct.includes("application/json")) {
+        const text = await res.text();
+        throw new Error(`Resposta inesperada do servidor: ${text.slice(0, 120)}`);
+      }
+      const d = await res.json();
+      if (!res.ok) {
+        throw new Error(d?.error ?? `Erro ${res.status}`);
+      }
+      setRewrite(d ?? null);
+      await loadVersions();
+    } catch (e: unknown) {
+      const msg = e instanceof Error ? e.message : "Erro ao gerar reescrita.";
+      console.error("Rewrite error:", msg);
+      setRewriteError(msg);
     } finally {
-      setLoadingAction(false);
+      setRewriteLoading(false);
     }
   };
 
@@ -418,14 +454,23 @@ export default function ReviewStudioPage({ params }: { params: { id: string } })
               )}
 
               {hasSuggestion && !hasRewrite && (
-                <GuidedPrompt step={3} message="Sugestão disponível. Aplique a reescrita ao trecho identificado.">
+                <GuidedPrompt
+                  step={3}
+                  message={
+                    decisionStatus === "APPROVED"
+                      ? "Sugestão aprovada. Aplique a reescrita ao trecho identificado."
+                      : "Aprove a sugestão antes de gerar a reescrita."
+                  }
+                >
                   <StepButton
                     id="btn-rewrite"
                     label="Gerar Reescrita"
                     onClick={handleGenerateRewrite}
-                    disabled={loadingAction}
+                    disabled={rewriteLoading || decisionStatus !== "APPROVED"}
+                    disabledReason={decisionStatus !== "APPROVED" ? "Aprove uma sugestão antes de gerar reescrita." : undefined}
                     colorClass="bg-indigo-600 hover:bg-indigo-700"
-                    loading={loadingAction}
+                    loading={rewriteLoading}
+                    loadingLabel="Gerando reescrita..."
                   />
                 </GuidedPrompt>
               )}
@@ -470,14 +515,17 @@ export default function ReviewStudioPage({ params }: { params: { id: string } })
                     id="btn-rewrite-panel"
                     label="Gerar Reescrita"
                     onClick={handleGenerateRewrite}
-                    disabled={!hasSuggestion || hasRewrite || loadingAction}
+                    disabled={!hasSuggestion || hasRewrite || rewriteLoading || decisionStatus !== "APPROVED"}
                     disabledReason={
                       !hasAudit ? "Execute a auditoria primeiro"
                         : !hasSuggestion ? "Gere a sugestão primeiro"
+                        : decisionStatus !== "APPROVED" ? "Aprove uma sugestão antes de gerar reescrita"
                         : hasRewrite ? "Reescrita já gerada"
                         : undefined
                     }
                     colorClass="bg-indigo-600 hover:bg-indigo-700"
+                    loading={rewriteLoading}
+                    loadingLabel="Gerando reescrita..."
                   />
                   <StepButton
                     id="btn-reaudit-panel"
@@ -493,10 +541,10 @@ export default function ReviewStudioPage({ params }: { params: { id: string } })
                     colorClass="bg-emerald-600 hover:bg-emerald-700"
                   />
                 </div>
-                {loadingAction && (
+                {(loadingAction || rewriteLoading) && (
                   <p className="mt-4 text-sm text-slate-400 flex items-center gap-2">
                     <span className="w-3.5 h-3.5 border-2 border-slate-300 border-t-blue-500 rounded-full animate-spin" />
-                    Processando com a IA...
+                    {rewriteLoading ? "Gerando reescrita com a IA..." : "Processando com a IA..."}
                   </p>
                 )}
               </div>
@@ -525,6 +573,18 @@ export default function ReviewStudioPage({ params }: { params: { id: string } })
                   />
                 )}
               </div>
+
+              {/* ── Rewrite error ── */}
+              {rewriteError && (
+                <div className="flex items-start gap-3 bg-red-50 border border-red-200 rounded-xl px-5 py-4">
+                  <span className="text-red-500 text-lg flex-shrink-0">✗</span>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-semibold text-red-800">Erro ao gerar reescrita</p>
+                    <p className="text-xs text-red-600 mt-0.5 break-words">{rewriteError}</p>
+                  </div>
+                  <button onClick={() => setRewriteError(null)} className="text-red-400 hover:text-red-600 text-xs flex-shrink-0">✕</button>
+                </div>
+              )}
 
               {/* ── Rewrite ── */}
               {hasRewrite && (
