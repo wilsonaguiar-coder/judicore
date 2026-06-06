@@ -1,4 +1,3 @@
-import dotenv from "dotenv";
 import * as fs from "fs";
 import * as path from "path";
 import { ProviderEvaluationService } from "../src/audit/assisted-revision/evaluation/provider-evaluation.service.js";
@@ -7,14 +6,29 @@ import { OpenAIRevisionAdapter } from "../src/audit/assisted-revision/providers/
 import { GeminiRevisionAdapter } from "../src/audit/assisted-revision/providers/gemini-revision-adapter.js";
 import { DeepSeekRevisionAdapter } from "../src/audit/assisted-revision/providers/deepseek-revision-adapter.js";
 
-// Carrega as vari\u00E1veis de ambiente seguras (ignora falha se rodando em windows sem o path)
+// Carrega as vari\u00E1veis de ambiente seguras nativamente (sem dependencia externa de dotenv)
 const envPath = "/opt/judicore/apps/api/.env";
-if (fs.existsSync(envPath)) {
-  dotenv.config({ path: envPath });
-} else {
-  // Fallback para ambiente local se o arquivo n\u00E3o existir na raiz linux
-  dotenv.config();
+const localEnvPath = path.resolve(process.cwd(), ".env");
+
+function loadEnv(targetPath: string) {
+  if (fs.existsSync(targetPath)) {
+    const content = fs.readFileSync(targetPath, "utf-8");
+    for (const line of content.split("\n")) {
+      const trimmed = line.trim();
+      if (trimmed && !trimmed.startsWith("#")) {
+        const [key, ...rest] = trimmed.split("=");
+        if (key && rest.length > 0) {
+          const value = rest.join("=").trim().replace(/^["']|["']$/g, "");
+          process.env[key.trim()] = value;
+        }
+      }
+    }
+  }
 }
+
+loadEnv(envPath);
+loadEnv(localEnvPath); // Fallback local
+
 
 async function runBenchmark() {
   console.log("==================================================");
