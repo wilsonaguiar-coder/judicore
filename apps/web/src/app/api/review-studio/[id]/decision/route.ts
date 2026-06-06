@@ -33,9 +33,9 @@ export async function POST(req: Request, { params }: { params: { id: string } })
     session.id,
     taskId,
     result.ruleCode,
-    (result as any).status || "APPROVED",
+    result.status || "APPROVED",
     result.reviewedBy || "system",
-    (result as any).notes || null
+    result.notes || undefined
   );
 
   return NextResponse.json(result);

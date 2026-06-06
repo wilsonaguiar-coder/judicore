@@ -27,9 +27,9 @@ export async function POST(req: Request, { params }: { params: { id: string } })
   await repo.saveReAudit(
     session.id,
     "rewrite-fallback-id",
-    result.originalAudit as any,
-    result.rewrittenAudit as any,
-    result.metrics as any,
+    result.originalAudit,
+    result.rewrittenAudit,
+    result.metrics,
     result.improved,
     result.regressed
   );

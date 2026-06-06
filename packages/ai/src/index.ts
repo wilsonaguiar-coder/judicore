@@ -20,3 +20,4 @@ export * from "./audit/re-audit/re-audit.service.js";
 export * from "./audit/re-audit/re-audit.types.js";
 export * from "./audit/review/human-review.service.js";
 export * from "./audit/review/human-review.types.js";
+export * from "./audit/revision/guided-revision.types.js";

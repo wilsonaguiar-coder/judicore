@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { ReviewStudioRepository } from "@/lib/review-studio.repository";
 import { RewriteService } from "@judicore/ai";
+import { RevisionTask } from "@judicore/ai";
 
 export async function POST(req: Request, { params }: { params: { id: string } }) {
   const repo = new ReviewStudioRepository();
@@ -17,11 +18,11 @@ export async function POST(req: Request, { params }: { params: { id: string } })
     return NextResponse.json({ error: "taskId is required" }, { status: 400 });
   }
 
-  const taskMock = {
+  const taskMock: RevisionTask = {
     id: taskId,
     code: "UNADDRESSED_MAIN_REQUEST",
-    priority: "HIGH" as any,
-    area: "M\u00C9RITO" as any,
+    priority: "HIGH",
+    area: "M\u00C9RITO",
     instruction: "Resolver a contradi\u00E7\u00E3o",
     completed: false
   };

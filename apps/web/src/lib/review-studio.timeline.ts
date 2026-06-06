@@ -1,4 +1,5 @@
 import { ReviewStudioRepository } from "./review-studio.repository";
+import { ReviewDraftVersion } from "@prisma/client";
 
 export type TimelineEvent = {
   id: string;
@@ -9,9 +10,9 @@ export type TimelineEvent = {
 
 export type ReviewTimeline = {
   sessionId: string;
-  versions: any[];
+  versions: ReviewDraftVersion[];
   events: TimelineEvent[];
-  recommendedVersionId?: string;
+  recommendedVersionId?: string | null;
 };
 
 export class ReviewStudioTimelineService {
@@ -24,7 +25,7 @@ export class ReviewStudioTimelineService {
     const events: TimelineEvent[] = [];
 
     // Audits
-    session.audits.forEach((a: any) => {
+    session.audits.forEach(a => {
       events.push({
         id: a.id,
         type: "AUDIT_CREATED",
@@ -34,7 +35,7 @@ export class ReviewStudioTimelineService {
     });
 
     // Suggestions
-    session.suggestions.forEach((s: any) => {
+    session.suggestions.forEach(s => {
       events.push({
         id: s.id,
         type: "SUGGESTION_CREATED",
@@ -44,7 +45,7 @@ export class ReviewStudioTimelineService {
     });
 
     // Decisions
-    session.decisions.forEach((d: any) => {
+    session.decisions.forEach(d => {
       events.push({
         id: d.id,
         type: "DECISION_CREATED",
@@ -54,7 +55,7 @@ export class ReviewStudioTimelineService {
     });
 
     // Rewrites
-    session.rewrites.forEach((r: any) => {
+    session.rewrites.forEach(r => {
       events.push({
         id: r.id,
         type: "REWRITE_CREATED",
@@ -64,7 +65,7 @@ export class ReviewStudioTimelineService {
     });
 
     // Re-Audits
-    session.reAudits.forEach((ra: any) => {
+    session.reAudits.forEach(ra => {
       events.push({
         id: ra.id,
         type: "RE_AUDIT_CREATED",
@@ -74,12 +75,12 @@ export class ReviewStudioTimelineService {
     });
 
     // Recommended Version
-    const recommendedVersion = session.versions.find((v: any) => v.isRecommended);
+    const recommendedVersion = session.versions.find(v => v.isRecommended);
     if (recommendedVersion) {
       events.push({
         id: `rec-${recommendedVersion.id}`,
         type: "VERSION_RECOMMENDED",
-        timestamp: recommendedVersion.updatedAt || recommendedVersion.createdAt,
+        timestamp: recommendedVersion.createdAt,
         details: { versionNumber: recommendedVersion.versionNumber }
       });
     }
@@ -91,7 +92,7 @@ export class ReviewStudioTimelineService {
       sessionId,
       versions: session.versions,
       events,
-      recommendedVersionId: recommendedVersion?.id
+      recommendedVersionId: recommendedVersion?.id || null
     };
   }
 }

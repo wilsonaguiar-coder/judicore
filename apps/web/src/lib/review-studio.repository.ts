@@ -1,4 +1,17 @@
-import { PrismaClient } from "@prisma/client";
+import { PrismaClient, Prisma } from "@prisma/client";
+
+export type ReviewSessionWithRelations = Prisma.ReviewSessionGetPayload<{
+  include: {
+    audits: true;
+    suggestions: true;
+    decisions: true;
+    rewrites: true;
+    reAudits: true;
+    versions: {
+      orderBy: { versionNumber: "asc" }
+    };
+  };
+}>;
 
 // Global instance to prevent multiple connections in dev
 const globalForPrisma = global as unknown as { prisma: PrismaClient };
@@ -6,7 +19,7 @@ export const prisma = globalForPrisma.prisma || new PrismaClient();
 if (process.env.NODE_ENV !== "production") globalForPrisma.prisma = prisma;
 
 export class ReviewStudioRepository {
-  public async createSession(pieceId: string, userId: string, domain: string, originalDraft: string) {
+  public async createSession(pieceId: string, userId: string, domain: string, originalDraft: string): Promise<ReviewSessionWithRelations> {
     const session = await prisma.reviewSession.create({
       data: {
         pieceId,
@@ -20,10 +33,14 @@ export class ReviewStudioRepository {
     await this.createDraftVersion(session.id, "ORIGINAL", null, 1, originalDraft, { createdVia: "session_init" });
 
     // Return the full session with include to match getSession return type
-    return this.getSession(session.id);
+    const refreshedSession = await this.getSession(session.id);
+    if (!refreshedSession) {
+      throw new Error("Failed to retrieve created session");
+    }
+    return refreshedSession;
   }
 
-  public async getSession(sessionId: string) {
+  public async getSession(sessionId: string): Promise<ReviewSessionWithRelations | null> {
     return prisma.reviewSession.findUnique({
       where: { id: sessionId },
       include: {
@@ -63,7 +80,7 @@ export class ReviewStudioRepository {
     });
   }
 
-  public async saveDecision(sessionId: string, taskId: string, ruleCode: string, status: string, reviewedBy: string, notes?: string) {
+  public async saveDecision(sessionId: string, taskId: string, ruleCode: string, status: string, reviewedBy: string, notes?: string | null) {
     return prisma.reviewDecision.create({
       data: {
         sessionId,
@@ -71,7 +88,7 @@ export class ReviewStudioRepository {
         ruleCode,
         status,
         reviewedBy,
-        notes,
+        notes: notes || null,
       },
     });
   }
@@ -134,8 +151,8 @@ export class ReviewStudioRepository {
     versionNumber: number,
     content: string,
     metadataJson: any,
-    score?: number,
-    status?: string
+    score?: number | null,
+    status?: string | null
   ) {
     return prisma.reviewDraftVersion.create({
       data: {
@@ -145,8 +162,8 @@ export class ReviewStudioRepository {
         versionNumber,
         content,
         metadataJson,
-        score,
-        status
+        score: score || null,
+        status: status || null
       }
     });
   }

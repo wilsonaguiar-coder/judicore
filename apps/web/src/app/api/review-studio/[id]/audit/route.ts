@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { ReviewStudioRepository } from "@/lib/review-studio.repository";
 import { getReviewStore } from "@/lib/review-studio.mock-store";
 import { AuditService } from "@judicore/ai";
+import type { LegalClassification } from "@judicore/ai";
 
 export async function GET(req: Request, { params }: { params: { id: string } }) {
   const repo = new ReviewStudioRepository();
@@ -17,17 +18,32 @@ export async function GET(req: Request, { params }: { params: { id: string } }) 
     );
 
     const auditService = new AuditService();
-    const auditResult = auditService.auditGeneratedDocument(params.id, session.originalDraft, "CIVIL_PETICAO_INICIAL" as any);
+    const classification: LegalClassification = {
+      tipo_justica: "ESTADUAL",
+      tipo_peca: "PETICAO_INICIAL",
+      regime_juridico: "CIVIL",
+      grau: "PRIMEIRO",
+      tribunal_competente: "TJSP",
+      rito: null,
+      assunto_principal: "Mock Assunto",
+      partes: { autor: "Mock Autor", reu: "Mock Reu" },
+      confianca: 1
+    };
+    const auditResult = await auditService.auditGeneratedDocument(params.id, session.originalDraft, classification);
 
     await repo.saveAudit(
       session.id,
-      auditResult as any,
-      auditResult.feedback as any,
-      auditResult.correctionPlan as any,
-      (auditResult as any).guidedRevision
+      auditResult.audit,
+      auditResult.feedback || null,
+      auditResult.correctionPlan || null,
+      null
     );
 
-    session = (await repo.getSession(session.id)) as any;
+    const refreshedSession = await repo.getSession(session.id);
+    if (!refreshedSession) {
+      return NextResponse.json({ error: "Session not found" }, { status: 404 });
+    }
+    session = refreshedSession;
   }
 
   const latestAudit = session?.audits?.[session.audits.length - 1];
