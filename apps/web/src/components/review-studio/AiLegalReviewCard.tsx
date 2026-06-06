@@ -218,7 +218,7 @@ function OpportunityCard({ finding, domain }: { finding: StrengthFinding; domain
             <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-amber-50 border border-amber-200 text-amber-700 text-xs font-semibold">
               ⚠ Revisão Humana Necessária
             </span>
-            <FeedbackRow finding={finding} domain={domain} />
+            <FeedbackRow finding={finding} {...(domain !== undefined ? { domain } : {})} />
           </div>
         </div>
       )}
@@ -291,7 +291,7 @@ export function AiLegalReviewCard({ result, loading, domain }: Props) {
             Peça sólida — nenhuma oportunidade de fortalecimento identificada.
           </div>
         ) : (
-          result.findings.map(f => <OpportunityCard key={f.id} finding={f} domain={domain} />)
+          result.findings.map(f => <OpportunityCard key={f.id} finding={f} {...(domain !== undefined ? { domain } : {})} />)
         )}
       </div>
 
