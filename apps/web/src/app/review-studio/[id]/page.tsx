@@ -8,6 +8,9 @@ import { SuggestionPanel } from "../../../components/review-studio/SuggestionPan
 import { RewriteComparison } from "../../../components/review-studio/RewriteComparison";
 import { ReAuditMetrics } from "../../../components/review-studio/ReAuditMetrics";
 import { HistoryTimeline } from "../../../components/review-studio/HistoryTimeline";
+import { VersionTimeline } from "../../../components/review-studio/VersionTimeline";
+import { VersionPreview } from "../../../components/review-studio/VersionPreview";
+import { VersionComparePanel } from "../../../components/review-studio/VersionComparePanel";
 
 export default function ReviewStudioPage({ params }: { params: { id: string } }) {
   const [data, setData] = useState<any>(null);
@@ -17,13 +20,25 @@ export default function ReviewStudioPage({ params }: { params: { id: string } })
   const [reAudit, setReAudit] = useState<any>(null);
   const [loadingAction, setLoadingAction] = useState(false);
 
-  useEffect(() => {
+  const [timeline, setTimeline] = useState<any>(null);
+  const [selectedVersion, setSelectedVersion] = useState<any>(null);
+
+  const loadData = () => {
     fetch(`/api/review-studio/${params.id}/audit`)
       .then(res => res.json())
       .then(d => {
         setData(d);
-        setLoading(false);
+        fetch(`/api/review-studio/${params.id}/versions`)
+          .then(res => res.json())
+          .then(t => {
+             setTimeline(t);
+             setLoading(false);
+          });
       });
+  };
+
+  useEffect(() => {
+    loadData();
   }, [params.id]);
 
   const handleGenerateSuggestion = async () => {
@@ -73,6 +88,14 @@ export default function ReviewStudioPage({ params }: { params: { id: string } })
     const ra = await res.json();
     setReAudit(ra);
     setLoadingAction(false);
+    loadData(); // reload timeline
+  };
+
+  const handleRecommend = async (versionId: string) => {
+    await fetch(`/api/review-studio/${params.id}/versions/${versionId}/recommend`, {
+      method: "POST"
+    });
+    loadData();
   };
 
   if (loading || !data) return <div className="p-8">Carregando auditoria...</div>;
@@ -90,7 +113,7 @@ export default function ReviewStudioPage({ params }: { params: { id: string } })
         <div className="space-y-8">
           <AuditSummaryCard {...data.audit} />
           <CorrectionPlanList items={data.correctionPlan?.items || []} />
-          <HistoryTimeline items={[]} />
+          <HistoryTimeline timeline={timeline} />
         </div>
 
         <div className="lg:col-span-2 space-y-8">
@@ -126,6 +149,9 @@ export default function ReviewStudioPage({ params }: { params: { id: string } })
 
           {reAudit && <ReAuditMetrics {...reAudit.metrics} improved={reAudit.improved} regressed={reAudit.regressed} />}
           {rewrite && <RewriteComparison original={rewrite.originalDraft} rewritten={rewrite.rewrittenDraft} />}
+
+          {timeline && <VersionTimeline versions={timeline.versions} onSelect={setSelectedVersion} />}
+          {selectedVersion && <VersionPreview version={selectedVersion} onRecommend={handleRecommend} />}
         </div>
       </div>
     </div>

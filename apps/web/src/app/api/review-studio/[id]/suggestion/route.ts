@@ -1,9 +1,15 @@
 import { NextResponse } from "next/server";
-import { getReviewStore } from "@/lib/review-studio.mock-store";
+import { ReviewStudioRepository } from "@/lib/review-studio.repository";
 import { AssistedRevisionService } from "@judicore/ai";
 
 export async function POST(req: Request, { params }: { params: { id: string } }) {
-  const store = getReviewStore(params.id);
+  const repo = new ReviewStudioRepository();
+  const session = await repo.getSession(params.id);
+
+  if (!session) {
+    return NextResponse.json({ error: "Session not found" }, { status: 404 });
+  }
+
   const body = await req.json();
   const { taskId } = body;
 
@@ -11,13 +17,11 @@ export async function POST(req: Request, { params }: { params: { id: string } })
     return NextResponse.json({ error: "taskId is required" }, { status: 400 });
   }
 
-  // Hardcode a fake task just to satisfy the GuidedRevision interface for now, 
-  // since the mock store might not have full task population in this phase.
   const taskMock = {
     id: taskId,
     code: "UNADDRESSED_MAIN_REQUEST",
-    priority: "HIGH" as const,
-    area: "M\u00C9RITO" as const,
+    priority: "HIGH" as any,
+    area: "M\u00C9RITO" as any,
     instruction: "Resolver a contradi\u00E7\u00E3o",
     completed: false
   };
@@ -25,7 +29,13 @@ export async function POST(req: Request, { params }: { params: { id: string } })
   const service = new AssistedRevisionService();
   const suggestion = service.createDeterministicSuggestion(taskMock);
 
-  store.suggestions[taskId] = suggestion;
+  await repo.saveSuggestion(
+    session.id,
+    taskId,
+    (suggestion as any).ruleCode,
+    (suggestion as any).provider,
+    suggestion as any
+  );
 
   return NextResponse.json(suggestion);
 }

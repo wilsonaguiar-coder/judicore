@@ -1,9 +1,15 @@
 import { NextResponse } from "next/server";
-import { getReviewStore } from "@/lib/review-studio.mock-store";
+import { ReviewStudioRepository } from "@/lib/review-studio.repository";
 import { RewriteService } from "@judicore/ai";
 
 export async function POST(req: Request, { params }: { params: { id: string } }) {
-  const store = getReviewStore(params.id);
+  const repo = new ReviewStudioRepository();
+  const session = await repo.getSession(params.id);
+
+  if (!session) {
+    return NextResponse.json({ error: "Session not found" }, { status: 404 });
+  }
+
   const body = await req.json();
   const { taskId, suggestionStr } = body;
 
@@ -14,21 +20,27 @@ export async function POST(req: Request, { params }: { params: { id: string } })
   const taskMock = {
     id: taskId,
     code: "UNADDRESSED_MAIN_REQUEST",
-    priority: "HIGH" as const,
-    area: "M\u00C9RITO" as const,
+    priority: "HIGH" as any,
+    area: "M\u00C9RITO" as any,
     instruction: "Resolver a contradi\u00E7\u00E3o",
     completed: false
   };
 
   const service = new RewriteService();
   const result = await service.generateRewrittenDraft({
-    draft: store.originalDraft,
+    draft: session.originalDraft,
     task: taskMock,
     suggestion: suggestionStr || "Corrigir os defeitos detectados.",
     provider: "DEEPSEEK"
   });
 
-  store.rewriteResults[taskId] = result;
+  await repo.saveRewrite(
+    session.id,
+    taskId,
+    result.provider,
+    result.originalDraft,
+    result.rewrittenDraft
+  );
 
   return NextResponse.json(result);
 }

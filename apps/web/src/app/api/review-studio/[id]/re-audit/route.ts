@@ -1,9 +1,15 @@
 import { NextResponse } from "next/server";
-import { getReviewStore } from "@/lib/review-studio.mock-store";
+import { ReviewStudioRepository } from "@/lib/review-studio.repository";
 import { ReAuditService } from "@judicore/ai";
 
 export async function POST(req: Request, { params }: { params: { id: string } }) {
-  const store = getReviewStore(params.id);
+  const repo = new ReviewStudioRepository();
+  const session = await repo.getSession(params.id);
+
+  if (!session) {
+    return NextResponse.json({ error: "Session not found" }, { status: 404 });
+  }
+
   const body = await req.json();
   const { originalDraft, rewrittenDraft, classification } = body;
 
@@ -18,7 +24,15 @@ export async function POST(req: Request, { params }: { params: { id: string } })
     classification
   });
 
-  store.reAuditResult = result;
+  await repo.saveReAudit(
+    session.id,
+    "rewrite-fallback-id",
+    result.originalAudit as any,
+    result.rewrittenAudit as any,
+    result.metrics as any,
+    result.improved,
+    result.regressed
+  );
 
   return NextResponse.json(result);
 }

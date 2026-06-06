@@ -33,10 +33,10 @@ enum UserRole {
 }
 
 model User {
-  id           String     @id @default(cuid())
-  email        String     @unique
-  name         String
-  passwordHash String     @map("password_hash")
+  id              String     @id @default(cuid())
+  email           String     @unique
+  name            String
+  passwordHash    String     @map("password_hash")
   role            UserRole   @default(COMUM)
   defaultArea     LegalArea? @map("default_area")
   accessExpiresAt DateTime?  @map("access_expires_at")
@@ -70,7 +70,7 @@ model Search {
   caseId      String    @map("case_id")
   query       String
   area        LegalArea
-  resultsJson Json      @map("results_json") // jurisprudências retornadas pelo ES
+  resultsJson Json      @map("results_json") // jurisprud\u00EAncias retornadas pelo ES
   createdAt   DateTime  @default(now()) @map("created_at")
 
   case Case @relation(fields: [caseId], references: [id], onDelete: Cascade)
@@ -79,14 +79,14 @@ model Search {
 }
 
 model Document {
-  id           String       @id @default(cuid())
-  caseId       String       @map("case_id")
-  type         DocumentType
-  content      String       @db.Text
-  instruction  String?      @db.Text
-  sourcesJson  Json         @map("sources_json") // citações usadas
-  modelUsed    String       @map("model_used")
-  createdAt    DateTime     @default(now()) @map("created_at")
+  id          String       @id @default(cuid())
+  caseId      String       @map("case_id")
+  type        DocumentType
+  content     String       @db.Text
+  instruction String?      @db.Text
+  sourcesJson Json         @map("sources_json") // cita\u00E7\u00F5es usadas
+  modelUsed   String       @map("model_used")
+  createdAt   DateTime     @default(now()) @map("created_at")
 
   case Case @relation(fields: [caseId], references: [id], onDelete: Cascade)
 
@@ -96,9 +96,9 @@ model Document {
 model UsageLog {
   id           String   @id @default(cuid())
   userId       String?  @map("user_id")
-  service      String   // "groq" | "gemini"
+  service      String // "groq" | "gemini"
   model        String
-  operation    String   // "generate" | "embed"
+  operation    String // "generate" | "embed"
   inputTokens  Int      @default(0) @map("input_tokens")
   outputTokens Int      @default(0) @map("output_tokens")
   docType      String?  @map("doc_type")
@@ -239,4 +239,124 @@ model LegalAuditRecord {
   generation LegalGeneration @relation(fields: [generationId], references: [id], onDelete: Cascade)
 
   @@map("legal_audits")
+}
+
+// ============================================================================
+// REVIEW STUDIO (FASE 8.3.2)
+// ============================================================================
+
+model ReviewSession {
+  id            String   @id @default(cuid())
+  pieceId       String   @map("piece_id") // ID do documento original
+  userId        String   @map("user_id")
+  domain        String // Ex: CIVIL_PETICAO_INICIAL
+  status        String   @default("OPEN")
+  originalDraft String   @map("original_draft") @db.Text
+  createdAt     DateTime @default(now()) @map("created_at")
+  updatedAt     DateTime @updatedAt @map("updated_at")
+
+  audits      ReviewAudit[]
+  suggestions ReviewSuggestion[]
+  decisions   ReviewDecision[]
+  rewrites    ReviewRewrite[]
+  reAudits    ReviewReAudit[]
+  versions    ReviewDraftVersion[]
+
+  @@map("review_sessions")
+}
+
+model ReviewAudit {
+  id                 String   @id @default(cuid())
+  sessionId          String   @map("session_id")
+  auditJson          Json     @map("audit_json")
+  feedbackJson       Json     @map("feedback_json")
+  correctionPlanJson Json     @map("correction_plan_json")
+  guidedRevisionJson Json     @map("guided_revision_json")
+  createdAt          DateTime @default(now()) @map("created_at")
+
+  session ReviewSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+
+  @@map("review_audits")
+}
+
+model ReviewSuggestion {
+  id             String   @id @default(cuid())
+  sessionId      String   @map("session_id")
+  taskId         String   @map("task_id")
+  ruleCode       String   @map("rule_code")
+  provider       String
+  suggestionJson Json     @map("suggestion_json")
+  status         String   @default("PENDING")
+  createdAt      DateTime @default(now()) @map("created_at")
+
+  session ReviewSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+
+  @@map("review_suggestions")
+}
+
+model ReviewDecision {
+  id         String   @id @default(cuid())
+  sessionId  String   @map("session_id")
+  taskId     String   @map("task_id")
+  ruleCode   String   @map("rule_code")
+  status     String // APPROVED | REJECTED | SKIPPED
+  reviewedBy String   @map("reviewed_by")
+  notes      String?  @db.Text
+  createdAt  DateTime @default(now()) @map("created_at")
+
+  session ReviewSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+
+  @@map("review_decisions")
+}
+
+model ReviewRewrite {
+  id                    String   @id @default(cuid())
+  sessionId             String   @map("session_id")
+  taskId                String   @map("task_id")
+  provider              String
+  originalDraftSnapshot String   @map("original_draft_snapshot") @db.Text
+  rewrittenDraft        String   @map("rewritten_draft") @db.Text
+  requiresHumanReview   Boolean  @default(true) @map("requires_human_review")
+  createdAt             DateTime @default(now()) @map("created_at")
+
+  session  ReviewSession        @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  versions ReviewDraftVersion[]
+
+  @@map("review_rewrites")
+}
+
+model ReviewDraftVersion {
+  id            String   @id @default(cuid())
+  sessionId     String   @map("session_id")
+  sourceType    String // "ORIGINAL" | "REWRITE"
+  rewriteId     String?  @map("rewrite_id")
+  versionNumber Int      @map("version_number")
+  content       String   @db.Text
+  score         Int?
+  status        String?
+  createdAt     DateTime @default(now()) @map("created_at")
+  createdBy     String?  @map("created_by")
+  isRecommended Boolean  @default(false) @map("is_recommended")
+  metadataJson  Json     @map("metadata_json")
+
+  session ReviewSession  @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  rewrite ReviewRewrite? @relation(fields: [rewriteId], references: [id], onDelete: SetNull)
+
+  @@map("review_draft_versions")
+}
+
+model ReviewReAudit {
+  id                 String   @id @default(cuid())
+  sessionId          String   @map("session_id")
+  rewriteId          String   @map("rewrite_id")
+  originalAuditJson  Json     @map("original_audit_json")
+  rewrittenAuditJson Json     @map("rewritten_audit_json")
+  metricsJson        Json     @map("metrics_json")
+  improved           Boolean
+  regressed          Boolean
+  createdAt          DateTime @default(now()) @map("created_at")
+
+  session ReviewSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+
+  @@map("review_re_audits")
 }

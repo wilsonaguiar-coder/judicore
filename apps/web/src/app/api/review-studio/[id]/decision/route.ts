@@ -1,9 +1,15 @@
 import { NextResponse } from "next/server";
-import { getReviewStore } from "@/lib/review-studio.mock-store";
+import { ReviewStudioRepository } from "@/lib/review-studio.repository";
 import { HumanReviewService } from "@judicore/ai";
 
 export async function POST(req: Request, { params }: { params: { id: string } }) {
-  const store = getReviewStore(params.id);
+  const repo = new ReviewStudioRepository();
+  const session = await repo.getSession(params.id);
+
+  if (!session) {
+    return NextResponse.json({ error: "Session not found" }, { status: 404 });
+  }
+
   const body = await req.json();
   const { taskId, decision } = body;
 
@@ -11,13 +17,8 @@ export async function POST(req: Request, { params }: { params: { id: string } })
     return NextResponse.json({ error: "taskId and decision are required" }, { status: 400 });
   }
 
-  const suggestion = store.suggestions[taskId];
-  if (!suggestion) {
-    return NextResponse.json({ error: "No suggestion found for this task" }, { status: 404 });
-  }
-
   const service = new HumanReviewService();
-  let baseDecision = service.createDecision(taskId, suggestion.ruleCode);
+  let baseDecision = service.createDecision(taskId, "UNKNOWN");
   
   let result;
   if (decision === "APPROVED") {
@@ -28,7 +29,14 @@ export async function POST(req: Request, { params }: { params: { id: string } })
     result = service.skip(baseDecision, "usuario-mock-ui", "Pulado pela UI");
   }
 
-  store.decisions[taskId] = result;
+  await repo.saveDecision(
+    session.id,
+    taskId,
+    result.ruleCode,
+    (result as any).status || "APPROVED",
+    result.reviewedBy || "system",
+    (result as any).notes || null
+  );
 
   return NextResponse.json(result);
 }
