@@ -995,6 +995,13 @@ function buildAuxilioIncapacidade(seed: CaseSeedData): DocumentElement[] {
   const cid = `M${dn(seed, "ci5", 40, 59)}.${dn(seed, "ci6", 0, 9)}`;
   const profissao = ["operador de máquinas", "auxiliar de produção", "motorista", "metalúrgico"][dn(seed, "pf", 0, 4) % 4] ?? "operador de máquinas";
   const contrib3 = dn(seed, "c3", 90, 50);
+  const incapYear = parseInt(seed.baseDate.slice(6), 10);
+  const incapMonth = parseInt(seed.baseDate.slice(3, 5), 10);
+  const lastContribOffset = 1 + dn(seed, "ulo", 0, 3);
+  let lastContribMonth = incapMonth - lastContribOffset;
+  let lastContribYear = incapYear;
+  if (lastContribMonth <= 0) { lastContribMonth += 12; lastContribYear -= 1; }
+  const lastContrib = `${String(lastContribMonth).padStart(2, "0")}/${lastContribYear}`;
 
   return [
     {
@@ -1030,7 +1037,7 @@ function buildAuxilioIncapacidade(seed: CaseSeedData): DocumentElement[] {
         `Na data da incapacidade (${seed.baseDate}), o(a) autor(a) era segurado(a) do RGPS, ` +
         `com ${contrib3} contribuições mensais (CNIS de ${seed.baseDate}), ` +
         `cumprindo a carência mínima de 12 contribuições (art. 25, I, da Lei n.º 8.213/1991). ` +
-        `Última contribuição: ${String(dn(seed, "ulm", 1, 12)).padStart(2, "0")}/${2024 + dn(seed, "uly", 0, 1)}.`,
+        `Última contribuição: ${lastContrib}.`,
       lightContent:
         `O(A) autor(a) era segurado na data da incapacidade.`,
       omittedContent:
@@ -1151,8 +1158,16 @@ function buildPensaoPorMorte(seed: CaseSeedData): DocumentElement[] {
 function buildCumprimentoJulgadoCompleto(seed: CaseSeedData): DocumentElement[] {
   const sentencaAno = 2019 + dn(seed, "sja", 0, 4);
   const dib = seed.derDate;
-  const dip = `${String(dn(seed, "dipm", 1, 12)).padStart(2, "0")}/${sentencaAno + 2}`;
-  const rmi = seed.salaryBase;
+  const dibYear = parseInt(seed.derDate.slice(6), 10);
+  const dibMonth = parseInt(seed.derDate.slice(3, 5), 10);
+  const dipYear = Math.max(sentencaAno + 2, dibYear + 1);
+  const dip = `${String(dn(seed, "dipm", 1, 12)).padStart(2, "0")}/${dipYear}`;
+  const rmiCents = 100000 + dn(seed, "rmic", 0, 120000);
+  const rmi = `R$ ${(rmiCents / 100).toFixed(2).replace(".", ",")}`;
+  const c01 = `R$ ${(Math.round(rmiCents * 1.0234) / 100).toFixed(2).replace(".", ",")}`;
+  const c02 = `R$ ${(Math.round(rmiCents * 1.0251) / 100).toFixed(2).replace(".", ",")}`;
+  const comp1 = `${String(dibMonth).padStart(2, "0")}/${dibYear}`;
+  const comp2 = `${String(dibMonth < 12 ? dibMonth + 1 : 1).padStart(2, "0")}/${dibMonth < 12 ? dibYear : dibYear + 1}`;
   const nbNum = `${dn(seed, "nb5", 10000000, 89999999)}`;
   const atrasados = `R$ ${(dn(seed, "atj", 3000000, 7000000) / 100).toFixed(2).replace(".", ",")}`;
   const corr = `INPC acumulado de ${dib} a ${dip}`;
@@ -1202,10 +1217,8 @@ function buildCumprimentoJulgadoCompleto(seed: CaseSeedData): DocumentElement[] 
       section: DocumentSection.DAS_PROVAS,
       fullContent:
         `MEMÓRIA DE CÁLCULO (DIB ${dib} a DIP ${dip})\n\n` +
-        `Competência 01/${sentencaAno + 1}: RMI ${rmi} × fator INPC 1,0234 = ` +
-        `${`R$ ${(dn(seed, "c01", 100000, 200000) / 100).toFixed(2).replace(".", ",")}`}\n` +
-        `Competência 02/${sentencaAno + 1}: RMI ${rmi} × fator INPC 1,0251 = ` +
-        `${`R$ ${(dn(seed, "c02", 100000, 200000) / 100).toFixed(2).replace(".", ",")}`}\n` +
+        `Competência ${comp1}: RMI ${rmi} × fator INPC 1,0234 = ${c01}\n` +
+        `Competência ${comp2}: RMI ${rmi} × fator INPC 1,0251 = ${c02}\n` +
         `[...planilha completa em anexo com todas as competências]\n` +
         `Subtotal principal: ${`R$ ${(dn(seed, "sub", 2000000, 5000000) / 100).toFixed(2).replace(".", ",")}`}\n` +
         `Juros: ${`R$ ${(dn(seed, "jur", 200000, 800000) / 100).toFixed(2).replace(".", ",")}`}\n` +
