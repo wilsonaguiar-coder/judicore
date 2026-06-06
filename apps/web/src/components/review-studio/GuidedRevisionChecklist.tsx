@@ -35,7 +35,7 @@ export function GuidedRevisionChecklist({ tasks }: { tasks?: TaskItem[] | null }
           );
         })}
         {safeTasks.length === 0 && (
-          <p className="text-sm text-slate-500 italic">Sem dados disponíveis.</p>
+          <p className="text-sm text-slate-500 italic">Nenhuma tarefa disponível. Execute a auditoria.</p>
         )}
       </div>
     </div>

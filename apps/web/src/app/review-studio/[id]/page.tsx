@@ -13,6 +13,8 @@ import { VersionPreview } from "../../../components/review-studio/VersionPreview
 import { ReviewWorkflowStepper, WorkflowStep } from "../../../components/review-studio/ReviewWorkflowStepper";
 import { AuditEntrypointCard } from "../../../components/review-studio/AuditEntrypointCard";
 
+const DEMO_ID = "teste-1";
+
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
 function computeSteps(
@@ -49,7 +51,7 @@ function computeSteps(
   ];
 }
 
-// ─── Tooltip wrapper for disabled buttons ────────────────────────────────────
+// ─── Tooltip-aware disabled button ───────────────────────────────────────────
 
 function StepButton({
   id,
@@ -74,16 +76,21 @@ function StepButton({
         id={id}
         onClick={onClick}
         disabled={disabled}
-        className={`px-5 py-2.5 rounded-lg text-sm font-semibold text-white transition-all duration-200
+        className={`px-5 py-2.5 rounded-lg text-sm font-semibold transition-all duration-200
           ${disabled
-            ? "bg-slate-300 cursor-not-allowed text-slate-500"
-            : `${colorClass} active:scale-95 shadow-sm`
+            ? "bg-slate-200 text-slate-400 cursor-not-allowed"
+            : `${colorClass} text-white active:scale-95 shadow-sm`
           }`}
       >
-        {loading ? "Processando..." : label}
+        {loading ? (
+          <span className="flex items-center gap-2">
+            <span className="w-3.5 h-3.5 border-2 border-current border-t-transparent rounded-full animate-spin" />
+            Processando...
+          </span>
+        ) : label}
       </button>
       {disabled && disabledReason && (
-        <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 hidden group-hover:block z-10">
+        <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 hidden group-hover:block z-10 pointer-events-none">
           <div className="bg-slate-800 text-white text-xs rounded-lg px-3 py-1.5 whitespace-nowrap shadow-lg">
             {disabledReason}
           </div>
@@ -94,9 +101,27 @@ function StepButton({
   );
 }
 
-// ─── Page ────────────────────────────────────────────────────────────────────
+// ─── Guided step prompt card ──────────────────────────────────────────────────
+
+function GuidedPrompt({ step, message, children }: { step: number; message: string; children?: React.ReactNode }) {
+  return (
+    <div className="flex items-start gap-4 bg-blue-50 border border-blue-200 rounded-xl px-5 py-4">
+      <div className="w-8 h-8 rounded-full bg-blue-600 text-white text-sm font-bold flex items-center justify-center flex-shrink-0 mt-0.5">
+        {step}
+      </div>
+      <div className="flex-1 min-w-0">
+        <p className="text-sm text-blue-800 font-medium mb-3">{message}</p>
+        {children}
+      </div>
+    </div>
+  );
+}
+
+// ─── Page ─────────────────────────────────────────────────────────────────────
 
 export default function ReviewStudioPage({ params }: { params: { id: string } }) {
+  const isDemo = params.id === DEMO_ID;
+
   const [data, setData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -116,8 +141,7 @@ export default function ReviewStudioPage({ params }: { params: { id: string } })
   const versions = timeline?.versions ?? [];
 
   /**
-   * hasAudit: true when the audit response contains a classification or score > 0.
-   * This guards all subsequent workflow steps.
+   * hasAudit: true when audit contains a classification OR score > 0.
    */
   const hasAudit: boolean =
     !!(audit?.classification) ||
@@ -127,30 +151,37 @@ export default function ReviewStudioPage({ params }: { params: { id: string } })
   const hasRewrite = !!rewrite;
   const hasReAudit = !!reAudit;
 
+  const fatalCount: number = (audit?.fatalErrors ?? []).length;
+  const warningCount: number = (audit?.nonFatalErrors ?? []).length;
+
   const steps = computeSteps(hasAudit, hasSuggestion, hasRewrite, hasReAudit);
 
   // ─── Data loading ─────────────────────────────────────────────────────────
 
+  const loadVersions = useCallback(async () => {
+    try {
+      const t = await fetch(`/api/review-studio/${params.id}/versions`).then(r => r.json());
+      setTimeline(t ?? null);
+    } catch { /* non-fatal */ }
+  }, [params.id]);
+
   const loadData = useCallback(() => {
     setError(null);
+    // GET: read existing audit (no trigger)
     fetch(`/api/review-studio/${params.id}/audit`)
       .then(res => res.json())
       .then(d => {
         setData(d ?? {});
-        return fetch(`/api/review-studio/${params.id}/versions`);
+        return loadVersions();
       })
-      .then(res => res.json())
-      .then(t => {
-        setTimeline(t ?? null);
-        setLoading(false);
-      })
+      .then(() => setLoading(false))
       .catch(err => {
         console.error("Review Studio load error:", err);
         setError("Erro ao carregar dados. Tente novamente.");
         setData({});
         setLoading(false);
       });
-  }, [params.id]);
+  }, [params.id, loadVersions]);
 
   useEffect(() => {
     loadData();
@@ -158,17 +189,20 @@ export default function ReviewStudioPage({ params }: { params: { id: string } })
 
   // ─── Handlers ─────────────────────────────────────────────────────────────
 
+  /**
+   * Trigger audit via POST — works for demo and real docs.
+   */
   const handleRunAudit = async () => {
     setAuditLoading(true);
     try {
       const res = await fetch(`/api/review-studio/${params.id}/audit`, {
-        method: "GET",
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({}), // backend picks up demo draft automatically
       });
       const d = await res.json();
       setData(d ?? {});
-      // Reload versions after audit
-      const tv = await fetch(`/api/review-studio/${params.id}/versions`).then(r => r.json());
-      setTimeline(tv ?? null);
+      await loadVersions();
     } catch (e) {
       console.error("Audit error:", e);
     } finally {
@@ -199,7 +233,6 @@ export default function ReviewStudioPage({ params }: { params: { id: string } })
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ taskId: "task-test-1", decision }),
       });
-      alert(`Decision: ${decision} saved.`);
     } catch (e) {
       console.error("Decision error:", e);
     }
@@ -252,7 +285,7 @@ export default function ReviewStudioPage({ params }: { params: { id: string } })
     }
   };
 
-  // ─── Loading / Error screens ──────────────────────────────────────────────
+  // ─── Loading / Error ──────────────────────────────────────────────────────
 
   if (loading) {
     return (
@@ -282,7 +315,7 @@ export default function ReviewStudioPage({ params }: { params: { id: string } })
     );
   }
 
-  // ─── Main render ──────────────────────────────────────────────────────────
+  // ─── Render ───────────────────────────────────────────────────────────────
 
   return (
     <div className="min-h-screen bg-slate-50 text-slate-900 font-sans">
@@ -292,7 +325,13 @@ export default function ReviewStudioPage({ params }: { params: { id: string } })
           <div>
             <h1 className="text-2xl font-bold tracking-tight text-slate-900">Review Studio</h1>
             <p className="text-slate-500 text-sm mt-0.5">
-              Documento: <span className="font-mono text-slate-700">{params.id}</span>
+              Documento:{" "}
+              <span className="font-mono text-slate-700">{params.id}</span>
+              {isDemo && (
+                <span className="ml-2 inline-flex items-center gap-1 px-2 py-0.5 bg-violet-100 text-violet-700 border border-violet-200 rounded-full text-xs font-semibold">
+                  🎭 DEMO
+                </span>
+              )}
             </p>
           </div>
           <div className="flex items-center gap-2">
@@ -303,9 +342,7 @@ export default function ReviewStudioPage({ params }: { params: { id: string } })
                   : "bg-amber-50 text-amber-700 border-amber-200"
                 }`}
             >
-              <span
-                className={`w-1.5 h-1.5 rounded-full ${hasAudit ? "bg-emerald-500" : "bg-amber-400"}`}
-              />
+              <span className={`w-1.5 h-1.5 rounded-full ${hasAudit ? "bg-emerald-500 animate-none" : "bg-amber-400 animate-pulse"}`} />
               {hasAudit ? "Auditado" : "Aguardando auditoria"}
             </span>
           </div>
@@ -313,14 +350,26 @@ export default function ReviewStudioPage({ params }: { params: { id: string } })
       </div>
 
       <div className="max-w-7xl mx-auto px-8 py-8">
+        {/* Demo banner */}
+        {isDemo && (
+          <div className="mb-6 flex items-start gap-3 bg-violet-50 border border-violet-200 rounded-xl px-5 py-4">
+            <span className="text-xl flex-shrink-0 mt-0.5">🎭</span>
+            <div>
+              <p className="text-sm font-semibold text-violet-800">Modo demonstração ativo</p>
+              <p className="text-xs text-violet-600 mt-0.5">
+                Este documento é fictício. Contém contradição deliberada (dano moral) e omissão de nexo causal para demonstração do JudiAudit.
+              </p>
+            </div>
+          </div>
+        )}
+
         {/* Stepper */}
         <ReviewWorkflowStepper steps={steps} />
 
-        {/* STEP 1: No audit yet — show entrypoint card */}
+        {/* STEP 1: No audit yet */}
         {!hasAudit ? (
           <AuditEntrypointCard onRunAudit={handleRunAudit} loading={auditLoading} />
         ) : (
-          /* MAIN LAYOUT — only when audit exists */
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
             {/* Left column */}
             <div className="space-y-8">
@@ -336,80 +385,104 @@ export default function ReviewStudioPage({ params }: { params: { id: string } })
             </div>
 
             {/* Right column */}
-            <div className="lg:col-span-2 space-y-8">
-              {/* ── Workflow Actions ── */}
-              <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-6">
-                <h2 className="text-base font-semibold text-slate-800 mb-1">
-                  {!hasSuggestion
-                    ? "Passo 2 — Gerar Sugestão"
-                    : !hasRewrite
-                    ? "Passo 3 — Gerar Reescrita"
-                    : !hasReAudit
-                    ? "Passo 4 — Executar Re-Audit"
-                    : "Ciclo completo ✓"}
-                </h2>
-                <p className="text-sm text-slate-400 mb-5">
-                  {!hasSuggestion
-                    ? "Auditoria concluída. Gere uma sugestão para iniciar a revisão guiada."
-                    : !hasRewrite
-                    ? "Sugestão disponível. Aplique a reescrita ao trecho identificado."
-                    : !hasReAudit
-                    ? "Nova versão disponível. Execute o Re-Audit para comparar os resultados."
-                    : "O ciclo de revisão foi completado com sucesso."}
-                </p>
-
-                <div className="flex flex-wrap gap-3">
+            <div className="lg:col-span-2 space-y-6">
+              {/* ── Guided Prompt ── */}
+              {!hasSuggestion && (
+                <GuidedPrompt
+                  step={2}
+                  message={
+                    fatalCount + warningCount > 0
+                      ? `Foram encontrados ${fatalCount} erro(s) fatal(is) e ${warningCount} alerta(s). Gere uma sugestão para iniciar a revisão guiada.`
+                      : "Auditoria concluída. Gere uma sugestão para iniciar a revisão guiada."
+                  }
+                >
                   <StepButton
                     id="btn-suggestion"
                     label="Gerar Sugestão"
                     onClick={handleGenerateSuggestion}
-                    disabled={!hasAudit || hasSuggestion || loadingAction}
-                    disabledReason={
-                      !hasAudit
-                        ? "Execute a auditoria primeiro"
-                        : hasSuggestion
-                        ? "Sugestão já gerada"
-                        : undefined
-                    }
+                    disabled={loadingAction}
                     colorClass="bg-blue-600 hover:bg-blue-700"
-                    loading={loadingAction && !hasSuggestion}
+                    loading={loadingAction}
                   />
+                </GuidedPrompt>
+              )}
+
+              {hasSuggestion && !hasRewrite && (
+                <GuidedPrompt step={3} message="Sugestão disponível. Aplique a reescrita ao trecho identificado.">
                   <StepButton
                     id="btn-rewrite"
                     label="Gerar Reescrita"
                     onClick={handleGenerateRewrite}
-                    disabled={!hasSuggestion || hasRewrite || loadingAction}
-                    disabledReason={
-                      !hasAudit
-                        ? "Execute a auditoria primeiro"
-                        : !hasSuggestion
-                        ? "Execute a auditoria primeiro"
-                        : hasRewrite
-                        ? "Reescrita já gerada"
-                        : undefined
-                    }
+                    disabled={loadingAction}
                     colorClass="bg-indigo-600 hover:bg-indigo-700"
-                    loading={loadingAction && hasSuggestion && !hasRewrite}
+                    loading={loadingAction}
                   />
+                </GuidedPrompt>
+              )}
+
+              {hasRewrite && !hasReAudit && (
+                <GuidedPrompt step={4} message="Nova versão criada. Execute o Re-Audit para comparar os resultados.">
                   <StepButton
                     id="btn-reaudit"
                     label="Executar Re-Audit"
                     onClick={handleReAudit}
+                    disabled={loadingAction}
+                    colorClass="bg-emerald-600 hover:bg-emerald-700"
+                    loading={loadingAction}
+                  />
+                </GuidedPrompt>
+              )}
+
+              {hasReAudit && (
+                <div className="bg-emerald-50 border border-emerald-200 rounded-xl px-5 py-4 flex items-center gap-3">
+                  <span className="text-2xl">✅</span>
+                  <p className="text-sm font-semibold text-emerald-800">Ciclo completo — todas as etapas concluídas.</p>
+                </div>
+              )}
+
+              {/* ── All step buttons overview (collapsed/disabled state) ── */}
+              <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-5">
+                <h2 className="text-sm font-semibold text-slate-500 uppercase tracking-wide mb-4">Ações do Estúdio</h2>
+                <div className="flex flex-wrap gap-3">
+                  <StepButton
+                    id="btn-suggestion-panel"
+                    label="Gerar Sugestão"
+                    onClick={handleGenerateSuggestion}
+                    disabled={!hasAudit || hasSuggestion || loadingAction}
+                    disabledReason={
+                      !hasAudit ? "Execute a auditoria primeiro"
+                        : hasSuggestion ? "Sugestão já gerada"
+                        : undefined
+                    }
+                    colorClass="bg-blue-600 hover:bg-blue-700"
+                  />
+                  <StepButton
+                    id="btn-rewrite-panel"
+                    label="Gerar Reescrita"
+                    onClick={handleGenerateRewrite}
+                    disabled={!hasSuggestion || hasRewrite || loadingAction}
+                    disabledReason={
+                      !hasAudit ? "Execute a auditoria primeiro"
+                        : !hasSuggestion ? "Gere a sugestão primeiro"
+                        : hasRewrite ? "Reescrita já gerada"
+                        : undefined
+                    }
+                    colorClass="bg-indigo-600 hover:bg-indigo-700"
+                  />
+                  <StepButton
+                    id="btn-reaudit-panel"
+                    label="Executar Re-Audit"
+                    onClick={handleReAudit}
                     disabled={!hasRewrite || hasReAudit || loadingAction}
                     disabledReason={
-                      !hasAudit
-                        ? "Execute a auditoria primeiro"
-                        : !hasRewrite
-                        ? "Gere a reescrita primeiro"
-                        : hasReAudit
-                        ? "Re-Audit já executado"
+                      !hasAudit ? "Execute a auditoria primeiro"
+                        : !hasRewrite ? "Gere a reescrita primeiro"
+                        : hasReAudit ? "Re-Audit já executado"
                         : undefined
                     }
                     colorClass="bg-emerald-600 hover:bg-emerald-700"
-                    loading={loadingAction && hasRewrite && !hasReAudit}
                   />
                 </div>
-
                 {loadingAction && (
                   <p className="mt-4 text-sm text-slate-400 flex items-center gap-2">
                     <span className="w-3.5 h-3.5 border-2 border-slate-300 border-t-blue-500 rounded-full animate-spin" />
@@ -418,10 +491,16 @@ export default function ReviewStudioPage({ params }: { params: { id: string } })
                 )}
               </div>
 
-              {/* ── Guided Revision + Suggestion ── */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+              {/* ── Guided Revision + Suggestion Panel ── */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <GuidedRevisionChecklist
-                  tasks={[{ id: "task-test-1", instruction: "Ajustar contradição.", completed: hasSuggestion }]}
+                  tasks={[
+                    {
+                      id: "task-test-1",
+                      instruction: "Corrigir contradição entre fundamentação e dispositivo.",
+                      completed: hasSuggestion,
+                    },
+                  ]}
                 />
                 {hasSuggestion && (
                   <SuggestionPanel
@@ -435,7 +514,7 @@ export default function ReviewStudioPage({ params }: { params: { id: string } })
                 )}
               </div>
 
-              {/* ── Rewrite Comparison ── */}
+              {/* ── Rewrite ── */}
               {hasRewrite && (
                 <RewriteComparison
                   original={rewrite?.originalDraft ?? ""}
