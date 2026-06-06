@@ -33,8 +33,8 @@ export async function POST(req: Request) {
       findingId: body.findingId,
       findingType: body.findingType,
       opportunityLevel: body.opportunityLevel,
-      domain: body.domain,
       feedback: body.feedback,
+      ...(body.domain !== undefined && { domain: body.domain }),
     });
 
     return NextResponse.json({ ok: true });
