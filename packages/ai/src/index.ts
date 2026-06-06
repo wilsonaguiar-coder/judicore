@@ -8,3 +8,15 @@ export type { FinalValidationResult } from "./validators/index.js";
 export type { DocumentStatus } from "./pipeline/types.js";
 export { AuditReportEngine } from "./audit-report/audit-report.engine.js";
 export type { AuditReport, AuditClassificacao, AuditItem, FundamentacaoJuridicaItem, QualidadeScore, ConsistenciaArgumentativa, QualidadeArgumentativa } from "./audit-report/audit-report.types.js";
+
+// Exporta\u00E7\u00F5es das Fases 8.x
+export * from "./audit/audit.service.js";
+export * from "./audit/correction-plan.service.js";
+export * from "./audit/assisted-revision/assisted-revision.service.js";
+export * from "./audit/assisted-revision/assisted-revision.types.js";
+export * from "./audit/rewrite/rewrite.service.js";
+export * from "./audit/rewrite/rewrite.types.js";
+export * from "./audit/re-audit/re-audit.service.js";
+export * from "./audit/re-audit/re-audit.types.js";
+export * from "./audit/review/human-review.service.js";
+export * from "./audit/review/human-review.types.js";

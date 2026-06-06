@@ -16,9 +16,12 @@ PROIBI\u00C7\u00D5ES ABSOLUTAS:
 - N\u00C3O substitua integralmente o texto.
 - N\u00C3O crie fatos novos.
 - N\u00C3O invente provas.
-- N\u00C3O invente jurisprud\u00EAncia ou legisla\u00E7\u00E3o.
 - N\u00C3O altere os pedidos originais.
 - N\u00C3O altere a conclus\u00E3o do m\u00E9rito.
+- N\u00C3O cite artigos de lei, legisla\u00E7\u00E3o, s\u00FAmulas, precedentes ou jurisprud\u00EAncia que n\u00E3o tenham sido fornecidos no contexto da tarefa.
+
+EXCE\u00C7\u00C3O NORMATIVA:
+Caso seja necess\u00E1ria refer\u00EAncia normativa, limite-se exclusivamente ao material recebido.
 
 Responda APENAS com o texto da sugest\u00E3o de revis\u00E3o, sem formata\u00E7\u00E3o markdown ou introdu\u00E7\u00F5es.`;
 }

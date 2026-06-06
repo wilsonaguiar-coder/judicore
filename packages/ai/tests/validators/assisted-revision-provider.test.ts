@@ -157,4 +157,27 @@ describe("AssistedRevision Providers", () => {
     assert.ok(promptText.includes(mockTask.instruction));
     assert.ok(promptText.includes("N\u00C3O escreva uma nova pe\u00E7a"));
   });
+
+  it("6. Prompt cont\u00E9m guardrails normativos e proibitivos", async () => {
+    let capturedBody: any;
+    mock.method(global, "fetch", async (url: any, options: any) => {
+      capturedBody = JSON.parse(options.body);
+      return { ok: true, json: async () => ({ choices: [{ message: { content: "Ok" } }] }) };
+    });
+
+    const adapter = new OpenAIRevisionAdapter("fake-key");
+    await adapter.suggestRevision(mockRequest);
+
+    const promptText = capturedBody.messages[1].content;
+    
+    // Regras antigas
+    assert.ok(promptText.includes("N\u00C3O crie fatos novos"));
+    assert.ok(promptText.includes("N\u00C3O invente provas"));
+    assert.ok(promptText.includes("N\u00C3O altere os pedidos originais"));
+    assert.ok(promptText.includes("N\u00C3O altere a conclus\u00E3o do m\u00E9rito"));
+    
+    // Novas regras normativas
+    assert.ok(promptText.includes("N\u00C3O cite artigos de lei, legisla\u00E7\u00E3o, s\u00FAmulas, precedentes ou jurisprud\u00EAncia"));
+    assert.ok(promptText.includes("Caso seja necess\u00E1ria refer\u00EAncia normativa, limite-se exclusivamente ao material recebido"));
+  });
 });
