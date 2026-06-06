@@ -21,13 +21,13 @@ export async function POST(req: Request, { params }: { params: { id: string } })
     const result = await service.review({
       draft: body.draft,
       classification: body.classification ?? "CIVIL_PETICAO_INICIAL",
-      domain: body.domain,
-      pieceType: body.pieceType,
       audit: body.audit,
-      correctionPlan: body.correctionPlan,
-      provider: body.provider,
-      availableDocuments: body.availableDocuments,
-      extractedEntities: body.extractedEntities,
+      ...(body.domain            !== undefined && { domain:             body.domain }),
+      ...(body.pieceType         !== undefined && { pieceType:          body.pieceType }),
+      ...(body.correctionPlan    !== undefined && { correctionPlan:     body.correctionPlan }),
+      ...(body.provider          !== undefined && { provider:           body.provider }),
+      ...(body.availableDocuments !== undefined && { availableDocuments: body.availableDocuments }),
+      ...(body.extractedEntities  !== undefined && { extractedEntities:  body.extractedEntities }),
     });
 
     return NextResponse.json(result);
