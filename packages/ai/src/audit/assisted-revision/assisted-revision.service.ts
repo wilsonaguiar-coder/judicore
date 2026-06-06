@@ -25,7 +25,12 @@ export class AssistedRevisionService {
    */
   public async suggestWithAdapter(request: AssistedRevisionRequest): Promise<AssistedRevisionSuggestion> {
     if (this.adapter) {
-      return this.adapter.suggestRevision(request);
+      try {
+        return await this.adapter.suggestRevision(request);
+      } catch (error) {
+        // Fallback silencioso em caso de falha do provedor
+        return this.createDeterministicSuggestion(request.task);
+      }
     }
     return this.createDeterministicSuggestion(request.task);
   }

@@ -20,9 +20,11 @@
     "test:legal-report": "tsx tests/report/generate-report.ts",
     "quality:cases": "tsx quality-lab/case-factory.ts",
     "quality:run": "tsx quality-lab/quality-runner.ts",
-    "quality:report": "tsx quality-lab/quality-report.ts"
+    "quality:report": "tsx quality-lab/quality-report.ts",
+    "benchmark:providers": "tsx scripts/run-provider-evaluation.ts"
   },
   "dependencies": {
+    "dotenv": "^17.4.2",
     "openai": "^6.39.1"
   },
   "devDependencies": {
