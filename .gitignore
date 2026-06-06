@@ -9,3 +9,6 @@ temp/
 packages.zip
 *.tsbuildinfo
 pnpm-lock.yaml
+.git_old/  
+.claude/  
+*.bin  

@@ -1,0 +1,402 @@
+[
+  {
+    "id": "CASE-001",
+    "domain": "RGPS",
+    "tipo": "CORRETO",
+    "expectedAlerts": [],
+    "classificationOverrides": { "regime_juridico": "RGPS", "tipo_justica": "FEDERAL", "assunto_principal": "auxílio-doença" },
+    "descricao": "Auxílio-doença concedido: laudo reconhece incapacidade total, dispositivo é coerente"
+  },
+  {
+    "id": "CASE-002",
+    "domain": "RGPS",
+    "tipo": "CORRETO",
+    "expectedAlerts": [],
+    "classificationOverrides": { "regime_juridico": "RGPS", "tipo_justica": "FEDERAL", "assunto_principal": "aposentadoria por tempo de contribuição" },
+    "descricao": "Aposentadoria por tempo de contribuição: DIB fixada, tudo coerente"
+  },
+  {
+    "id": "CASE-003",
+    "domain": "RGPS",
+    "tipo": "CORRETO",
+    "expectedAlerts": [],
+    "classificationOverrides": { "regime_juridico": "RGPS", "tipo_justica": "FEDERAL", "assunto_principal": "pensão por morte" },
+    "descricao": "Pensão por morte: dependência e óbito comprovados, dispositivo coerente"
+  },
+  {
+    "id": "CASE-004",
+    "domain": "RGPS",
+    "tipo": "ERRO_CONTROLADO",
+    "expectedAlerts": ["NO_INCAPACITY_BENEFIT_CONTRADICTION"],
+    "classificationOverrides": { "regime_juridico": "RGPS", "tipo_justica": "FEDERAL", "assunto_principal": "auxílio-doença" },
+    "descricao": "Contradição: fundamentação afasta incapacidade, dispositivo concede auxílio-doença"
+  },
+  {
+    "id": "CASE-005",
+    "domain": "RGPS",
+    "tipo": "ERRO_CONTROLADO",
+    "expectedAlerts": ["MEDICAL_EVIDENCE_INCAPACITY_CONTRADICTION"],
+    "classificationOverrides": { "regime_juridico": "RGPS", "tipo_justica": "FEDERAL", "assunto_principal": "auxílio-doença" },
+    "descricao": "Contradição Evidence×Conclusion: laudo reconhece incapacidade, benefício é negado"
+  },
+  {
+    "id": "CASE-006",
+    "domain": "RGPS",
+    "tipo": "ERRO_CONTROLADO",
+    "expectedAlerts": ["MISSING_ESSENTIAL_TOPIC"],
+    "classificationOverrides": { "regime_juridico": "RGPS", "tipo_justica": "FEDERAL", "assunto_principal": "aposentadoria especial" },
+    "descricao": "Coverage: aposentadoria especial sem tratar exposição habitual a agente nocivo nem prova técnica"
+  },
+  {
+    "id": "CASE-007",
+    "domain": "RGPS",
+    "tipo": "ERRO_CONTROLADO",
+    "expectedAlerts": ["INCOMPLETE_RELIEF"],
+    "classificationOverrides": { "regime_juridico": "RGPS", "tipo_justica": "FEDERAL", "assunto_principal": "auxílio-doença" },
+    "descricao": "Dispositivo incompleto: concede auxílio-doença sem fixar DIB ou determinar implantação"
+  },
+  {
+    "id": "CASE-008",
+    "domain": "RGPS",
+    "tipo": "ERRO_CONTROLADO",
+    "expectedAlerts": ["NO_QUALITY_INSURED_BENEFIT_CONTRADICTION"],
+    "classificationOverrides": { "regime_juridico": "RGPS", "tipo_justica": "FEDERAL", "assunto_principal": "benefício previdenciário" },
+    "descricao": "Contradição: qualidade de segurado ausente na fundamentação, benefício concedido no dispositivo"
+  },
+  {
+    "id": "CASE-009",
+    "domain": "RGPS",
+    "tipo": "DIFÍCIL",
+    "expectedAlerts": ["REVIEW_HUMAN"],
+    "classificationOverrides": { "regime_juridico": "RGPS", "tipo_justica": "FEDERAL", "assunto_principal": "auxílio-doença" },
+    "descricao": "Limítrofe: laudo aponta capacidade parcialmente preservada para trabalho leve; benefício negado"
+  },
+  {
+    "id": "CASE-010",
+    "domain": "RGPS",
+    "tipo": "DIFÍCIL",
+    "expectedAlerts": ["REVIEW_HUMAN"],
+    "classificationOverrides": { "regime_juridico": "RGPS", "tipo_justica": "FEDERAL", "assunto_principal": "aposentadoria especial" },
+    "descricao": "Limítrofe: PPP aponta exposição ao ruído mas nível medido está abaixo do limite legal"
+  },
+  {
+    "id": "CASE-011",
+    "domain": "TRABALHISTA",
+    "tipo": "CORRETO",
+    "expectedAlerts": [],
+    "classificationOverrides": { "regime_juridico": "CLT", "tipo_justica": "TRABALHO", "assunto_principal": "reconhecimento de vínculo empregatício" },
+    "descricao": "Vínculo empregatício reconhecido: subordinação e verbas trabalhistas fundamentadas e deferidas"
+  },
+  {
+    "id": "CASE-012",
+    "domain": "TRABALHISTA",
+    "tipo": "CORRETO",
+    "expectedAlerts": [],
+    "classificationOverrides": { "regime_juridico": "CLT", "tipo_justica": "TRABALHO", "assunto_principal": "horas extras" },
+    "descricao": "Horas extras deferidas: jornada e controle de ponto analisados, dispositivo coerente"
+  },
+  {
+    "id": "CASE-013",
+    "domain": "TRABALHISTA",
+    "tipo": "CORRETO",
+    "expectedAlerts": [],
+    "classificationOverrides": { "regime_juridico": "CLT", "tipo_justica": "TRABALHO", "assunto_principal": "reconhecimento de vínculo empregatício" },
+    "descricao": "Improcedência trabalhista: ausência de subordinação devidamente fundamentada"
+  },
+  {
+    "id": "CASE-014",
+    "domain": "TRABALHISTA",
+    "tipo": "CORRETO",
+    "expectedAlerts": [],
+    "classificationOverrides": { "regime_juridico": "CLT", "tipo_justica": "TRABALHO", "assunto_principal": "rescisão indireta" },
+    "descricao": "Rescisão indireta: descumprimento patronal reconhecido, verbas deferidas"
+  },
+  {
+    "id": "CASE-015",
+    "domain": "TRABALHISTA",
+    "tipo": "ERRO_CONTROLADO",
+    "expectedAlerts": ["EMPLOYMENT_RELATION_CONTRADICTION"],
+    "classificationOverrides": { "regime_juridico": "CLT", "tipo_justica": "TRABALHO", "assunto_principal": "reconhecimento de vínculo empregatício" },
+    "descricao": "Contradição: fundamentação afasta relação de emprego, dispositivo reconhece vínculo e determina anotação em CTPS"
+  },
+  {
+    "id": "CASE-016",
+    "domain": "TRABALHISTA",
+    "tipo": "ERRO_CONTROLADO",
+    "expectedAlerts": ["WITNESS_OVERTIME_CONTRADICTION"],
+    "classificationOverrides": { "regime_juridico": "CLT", "tipo_justica": "TRABALHO", "assunto_principal": "horas extras" },
+    "descricao": "Contradição E×C: prova testemunhal confirma jornada extraordinária, horas extras negadas por ausência de prova"
+  },
+  {
+    "id": "CASE-017",
+    "domain": "TRABALHISTA",
+    "tipo": "ERRO_CONTROLADO",
+    "expectedAlerts": ["MISSING_ESSENTIAL_TOPIC"],
+    "classificationOverrides": { "regime_juridico": "CLT", "tipo_justica": "TRABALHO", "assunto_principal": "horas extras" },
+    "descricao": "Coverage: horas extras não enfrentam jornada, horário ou controle de ponto"
+  },
+  {
+    "id": "CASE-018",
+    "domain": "TRABALHISTA",
+    "tipo": "ERRO_CONTROLADO",
+    "expectedAlerts": ["UNADDRESSED_MAIN_REQUEST"],
+    "classificationOverrides": { "regime_juridico": "CLT", "tipo_justica": "TRABALHO", "assunto_principal": "horas extras" },
+    "descricao": "R×D: horas extras pedidas, dispositivo condena apenas em verbas rescisórias sem enfrentar o pedido"
+  },
+  {
+    "id": "CASE-019",
+    "domain": "TRABALHISTA",
+    "tipo": "DIFÍCIL",
+    "expectedAlerts": ["REVIEW_HUMAN"],
+    "classificationOverrides": { "regime_juridico": "CLT", "tipo_justica": "TRABALHO", "assunto_principal": "reconhecimento de vínculo empregatício" },
+    "descricao": "Limítrofe: pejotização — prestador CNPJ com elementos de subordinação e habitualidade"
+  },
+  {
+    "id": "CASE-020",
+    "domain": "TRABALHISTA",
+    "tipo": "DIFÍCIL",
+    "expectedAlerts": ["REVIEW_HUMAN"],
+    "classificationOverrides": { "regime_juridico": "CLT", "tipo_justica": "TRABALHO", "assunto_principal": "reintegração ao emprego" },
+    "descricao": "Limítrofe: pedido subsidiário de indenização substitutiva de reintegração parcialmente enfrentado"
+  },
+  {
+    "id": "CASE-021",
+    "domain": "FAMÍLIA",
+    "tipo": "CORRETO",
+    "expectedAlerts": [],
+    "classificationOverrides": { "assunto_principal": "guarda compartilhada de filho menor" },
+    "descricao": "Guarda compartilhada deferida: melhor interesse e condições parentais analisados"
+  },
+  {
+    "id": "CASE-022",
+    "domain": "FAMÍLIA",
+    "tipo": "CORRETO",
+    "expectedAlerts": [],
+    "classificationOverrides": { "assunto_principal": "alimentos" },
+    "descricao": "Alimentos fixados: necessidade e possibilidade fundamentadas, dispositivo coerente"
+  },
+  {
+    "id": "CASE-023",
+    "domain": "FAMÍLIA",
+    "tipo": "ERRO_CONTROLADO",
+    "expectedAlerts": ["MISSING_ESSENTIAL_TOPIC"],
+    "classificationOverrides": { "assunto_principal": "guarda compartilhada de filho menor" },
+    "descricao": "Coverage: guarda sem análise do melhor interesse da criança nem condições dos genitores"
+  },
+  {
+    "id": "CASE-024",
+    "domain": "FAMÍLIA",
+    "tipo": "ERRO_CONTROLADO",
+    "expectedAlerts": ["UNADDRESSED_MAIN_REQUEST"],
+    "classificationOverrides": { "assunto_principal": "guarda e alimentos" },
+    "descricao": "R×D: alimentos pedidos, dispositivo decide apenas a guarda sem enfrentar o pedido alimentar"
+  },
+  {
+    "id": "CASE-025",
+    "domain": "FAMÍLIA",
+    "tipo": "DIFÍCIL",
+    "expectedAlerts": ["REVIEW_HUMAN"],
+    "classificationOverrides": { "assunto_principal": "pensão por morte" },
+    "descricao": "Limítrofe: dependência econômica parcial — convivente com renda própria, mas sustento complementar comprovado"
+  },
+  {
+    "id": "CASE-026",
+    "domain": "FAMÍLIA",
+    "tipo": "DIFÍCIL",
+    "expectedAlerts": ["REVIEW_HUMAN"],
+    "classificationOverrides": { "assunto_principal": "dano moral por alienação parental" },
+    "descricao": "Limítrofe: alienação parental — dano moral parcialmente reconhecido, quantum contestável"
+  },
+  {
+    "id": "CASE-027",
+    "domain": "CONSUMIDOR",
+    "tipo": "CORRETO",
+    "expectedAlerts": [],
+    "classificationOverrides": { "assunto_principal": "consumidor cobrança indevida restituição" },
+    "descricao": "Cobrança indevida: restituição em dobro, falha do serviço e nexo causal estabelecidos"
+  },
+  {
+    "id": "CASE-028",
+    "domain": "CONSUMIDOR",
+    "tipo": "CORRETO",
+    "expectedAlerts": [],
+    "classificationOverrides": { "assunto_principal": "consumidor produto defeituoso" },
+    "descricao": "Improcedência consumidor: ausência de defeito do produto devidamente fundamentada"
+  },
+  {
+    "id": "CASE-029",
+    "domain": "CONSUMIDOR",
+    "tipo": "ERRO_CONTROLADO",
+    "expectedAlerts": ["MORAL_DAMAGE_CONTRADICTION"],
+    "classificationOverrides": { "assunto_principal": "consumidor dano moral" },
+    "descricao": "Contradição: fundamentação afasta dano moral (mero aborrecimento), dispositivo condena por dano moral"
+  },
+  {
+    "id": "CASE-030",
+    "domain": "CONSUMIDOR",
+    "tipo": "ERRO_CONTROLADO",
+    "expectedAlerts": ["MISSING_ESSENTIAL_TOPIC"],
+    "classificationOverrides": { "assunto_principal": "consumidor cobrança indevida" },
+    "descricao": "Coverage: cobrança indevida sem análise da falha do serviço nem do nexo causal"
+  },
+  {
+    "id": "CASE-031",
+    "domain": "CONSUMIDOR",
+    "tipo": "ERRO_CONTROLADO",
+    "expectedAlerts": ["PAYMENT_PROOF_CONTRADICTION"],
+    "classificationOverrides": { "assunto_principal": "consumidor pagamento" },
+    "descricao": "Contradição E×C: comprovante de pagamento nos autos, dispositivo afirma ausência de pagamento"
+  },
+  {
+    "id": "CASE-032",
+    "domain": "CONSUMIDOR",
+    "tipo": "DIFÍCIL",
+    "expectedAlerts": ["REVIEW_HUMAN"],
+    "classificationOverrides": { "assunto_principal": "consumidor dano moral" },
+    "descricao": "Limítrofe: dano moral parcialmente reconhecido, quantum muito aquém do pedido"
+  },
+  {
+    "id": "CASE-033",
+    "domain": "TRIBUTÁRIO",
+    "tipo": "CORRETO",
+    "expectedAlerts": [],
+    "classificationOverrides": { "tipo_justica": "EXECUCAO_FISCAL", "assunto_principal": "débito fiscal tributário anulação" },
+    "descricao": "Anulação de débito fiscal: lançamento, constituição do crédito e decadência analisados"
+  },
+  {
+    "id": "CASE-034",
+    "domain": "TRIBUTÁRIO",
+    "tipo": "CORRETO",
+    "expectedAlerts": [],
+    "classificationOverrides": { "tipo_justica": "EXECUCAO_FISCAL", "assunto_principal": "débito fiscal tributário execução" },
+    "descricao": "Execução fiscal: embargos à execução, lançamento discutido, CDA examinada"
+  },
+  {
+    "id": "CASE-035",
+    "domain": "TRIBUTÁRIO",
+    "tipo": "ERRO_CONTROLADO",
+    "expectedAlerts": ["PRESCRIPTION_PROCEDENCE_CONTRADICTION"],
+    "classificationOverrides": { "tipo_justica": "EXECUCAO_FISCAL", "assunto_principal": "débito fiscal tributário" },
+    "descricao": "Contradição: prescrição reconhecida na fundamentação, dispositivo julga procedente"
+  },
+  {
+    "id": "CASE-036",
+    "domain": "TRIBUTÁRIO",
+    "tipo": "ERRO_CONTROLADO",
+    "expectedAlerts": ["MISSING_ESSENTIAL_TOPIC"],
+    "classificationOverrides": { "tipo_justica": "EXECUCAO_FISCAL", "assunto_principal": "débito fiscal tributário" },
+    "descricao": "Coverage: débito fiscal sem examinar lançamento ou constituição do crédito tributário"
+  },
+  {
+    "id": "CASE-037",
+    "domain": "TRIBUTÁRIO",
+    "tipo": "DIFÍCIL",
+    "expectedAlerts": ["REVIEW_HUMAN"],
+    "classificationOverrides": { "tipo_justica": "EXECUCAO_FISCAL", "assunto_principal": "débito fiscal tributário parcelamento" },
+    "descricao": "Limítrofe: parcelamento REFIS com créditos parcialmente prescritos; discussão sobre novação"
+  },
+  {
+    "id": "CASE-038",
+    "domain": "CRIMINAL",
+    "tipo": "CORRETO",
+    "expectedAlerts": [],
+    "classificationOverrides": { "tipo_justica": "CRIMINAL", "assunto_principal": "furto simples" },
+    "descricao": "Condenação penal completa: materialidade, autoria, tipicidade e dosimetria analisados"
+  },
+  {
+    "id": "CASE-039",
+    "domain": "CRIMINAL",
+    "tipo": "CORRETO",
+    "expectedAlerts": [],
+    "classificationOverrides": { "tipo_justica": "CRIMINAL", "assunto_principal": "lesão corporal" },
+    "descricao": "Absolvição por atipicidade: materialidade, autoria e tipicidade examinados, atipicidade reconhecida"
+  },
+  {
+    "id": "CASE-040",
+    "domain": "CRIMINAL",
+    "tipo": "ERRO_CONTROLADO",
+    "expectedAlerts": ["MISSING_ESSENTIAL_TOPIC"],
+    "classificationOverrides": { "tipo_justica": "CRIMINAL", "assunto_principal": "roubo agravado" },
+    "descricao": "Coverage: condenação penal sem dosimetria (sem pena-base, agravantes, regime inicial)"
+  },
+  {
+    "id": "CASE-041",
+    "domain": "CRIMINAL",
+    "tipo": "ERRO_CONTROLADO",
+    "expectedAlerts": ["MISSING_ESSENTIAL_TOPIC"],
+    "classificationOverrides": { "tipo_justica": "CRIMINAL", "assunto_principal": "tráfico de drogas" },
+    "descricao": "Coverage: sentença criminal sem analisar materialidade, autoria nem tipicidade"
+  },
+  {
+    "id": "CASE-042",
+    "domain": "CRIMINAL",
+    "tipo": "DIFÍCIL",
+    "expectedAlerts": ["REVIEW_HUMAN"],
+    "classificationOverrides": { "tipo_justica": "CRIMINAL", "assunto_principal": "estelionato" },
+    "descricao": "Limítrofe: absolvição por in dubio pro reo — prova insuficiente mas não inexistente"
+  },
+  {
+    "id": "CASE-043",
+    "domain": "FAZENDA PÚBLICA",
+    "tipo": "CORRETO",
+    "expectedAlerts": [],
+    "classificationOverrides": { "assunto_principal": "mandado de segurança fazenda pública" },
+    "descricao": "Mandado de segurança: direito líquido e certo, autoridade coatora e prazo decadencial examinados"
+  },
+  {
+    "id": "CASE-044",
+    "domain": "FAZENDA PÚBLICA",
+    "tipo": "CORRETO",
+    "expectedAlerts": [],
+    "classificationOverrides": { "assunto_principal": "concurso público nomeação administração pública" },
+    "descricao": "Concurso público: direito subjetivo à nomeação, aprovado dentro das vagas, preterição comprovada"
+  },
+  {
+    "id": "CASE-045",
+    "domain": "FAZENDA PÚBLICA",
+    "tipo": "ERRO_CONTROLADO",
+    "expectedAlerts": ["ADMIN_NULLITY_MAINTAINED_ACT_CONTRADICTION"],
+    "classificationOverrides": { "assunto_principal": "ato administrativo fazenda pública" },
+    "descricao": "Contradição: nulidade do ato administrativo reconhecida na fundamentação, ato mantido no dispositivo"
+  },
+  {
+    "id": "CASE-046",
+    "domain": "FAZENDA PÚBLICA",
+    "tipo": "DIFÍCIL",
+    "expectedAlerts": ["REVIEW_HUMAN"],
+    "classificationOverrides": { "assunto_principal": "concurso público nomeação administração pública" },
+    "descricao": "Limítrofe: candidato aprovado além das vagas; criação de novos cargos em discussão"
+  },
+  {
+    "id": "CASE-047",
+    "domain": "AMBIENTAL",
+    "tipo": "CORRETO",
+    "expectedAlerts": [],
+    "classificationOverrides": { "assunto_principal": "dano ambiental APP área de preservação permanente" },
+    "descricao": "Dano ambiental: degradação, nexo causal e reparação/recuperação da área examinados"
+  },
+  {
+    "id": "CASE-048",
+    "domain": "AMBIENTAL",
+    "tipo": "CORRETO",
+    "expectedAlerts": [],
+    "classificationOverrides": { "assunto_principal": "dano ambiental ibama multa ambiental" },
+    "descricao": "Auto de infração ambiental: dano, conduta do autuado e obrigação de reparação examinados"
+  },
+  {
+    "id": "CASE-049",
+    "domain": "AMBIENTAL",
+    "tipo": "CORRETO",
+    "expectedAlerts": [],
+    "classificationOverrides": { "assunto_principal": "dano ambiental APP desmatamento" },
+    "descricao": "Absolvição ambiental: dano, nexo e reparação discutidos; nexo não comprovado"
+  },
+  {
+    "id": "CASE-050",
+    "domain": "AMBIENTAL",
+    "tipo": "ERRO_CONTROLADO",
+    "expectedAlerts": ["MISSING_ESSENTIAL_TOPIC"],
+    "classificationOverrides": { "assunto_principal": "dano ambiental APP supressão de vegetação" },
+    "descricao": "Coverage: APP com dano descrito mas sem análise de nexo causal nem reparação"
+  }
+]

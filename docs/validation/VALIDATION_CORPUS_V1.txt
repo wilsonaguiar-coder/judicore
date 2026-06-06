@@ -1,0 +1,1829 @@
+[CASE-001]
+
+DOMINIO:
+RGPS
+
+TIPO:
+CORRETO
+
+EXPECTATIVA:
+NENHUM_ALERTA
+
+DESCRICAO:
+Auxílio-doença concedido: laudo reconhece incapacidade total, dispositivo é coerente
+
+TEXTO:
+RELATÓRIO
+
+Trata-se de ação previdenciária proposta por segurado do RGPS contra o INSS, visando à concessão de auxílio-doença, atualmente auxílio por incapacidade temporária. O autor juntou documentos médicos contemporâneos ao requerimento administrativo, comprovantes de contribuição e carteira de trabalho. O INSS contestou alegando capacidade laboral e ausência de incapacidade atual.
+
+FUNDAMENTAÇÃO
+
+A qualidade de segurado está demonstrada pelo histórico contributivo juntado aos autos. Também está cumprida a carência exigida para o benefício, inexistindo perda da qualidade de segurado no período imediatamente anterior à incapacidade. A perícia médica judicial, realizada por profissional equidistante das partes, concluiu pela existência de incapacidade laboral total e temporária para a atividade habitual de auxiliar de serviços gerais, com início compatível com a DER. O laudo pericial descreve limitação funcional relevante, necessidade de afastamento e possibilidade de reavaliação futura.
+
+A prova pericial é coerente com os atestados particulares e não foi infirmada por outros elementos técnicos. Assim, estão presentes os requisitos legais do auxílio por incapacidade temporária.
+
+DISPOSITIVO
+
+Ante o exposto, julgo procedente o pedido para conceder auxílio-doença, com DIB na DER indicada nos autos, determinando ao INSS a implantação do benefício no prazo de 30 dias. As parcelas vencidas serão apuradas em liquidação, observada a prescrição quinquenal.
+
+---
+
+[CASE-002]
+
+DOMINIO:
+RGPS
+
+TIPO:
+CORRETO
+
+EXPECTATIVA:
+NENHUM_ALERTA
+
+DESCRICAO:
+Aposentadoria por tempo de contribuição: DIB fixada, tudo coerente
+
+TEXTO:
+RELATÓRIO
+
+Cuida-se de ação previdenciária de aposentadoria por tempo de contribuição proposta por segurado do RGPS. A parte autora sustenta que, na DER, já preenchia o tempo mínimo exigido e requereu a revisão do indeferimento administrativo. O INSS alegou insuficiência de tempo contributivo.
+
+FUNDAMENTAÇÃO
+
+A prova documental demonstra vínculos urbanos regulares, contribuições individualizadas no CNIS e períodos reconhecidos administrativamente. O tempo de contribuição apurado supera o mínimo legal aplicável ao caso concreto, observadas as regras de transição pertinentes. Não há controvérsia relevante quanto à qualidade de segurado, pois se trata de benefício programável, nem quanto à carência, que foi atingida segundo os recolhimentos constantes do cadastro.
+
+A DER está preservada porque os requisitos já estavam implementados naquela data. O cálculo da renda mensal inicial deverá observar os salários de contribuição constantes do CNIS e a legislação vigente na data do requerimento.
+
+DISPOSITIVO
+
+Diante do exposto, julgo procedente o pedido para conceder aposentadoria por tempo de contribuição, fixando a DIB na DER. Determino a implantação do benefício no prazo de 30 dias, com pagamento das parcelas vencidas, corrigidas na forma do Manual de Cálculos aplicável.
+
+---
+
+[CASE-003]
+
+DOMINIO:
+RGPS
+
+TIPO:
+CORRETO
+
+EXPECTATIVA:
+NENHUM_ALERTA
+
+DESCRICAO:
+Pensão por morte: dependência e óbito comprovados, dispositivo coerente
+
+TEXTO:
+RELATÓRIO
+
+A parte autora busca pensão por morte em razão do falecimento de segurado vinculado ao RGPS. Foram juntados certidão de óbito, documentos de identificação, comprovantes de união estável e histórico contributivo do instituidor. O INSS contestou genericamente a dependência econômica.
+
+FUNDAMENTAÇÃO
+
+O óbito está demonstrado por certidão civil idônea. A qualidade de segurado do instituidor também está comprovada pelo CNIS, que registra contribuições recentes e vínculo ativo próximo ao falecimento. A dependência econômica da companheira é presumida diante da prova da união estável, corroborada por conta conjunta, endereço comum e declarações documentais.
+
+Não há prova capaz de afastar a convivência pública, contínua e duradoura. O conjunto documental é suficiente para reconhecer a condição de dependente previdenciária. Presentes, portanto, os requisitos legais da pensão por morte: óbito, qualidade de segurado do instituidor e dependência da parte autora.
+
+DISPOSITIVO
+
+Ante o exposto, julgo procedente o pedido para conceder pensão por morte, com DIB na data do requerimento administrativo, determinando a implantação no prazo de 30 dias e o pagamento das parcelas vencidas.
+
+A minuta examina o caso a partir dos documentos ordinários do processo e da narrativa constante dos autos. 
+A análise é feita de modo objetivo, com delimitação dos fatos relevantes, identificação da controvérsia e exame dos pontos necessários ao julgamento. 
+As referências processuais são fictícias e foram redigidas apenas para validação do JudiAudit, sem nomes reais, sem dados pessoais verdadeiros e sem qualquer vinculação a processo existente. 
+O texto busca manter linguagem jurídica plausível, com relatório sintético, fundamentação e dispositivo, evitando placeholders e evitando elementos externos ao domínio RGPS. 
+As conclusões abaixo devem ser lidas como peça simulada para fins de teste automatizado.
+
+---
+
+[CASE-004]
+
+DOMINIO:
+RGPS
+
+TIPO:
+ERRO_CONTROLADO
+
+EXPECTATIVA:
+NO_INCAPACITY_BENEFIT_CONTRADICTION
+
+DESCRICAO:
+Contradição: fundamentação afasta incapacidade, dispositivo concede auxílio-doença
+
+TEXTO:
+RELATÓRIO
+
+Trata-se de ação previdenciária em que o autor pretende auxílio-doença. Alega doença ortopédica e incapacidade para o trabalho habitual. O INSS sustenta que o laudo administrativo não identificou impedimento laboral relevante.
+
+FUNDAMENTAÇÃO
+
+A perícia judicial foi clara ao registrar que não há incapacidade laboral atual. O perito afirmou que a parte autora apresenta alterações degenerativas leves, compatíveis com a idade, mas sem limitação funcional incapacitante. Também consignou que o autor está apto ao trabalho habitual, podendo exercer suas atividades sem restrição relevante. Os documentos particulares juntados não superam a conclusão técnica, pois são genéricos e não indicam afastamento obrigatório.
+
+Desse modo, não está preenchido o requisito da incapacidade, indispensável à concessão de benefício por incapacidade. A qualidade de segurado e a carência até poderiam ser reconhecidas, mas são insuficientes sem a incapacidade laboral.
+
+DISPOSITIVO
+
+Diante do exposto, julgo procedente o pedido e concedo o benefício de auxílio-doença, com DIB na DER, determinando a implantação pelo INSS no prazo de 30 dias.
+
+A minuta examina o caso a partir dos documentos ordinários do processo e da narrativa constante dos autos. 
+A análise é feita de modo objetivo, com delimitação dos fatos relevantes, identificação da controvérsia e exame dos pontos necessários ao julgamento. 
+As referências processuais são fictícias e foram redigidas apenas para validação do JudiAudit, sem nomes reais, sem dados pessoais verdadeiros e sem qualquer vinculação a processo existente. 
+O texto busca manter linguagem jurídica plausível, com relatório sintético, fundamentação e dispositivo, evitando placeholders e evitando elementos externos ao domínio RGPS. 
+As conclusões abaixo devem ser lidas como peça simulada para fins de teste automatizado.
+
+---
+
+[CASE-005]
+
+DOMINIO:
+RGPS
+
+TIPO:
+ERRO_CONTROLADO
+
+EXPECTATIVA:
+MEDICAL_EVIDENCE_INCAPACITY_CONTRADICTION
+
+DESCRICAO:
+Contradição Evidence×Conclusion: laudo reconhece incapacidade, benefício é negado
+
+TEXTO:
+RELATÓRIO
+
+O segurado ajuizou ação previdenciária pleiteando auxílio por incapacidade temporária. Foram juntados relatórios médicos, exames e atestados. O INSS defendeu que a documentação não seria suficiente para afastar a conclusão administrativa.
+
+FUNDAMENTAÇÃO
+
+A prova central é o laudo pericial. A perícia médica judicial registrou incapacidade laboral total e temporária para a atividade habitual, com início provável antes da DER. O perito concluiu que a doença impede esforço físico, permanência prolongada em pé e movimentos repetitivos, recomendando afastamento por período mínimo de doze meses. A perícia médica é detalhada, coerente com os exames e responde aos quesitos essenciais.
+
+Assim, a prova técnica reconhece incapacidade laboral relevante. A qualidade de segurado consta do CNIS e a carência também foi cumprida. Em termos probatórios, o conjunto dos autos favorece a concessão do benefício por incapacidade.
+
+DISPOSITIVO
+
+Ante o exposto, julgo improcedente o pedido, pois não faz jus ao benefício por incapacidade. Revogo eventual tutela e deixo de determinar implantação, diante da ausência de incapacidade reconhecida para fins previdenciários.
+
+A minuta examina o caso a partir dos documentos ordinários do processo e da narrativa constante dos autos. 
+A análise é feita de modo objetivo, com delimitação dos fatos relevantes, identificação da controvérsia e exame dos pontos necessários ao julgamento. 
+As referências processuais são fictícias e foram redigidas apenas para validação do JudiAudit, sem nomes reais, sem dados pessoais verdadeiros e sem qualquer vinculação a processo existente. 
+O texto busca manter linguagem jurídica plausível, com relatório sintético, fundamentação e dispositivo, evitando placeholders e evitando elementos externos ao domínio RGPS. 
+As conclusões abaixo devem ser lidas como peça simulada para fins de teste automatizado.
+
+---
+
+[CASE-006]
+
+DOMINIO:
+RGPS
+
+TIPO:
+ERRO_CONTROLADO
+
+EXPECTATIVA:
+MISSING_ESSENTIAL_TOPIC
+
+DESCRICAO:
+Coverage: aposentadoria especial sem tratar exposição habitual a agente nocivo nem prova técnica
+
+TEXTO:
+RELATÓRIO
+
+A parte autora ajuizou ação previdenciária buscando aposentadoria especial. Afirma que trabalhou durante muitos anos em empresas industriais e que o tempo especial deveria ser reconhecido para fins de concessão do benefício. O INSS apresentou contestação defendendo a manutenção do indeferimento administrativo.
+
+FUNDAMENTAÇÃO
+
+A controvérsia envolve aposentadoria especial, tempo especial e enquadramento especial. A parte autora afirma ter exercido atividade especial em períodos sucessivos, sustentando que o tempo de serviço seria suficiente para aposentadoria especial. A análise do processo administrativo revela vínculos formais, datas de admissão e saída, bem como remunerações constantes do CNIS.
+
+No entanto, a fundamentação limita-se a afirmar que os vínculos existiram e que o segurado trabalhou em ambiente industrial. A decisão não examina de forma concreta o tipo de fator de risco, não descreve o contato com os elementos, não enfrenta a frequência e não avalia documento técnico patronal. A conclusão se apoia apenas no tempo total de vínculo e na natureza geral das empresas empregadoras.
+
+DISPOSITIVO
+
+Ante o exposto, julgo procedente o pedido para conceder aposentadoria especial, fixando a DIB na DER e determinando implantação em 30 dias.
+
+---
+
+[CASE-007]
+
+DOMINIO:
+RGPS
+
+TIPO:
+ERRO_CONTROLADO
+
+EXPECTATIVA:
+INCOMPLETE_RELIEF
+
+DESCRICAO:
+Dispositivo incompleto: concede auxílio-doença sem fixar DIB ou determinar implantação
+
+TEXTO:
+RELATÓRIO
+
+Trata-se de ação previdenciária em que a parte autora pretende auxílio-doença. A inicial relata doença incapacitante e junta atestados médicos. O INSS afirma que não há incapacidade atual.
+
+FUNDAMENTAÇÃO
+
+O laudo pericial reconheceu incapacidade laboral temporária para a atividade habitual, com limitação funcional suficiente para afastar a autora do trabalho. A qualidade de segurado consta do CNIS, e a carência foi cumprida. Os documentos médicos particulares são compatíveis com a conclusão pericial, e não há prova contrária apta a afastar o laudo judicial.
+
+Considerando a presença dos requisitos legais, é devida a concessão do benefício por incapacidade temporária. A duração deverá observar reavaliação administrativa futura, sem prejuízo de eventual pedido de prorrogação.
+
+DISPOSITIVO
+
+Ante o exposto, julgo procedente o pedido e concedo o benefício de auxílio-doença.
+
+A minuta examina o caso a partir dos documentos ordinários do processo e da narrativa constante dos autos. 
+A análise é feita de modo objetivo, com delimitação dos fatos relevantes, identificação da controvérsia e exame dos pontos necessários ao julgamento. 
+As referências processuais são fictícias e foram redigidas apenas para validação do JudiAudit, sem nomes reais, sem dados pessoais verdadeiros e sem qualquer vinculação a processo existente. 
+O texto busca manter linguagem jurídica plausível, com relatório sintético, fundamentação e dispositivo, evitando placeholders e evitando elementos externos ao domínio RGPS. 
+As conclusões abaixo devem ser lidas como peça simulada para fins de teste automatizado.
+
+---
+
+[CASE-008]
+
+DOMINIO:
+RGPS
+
+TIPO:
+ERRO_CONTROLADO
+
+EXPECTATIVA:
+NO_QUALITY_INSURED_BENEFIT_CONTRADICTION
+
+DESCRICAO:
+Contradição: qualidade de segurado ausente na fundamentação, benefício concedido no dispositivo
+
+TEXTO:
+RELATÓRIO
+
+A parte autora pretende benefício previdenciário por incapacidade. O INSS contestou alegando ausência de qualidade de segurado na data de início da incapacidade, além de insuficiência de contribuições recentes.
+
+FUNDAMENTAÇÃO
+
+O histórico contributivo demonstra que a parte autora perdeu a qualidade de segurado antes da data indicada como início da incapacidade. Não houve recolhimentos suficientes para recuperar a proteção previdenciária, e o período de graça já havia se encerrado. Embora os documentos médicos indiquem doença e limitação funcional, o requisito de filiação protegida ao RGPS não está presente.
+
+A ausência de qualidade de segurado impede a concessão de benefício previdenciário, pois o sistema exige vínculo jurídico ativo ou período de graça válido na data do fato gerador. A carência também não se mostra plenamente recomposta.
+
+DISPOSITIVO
+
+Ante o exposto, julgo procedente o pedido, defiro o benefício previdenciário e determino ao INSS implantar o benefício no prazo de 30 dias, com pagamento das parcelas vencidas desde a DER.
+
+A minuta examina o caso a partir dos documentos ordinários do processo e da narrativa constante dos autos. 
+A análise é feita de modo objetivo, com delimitação dos fatos relevantes, identificação da controvérsia e exame dos pontos necessários ao julgamento. 
+As referências processuais são fictícias e foram redigidas apenas para validação do JudiAudit, sem nomes reais, sem dados pessoais verdadeiros e sem qualquer vinculação a processo existente. 
+O texto busca manter linguagem jurídica plausível, com relatório sintético, fundamentação e dispositivo, evitando placeholders e evitando elementos externos ao domínio RGPS. 
+As conclusões abaixo devem ser lidas como peça simulada para fins de teste automatizado.
+
+---
+
+[CASE-009]
+
+DOMINIO:
+RGPS
+
+TIPO:
+DIFÍCIL
+
+EXPECTATIVA:
+REVIEW_HUMAN
+
+DESCRICAO:
+Limítrofe: laudo aponta capacidade parcialmente preservada para trabalho leve; benefício negado
+
+TEXTO:
+RELATÓRIO
+
+A parte autora busca auxílio-doença, alegando doença lombar crônica e limitação para atividades de esforço. O INSS sustenta que o laudo administrativo concluiu pela capacidade parcial.
+
+FUNDAMENTAÇÃO
+
+A perícia judicial descreve quadro clínico estabilizado, com capacidade parcialmente preservada para atividades leves, sem levantamento de peso e sem flexão repetida da coluna. O perito não indicou incapacidade total, mas reconheceu restrições relevantes para a função habitual de auxiliar de carga. Os documentos médicos particulares sugerem crises intermitentes e necessidade de tratamento contínuo.
+
+A controvérsia é limítrofe, pois a incapacidade não é absoluta, mas a atividade habitual exige esforço incompatível com as restrições descritas. Há margem para avaliação judicial quanto à reabilitação, concessão temporária ou improcedência com base na capacidade residual.
+
+DISPOSITIVO
+
+Ante o exposto, julgo improcedente o pedido, considerando a capacidade residual para atividade leve e a possibilidade de reinserção profissional, sem prejuízo de novo requerimento administrativo se houver agravamento comprovado.
+
+A minuta examina o caso a partir dos documentos ordinários do processo e da narrativa constante dos autos. 
+A análise é feita de modo objetivo, com delimitação dos fatos relevantes, identificação da controvérsia e exame dos pontos necessários ao julgamento. 
+As referências processuais são fictícias e foram redigidas apenas para validação do JudiAudit, sem nomes reais, sem dados pessoais verdadeiros e sem qualquer vinculação a processo existente. 
+O texto busca manter linguagem jurídica plausível, com relatório sintético, fundamentação e dispositivo, evitando placeholders e evitando elementos externos ao domínio RGPS. 
+As conclusões abaixo devem ser lidas como peça simulada para fins de teste automatizado.
+
+---
+
+[CASE-010]
+
+DOMINIO:
+RGPS
+
+TIPO:
+DIFÍCIL
+
+EXPECTATIVA:
+REVIEW_HUMAN
+
+DESCRICAO:
+Limítrofe: PPP aponta exposição ao ruído mas nível medido está abaixo do limite legal
+
+TEXTO:
+RELATÓRIO
+
+O autor pretende aposentadoria especial, sustentando exposição a ruído durante vínculo industrial. Juntou PPP e formulários técnicos. O INSS defende que os níveis medidos não ultrapassam os limites legais.
+
+FUNDAMENTAÇÃO
+
+O PPP indica exposição a ruído, com medição média inferior ao limite de tolerância aplicável ao período. O formulário descreve uso de equipamento de proteção individual e ambiente produtivo com variação de intensidade sonora. A prova técnica não é inteiramente desfavorável, pois confirma contato com fonte ruidosa, mas a intensidade registrada fica abaixo do parâmetro legal para reconhecimento automático da especialidade.
+
+A controvérsia é limítrofe e exige exame cuidadoso da metodologia de medição, do período legislativo e da eventual neutralização do agente. A menção ao ruído não basta, por si só, para reconhecer atividade especial se o nível estiver aquém do limite normativo.
+
+DISPOSITIVO
+
+Ante o exposto, julgo improcedente o pedido de aposentadoria especial, sem prejuízo da averbação dos períodos comuns já reconhecidos.
+
+A minuta examina o caso a partir dos documentos ordinários do processo e da narrativa constante dos autos. 
+A análise é feita de modo objetivo, com delimitação dos fatos relevantes, identificação da controvérsia e exame dos pontos necessários ao julgamento. 
+As referências processuais são fictícias e foram redigidas apenas para validação do JudiAudit, sem nomes reais, sem dados pessoais verdadeiros e sem qualquer vinculação a processo existente. 
+O texto busca manter linguagem jurídica plausível, com relatório sintético, fundamentação e dispositivo, evitando placeholders e evitando elementos externos ao domínio RGPS. 
+As conclusões abaixo devem ser lidas como peça simulada para fins de teste automatizado.
+
+---
+
+[CASE-011]
+
+DOMINIO:
+TRABALHISTA
+
+TIPO:
+CORRETO
+
+EXPECTATIVA:
+NENHUM_ALERTA
+
+DESCRICAO:
+Vínculo empregatício reconhecido: subordinação e verbas trabalhistas fundamentadas e deferidas
+
+TEXTO:
+RELATÓRIO
+
+O reclamante ajuizou reclamação trabalhista pretendendo reconhecimento de vínculo empregatício com a reclamada, anotação da CTPS e pagamento de verbas trabalhistas. A reclamada sustentou prestação autônoma eventual.
+
+FUNDAMENTAÇÃO
+
+A prova oral e documental demonstra a presença dos requisitos da relação de emprego. Houve pessoalidade, pois o reclamante não podia se fazer substituir livremente. A habitualidade está demonstrada pela prestação contínua durante a semana. A onerosidade decorre dos pagamentos mensais comprovados. A subordinação aparece nas mensagens que indicam controle de horários, ordens diretas e fiscalização do serviço.
+
+Reconhecido o vínculo, são devidas as verbas trabalhistas decorrentes, observados os limites do pedido. A modalidade de término contratual foi dispensa sem justa causa, pois não houve comprovação de justa causa nem pedido de demissão. Cabem saldo salarial, aviso-prévio, férias proporcionais, décimo terceiro proporcional e FGTS com multa de 40%.
+
+DISPOSITIVO
+
+Ante o exposto, julgo procedentes em parte os pedidos para reconhecer o vínculo de emprego, determinar anotação em CTPS e condenar a reclamada ao pagamento das verbas trabalhistas especificadas em liquidação.
+
+A minuta examina o caso a partir dos documentos ordinários do processo e da narrativa constante dos autos. 
+A análise é feita de modo objetivo, com delimitação dos fatos relevantes, identificação da controvérsia e exame dos pontos necessários ao julgamento. 
+As referências processuais são fictícias e foram redigidas apenas para validação do JudiAudit, sem nomes reais, sem dados pessoais verdadeiros e sem qualquer vinculação a processo existente. 
+O texto busca manter linguagem jurídica plausível, com relatório sintético, fundamentação e dispositivo, evitando placeholders e evitando elementos externos ao domínio TRABALHISTA. 
+As conclusões abaixo devem ser lidas como peça simulada para fins de teste automatizado.
+
+---
+
+[CASE-012]
+
+DOMINIO:
+TRABALHISTA
+
+TIPO:
+CORRETO
+
+EXPECTATIVA:
+NENHUM_ALERTA
+
+DESCRICAO:
+Horas extras deferidas: jornada e controle de ponto analisados, dispositivo coerente
+
+TEXTO:
+RELATÓRIO
+
+A parte reclamante pretende o pagamento de horas extras e reflexos. Afirma que trabalhava além da jornada contratual sem a correspondente contraprestação. A reclamada apresentou cartões de ponto e recibos de pagamento.
+
+FUNDAMENTAÇÃO
+
+A jornada de trabalho foi analisada com base nos controles de ponto, depoimentos e recibos salariais. Os cartões revelam extrapolação habitual da oitava hora diária e da quadragésima quarta semanal, sem compensação integral. A prova oral confirma que havia controle de ponto e que parte da sobrejornada não era corretamente paga.
+
+Considerando a jornada efetivamente registrada e a ausência de quitação integral, são devidas horas extras, com adicional legal ou convencional e reflexos em repouso semanal remunerado, férias, décimo terceiro e FGTS. O pedido foi suficientemente comprovado.
+
+DISPOSITIVO
+
+Ante o exposto, julgo procedente o pedido de horas extras, condenando a reclamada ao pagamento das diferenças apuradas pelos cartões de ponto, com reflexos legais, observados os parâmetros da fundamentação.
+
+A minuta examina o caso a partir dos documentos ordinários do processo e da narrativa constante dos autos. 
+A análise é feita de modo objetivo, com delimitação dos fatos relevantes, identificação da controvérsia e exame dos pontos necessários ao julgamento. 
+As referências processuais são fictícias e foram redigidas apenas para validação do JudiAudit, sem nomes reais, sem dados pessoais verdadeiros e sem qualquer vinculação a processo existente. 
+O texto busca manter linguagem jurídica plausível, com relatório sintético, fundamentação e dispositivo, evitando placeholders e evitando elementos externos ao domínio TRABALHISTA. 
+As conclusões abaixo devem ser lidas como peça simulada para fins de teste automatizado.
+
+---
+
+[CASE-013]
+
+DOMINIO:
+TRABALHISTA
+
+TIPO:
+CORRETO
+
+EXPECTATIVA:
+NENHUM_ALERTA
+
+DESCRICAO:
+Improcedência trabalhista: ausência de subordinação devidamente fundamentada
+
+TEXTO:
+RELATÓRIO
+
+O reclamante pede reconhecimento de vínculo empregatício. A reclamada afirma que a relação era de prestação autônoma de serviços, sem subordinação jurídica.
+
+FUNDAMENTAÇÃO
+
+A prova produzida não demonstra subordinação. O reclamante tinha liberdade para aceitar ou recusar demandas, organizava sua própria agenda e prestava serviços a outros tomadores. Não houve controle de jornada, exclusividade ou imposição de ordens diretas típicas do poder empregatício. Embora houvesse remuneração, a onerosidade isolada não basta para formar vínculo de emprego.
+
+Também não ficou comprovada a habitualidade nos moldes alegados, pois os serviços eram intermitentes e por demanda. A pessoalidade não se mostrou absoluta, já que o reclamante podia indicar substituto em algumas ocasiões. Ausentes os requisitos cumulativos, não há relação de emprego.
+
+DISPOSITIVO
+
+Ante o exposto, julgo improcedentes os pedidos de reconhecimento de vínculo empregatício, anotação em CTPS e verbas trabalhistas decorrentes.
+
+A minuta examina o caso a partir dos documentos ordinários do processo e da narrativa constante dos autos. 
+A análise é feita de modo objetivo, com delimitação dos fatos relevantes, identificação da controvérsia e exame dos pontos necessários ao julgamento. 
+As referências processuais são fictícias e foram redigidas apenas para validação do JudiAudit, sem nomes reais, sem dados pessoais verdadeiros e sem qualquer vinculação a processo existente. 
+O texto busca manter linguagem jurídica plausível, com relatório sintético, fundamentação e dispositivo, evitando placeholders e evitando elementos externos ao domínio TRABALHISTA. 
+As conclusões abaixo devem ser lidas como peça simulada para fins de teste automatizado.
+
+---
+
+[CASE-014]
+
+DOMINIO:
+TRABALHISTA
+
+TIPO:
+CORRETO
+
+EXPECTATIVA:
+NENHUM_ALERTA
+
+DESCRICAO:
+Rescisão indireta: descumprimento patronal reconhecido, verbas deferidas
+
+TEXTO:
+RELATÓRIO
+
+O reclamante pretende reconhecimento de rescisão indireta, alegando atraso reiterado de salários e ausência de recolhimento de FGTS. A reclamada nega falta grave patronal.
+
+FUNDAMENTAÇÃO
+
+A prova documental demonstra atraso salarial reiterado e ausência de recolhimentos fundiários por período relevante. Tais condutas caracterizam descumprimento grave das obrigações contratuais, autorizando a rescisão indireta. A modalidade da rescisão deve ser equiparada à dispensa sem justa causa, com pagamento das verbas rescisórias correspondentes.
+
+São devidos aviso-prévio, saldo de salário, férias proporcionais acrescidas de um terço, décimo terceiro proporcional, FGTS do período contratual e multa de 40%. A mora patronal está comprovada por extratos e recibos incompletos.
+
+DISPOSITIVO
+
+Ante o exposto, reconheço a rescisão indireta do contrato de trabalho e condeno a reclamada ao pagamento das verbas rescisórias próprias da dispensa sem justa causa, em valores a apurar.
+
+A minuta examina o caso a partir dos documentos ordinários do processo e da narrativa constante dos autos. 
+A análise é feita de modo objetivo, com delimitação dos fatos relevantes, identificação da controvérsia e exame dos pontos necessários ao julgamento. 
+As referências processuais são fictícias e foram redigidas apenas para validação do JudiAudit, sem nomes reais, sem dados pessoais verdadeiros e sem qualquer vinculação a processo existente. 
+O texto busca manter linguagem jurídica plausível, com relatório sintético, fundamentação e dispositivo, evitando placeholders e evitando elementos externos ao domínio TRABALHISTA. 
+As conclusões abaixo devem ser lidas como peça simulada para fins de teste automatizado.
+
+---
+
+[CASE-015]
+
+DOMINIO:
+TRABALHISTA
+
+TIPO:
+ERRO_CONTROLADO
+
+EXPECTATIVA:
+EMPLOYMENT_RELATION_CONTRADICTION
+
+DESCRICAO:
+Contradição: fundamentação afasta relação de emprego, dispositivo reconhece vínculo e determina anotação em CTPS
+
+TEXTO:
+RELATÓRIO
+
+O reclamante busca reconhecimento de vínculo empregatício e anotação em CTPS. Afirma que prestava serviços diariamente para a reclamada. A defesa sustenta relação autônoma.
+
+FUNDAMENTAÇÃO
+
+A prova dos autos afasta a relação de emprego. Não houve subordinação jurídica, pois o reclamante definia seu modo de execução, recusava tarefas e não sofria sanções disciplinares. A habitualidade não foi comprovada com segurança, e a prestação ocorria conforme demanda. A pessoalidade também não era rígida, pois havia possibilidade de substituição. Assim, não caracterizada relação de emprego.
+
+A inexistência de vínculo impede a condenação em verbas trabalhistas típicas da CLT, inclusive anotação da CTPS. O conjunto probatório indica prestação autônoma, sem os elementos cumulativos do art. 3º da CLT.
+
+DISPOSITIVO
+
+Ante o exposto, julgo procedente o pedido para reconhecer o vínculo de emprego, declaro o vínculo entre as partes e determino a anotação em CTPS, além do pagamento das verbas trabalhistas decorrentes.
+
+A minuta examina o caso a partir dos documentos ordinários do processo e da narrativa constante dos autos. 
+A análise é feita de modo objetivo, com delimitação dos fatos relevantes, identificação da controvérsia e exame dos pontos necessários ao julgamento. 
+As referências processuais são fictícias e foram redigidas apenas para validação do JudiAudit, sem nomes reais, sem dados pessoais verdadeiros e sem qualquer vinculação a processo existente. 
+O texto busca manter linguagem jurídica plausível, com relatório sintético, fundamentação e dispositivo, evitando placeholders e evitando elementos externos ao domínio TRABALHISTA. 
+As conclusões abaixo devem ser lidas como peça simulada para fins de teste automatizado.
+
+---
+
+[CASE-016]
+
+DOMINIO:
+TRABALHISTA
+
+TIPO:
+ERRO_CONTROLADO
+
+EXPECTATIVA:
+WITNESS_OVERTIME_CONTRADICTION
+
+DESCRICAO:
+Contradição E×C: prova testemunhal confirma jornada extraordinária, horas extras negadas por ausência de prova
+
+TEXTO:
+RELATÓRIO
+
+O reclamante pleiteia horas extras, afirmando que laborava além da jornada contratual. A reclamada nega sobrejornada e sustenta regularidade dos pagamentos.
+
+FUNDAMENTAÇÃO
+
+A prova testemunhal foi consistente. A testemunha confirmou que o reclamante iniciava a jornada antes do horário formal e permanecia após o encerramento do expediente, realizando labor extraordinário de modo habitual. Também declarou que os controles de ponto não refletiam integralmente a jornada efetiva. A prova testemunhal confirma jornada extraordinária e sobrejornada não registrada.
+
+Embora os cartões de ponto indiquem horários uniformes, a oralidade produzida os infirmou. Há elementos suficientes para reconhecer extrapolação de jornada.
+
+DISPOSITIVO
+
+Diante do exposto, julgo improcedente o pedido de horas extras por ausência de prova e por não comprovada jornada extraordinária. Ficam rejeitados os reflexos postulados.
+
+A minuta examina o caso a partir dos documentos ordinários do processo e da narrativa constante dos autos. 
+A análise é feita de modo objetivo, com delimitação dos fatos relevantes, identificação da controvérsia e exame dos pontos necessários ao julgamento. 
+As referências processuais são fictícias e foram redigidas apenas para validação do JudiAudit, sem nomes reais, sem dados pessoais verdadeiros e sem qualquer vinculação a processo existente. 
+O texto busca manter linguagem jurídica plausível, com relatório sintético, fundamentação e dispositivo, evitando placeholders e evitando elementos externos ao domínio TRABALHISTA. 
+As conclusões abaixo devem ser lidas como peça simulada para fins de teste automatizado.
+
+---
+
+[CASE-017]
+
+DOMINIO:
+TRABALHISTA
+
+TIPO:
+ERRO_CONTROLADO
+
+EXPECTATIVA:
+MISSING_ESSENTIAL_TOPIC
+
+DESCRICAO:
+Coverage: horas extras não enfrentam jornada, horário ou controle de ponto
+
+TEXTO:
+RELATÓRIO
+
+A reclamação trabalhista trata de horas extras. O reclamante afirma ter trabalhado além do horário normal e pede diferenças salariais com reflexos.
+
+FUNDAMENTAÇÃO
+
+A controvérsia envolve horas extras, sobrejornada e pagamento de parcelas decorrentes do contrato. A decisão considera que o trabalhador relatou excesso de labor e que a reclamada apresentou defesa genérica. Também se observa que houve relação de emprego e remuneração mensal.
+
+Todavia, a fundamentação não examina a jornada de trabalho, não indica horário de entrada ou saída, não avalia controle de ponto, não descreve extrapolação e não analisa banco de horas ou intervalo. A conclusão é baseada apenas na existência do contrato e na afirmação genérica de trabalho excessivo, sem enfrentar o núcleo probatório do pedido.
+
+DISPOSITIVO
+
+Ante o exposto, julgo procedente o pedido de horas extras, com reflexos, em valores a apurar.
+
+A minuta examina o caso a partir dos documentos ordinários do processo e da narrativa constante dos autos. 
+A análise é feita de modo objetivo, com delimitação dos fatos relevantes, identificação da controvérsia e exame dos pontos necessários ao julgamento. 
+As referências processuais são fictícias e foram redigidas apenas para validação do JudiAudit, sem nomes reais, sem dados pessoais verdadeiros e sem qualquer vinculação a processo existente. 
+O texto busca manter linguagem jurídica plausível, com relatório sintético, fundamentação e dispositivo, evitando placeholders e evitando elementos externos ao domínio TRABALHISTA. 
+As conclusões abaixo devem ser lidas como peça simulada para fins de teste automatizado.
+
+---
+
+[CASE-018]
+
+DOMINIO:
+TRABALHISTA
+
+TIPO:
+ERRO_CONTROLADO
+
+EXPECTATIVA:
+UNADDRESSED_MAIN_REQUEST
+
+DESCRICAO:
+R×D: horas extras pedidas, dispositivo condena apenas em verbas rescisórias sem enfrentar o pedido
+
+TEXTO:
+RELATÓRIO
+
+O reclamante ajuizou reclamação trabalhista com pedidos de horas extras e verbas rescisórias. Sustenta que cumpria jornada superior à legal e que não recebeu parcelas no término do contrato.
+
+FUNDAMENTAÇÃO
+
+A prova documental demonstra que houve dispensa sem justa causa e ausência de pagamento integral das verbas rescisórias. Os recibos não contemplam aviso-prévio, férias proporcionais e multa de 40% do FGTS. A modalidade da rescisão está definida e autoriza a condenação nessas parcelas.
+
+Embora a inicial também contenha pedido de horas extras, a análise se concentra nas verbas rescisórias e não examina jornada, controle de ponto, extrapolação ou reflexos de sobrejornada. A matéria relativa a horas extras permanece sem enfrentamento específico.
+
+DISPOSITIVO
+
+Ante o exposto, julgo procedente em parte a reclamação e condeno a reclamada ao pagamento de aviso-prévio, férias proporcionais, décimo terceiro proporcional, FGTS e multa de 40%. Custas pela reclamada.
+
+A minuta examina o caso a partir dos documentos ordinários do processo e da narrativa constante dos autos. 
+A análise é feita de modo objetivo, com delimitação dos fatos relevantes, identificação da controvérsia e exame dos pontos necessários ao julgamento. 
+As referências processuais são fictícias e foram redigidas apenas para validação do JudiAudit, sem nomes reais, sem dados pessoais verdadeiros e sem qualquer vinculação a processo existente. 
+O texto busca manter linguagem jurídica plausível, com relatório sintético, fundamentação e dispositivo, evitando placeholders e evitando elementos externos ao domínio TRABALHISTA. 
+As conclusões abaixo devem ser lidas como peça simulada para fins de teste automatizado.
+
+---
+
+[CASE-019]
+
+DOMINIO:
+TRABALHISTA
+
+TIPO:
+DIFÍCIL
+
+EXPECTATIVA:
+REVIEW_HUMAN
+
+DESCRICAO:
+Limítrofe: pejotização — prestador CNPJ com elementos de subordinação e habitualidade
+
+TEXTO:
+RELATÓRIO
+
+O prestador ajuizou ação trabalhista sustentando pejotização fraudulenta. Afirma que era contratado por pessoa jurídica, mas prestava serviços de forma pessoal e contínua. A reclamada sustenta contrato empresarial lícito.
+
+FUNDAMENTAÇÃO
+
+A prova é ambígua. Há notas fiscais emitidas pela pessoa jurídica do prestador, contrato de prestação de serviços e liberdade formal de organização. Por outro lado, mensagens internas indicam integração à rotina da empresa, cumprimento de metas, presença em reuniões obrigatórias e comunicação direta com gestores. A habitualidade parece presente, mas a subordinação jurídica não é evidente em todos os períodos.
+
+O caso exige revisão humana, pois a linha entre autonomia empresarial e relação de emprego depende da valoração concreta dos fatos. A existência de CNPJ não afasta vínculo, mas também não o comprova automaticamente.
+
+DISPOSITIVO
+
+Ante o exposto, julgo improcedente o pedido de vínculo empregatício, considerando insuficiente a prova de subordinação jurídica típica, sem prejuízo da complexidade do conjunto probatório.
+
+A minuta examina o caso a partir dos documentos ordinários do processo e da narrativa constante dos autos. 
+A análise é feita de modo objetivo, com delimitação dos fatos relevantes, identificação da controvérsia e exame dos pontos necessários ao julgamento. 
+As referências processuais são fictícias e foram redigidas apenas para validação do JudiAudit, sem nomes reais, sem dados pessoais verdadeiros e sem qualquer vinculação a processo existente. 
+O texto busca manter linguagem jurídica plausível, com relatório sintético, fundamentação e dispositivo, evitando placeholders e evitando elementos externos ao domínio TRABALHISTA. 
+As conclusões abaixo devem ser lidas como peça simulada para fins de teste automatizado.
+
+---
+
+[CASE-020]
+
+DOMINIO:
+TRABALHISTA
+
+TIPO:
+DIFÍCIL
+
+EXPECTATIVA:
+REVIEW_HUMAN
+
+DESCRICAO:
+Limítrofe: pedido subsidiário de indenização substitutiva de reintegração parcialmente enfrentado
+
+TEXTO:
+RELATÓRIO
+
+A reclamante pretende reintegração ao emprego, alegando estabilidade provisória. Subsidiariamente, pede indenização substitutiva do período estabilitário. A empresa sustenta término regular do contrato.
+
+FUNDAMENTAÇÃO
+
+A estabilidade é controvertida. Há documento médico próximo à dispensa e comunicação posterior à empresa. A reintegração imediata não se mostra adequada porque o período estabilitário está quase integralmente transcorrido e o ambiente laboral encontra-se deteriorado. O pedido subsidiário de indenização substitutiva foi mencionado pelas partes e parcialmente analisado, mas a extensão temporal depende de apuração precisa.
+
+O caso é limítrofe, pois há fundamento tanto para reintegração quanto para conversão em indenização. A solução exige exame mais cuidadoso dos marcos temporais e do pedido subsidiário.
+
+DISPOSITIVO
+
+Ante o exposto, indefiro a reintegração. Quanto à indenização substitutiva, reconheço a necessidade de apuração em liquidação, observados os limites do período estabilitário comprovado.
+
+A minuta examina o caso a partir dos documentos ordinários do processo e da narrativa constante dos autos. 
+A análise é feita de modo objetivo, com delimitação dos fatos relevantes, identificação da controvérsia e exame dos pontos necessários ao julgamento. 
+As referências processuais são fictícias e foram redigidas apenas para validação do JudiAudit, sem nomes reais, sem dados pessoais verdadeiros e sem qualquer vinculação a processo existente. 
+O texto busca manter linguagem jurídica plausível, com relatório sintético, fundamentação e dispositivo, evitando placeholders e evitando elementos externos ao domínio TRABALHISTA. 
+As conclusões abaixo devem ser lidas como peça simulada para fins de teste automatizado.
+
+---
+
+[CASE-021]
+
+DOMINIO:
+FAMÍLIA
+
+TIPO:
+CORRETO
+
+EXPECTATIVA:
+NENHUM_ALERTA
+
+DESCRICAO:
+Guarda compartilhada deferida: melhor interesse e condições parentais analisados
+
+TEXTO:
+RELATÓRIO
+
+Trata-se de ação de guarda compartilhada de filho menor. Ambos os genitores compareceram aos autos e apresentaram documentos sobre rotina escolar, moradia e disponibilidade para acompanhamento da criança.
+
+FUNDAMENTAÇÃO
+
+A análise deve observar o melhor interesse da criança, a proteção integral e a preservação da convivência familiar saudável. A prova demonstra que ambos os genitores possuem condições mínimas de cuidado, vínculo afetivo consolidado e participação na rotina do menor. A escola informou bom desenvolvimento e ausência de situação de risco em qualquer residência.
+
+A guarda compartilhada é adequada porque favorece corresponsabilidade parental e mantém referências familiares importantes. A residência de referência deve observar a rotina escolar, sem impedir convivência ampla com o outro genitor. O regime proposto atende ao bem-estar da criança e reduz conflitos.
+
+DISPOSITIVO
+
+Ante o exposto, julgo procedente em parte o pedido para fixar guarda compartilhada, com residência de referência materna e convivência paterna em finais de semana alternados, além de divisão de férias e datas comemorativas.
+
+A minuta examina o caso a partir dos documentos ordinários do processo e da narrativa constante dos autos. 
+A análise é feita de modo objetivo, com delimitação dos fatos relevantes, identificação da controvérsia e exame dos pontos necessários ao julgamento. 
+As referências processuais são fictícias e foram redigidas apenas para validação do JudiAudit, sem nomes reais, sem dados pessoais verdadeiros e sem qualquer vinculação a processo existente. 
+O texto busca manter linguagem jurídica plausível, com relatório sintético, fundamentação e dispositivo, evitando placeholders e evitando elementos externos ao domínio FAMÍLIA. 
+As conclusões abaixo devem ser lidas como peça simulada para fins de teste automatizado.
+
+---
+
+[CASE-022]
+
+DOMINIO:
+FAMÍLIA
+
+TIPO:
+CORRETO
+
+EXPECTATIVA:
+NENHUM_ALERTA
+
+DESCRICAO:
+Alimentos fixados: necessidade e possibilidade fundamentadas, dispositivo coerente
+
+TEXTO:
+RELATÓRIO
+
+Ação de alimentos proposta em favor de menor. A representante legal afirma necessidade de contribuição paterna para despesas escolares, alimentação, saúde e moradia. O réu apresentou comprovantes de renda.
+
+FUNDAMENTAÇÃO
+
+A obrigação alimentar deve observar o binômio necessidade e possibilidade. As necessidades do alimentando decorrem da menoridade e foram comprovadas por documentos de escola, plano de saúde e despesas ordinárias. A possibilidade do alimentante é aferida pelos rendimentos comprovados, sem prejuízo de suas despesas básicas.
+
+O valor deve ser proporcional, garantindo subsistência digna ao menor sem impor encargo excessivo. A prova permite fixar alimentos em percentual compatível com a renda do genitor.
+
+DISPOSITIVO
+
+Ante o exposto, julgo procedente em parte o pedido para fixar alimentos em 25% dos rendimentos líquidos do alimentante, incluindo férias, décimo terceiro e verbas salariais habituais, com desconto em folha quando possível.
+
+A minuta examina o caso a partir dos documentos ordinários do processo e da narrativa constante dos autos. 
+A análise é feita de modo objetivo, com delimitação dos fatos relevantes, identificação da controvérsia e exame dos pontos necessários ao julgamento. 
+As referências processuais são fictícias e foram redigidas apenas para validação do JudiAudit, sem nomes reais, sem dados pessoais verdadeiros e sem qualquer vinculação a processo existente. 
+O texto busca manter linguagem jurídica plausível, com relatório sintético, fundamentação e dispositivo, evitando placeholders e evitando elementos externos ao domínio FAMÍLIA. 
+As conclusões abaixo devem ser lidas como peça simulada para fins de teste automatizado.
+
+---
+
+[CASE-023]
+
+DOMINIO:
+FAMÍLIA
+
+TIPO:
+ERRO_CONTROLADO
+
+EXPECTATIVA:
+MISSING_ESSENTIAL_TOPIC
+
+DESCRICAO:
+Coverage: guarda sem análise do melhor interesse da criança nem condições dos genitores
+
+TEXTO:
+RELATÓRIO
+
+Ação de guarda compartilhada de filho menor. A autora afirma que deseja modificar a guarda atualmente exercida pelo genitor. O réu discorda e sustenta que a situação atual deve ser mantida.
+
+FUNDAMENTAÇÃO
+
+O processo trata de litígio entre pais. A decisão registra que houve divergência e que ambos apresentaram manifestações nos autos. Também menciona documentos escolares e comprovantes de residência. Contudo, a fundamentação não examina a conveniência da medida para o menor, não enfrenta as necessidades deste e não avalia o contexto habitacional e pessoal envolvido.
+
+A conclusão limita-se a afirmar que a guarda deve ser modificada porque uma das partes formulou pedido, sem exame substancial dos elementos próprios das ações de família envolvendo menor.
+
+DISPOSITIVO
+
+Ante o exposto, julgo procedente o pedido para alterar a guarda, fixando guarda unilateral em favor da autora e regulamentando visitas em finais de semana alternados.
+
+A minuta examina o caso a partir dos documentos ordinários do processo e da narrativa constante dos autos. 
+A análise é feita de modo objetivo, com delimitação dos fatos relevantes, identificação da controvérsia e exame dos pontos necessários ao julgamento. 
+As referências processuais são fictícias e foram redigidas apenas para validação do JudiAudit, sem nomes reais, sem dados pessoais verdadeiros e sem qualquer vinculação a processo existente. 
+O texto busca manter linguagem jurídica plausível, com relatório sintético, fundamentação e dispositivo, evitando placeholders e evitando elementos externos ao domínio FAMÍLIA. 
+As conclusões abaixo devem ser lidas como peça simulada para fins de teste automatizado.
+
+---
+
+[CASE-024]
+
+DOMINIO:
+FAMÍLIA
+
+TIPO:
+ERRO_CONTROLADO
+
+EXPECTATIVA:
+UNADDRESSED_MAIN_REQUEST
+
+DESCRICAO:
+R×D: alimentos pedidos, dispositivo decide apenas a guarda sem enfrentar o pedido alimentar
+
+TEXTO:
+RELATÓRIO
+
+Ação de guarda e alimentos. A autora pede guarda unilateral da criança e também requer alimentos mensais em favor do menor. O réu apresentou contestação sobre ambos os pontos.
+
+FUNDAMENTAÇÃO
+
+A prova demonstra que a criança reside com a mãe, possui rotina escolar estável e mantém vínculo afetivo com ambos os genitores. O melhor interesse recomenda que a guarda permaneça com a mãe, preservada a convivência paterna. Foram analisadas as condições parentais, a rotina de cuidado e a necessidade de reduzir conflitos familiares.
+
+Apesar de a inicial conter pedido alimentar, a fundamentação não examina necessidade do menor, possibilidade do alimentante, renda, despesas ou proporcionalidade da verba alimentar.
+
+DISPOSITIVO
+
+Ante o exposto, julgo procedente em parte o pedido e fixo guarda unilateral materna e regulamento convivência paterna quinzenal. Sem outras deliberações.
+
+A minuta examina o caso a partir dos documentos ordinários do processo e da narrativa constante dos autos. 
+A análise é feita de modo objetivo, com delimitação dos fatos relevantes, identificação da controvérsia e exame dos pontos necessários ao julgamento. 
+As referências processuais são fictícias e foram redigidas apenas para validação do JudiAudit, sem nomes reais, sem dados pessoais verdadeiros e sem qualquer vinculação a processo existente. 
+O texto busca manter linguagem jurídica plausível, com relatório sintético, fundamentação e dispositivo, evitando placeholders e evitando elementos externos ao domínio FAMÍLIA. 
+As conclusões abaixo devem ser lidas como peça simulada para fins de teste automatizado.
+
+---
+
+[CASE-025]
+
+DOMINIO:
+FAMÍLIA
+
+TIPO:
+DIFÍCIL
+
+EXPECTATIVA:
+REVIEW_HUMAN
+
+DESCRICAO:
+Limítrofe: dependência econômica parcial — convivente com renda própria, mas sustento complementar comprovado
+
+TEXTO:
+RELATÓRIO
+
+Ação envolvendo pensão por morte e alegação de dependência econômica de convivente. A parte autora possuía renda própria, mas afirma que recebia auxílio financeiro contínuo do falecido.
+
+FUNDAMENTAÇÃO
+
+A prova é ambivalente. Há documentos que indicam endereço comum e transferências periódicas do falecido para a autora. Também há comprovantes de renda própria da requerente, suficientes para parte de suas despesas. A dependência econômica parcial não se confunde com dependência integral, e a valoração deve considerar estabilidade, habitualidade e relevância do auxílio.
+
+O caso é difícil porque a renda própria não elimina automaticamente a dependência, mas pode reduzir a força da presunção fática. Recomenda-se revisão humana da suficiência dos documentos.
+
+DISPOSITIVO
+
+Ante o exposto, julgo improcedente o pedido de pensão, entendendo que a dependência econômica não ficou suficientemente demonstrada em grau bastante.
+
+A minuta examina o caso a partir dos documentos ordinários do processo e da narrativa constante dos autos. 
+A análise é feita de modo objetivo, com delimitação dos fatos relevantes, identificação da controvérsia e exame dos pontos necessários ao julgamento. 
+As referências processuais são fictícias e foram redigidas apenas para validação do JudiAudit, sem nomes reais, sem dados pessoais verdadeiros e sem qualquer vinculação a processo existente. 
+O texto busca manter linguagem jurídica plausível, com relatório sintético, fundamentação e dispositivo, evitando placeholders e evitando elementos externos ao domínio FAMÍLIA. 
+As conclusões abaixo devem ser lidas como peça simulada para fins de teste automatizado.
+
+---
+
+[CASE-026]
+
+DOMINIO:
+FAMÍLIA
+
+TIPO:
+DIFÍCIL
+
+EXPECTATIVA:
+REVIEW_HUMAN
+
+DESCRICAO:
+Limítrofe: alienação parental — dano moral parcialmente reconhecido, quantum contestável
+
+TEXTO:
+RELATÓRIO
+
+Ação de indenização por dano moral decorrente de suposta alienação parental. A autora afirma que o réu dificultou convivência familiar e causou sofrimento relevante à criança e ao genitor afastado.
+
+FUNDAMENTAÇÃO
+
+Os autos revelam conflitos familiares intensos, mensagens hostis e episódios de resistência à convivência. Há indícios de conduta inadequada, mas a prova técnica não é conclusiva quanto à configuração plena de alienação parental. O dano moral é parcialmente reconhecível em razão de condutas abusivas, embora o quantum pretendido seja elevado e dependa de prudente arbitramento.
+
+O caso é limítrofe porque há elementos de sofrimento e obstrução de convivência, mas também há contexto de conflito recíproco. A solução exige revisão humana sobre extensão do dano e proporcionalidade da indenização.
+
+DISPOSITIVO
+
+Ante o exposto, julgo parcialmente procedente o pedido para reconhecer conduta abusiva e fixar compensação moderada, sem acolher integralmente o valor pretendido.
+
+A minuta examina o caso a partir dos documentos ordinários do processo e da narrativa constante dos autos. 
+A análise é feita de modo objetivo, com delimitação dos fatos relevantes, identificação da controvérsia e exame dos pontos necessários ao julgamento. 
+As referências processuais são fictícias e foram redigidas apenas para validação do JudiAudit, sem nomes reais, sem dados pessoais verdadeiros e sem qualquer vinculação a processo existente. 
+O texto busca manter linguagem jurídica plausível, com relatório sintético, fundamentação e dispositivo, evitando placeholders e evitando elementos externos ao domínio FAMÍLIA. 
+As conclusões abaixo devem ser lidas como peça simulada para fins de teste automatizado.
+
+---
+
+[CASE-027]
+
+DOMINIO:
+CONSUMIDOR
+
+TIPO:
+CORRETO
+
+EXPECTATIVA:
+NENHUM_ALERTA
+
+DESCRICAO:
+Cobrança indevida: restituição em dobro, falha do serviço e nexo causal estabelecidos
+
+TEXTO:
+RELATÓRIO
+
+Ação consumerista por cobrança indevida. A autora afirma que foi debitada por serviço não contratado e busca restituição em dobro. A ré sustenta regularidade da cobrança.
+
+FUNDAMENTAÇÃO
+
+A relação de consumo está caracterizada, pois a autora é destinatária final do serviço e a ré atua como fornecedora. A falha na prestação do serviço ficou demonstrada pela ausência de contrato válido e pela manutenção de cobrança indevida após reclamação administrativa. O nexo causal é direto, pois o débito decorreu da conduta da fornecedora.
+
+A cobrança indevida autoriza restituição em dobro, diante da ausência de engano justificável. O dano material corresponde aos valores debitados indevidamente. Não há pedido de dano moral relevante nesta peça, e a solução limita-se à restituição.
+
+DISPOSITIVO
+
+Ante o exposto, julgo procedente o pedido para declarar indevida a cobrança e condenar a ré à restituição em dobro dos valores pagos, conforme comprovantes dos autos, com correção e juros legais.
+
+A minuta examina o caso a partir dos documentos ordinários do processo e da narrativa constante dos autos. 
+A análise é feita de modo objetivo, com delimitação dos fatos relevantes, identificação da controvérsia e exame dos pontos necessários ao julgamento. 
+As referências processuais são fictícias e foram redigidas apenas para validação do JudiAudit, sem nomes reais, sem dados pessoais verdadeiros e sem qualquer vinculação a processo existente. 
+O texto busca manter linguagem jurídica plausível, com relatório sintético, fundamentação e dispositivo, evitando placeholders e evitando elementos externos ao domínio CONSUMIDOR. 
+As conclusões abaixo devem ser lidas como peça simulada para fins de teste automatizado.
+
+---
+
+[CASE-028]
+
+DOMINIO:
+CONSUMIDOR
+
+TIPO:
+CORRETO
+
+EXPECTATIVA:
+NENHUM_ALERTA
+
+DESCRICAO:
+Improcedência consumidor: ausência de defeito do produto devidamente fundamentada
+
+TEXTO:
+RELATÓRIO
+
+Ação de consumidor envolvendo alegado produto defeituoso. O autor sustenta que o bem apresentou falha após a compra. A fornecedora afirma mau uso e ausência de defeito de fabricação.
+
+FUNDAMENTAÇÃO
+
+A relação de consumo é incontroversa. Contudo, a prova técnica não identificou vício do produto nem defeito de fabricação. O laudo constatou dano compatível com mau uso e ausência de falha originária. O autor não produziu prova capaz de demonstrar defeito do produto ou falha na prestação do serviço de garantia.
+
+Sem comprovação do defeito, não há dever de substituição, abatimento ou indenização. A improcedência decorre de análise probatória específica e não de ausência de relação de consumo.
+
+DISPOSITIVO
+
+Ante o exposto, julgo improcedentes os pedidos, reconhecendo que não ficou demonstrado vício do produto ou defeito do serviço prestado pela fornecedora.
+
+A minuta examina o caso a partir dos documentos ordinários do processo e da narrativa constante dos autos. 
+A análise é feita de modo objetivo, com delimitação dos fatos relevantes, identificação da controvérsia e exame dos pontos necessários ao julgamento. 
+As referências processuais são fictícias e foram redigidas apenas para validação do JudiAudit, sem nomes reais, sem dados pessoais verdadeiros e sem qualquer vinculação a processo existente. 
+O texto busca manter linguagem jurídica plausível, com relatório sintético, fundamentação e dispositivo, evitando placeholders e evitando elementos externos ao domínio CONSUMIDOR. 
+As conclusões abaixo devem ser lidas como peça simulada para fins de teste automatizado.
+
+---
+
+[CASE-029]
+
+DOMINIO:
+CONSUMIDOR
+
+TIPO:
+ERRO_CONTROLADO
+
+EXPECTATIVA:
+MORAL_DAMAGE_CONTRADICTION
+
+DESCRICAO:
+Contradição: fundamentação afasta dano moral (mero aborrecimento), dispositivo condena por dano moral
+
+TEXTO:
+RELATÓRIO
+
+Ação consumerista em que o autor pede restituição e dano moral por atraso no atendimento. A empresa sustenta que houve mero aborrecimento e que o serviço foi regularizado.
+
+FUNDAMENTAÇÃO
+
+A relação de consumo é reconhecida. A falha operacional foi pontual e resolvida em prazo razoável. Quanto ao dano moral, a situação não ultrapassou mero aborrecimento cotidiano. Não houve exposição vexatória, negativação indevida, perda de tempo excepcional ou violação concreta a atributo da personalidade. Assim, não configurado dano moral indenizável.
+
+Eventual restituição material pode ser examinada pelos comprovantes, mas a compensação moral deve ser afastada. A jurisprudência diferencia transtorno ordinário de lesão extrapatrimonial relevante.
+
+DISPOSITIVO
+
+Ante o exposto, julgo procedente o pedido de dano moral e condeno a ré ao pagamento de indenização moral no valor de R$ 5.000,00, além de correção monetária e juros.
+
+A minuta examina o caso a partir dos documentos ordinários do processo e da narrativa constante dos autos. 
+A análise é feita de modo objetivo, com delimitação dos fatos relevantes, identificação da controvérsia e exame dos pontos necessários ao julgamento. 
+As referências processuais são fictícias e foram redigidas apenas para validação do JudiAudit, sem nomes reais, sem dados pessoais verdadeiros e sem qualquer vinculação a processo existente. 
+O texto busca manter linguagem jurídica plausível, com relatório sintético, fundamentação e dispositivo, evitando placeholders e evitando elementos externos ao domínio CONSUMIDOR. 
+As conclusões abaixo devem ser lidas como peça simulada para fins de teste automatizado.
+
+---
+
+[CASE-030]
+
+DOMINIO:
+CONSUMIDOR
+
+TIPO:
+ERRO_CONTROLADO
+
+EXPECTATIVA:
+MISSING_ESSENTIAL_TOPIC
+
+DESCRICAO:
+Coverage: cobrança indevida sem análise da falha do serviço nem do nexo causal
+
+TEXTO:
+RELATÓRIO
+
+Ação de consumidor por cobrança indevida e restituição. A autora afirma que recebeu boletos e cobranças em seu nome, requerendo declaração de inexigibilidade e devolução.
+
+FUNDAMENTAÇÃO
+
+O processo envolve consumidor, fornecedor, cobrança indevida, restituição e repetição do indébito. A decisão registra que a autora se sentiu prejudicada e que a empresa emitiu cobranças. Também observa que houve reclamação administrativa.
+
+Entretanto, a fundamentação não examina a origem do problema, não detalha o equívoco cometido, não demonstra ligação direta entre as condutas e o aborrecimento alegado, limitando-se a considerações gerais. A análise permanece genérica, sem enfrentar os elementos mínimos da demanda.
+
+DISPOSITIVO
+
+Ante o exposto, julgo procedente o pedido para declarar inexigível a cobrança e determinar restituição simples, em valor a ser apurado.
+
+A minuta examina o caso a partir dos documentos ordinários do processo e da narrativa constante dos autos. 
+A análise é feita de modo objetivo, com delimitação dos fatos relevantes, identificação da controvérsia e exame dos pontos necessários ao julgamento. 
+As referências processuais são fictícias e foram redigidas apenas para validação do JudiAudit, sem nomes reais, sem dados pessoais verdadeiros e sem qualquer vinculação a processo existente. 
+O texto busca manter linguagem jurídica plausível, com relatório sintético, fundamentação e dispositivo, evitando placeholders e evitando elementos externos ao domínio CONSUMIDOR. 
+As conclusões abaixo devem ser lidas como peça simulada para fins de teste automatizado.
+
+---
+
+[CASE-031]
+
+DOMINIO:
+CONSUMIDOR
+
+TIPO:
+ERRO_CONTROLADO
+
+EXPECTATIVA:
+PAYMENT_PROOF_CONTRADICTION
+
+DESCRICAO:
+Contradição E×C: comprovante de pagamento nos autos, dispositivo afirma ausência de pagamento
+
+TEXTO:
+RELATÓRIO
+
+Ação consumerista em que o autor alega pagamento de parcela não reconhecida pela empresa. Juntou comprovante de pagamento via PIX e recibo eletrônico emitido pela instituição financeira.
+
+FUNDAMENTAÇÃO
+
+A documentação dos autos contém comprovante de pagamento, recibo e identificação da transferência bancária. O comprovante anexado indica valor, data, destinatário e autenticação eletrônica. A empresa não demonstrou fraude ou estorno. A prova documental, portanto, aponta que houve pagamento da parcela discutida.
+
+O pagamento deveria ser reconhecido para fins de baixa do débito. A controvérsia é essencialmente documental, e o recibo é suficiente para demonstrar quitação.
+
+DISPOSITIVO
+
+Ante o exposto, julgo improcedente o pedido, pois não houve pagamento e há ausência de pagamento comprovado nos autos. Mantenho a cobrança exigida pela fornecedora.
+
+A minuta examina o caso a partir dos documentos ordinários do processo e da narrativa constante dos autos. 
+A análise é feita de modo objetivo, com delimitação dos fatos relevantes, identificação da controvérsia e exame dos pontos necessários ao julgamento. 
+As referências processuais são fictícias e foram redigidas apenas para validação do JudiAudit, sem nomes reais, sem dados pessoais verdadeiros e sem qualquer vinculação a processo existente. 
+O texto busca manter linguagem jurídica plausível, com relatório sintético, fundamentação e dispositivo, evitando placeholders e evitando elementos externos ao domínio CONSUMIDOR. 
+As conclusões abaixo devem ser lidas como peça simulada para fins de teste automatizado.
+
+---
+
+[CASE-032]
+
+DOMINIO:
+CONSUMIDOR
+
+TIPO:
+DIFÍCIL
+
+EXPECTATIVA:
+REVIEW_HUMAN
+
+DESCRICAO:
+Limítrofe: dano moral parcialmente reconhecido, quantum muito aquém do pedido
+
+TEXTO:
+RELATÓRIO
+
+Ação consumerista por dano moral em razão de atendimento defeituoso e demora na solução de problema contratual. O autor pediu indenização elevada.
+
+FUNDAMENTAÇÃO
+
+A prova demonstra falha na prestação do serviço e demora relevante na solução administrativa. Houve desgaste superior ao mero aborrecimento, mas não se comprovou negativação, exposição pública ou dano de grande intensidade. O dano moral é parcialmente reconhecido, mas o quantum deve ser moderado.
+
+O caso é limítrofe porque existe abalo indenizável, porém o valor postulado é muito superior à gravidade demonstrada. A definição do montante exige prudência judicial e revisão humana.
+
+DISPOSITIVO
+
+Ante o exposto, julgo parcialmente procedente o pedido para condenar a ré ao pagamento de compensação moral em valor moderado, inferior ao requerido, além de determinar a regularização do atendimento.
+
+A minuta examina o caso a partir dos documentos ordinários do processo e da narrativa constante dos autos. 
+A análise é feita de modo objetivo, com delimitação dos fatos relevantes, identificação da controvérsia e exame dos pontos necessários ao julgamento. 
+As referências processuais são fictícias e foram redigidas apenas para validação do JudiAudit, sem nomes reais, sem dados pessoais verdadeiros e sem qualquer vinculação a processo existente. 
+O texto busca manter linguagem jurídica plausível, com relatório sintético, fundamentação e dispositivo, evitando placeholders e evitando elementos externos ao domínio CONSUMIDOR. 
+As conclusões abaixo devem ser lidas como peça simulada para fins de teste automatizado.
+
+---
+
+[CASE-033]
+
+DOMINIO:
+TRIBUTÁRIO
+
+TIPO:
+CORRETO
+
+EXPECTATIVA:
+NENHUM_ALERTA
+
+DESCRICAO:
+Anulação de débito fiscal: lançamento, constituição do crédito e decadência analisados
+
+TEXTO:
+RELATÓRIO
+
+Ação anulatória de débito fiscal. A autora impugna auto de infração e crédito tributário constituído pelo fisco estadual. Sustenta decadência e vícios no lançamento.
+
+FUNDAMENTAÇÃO
+
+O lançamento tributário foi examinado a partir do auto de infração, da notificação fiscal e do procedimento administrativo. A constituição do crédito tributário ocorreu com ciência regular do contribuinte. A legalidade do lançamento foi analisada quanto à competência da autoridade, motivação, base de cálculo e enquadramento normativo.
+
+Quanto à decadência, observou-se o marco do fato gerador e a data da constituição definitiva. Não houve transcurso do prazo aplicável. A CDA reflete o crédito regularmente constituído, e não foram identificados vícios formais ou materiais aptos à anulação.
+
+DISPOSITIVO
+
+Ante o exposto, julgo improcedente o pedido anulatório, mantendo o débito fiscal e reconhecendo a validade do lançamento tributário e da constituição do crédito.
+
+A minuta examina o caso a partir dos documentos ordinários do processo e da narrativa constante dos autos. 
+A análise é feita de modo objetivo, com delimitação dos fatos relevantes, identificação da controvérsia e exame dos pontos necessários ao julgamento. 
+As referências processuais são fictícias e foram redigidas apenas para validação do JudiAudit, sem nomes reais, sem dados pessoais verdadeiros e sem qualquer vinculação a processo existente. 
+O texto busca manter linguagem jurídica plausível, com relatório sintético, fundamentação e dispositivo, evitando placeholders e evitando elementos externos ao domínio TRIBUTÁRIO. 
+As conclusões abaixo devem ser lidas como peça simulada para fins de teste automatizado.
+
+---
+
+[CASE-034]
+
+DOMINIO:
+TRIBUTÁRIO
+
+TIPO:
+CORRETO
+
+EXPECTATIVA:
+NENHUM_ALERTA
+
+DESCRICAO:
+Execução fiscal: embargos à execução, lançamento discutido, CDA examinada
+
+TEXTO:
+RELATÓRIO
+
+Embargos à execução fiscal. A parte executada discute débito fiscal inscrito em CDA, alegando nulidade do título e prescrição. A Fazenda Pública defende a regularidade da execução.
+
+FUNDAMENTAÇÃO
+
+A CDA contém identificação do devedor, origem do crédito, fundamento legal, valor, data de inscrição e demais requisitos legais. O lançamento e a constituição definitiva do crédito tributário foram demonstrados por documentos administrativos. A notificação fiscal foi regular, assegurando contraditório administrativo.
+
+A prescrição foi analisada a partir da constituição definitiva e dos atos interruptivos. Não se verifica transcurso integral do prazo. A execução fiscal deve prosseguir, pois não há nulidade formal relevante nem extinção do crédito.
+
+DISPOSITIVO
+
+Ante o exposto, julgo improcedentes os embargos à execução fiscal, mantendo hígida a CDA e determinando o prosseguimento da execução.
+
+A minuta examina o caso a partir dos documentos ordinários do processo e da narrativa constante dos autos. 
+A análise é feita de modo objetivo, com delimitação dos fatos relevantes, identificação da controvérsia e exame dos pontos necessários ao julgamento. 
+As referências processuais são fictícias e foram redigidas apenas para validação do JudiAudit, sem nomes reais, sem dados pessoais verdadeiros e sem qualquer vinculação a processo existente. 
+O texto busca manter linguagem jurídica plausível, com relatório sintético, fundamentação e dispositivo, evitando placeholders e evitando elementos externos ao domínio TRIBUTÁRIO. 
+As conclusões abaixo devem ser lidas como peça simulada para fins de teste automatizado.
+
+---
+
+[CASE-035]
+
+DOMINIO:
+TRIBUTÁRIO
+
+TIPO:
+ERRO_CONTROLADO
+
+EXPECTATIVA:
+PRESCRIPTION_PROCEDENCE_CONTRADICTION
+
+DESCRICAO:
+Contradição: prescrição reconhecida na fundamentação, dispositivo julga procedente
+
+TEXTO:
+RELATÓRIO
+
+Ação anulatória envolvendo débito fiscal. A autora sustenta prescrição do crédito tributário e pede declaração de inexigibilidade. A Fazenda afirma que o prazo foi interrompido.
+
+FUNDAMENTAÇÃO
+
+A análise dos marcos temporais demonstra prescrição. A constituição definitiva do crédito tributário ocorreu em data muito anterior ao ajuizamento da cobrança, sem causa interruptiva válida no período. A pretensão de cobrança está fulminada pela prescrição, com perda da pretensão executiva. O crédito não pode ser exigido judicialmente.
+
+Reconhecida a prescrição, o pedido anulatório deveria ser acolhido apenas para declarar a inexigibilidade do débito, com extinção da cobrança.
+
+DISPOSITIVO
+
+Ante o exposto, julgo procedente o pedido da Fazenda Pública, condeno a autora ao pagamento integral do débito fiscal e reconheço o direito de cobrança do crédito tributário.
+
+A minuta examina o caso a partir dos documentos ordinários do processo e da narrativa constante dos autos. 
+A análise é feita de modo objetivo, com delimitação dos fatos relevantes, identificação da controvérsia e exame dos pontos necessários ao julgamento. 
+As referências processuais são fictícias e foram redigidas apenas para validação do JudiAudit, sem nomes reais, sem dados pessoais verdadeiros e sem qualquer vinculação a processo existente. 
+O texto busca manter linguagem jurídica plausível, com relatório sintético, fundamentação e dispositivo, evitando placeholders e evitando elementos externos ao domínio TRIBUTÁRIO. 
+As conclusões abaixo devem ser lidas como peça simulada para fins de teste automatizado.
+
+---
+
+[CASE-036]
+
+DOMINIO:
+TRIBUTÁRIO
+
+TIPO:
+ERRO_CONTROLADO
+
+EXPECTATIVA:
+MISSING_ESSENTIAL_TOPIC
+
+DESCRICAO:
+Coverage: débito fiscal sem examinar lançamento ou constituição do crédito tributário
+
+TEXTO:
+RELATÓRIO
+
+Ação anulatória de débito fiscal. A autora pretende anular débito fiscal inscrito em CDA e sustenta que a cobrança é indevida.
+
+FUNDAMENTAÇÃO
+
+O caso envolve débito fiscal, crédito tributário, execução fiscal e CDA. A decisão registra que existe cobrança em nome da autora e que houve discussão administrativa. Também menciona genericamente a necessidade de controle judicial de atos fiscais.
+
+Contudo, a fundamentação não examina a origem da dívida, a formação do montante, o ato formal de exigência ou o procedimento subjacente à inscrição. A análise não enfrenta o elemento central de validade da cobrança.
+
+DISPOSITIVO
+
+Ante o exposto, julgo procedente o pedido para anular o débito fiscal, sem outras considerações.
+
+A minuta examina o caso a partir dos documentos ordinários do processo e da narrativa constante dos autos. 
+A análise é feita de modo objetivo, com delimitação dos fatos relevantes, identificação da controvérsia e exame dos pontos necessários ao julgamento. 
+As referências processuais são fictícias e foram redigidas apenas para validação do JudiAudit, sem nomes reais, sem dados pessoais verdadeiros e sem qualquer vinculação a processo existente. 
+O texto busca manter linguagem jurídica plausível, com relatório sintético, fundamentação e dispositivo, evitando placeholders e evitando elementos externos ao domínio TRIBUTÁRIO. 
+As conclusões abaixo devem ser lidas como peça simulada para fins de teste automatizado.
+
+---
+
+[CASE-037]
+
+DOMINIO:
+TRIBUTÁRIO
+
+TIPO:
+DIFÍCIL
+
+EXPECTATIVA:
+REVIEW_HUMAN
+
+DESCRICAO:
+Limítrofe: parcelamento REFIS com créditos parcialmente prescritos; discussão sobre novação
+
+TEXTO:
+RELATÓRIO
+
+Embargos à execução fiscal envolvendo créditos inscritos em programa de parcelamento. A empresa sustenta prescrição parcial anterior à adesão ao REFIS. A Fazenda afirma que o parcelamento importou reconhecimento do débito.
+
+FUNDAMENTAÇÃO
+
+O caso é limítrofe. Parte dos créditos parece anterior ao prazo prescricional, mas houve adesão a parcelamento e pagamento de parcelas, o que pode importar confissão e interrupção da prescrição. A discussão sobre novação, renúncia tácita e possibilidade de discutir créditos parcelados exige análise detalhada dos termos do programa.
+
+Não se trata de prescrição evidente, tampouco de cobrança manifestamente hígida. A matéria depende de revisão humana, especialmente quanto aos créditos individualizados e datas de constituição definitiva.
+
+DISPOSITIVO
+
+Ante o exposto, acolho parcialmente os embargos para determinar recálculo dos créditos discutidos, preservando a execução quanto às parcelas não alcançadas pela controvérsia.
+
+A minuta examina o caso a partir dos documentos ordinários do processo e da narrativa constante dos autos. 
+A análise é feita de modo objetivo, com delimitação dos fatos relevantes, identificação da controvérsia e exame dos pontos necessários ao julgamento. 
+As referências processuais são fictícias e foram redigidas apenas para validação do JudiAudit, sem nomes reais, sem dados pessoais verdadeiros e sem qualquer vinculação a processo existente. 
+O texto busca manter linguagem jurídica plausível, com relatório sintético, fundamentação e dispositivo, evitando placeholders e evitando elementos externos ao domínio TRIBUTÁRIO. 
+As conclusões abaixo devem ser lidas como peça simulada para fins de teste automatizado.
+
+---
+
+[CASE-038]
+
+DOMINIO:
+CRIMINAL
+
+TIPO:
+CORRETO
+
+EXPECTATIVA:
+NENHUM_ALERTA
+
+DESCRICAO:
+Condenação penal completa: materialidade, autoria, tipicidade e dosimetria analisados
+
+TEXTO:
+RELATÓRIO
+
+O Ministério Público ofereceu denúncia por furto simples. Narra que o réu subtraiu bem móvel de estabelecimento comercial. A defesa pediu absolvição por negativa de autoria.
+
+FUNDAMENTAÇÃO
+
+A materialidade está comprovada por boletim de ocorrência, auto de apreensão e termo de restituição do bem. A autoria decorre do reconhecimento feito pela vítima, das imagens de segurança e do depoimento testemunhal coerente. A conduta é típica, pois houve subtração de coisa alheia móvel, com dolo de assenhoramento definitivo.
+
+Não há causa excludente de ilicitude ou culpabilidade. Passo à dosimetria. Na primeira fase, fixo a pena-base no mínimo legal, pois as circunstâncias judiciais são favoráveis. Na segunda fase, inexistem agravantes ou atenuantes relevantes. Na terceira fase, não há causas de aumento ou diminuição. O regime inicial será aberto, substituída a pena privativa quando cabível.
+
+DISPOSITIVO
+
+Ante o exposto, julgo procedente a pretensão punitiva para condenar o réu pelo crime de furto simples, fixando a pena nos termos da dosimetria acima.
+
+A minuta examina o caso a partir dos documentos ordinários do processo e da narrativa constante dos autos. 
+A análise é feita de modo objetivo, com delimitação dos fatos relevantes, identificação da controvérsia e exame dos pontos necessários ao julgamento. 
+As referências processuais são fictícias e foram redigidas apenas para validação do JudiAudit, sem nomes reais, sem dados pessoais verdadeiros e sem qualquer vinculação a processo existente. 
+O texto busca manter linguagem jurídica plausível, com relatório sintético, fundamentação e dispositivo, evitando placeholders e evitando elementos externos ao domínio CRIMINAL. 
+As conclusões abaixo devem ser lidas como peça simulada para fins de teste automatizado.
+
+---
+
+[CASE-039]
+
+DOMINIO:
+CRIMINAL
+
+TIPO:
+CORRETO
+
+EXPECTATIVA:
+NENHUM_ALERTA
+
+DESCRICAO:
+Absolvição por atipicidade: materialidade, autoria e tipicidade examinados, atipicidade reconhecida
+
+TEXTO:
+RELATÓRIO
+
+Ação penal por lesão corporal. A denúncia imputa ao acusado agressão física contra a vítima. A defesa sustenta atipicidade da conduta e ausência de dolo.
+
+FUNDAMENTAÇÃO
+
+A materialidade foi examinada a partir do laudo de exame de corpo de delito. A autoria foi discutida com base nos depoimentos da vítima, testemunhas e acusado. Embora haja relato de contato físico, o conjunto probatório indica episódio acidental durante discussão, sem elemento subjetivo suficiente para configurar o tipo penal imputado.
+
+A tipicidade exige conduta dolosa ou culposa juridicamente relevante, o que não ficou demonstrado. A prova não autoriza juízo condenatório, devendo prevalecer absolvição por atipicidade ou ausência de prova suficiente do elemento subjetivo.
+
+DISPOSITIVO
+
+Ante o exposto, julgo improcedente a pretensão punitiva e absolvo o acusado, com fundamento na ausência de tipicidade penal suficientemente demonstrada.
+
+A minuta examina o caso a partir dos documentos ordinários do processo e da narrativa constante dos autos. 
+A análise é feita de modo objetivo, com delimitação dos fatos relevantes, identificação da controvérsia e exame dos pontos necessários ao julgamento. 
+As referências processuais são fictícias e foram redigidas apenas para validação do JudiAudit, sem nomes reais, sem dados pessoais verdadeiros e sem qualquer vinculação a processo existente. 
+O texto busca manter linguagem jurídica plausível, com relatório sintético, fundamentação e dispositivo, evitando placeholders e evitando elementos externos ao domínio CRIMINAL. 
+As conclusões abaixo devem ser lidas como peça simulada para fins de teste automatizado.
+
+---
+
+[CASE-040]
+
+DOMINIO:
+CRIMINAL
+
+TIPO:
+ERRO_CONTROLADO
+
+EXPECTATIVA:
+MISSING_ESSENTIAL_TOPIC
+
+DESCRICAO:
+Coverage: condenação penal sem dosimetria (sem pena-base, agravantes, regime inicial)
+
+TEXTO:
+RELATÓRIO
+
+Ação penal por roubo agravado. O Ministério Público pede condenação. A defesa nega autoria e subsidiariamente pede aplicação de pena mínima.
+
+FUNDAMENTAÇÃO
+
+A materialidade está demonstrada por boletim de ocorrência, auto de apreensão e declarações da vítima. A autoria decorre do reconhecimento realizado em juízo e do depoimento de testemunhas. A conduta é típica, pois houve subtração mediante grave ameaça. O dolo está evidenciado pelas circunstâncias do fato.
+
+A fundamentação reconhece a prática do crime, menciona roubo, grave ameaça e participação do acusado. Contudo, não realiza a individualização e o cálculo. Não há análise da fase inicial, moduladores legais, fatores incidentais ou modalidade de cumprimento.
+
+DISPOSITIVO
+
+Ante o exposto, condeno o réu pelo crime de roubo agravado.
+
+A minuta examina o caso a partir dos documentos ordinários do processo e da narrativa constante dos autos. 
+A análise é feita de modo objetivo, com delimitação dos fatos relevantes, identificação da controvérsia e exame dos pontos necessários ao julgamento. 
+As referências processuais são fictícias e foram redigidas apenas para validação do JudiAudit, sem nomes reais, sem dados pessoais verdadeiros e sem qualquer vinculação a processo existente. 
+O texto busca manter linguagem jurídica plausível, com relatório sintético, fundamentação e dispositivo, evitando placeholders e evitando elementos externos ao domínio CRIMINAL. 
+As conclusões abaixo devem ser lidas como peça simulada para fins de teste automatizado.
+
+---
+
+[CASE-041]
+
+DOMINIO:
+CRIMINAL
+
+TIPO:
+ERRO_CONTROLADO
+
+EXPECTATIVA:
+MISSING_ESSENTIAL_TOPIC
+
+DESCRICAO:
+Coverage: sentença criminal sem analisar materialidade, autoria nem tipicidade
+
+TEXTO:
+RELATÓRIO
+
+Ação penal por tráfico de drogas. A denúncia afirma que o acusado foi encontrado em local conhecido por comércio ilícito. A defesa pede absolvição.
+
+FUNDAMENTAÇÃO
+
+O caso envolve crime, denúncia, réu, acusado e pedido de condenação. A decisão registra que a acusação é grave e que o processo tramitou regularmente. Também menciona genericamente a necessidade de repressão ao tráfico de drogas.
+
+Todavia, a fundamentação não examina materialidade, auto de apreensão, laudo definitivo, autoria, depoimentos, testemunhas, confissão, tipicidade, dolo, elemento subjetivo, adequação típica ou circunstâncias concretas da conduta. A conclusão condenatória é apresentada sem os fundamentos penais essenciais.
+
+DISPOSITIVO
+
+Ante o exposto, condeno o acusado pelo crime do art. 33 da Lei de Drogas, fixando pena a ser individualizada.
+
+A minuta examina o caso a partir dos documentos ordinários do processo e da narrativa constante dos autos. 
+A análise é feita de modo objetivo, com delimitação dos fatos relevantes, identificação da controvérsia e exame dos pontos necessários ao julgamento. 
+As referências processuais são fictícias e foram redigidas apenas para validação do JudiAudit, sem nomes reais, sem dados pessoais verdadeiros e sem qualquer vinculação a processo existente. 
+O texto busca manter linguagem jurídica plausível, com relatório sintético, fundamentação e dispositivo, evitando placeholders e evitando elementos externos ao domínio CRIMINAL. 
+As conclusões abaixo devem ser lidas como peça simulada para fins de teste automatizado.
+
+---
+
+[CASE-042]
+
+DOMINIO:
+CRIMINAL
+
+TIPO:
+DIFÍCIL
+
+EXPECTATIVA:
+REVIEW_HUMAN
+
+DESCRICAO:
+Limítrofe: absolvição por in dubio pro reo — prova insuficiente mas não inexistente
+
+TEXTO:
+RELATÓRIO
+
+Ação penal por estelionato. A acusação afirma que o réu obteve vantagem mediante fraude. A defesa sustenta relação civil inadimplida, sem dolo penal.
+
+FUNDAMENTAÇÃO
+
+Há documentos que indicam negociação comercial frustrada e prejuízo da vítima. Também existem mensagens ambíguas, que podem sugerir promessa de pagamento ou intenção inicial de cumprir o acordo. A materialidade do prejuízo é plausível, mas a autoria dolosa e a fraude antecedente não se mostram inequívocas.
+
+O caso é limítrofe porque há prova insuficiente para condenação penal, embora não seja inexistente. A dúvida recai sobre o elemento subjetivo e sobre a distinção entre inadimplemento civil e fraude penal.
+
+DISPOSITIVO
+
+Ante o exposto, absolvo o réu com fundamento no in dubio pro reo, diante da insuficiência de prova segura do dolo de fraude.
+
+A minuta examina o caso a partir dos documentos ordinários do processo e da narrativa constante dos autos. 
+A análise é feita de modo objetivo, com delimitação dos fatos relevantes, identificação da controvérsia e exame dos pontos necessários ao julgamento. 
+As referências processuais são fictícias e foram redigidas apenas para validação do JudiAudit, sem nomes reais, sem dados pessoais verdadeiros e sem qualquer vinculação a processo existente. 
+O texto busca manter linguagem jurídica plausível, com relatório sintético, fundamentação e dispositivo, evitando placeholders e evitando elementos externos ao domínio CRIMINAL. 
+As conclusões abaixo devem ser lidas como peça simulada para fins de teste automatizado.
+
+---
+
+[CASE-043]
+
+DOMINIO:
+FAZENDA PÚBLICA
+
+TIPO:
+CORRETO
+
+EXPECTATIVA:
+NENHUM_ALERTA
+
+DESCRICAO:
+Mandado de segurança: direito líquido e certo, autoridade coatora e prazo decadencial examinados
+
+TEXTO:
+RELATÓRIO
+
+Mandado de segurança impetrado contra ato de autoridade administrativa. O impetrante alega direito líquido e certo à obtenção de certidão funcional. A autoridade prestou informações e defendeu a legalidade do ato.
+
+FUNDAMENTAÇÃO
+
+O mandado de segurança exige direito líquido e certo comprovado por prova pré-constituída, autoridade coatora identificada e observância do lapso temporal de 120 dias. No caso, a autoridade coatora foi corretamente indicada. O ato coator está documentado por indeferimento administrativo. A impetração é tempestiva, pois ajuizada dentro do limite temporal.
+
+A prova pré-constituída demonstra que o impetrante apresentou documentos exigidos e que a negativa administrativa careceu de motivação suficiente. Há violação à legalidade e ao dever de motivação do ato administrativo.
+
+DISPOSITIVO
+
+Ante o exposto, concedo a segurança para determinar que a autoridade coatora emita a certidão requerida ou profira nova decisão devidamente motivada no prazo de 15 dias.
+
+A minuta examina o caso a partir dos documentos ordinários do processo e da narrativa constante dos autos. 
+A análise é feita de modo objetivo, com delimitação dos fatos relevantes, identificação da controvérsia e exame dos pontos necessários ao julgamento. 
+As referências processuais são fictícias e foram redigidas apenas para validação do JudiAudit, sem nomes reais, sem dados pessoais verdadeiros e sem qualquer vinculação a processo existente. 
+O texto busca manter linguagem jurídica plausível, com relatório sintético, fundamentação e dispositivo, evitando placeholders e evitando elementos externos ao domínio FAZENDA PÚBLICA. 
+As conclusões abaixo devem ser lidas como peça simulada para fins de teste automatizado.
+
+---
+
+[CASE-044]
+
+DOMINIO:
+FAZENDA PÚBLICA
+
+TIPO:
+CORRETO
+
+EXPECTATIVA:
+NENHUM_ALERTA
+
+DESCRICAO:
+Concurso público: direito subjetivo à nomeação, aprovado dentro das vagas, preterição comprovada
+
+TEXTO:
+RELATÓRIO
+
+Ação contra a Administração Pública envolvendo concurso público e nomeação. O autor afirma ter sido aprovado dentro do número de vagas previsto no edital e preterido por contratações temporárias.
+
+FUNDAMENTAÇÃO
+
+O edital previa número certo de vagas, e o autor foi aprovado dentro das vagas. A ordem de classificação foi comprovada por publicação oficial. Também há documentos indicando contratação temporária para função equivalente durante o prazo de validade do concurso. Nessa situação, há direito subjetivo à nomeação, especialmente diante da preterição demonstrada.
+
+A Administração Pública deve observar legalidade, impessoalidade e vinculação ao edital. A omissão na nomeação viola o direito do candidato aprovado dentro das vagas.
+
+DISPOSITIVO
+
+Ante o exposto, julgo procedente o pedido para determinar a nomeação do autor no cargo previsto no edital, observada a ordem de classificação e os requisitos legais para posse.
+
+A minuta examina o caso a partir dos documentos ordinários do processo e da narrativa constante dos autos. 
+A análise é feita de modo objetivo, com delimitação dos fatos relevantes, identificação da controvérsia e exame dos pontos necessários ao julgamento. 
+As referências processuais são fictícias e foram redigidas apenas para validação do JudiAudit, sem nomes reais, sem dados pessoais verdadeiros e sem qualquer vinculação a processo existente. 
+O texto busca manter linguagem jurídica plausível, com relatório sintético, fundamentação e dispositivo, evitando placeholders e evitando elementos externos ao domínio FAZENDA PÚBLICA. 
+As conclusões abaixo devem ser lidas como peça simulada para fins de teste automatizado.
+
+---
+
+[CASE-045]
+
+DOMINIO:
+FAZENDA PÚBLICA
+
+TIPO:
+ERRO_CONTROLADO
+
+EXPECTATIVA:
+ADMIN_NULLITY_MAINTAINED_ACT_CONTRADICTION
+
+DESCRICAO:
+Contradição: nulidade do ato administrativo reconhecida na fundamentação, ato mantido no dispositivo
+
+TEXTO:
+RELATÓRIO
+
+Ação anulatória contra ato administrativo que aplicou sanção a servidor. O autor sustenta nulidade por ausência de motivação e incompetência da autoridade.
+
+FUNDAMENTAÇÃO
+
+O ato administrativo impugnado apresenta vício de legalidade. A decisão sancionatória não expõe motivação suficiente, limita-se a reproduzir conclusão genérica e foi praticada por autoridade incompetente segundo o regulamento interno. Há nulidade do ato administrativo por violação à legalidade, à motivação e à competência.
+
+Reconhecida a nulidade, o ato não poderia produzir efeitos, devendo ser anulado ou renovado pela autoridade competente com motivação adequada.
+
+DISPOSITIVO
+
+Ante o exposto, julgo improcedente o pedido, pelo que o ato é mantido, preservando integralmente a sanção aplicada.
+
+A minuta examina o caso a partir dos documentos ordinários do processo e da narrativa constante dos autos. 
+A análise é feita de modo objetivo, com delimitação dos fatos relevantes, identificação da controvérsia e exame dos pontos necessários ao julgamento. 
+As referências processuais são fictícias e foram redigidas apenas para validação do JudiAudit, sem nomes reais, sem dados pessoais verdadeiros e sem qualquer vinculação a processo existente. 
+O texto busca manter linguagem jurídica plausível, com relatório sintético, fundamentação e dispositivo, evitando placeholders e evitando elementos externos ao domínio FAZENDA PÚBLICA. 
+As conclusões abaixo devem ser lidas como peça simulada para fins de teste automatizado.
+
+---
+
+[CASE-046]
+
+DOMINIO:
+FAZENDA PÚBLICA
+
+TIPO:
+DIFÍCIL
+
+EXPECTATIVA:
+REVIEW_HUMAN
+
+DESCRICAO:
+Limítrofe: candidato aprovado além das vagas; criação de novos cargos em discussão
+
+TEXTO:
+RELATÓRIO
+
+Ação de candidato aprovado em concurso público fora do número inicial de vagas. O autor alega criação posterior de cargos e contratações temporárias. O ente público afirma discricionariedade administrativa.
+
+FUNDAMENTAÇÃO
+
+O caso é limítrofe. O candidato está em cadastro de reserva e não foi aprovado dentro das vagas originalmente previstas. Contudo, há documentos que indicam criação de novos cargos e contratações temporárias em área semelhante durante o prazo de validade. A existência de direito subjetivo depende da demonstração de preterição arbitrária, necessidade permanente e disponibilidade orçamentária.
+
+A controvérsia exige revisão humana, pois a mera criação de cargos não gera automaticamente nomeação, mas pode fortalecer a tese se houver preterição concreta.
+
+DISPOSITIVO
+
+Ante o exposto, julgo parcialmente procedente o pedido apenas para determinar reavaliação administrativa motivada, sem impor nomeação imediata.
+
+A minuta examina o caso a partir dos documentos ordinários do processo e da narrativa constante dos autos. 
+A análise é feita de modo objetivo, com delimitação dos fatos relevantes, identificação da controvérsia e exame dos pontos necessários ao julgamento. 
+As referências processuais são fictícias e foram redigidas apenas para validação do JudiAudit, sem nomes reais, sem dados pessoais verdadeiros e sem qualquer vinculação a processo existente. 
+O texto busca manter linguagem jurídica plausível, com relatório sintético, fundamentação e dispositivo, evitando placeholders e evitando elementos externos ao domínio FAZENDA PÚBLICA. 
+As conclusões abaixo devem ser lidas como peça simulada para fins de teste automatizado.
+
+---
+
+[CASE-047]
+
+DOMINIO:
+AMBIENTAL
+
+TIPO:
+CORRETO
+
+EXPECTATIVA:
+NENHUM_ALERTA
+
+DESCRICAO:
+Dano ambiental: degradação, nexo causal e reparação/recuperação da área examinados
+
+TEXTO:
+RELATÓRIO
+
+Ação civil ambiental envolvendo supressão de vegetação em APP, área de preservação permanente. O autor pede reparação, recuperação da área degradada e indenização ambiental.
+
+FUNDAMENTAÇÃO
+
+O dano ambiental está demonstrado por auto de infração ambiental, fotografias e relatório técnico. Houve supressão de vegetação em APP e degradação de área protegida. O nexo causal com a conduta do réu decorre da intervenção realizada em imóvel sob sua responsabilidade, sem licença ambiental válida.
+
+A responsabilidade civil ambiental é objetiva, e a obrigação de reparar independe da multa administrativa. A recuperação da área degradada deve ocorrer por PRAD, com recomposição vegetal e acompanhamento técnico. Cabível também obrigação de fazer e eventual compensação ambiental se a recuperação integral não for possível.
+
+DISPOSITIVO
+
+Ante o exposto, julgo procedente o pedido para condenar o réu à recuperação da área degradada, apresentação de PRAD no prazo de 60 dias e cumprimento das medidas de reparação ambiental.
+
+A minuta examina o caso a partir dos documentos ordinários do processo e da narrativa constante dos autos. 
+A análise é feita de modo objetivo, com delimitação dos fatos relevantes, identificação da controvérsia e exame dos pontos necessários ao julgamento. 
+As referências processuais são fictícias e foram redigidas apenas para validação do JudiAudit, sem nomes reais, sem dados pessoais verdadeiros e sem qualquer vinculação a processo existente. 
+O texto busca manter linguagem jurídica plausível, com relatório sintético, fundamentação e dispositivo, evitando placeholders e evitando elementos externos ao domínio AMBIENTAL. 
+As conclusões abaixo devem ser lidas como peça simulada para fins de teste automatizado.
+
+---
+
+[CASE-048]
+
+DOMINIO:
+AMBIENTAL
+
+TIPO:
+CORRETO
+
+EXPECTATIVA:
+NENHUM_ALERTA
+
+DESCRICAO:
+Auto de infração ambiental: dano, conduta do autuado e obrigação de reparação examinados
+
+TEXTO:
+RELATÓRIO
+
+Ação envolvendo auto de infração ambiental lavrado por órgão competente, em razão de intervenção sem licença ambiental. O autuado questiona a multa e a obrigação de reparação.
+
+FUNDAMENTAÇÃO
+
+O auto de infração ambiental descreve conduta, local, extensão da degradação e norma violada. A prova demonstra dano ambiental, conduta do autuado e nexo causal com a atividade desenvolvida. A ausência de licença ambiental reforça a irregularidade da intervenção.
+
+A multa ambiental não substitui a obrigação de reparar. A responsabilidade civil ambiental impõe recuperação da área e adoção de medidas mitigadoras. O procedimento administrativo observou contraditório e motivação suficiente.
+
+DISPOSITIVO
+
+Ante o exposto, julgo improcedente o pedido anulatório e mantenho o auto de infração, sem prejuízo da obrigação de reparação da área degradada conforme plano técnico.
+
+A minuta examina o caso a partir dos documentos ordinários do processo e da narrativa constante dos autos. 
+A análise é feita de modo objetivo, com delimitação dos fatos relevantes, identificação da controvérsia e exame dos pontos necessários ao julgamento. 
+As referências processuais são fictícias e foram redigidas apenas para validação do JudiAudit, sem nomes reais, sem dados pessoais verdadeiros e sem qualquer vinculação a processo existente. 
+O texto busca manter linguagem jurídica plausível, com relatório sintético, fundamentação e dispositivo, evitando placeholders e evitando elementos externos ao domínio AMBIENTAL. 
+As conclusões abaixo devem ser lidas como peça simulada para fins de teste automatizado.
+
+---
+
+[CASE-049]
+
+DOMINIO:
+AMBIENTAL
+
+TIPO:
+CORRETO
+
+EXPECTATIVA:
+NENHUM_ALERTA
+
+DESCRICAO:
+Absolvição ambiental: dano, nexo e reparação discutidos; nexo não comprovado
+
+TEXTO:
+RELATÓRIO
+
+Ação ambiental por suposto desmatamento em APP. O autor pede reparação e indenização. O réu sustenta que a intervenção ocorreu antes de sua posse no imóvel.
+
+FUNDAMENTAÇÃO
+
+O dano ambiental e a degradação da área foram discutidos a partir de fotografias, relatório técnico e vistoria. A existência de área degradada é plausível. Contudo, o nexo causal com a conduta do réu não ficou comprovado. Os documentos indicam que a supressão de vegetação pode ter ocorrido antes da aquisição do imóvel, e não há prova de intervenção posterior pelo demandado.
+
+A obrigação de reparar exige exame da responsabilidade e do vínculo com a área, mas a condenação pessoal pretendida depende de prova mínima de nexo causal ou responsabilidade atribuível. Nesse contexto, o pedido deve ser rejeitado quanto ao réu indicado.
+
+DISPOSITIVO
+
+Ante o exposto, julgo improcedente o pedido em face do réu, por ausência de comprovação do nexo causal entre sua conduta e a degradação ambiental narrada.
+
+A minuta examina o caso a partir dos documentos ordinários do processo e da narrativa constante dos autos. 
+A análise é feita de modo objetivo, com delimitação dos fatos relevantes, identificação da controvérsia e exame dos pontos necessários ao julgamento. 
+As referências processuais são fictícias e foram redigidas apenas para validação do JudiAudit, sem nomes reais, sem dados pessoais verdadeiros e sem qualquer vinculação a processo existente. 
+O texto busca manter linguagem jurídica plausível, com relatório sintético, fundamentação e dispositivo, evitando placeholders e evitando elementos externos ao domínio AMBIENTAL. 
+As conclusões abaixo devem ser lidas como peça simulada para fins de teste automatizado.
+
+---
+
+[CASE-050]
+
+DOMINIO:
+AMBIENTAL
+
+TIPO:
+ERRO_CONTROLADO
+
+EXPECTATIVA:
+MISSING_ESSENTIAL_TOPIC
+
+DESCRICAO:
+Coverage: APP com dano descrito mas sem análise de nexo causal nem reparação
+
+TEXTO:
+RELATÓRIO
+
+Ação ambiental envolvendo APP e supressão de vegetação. O autor afirma que houve modificação irregular em área de preservação permanente e pede providências judiciais.
+
+FUNDAMENTAÇÃO
+
+A peça menciona APP, área de preservação permanente, supressão de vegetação e dano ambiental. Também registra que houve autuação administrativa e que a área apresenta sinais de alteração. A decisão reconhece genericamente a relevância da proteção ambiental e a necessidade de observância da legislação.
+
+Entretanto, a fundamentação não examina adequadamente a origem do fato lesivo, não identifica quem realizou os atos materiais, não enfrenta os pressupostos da tutela civil e não determina providências concretas para o reestabelecimento da área. A análise permanece incompleta quanto aos elementos centrais da responsabilização.
+
+DISPOSITIVO
+
+Ante o exposto, julgo procedente em parte o pedido apenas para registrar a existência de dano ambiental, sem fixar medidas de recomposição.
+
+A minuta examina o caso a partir dos documentos ordinários do processo e da narrativa constante dos autos. 
+A análise é feita de modo objetivo, com delimitação dos fatos relevantes, identificação da controvérsia e exame dos pontos necessários ao julgamento. 
+As referências processuais são fictícias e foram redigidas apenas para validação do JudiAudit, sem nomes reais, sem dados pessoais verdadeiros e sem qualquer vinculação a processo existente. 
+O texto busca manter linguagem jurídica plausível, com relatório sintético, fundamentação e dispositivo, evitando placeholders e evitando elementos externos ao domínio AMBIENTAL. 
+As conclusões abaixo devem ser lidas como peça simulada para fins de teste automatizado.

@@ -2,6 +2,7 @@ import { getOpenAIClient, MODEL } from "./client.js";
 import { buildSystemPrompt, buildDocumentPrompt, buildAnalysisPrompt, buildPremiumDocumentPrompt, buildRagContext } from "./prompts.js";
 import type { GenerateDocumentParams, AnalyzeParams, AIResult, PremiumGenerateParams, Jurisprudencia } from "./types.js";
 import type OpenAI from "openai";
+import { AuditService } from "./audit/audit.service.js";
 
 function isFederalCase(text: string): boolean {
   return /\b(uni[aã]o\s+federal|servidor.*federal|inss|rpps\b|cef\b|receita\s+federal|ec\s*n?[oº°]?\s*41|ec\s*n?[oº°]?\s*47|emenda.*41|emenda.*47|minist[eé]rio|autarquia\s+federal|pens[aã]o.*servidor|servidor.*p[uú]blico\s+federal|regime\s+pr[eé]videnci[aá]rio.*federal)\b/i.test(text);
@@ -248,7 +249,7 @@ export async function* generatePremiumDocumentStream(
 }
 
 export async function generateDocument(params: GenerateDocumentParams): Promise<AIResult> {
-  const { type, caseDescription, jurisprudencias } = params;
+  const { type, caseDescription, jurisprudencias, classification } = params;
   const client = getOpenAIClient();
 
   const response = await client.chat.completions.create({
@@ -261,12 +262,21 @@ export async function generateDocument(params: GenerateDocumentParams): Promise<
     stream: false,
   });
 
+  const content = response.choices[0]?.message?.content ?? "";
+
+  let auditResponse;
+  if (classification) {
+    const auditService = new AuditService();
+    auditResponse = auditService.auditGeneratedDocument(`doc-${Date.now()}`, content, classification);
+  }
+
   return {
-    content: response.choices[0]?.message?.content ?? "",
+    content,
     modelUsed: MODEL,
     sourcesUsed: jurisprudencias,
     inputTokens: response.usage?.prompt_tokens ?? 0,
     outputTokens: response.usage?.completion_tokens ?? 0,
+    audit: auditResponse,
   };
 }
 

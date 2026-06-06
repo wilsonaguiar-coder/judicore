@@ -51,9 +51,41 @@ const ARGUMENTATIVE_RULES = new Set([
   "MATRIX_MISSING_RATIO", "MATRIX_NO_CONTRAPONTO", "MATRIX_WEAK_TESE", "MATRIX_INSUFFICIENT_TESES",
 ]);
 
+const LEGAL_CONTRADICTION_RULES = new Set([
+  "PRESCRIPTION_PROCEDENCE_CONTRADICTION",
+  "STANDING_CONTRADICTION",
+  "LACK_OF_EVIDENCE_CONTRADICTION",
+  "MORAL_DAMAGE_CONTRADICTION",
+  "EMPLOYMENT_RELATION_CONTRADICTION",
+  "SPECIAL_ACTIVITY_CONTRADICTION",
+  "RES_JUDICATA_MERITS_CONTRADICTION",
+  "LACK_OF_INTEREST_PROCEDENCE_CONTRADICTION",
+  "NO_DAMAGE_COMPENSATION_CONTRADICTION",
+  "NO_INCAPACITY_BENEFIT_CONTRADICTION",
+  "NO_QUALITY_INSURED_BENEFIT_CONTRADICTION",
+  "ADMIN_NULLITY_MAINTAINED_ACT_CONTRADICTION",
+]);
+
+const REQUEST_DISPOSITIVE_RULES = new Set([
+  "UNADDRESSED_MAIN_REQUEST",
+  "UNADDRESSED_SUBSIDIARY_REQUEST",
+  "UNADDRESSED_INJUNCTION_REQUEST",
+  "RELIEF_NOT_REQUESTED",
+  "INCOMPLETE_RELIEF",
+]);
+
+const EVIDENCE_CONCLUSION_RULES = new Set([
+  "MEDICAL_EVIDENCE_INCAPACITY_CONTRADICTION",
+  "SPECIAL_ACTIVITY_EVIDENCE_CONTRADICTION",
+  "PAYMENT_PROOF_CONTRADICTION",
+  "CONTRACT_EVIDENCE_CONTRADICTION",
+  "WITNESS_OVERTIME_CONTRADICTION",
+  "DEPENDENCY_EVIDENCE_CONTRADICTION",
+]);
+
 // ── Mapeamento de regras para títulos humanizados ─────────────────────────────
 
-const RULE_TITLES: Record<string, string> = {
+export const RULE_TITLES: Record<string, string> = {
   // Estrutura geral
   MISSING_STRUCTURE:                    "Estrutura incompleta",
   DESPACHO_WITH_DECISION_LANGUAGE:      "Linguagem decisória em despacho",
@@ -178,11 +210,42 @@ const RULE_TITLES: Record<string, string> = {
   POSSIBLE_DECADENCE_PRESCRIPTION_CONFUSION:     "Possível confusão entre decadência e prescrição tributária",
   ENVIRONMENTAL_LIABILITY_WARNING:               "Inconsistência com responsabilidade civil ambiental objetiva",
   MISSING_ESSENTIAL_TOPIC:                       "Tema essencial não enfrentado",
+
+  // Contradições jurídicas (FASE 5.7.0)
+  PRESCRIPTION_PROCEDENCE_CONTRADICTION:         "Contradição: prescrição/decadência × procedência",
+  STANDING_CONTRADICTION:                        "Contradição: ilegitimidade × decisão de mérito",
+  LACK_OF_EVIDENCE_CONTRADICTION:                "Contradição: insuficiência probatória × procedência",
+  MORAL_DAMAGE_CONTRADICTION:                    "Contradição: afasta dano moral × condena por dano moral",
+  EMPLOYMENT_RELATION_CONTRADICTION:             "Contradição: afasta vínculo empregatício × reconhece vínculo",
+  SPECIAL_ACTIVITY_CONTRADICTION:                "Contradição: afasta atividade especial × reconhece tempo especial",
+
+  // Request × Dispositive (FASE 5.8.0)
+  UNADDRESSED_MAIN_REQUEST:       "Pedido principal aparentemente não enfrentado",
+  UNADDRESSED_SUBSIDIARY_REQUEST: "Pedido subsidiário aparentemente não enfrentado",
+  UNADDRESSED_INJUNCTION_REQUEST: "Pedido de tutela aparentemente não enfrentado",
+  RELIEF_NOT_REQUESTED:           "Concessão de providência não identificada nos pedidos",
+  INCOMPLETE_RELIEF:              "Dispositivo sem definição mínima de parâmetros",
+
+  // Contradições jurídicas (FASE 5.7.2)
+  RES_JUDICATA_MERITS_CONTRADICTION:             "Contradição: coisa julgada/litispendência × procedência",
+  LACK_OF_INTEREST_PROCEDENCE_CONTRADICTION:     "Contradição: falta de interesse de agir × procedência",
+  NO_DAMAGE_COMPENSATION_CONTRADICTION:          "Contradição: ausência de dano/prejuízo × indenização",
+  NO_INCAPACITY_BENEFIT_CONTRADICTION:           "Contradição: ausência de incapacidade × benefício por incapacidade",
+  NO_QUALITY_INSURED_BENEFIT_CONTRADICTION:      "Contradição: ausência de qualidade de segurado × benefício previdenciário",
+  ADMIN_NULLITY_MAINTAINED_ACT_CONTRADICTION:    "Contradição: nulidade do ato administrativo × manutenção do ato",
+
+  // Evidence × Conclusion (FASE 5.9.0)
+  MEDICAL_EVIDENCE_INCAPACITY_CONTRADICTION: "Contradição: laudo/perícia reconhece incapacidade × benefício negado",
+  SPECIAL_ACTIVITY_EVIDENCE_CONTRADICTION:   "Contradição: PPP/LTCAT comprova atividade especial × tempo especial negado",
+  PAYMENT_PROOF_CONTRADICTION:               "Contradição: comprovante de pagamento × pagamento negado",
+  CONTRACT_EVIDENCE_CONTRADICTION:           "Contradição: contrato juntado × relação jurídica negada",
+  WITNESS_OVERTIME_CONTRADICTION:            "Contradição: prova testemunhal confirma jornada × horas extras negadas",
+  DEPENDENCY_EVIDENCE_CONTRADICTION:         "Contradição: dependência econômica reconhecida × pensão negada",
 };
 
 // ── Mapeamento de regras para sugestões de melhoria ──────────────────────────
 
-const RULE_SUGGESTIONS: Record<string, string> = {
+export const RULE_SUGGESTIONS: Record<string, string> = {
   MISSING_STRUCTURE: "Adicionar as seções faltantes seguindo a estrutura exigida para o tipo de peça.",
   FINAL_DRAFT_WEAK_ARGUMENTATION: "Citar mais artigos de lei, desenvolver seções argumentativas distintas e incluir jurisprudência específica ao caso.",
   FINAL_DRAFT_GENERIC_LANGUAGE: "Substituir as expressões genéricas por argumentação fundada nos fatos concretos do caso.",
@@ -203,6 +266,31 @@ const RULE_SUGGESTIONS: Record<string, string> = {
   EXECUTION_SISBAJUD_MISSING: "Requerer expressamente a penhora via SISBAJUD como primeira medida executiva (art. 854 CPC).",
   MATRIX_INSUFFICIENT_TESES: "Desenvolver uma tese argumentativa completa para cada pedido formulado na peça.",
   MATRIX_WEAK_TESE: "Aprimorar a ratio decidendi das teses, conectando fato, norma e consequência jurídica.",
+  PRESCRIPTION_PROCEDENCE_CONTRADICTION: "Revisar a coerência entre a fundamentação (prescrição/decadência) e o dispositivo. Se o direito está prescrito, o dispositivo deve extinguir o processo ou julgar improcedente.",
+  STANDING_CONTRADICTION: "Revisar a coerência entre a fundamentação (ilegitimidade) e o dispositivo. Parte ilegítima impede julgamento do mérito.",
+  LACK_OF_EVIDENCE_CONTRADICTION: "Revisar a coerência entre a fundamentação (insuficiência probatória) e o dispositivo. Ausência de prova suficiente conduz à improcedência.",
+  MORAL_DAMAGE_CONTRADICTION: "Revisar a coerência entre a fundamentação (afastamento do dano moral) e o dispositivo. Mero aborrecimento não gera condenação por dano moral.",
+  EMPLOYMENT_RELATION_CONTRADICTION: "Revisar a coerência entre a fundamentação (ausência de vínculo) e o dispositivo. Ausência de subordinação impede o reconhecimento do vínculo empregatício.",
+  SPECIAL_ACTIVITY_CONTRADICTION: "Revisar a coerência entre a fundamentação (ausência de atividade especial) e o dispositivo. PPP/LTCAT insuficiente não sustenta o reconhecimento de tempo especial.",
+  RES_JUDICATA_MERITS_CONTRADICTION: "Revisar a coerência entre a fundamentação (coisa julgada/litispendência) e o dispositivo. Coisa julgada e litispendência impedem novo julgamento do mérito (art. 485 V/VI CPC).",
+  LACK_OF_INTEREST_PROCEDENCE_CONTRADICTION: "Revisar a coerência entre a fundamentação (falta de interesse de agir) e o dispositivo. Ausência de interesse processual impede julgamento do mérito (art. 485 VI CPC).",
+  NO_DAMAGE_COMPENSATION_CONTRADICTION: "Revisar a coerência entre a fundamentação (ausência de dano) e o dispositivo. Sem dano ou prejuízo demonstrado, não há base legal para condenação indenizatória (art. 186 CC).",
+  NO_INCAPACITY_BENEFIT_CONTRADICTION: "Revisar a coerência entre a fundamentação (ausência de incapacidade) e o dispositivo. Incapacidade não comprovada não sustenta concessão de benefício por incapacidade.",
+  NO_QUALITY_INSURED_BENEFIT_CONTRADICTION: "Revisar a coerência entre a fundamentação (ausência de qualidade de segurado) e o dispositivo. Sem qualidade de segurado, benefício previdenciário não pode ser concedido.",
+  ADMIN_NULLITY_MAINTAINED_ACT_CONTRADICTION: "Revisar a coerência entre a fundamentação (nulidade do ato) e o dispositivo. Vício reconhecido de nulidade ou legalidade impõe a anulação, não a manutenção do ato.",
+  UNADDRESSED_MAIN_REQUEST: "Verificar se o dispositivo enfrenta explicitamente todos os pedidos principais identificados na peça.",
+  UNADDRESSED_SUBSIDIARY_REQUEST: "Verificar se o dispositivo aprecia o pedido subsidiário, concedendo ou negando expressamente a pretensão alternativa.",
+  UNADDRESSED_INJUNCTION_REQUEST: "Verificar se o dispositivo decide expressamente o pedido de tutela de urgência ou liminar, deferindo ou indeferindo.",
+  RELIEF_NOT_REQUESTED: "Revisar o dispositivo para confirmar que todas as providências concedidas correspondem a pedidos formulados na peça.",
+  INCOMPLETE_RELIEF: "Complementar o dispositivo com os parâmetros mínimos: valor (R$) para condenações, DIB/DER para benefícios, prazo para obrigações de fazer.",
+
+  // Evidence × Conclusion (FASE 5.9.0)
+  MEDICAL_EVIDENCE_INCAPACITY_CONTRADICTION: "Revisar a coerência entre a prova pericial (que aparenta reconhecer incapacidade) e o dispositivo que nega o benefício. Se o laudo confirma incapacidade, o indeferimento deve ser fundamentado com argumento específico.",
+  SPECIAL_ACTIVITY_EVIDENCE_CONTRADICTION:   "Revisar a coerência entre a prova técnica (PPP/LTCAT/agente nocivo) e a conclusão que afasta o tempo especial. A recusa deve ser fundamentada com argumento específico que explique o porquê da prova ser insuficiente.",
+  PAYMENT_PROOF_CONTRADICTION:               "Revisar a coerência entre o comprovante de pagamento reconhecido e a conclusão que nega a quitação. Se o documento foi juntado e não foi impugnado, a fundamentação deve explicar a razão de não ser suficiente.",
+  CONTRACT_EVIDENCE_CONTRADICTION:           "Revisar a coerência entre a documentação contratual juntada e a conclusão que nega a relação jurídica. A existência do contrato deve ser enfrentada diretamente na fundamentação.",
+  WITNESS_OVERTIME_CONTRADICTION:            "Revisar a coerência entre a prova testemunhal que confirma a jornada e a conclusão que afasta o pedido por ausência de prova. A fundamentação deve explicar por que a prova testemunhal foi desconsiderada.",
+  DEPENDENCY_EVIDENCE_CONTRADICTION:         "Revisar a coerência entre os elementos de dependência econômica reconhecidos na fundamentação e a conclusão que nega o requisito. A fundamentação deve explicar por que a dependência não é suficiente para o caso.",
 };
 
 // ── Mapeamento de regras para riscos processuais ──────────────────────────────
@@ -533,6 +621,30 @@ export class AuditReportEngine {
       strengths.push({
         titulo: "Argumentação coerente com o entendimento dominante",
         descricao: "Não foram detectadas contradições com o entendimento consolidado dos tribunais superiores.",
+      });
+    }
+
+    const hasLegalContradiction = [...LEGAL_CONTRADICTION_RULES].some((r) => firedRules.has(r));
+    if (!hasLegalContradiction) {
+      strengths.push({
+        titulo: "Coerência entre fundamentação e dispositivo",
+        descricao: "Não foram detectadas contradições materiais entre a fundamentação e o resultado do dispositivo.",
+      });
+    }
+
+    const hasRequestDispositive = [...REQUEST_DISPOSITIVE_RULES].some((r) => firedRules.has(r));
+    if (!hasRequestDispositive) {
+      strengths.push({
+        titulo: "Pedidos adequadamente enfrentados",
+        descricao: "Não foram detectadas omissões ou inconsistências entre os pedidos e o dispositivo.",
+      });
+    }
+
+    const hasEvidenceConclusion = [...EVIDENCE_CONCLUSION_RULES].some((r) => firedRules.has(r));
+    if (!hasEvidenceConclusion) {
+      strengths.push({
+        titulo: "Provas compatíveis com a conclusão",
+        descricao: "Não foram detectadas inconsistências entre as provas reconhecidas e a conclusão adotada.",
       });
     }
 

@@ -1,0 +1,6 @@
+{
+  "chat.openAI.apiKey": "sk-08a397a9bfa647c581a80cb4f37ebc88",
+  "chat.openAI.endpoint": "https://api.deepseek.com/v1",
+  "chat.openAI.model": "deepseek-chat",
+  "chat.openAI.defaultModel": "deepseek-chat"
+}

@@ -16,6 +16,7 @@ export interface GenerateDocumentParams {
   caseDescription: string;
   jurisprudencias: Jurisprudencia[];
   instruction?: string | undefined;
+  classification?: any; // LegalClassification
 }
 
 export interface AnalyzeParams {
@@ -38,4 +39,5 @@ export interface AIResult {
   sourcesUsed: Jurisprudencia[];
   inputTokens: number;
   outputTokens: number;
+  audit?: any; // IntegratedAuditResponse
 }

@@ -25,6 +25,9 @@ import { ExecutionValidator } from "./execution.validator.js";
 import { JefCivelValidator } from "./jef-civel.validator.js";
 import { StanceContradictionValidator } from "./stance-contradiction.validator.js";
 import { validateCoverage } from "./coverage.validator.js";
+import { validateLegalContradictions } from "./legal-contradiction.validator.js";
+import { validateRequestDispositive } from "./request-dispositive.validator.js";
+import { validateEvidenceConclusion } from "./evidence-conclusion.validator.js";
 
 export interface FinalValidationResult {
   valid: boolean;
@@ -243,6 +246,15 @@ export class FinalValidator {
 
     // ── FASE 5.6 — Coverage validator (omissão de tema essencial) ────────────────
     allErrors.push(...validateCoverage(draft, classification));
+
+    // ── FASE 5.7.0 — Legal Contradictions (fundamentação × dispositivo) ──────────
+    allErrors.push(...validateLegalContradictions(draft));
+
+    // ── FASE 5.8.0 — Request × Dispositive Audit (pedidos × dispositivo) ─────────
+    allErrors.push(...validateRequestDispositive(draft));
+
+    // ── FASE 5.9.0 — Evidence × Conclusion Audit (provas × conclusão) ────────────
+    allErrors.push(...validateEvidenceConclusion(draft));
 
     // ── FASE 5.5 — alertas materiais específicos por domínio ─────────────────────
 

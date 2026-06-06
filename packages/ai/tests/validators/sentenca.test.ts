@@ -1,26 +1,29 @@
 import { describe, it } from "node:test";
 import assert from "node:assert/strict";
+import { StructuralValidator } from "../../src/validators/structural.validator.js";
 import { SentencaValidator } from "../../src/validators/sentenca.validator.js";
 import { CriminalSentenceValidator } from "../../src/validators/criminal-sentenca.validator.js";
 import { makeClassification } from "../helpers/factories.js";
 
-// ── SentencaValidator (geral) ────────────────────────────────────────────────
+// ── StructuralValidator — ausência de seções obrigatórias em sentença ─────────
+// SentencaValidator delega verificação de seções ao StructuralValidator
+// (comentário na linha 49 de sentenca.validator.ts), que emite MISSING_STRUCTURE.
 
-describe("SentencaValidator — sentença sem relatório", () => {
-  it("deve emitir SENTENCA_MISSING_RELATORIO fatal", () => {
-    const v = new SentencaValidator();
+describe("StructuralValidator — sentença sem relatório", () => {
+  it("deve emitir MISSING_STRUCTURE fatal", () => {
+    const v = new StructuralValidator();
     const draft = "FUNDAMENTAÇÃO\nAnálise...\nDISPOSITIVO\nAnte o exposto, julgo procedente. Apelação cabível (art. 1.009 CPC).";
-    const result = v.validate(draft, makeClassification({ tipo_peca: "SENTENCA" }));
-    assert.ok(result.errors.some((e) => e.rule === "SENTENCA_MISSING_RELATORIO" && e.fatal));
+    const result = v.validate(draft, "SENTENCA");
+    assert.ok(result.errors.some((e) => e.rule === "MISSING_STRUCTURE" && e.fatal));
   });
 });
 
-describe("SentencaValidator — sentença sem dispositivo", () => {
-  it("deve emitir SENTENCA_MISSING_DISPOSITIVO fatal", () => {
-    const v = new SentencaValidator();
+describe("StructuralValidator — sentença sem dispositivo", () => {
+  it("deve emitir MISSING_STRUCTURE fatal", () => {
+    const v = new StructuralValidator();
     const draft = "RELATÓRIO\nTrata-se de ação...\nFUNDAMENTAÇÃO\nAnálise dos pontos.";
-    const result = v.validate(draft, makeClassification({ tipo_peca: "SENTENCA" }));
-    assert.ok(result.errors.some((e) => e.rule === "SENTENCA_MISSING_DISPOSITIVO" && e.fatal));
+    const result = v.validate(draft, "SENTENCA");
+    assert.ok(result.errors.some((e) => e.rule === "MISSING_STRUCTURE" && e.fatal));
   });
 });
 

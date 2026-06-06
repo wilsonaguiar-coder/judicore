@@ -16,3 +16,6 @@ export { JefCivelValidator } from "./jef-civel.validator.js";
 export { StanceContradictionValidator } from "./stance-contradiction.validator.js";
 export { detectArticleContext, isArticleUsedAsDistinction } from "./article-context.js";
 export type { ArticleContext } from "./article-context.js";
+export { validateLegalContradictions } from "./legal-contradiction.validator.js";
+export { validateRequestDispositive } from "./request-dispositive.validator.js";
+export { validateEvidenceConclusion } from "./evidence-conclusion.validator.js";

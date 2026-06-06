@@ -1,0 +1,20 @@
+[
+  {
+    "name": "DeepSeek API",
+    "vendor": "customendpoint",
+    "apiKey": "sk-08a397a9bfa647c581a80cb4f37ebc88",
+    "apiType": "chat-completions",
+    "models": [
+      {
+        "id": "deepseek-chat",
+        "name": "DeepSeek Coder (V3/V4)",
+        "url": "https://api.deepseek.com/v1",
+        "toolCalling": true,
+        "vision": false,
+        "thinking": false,
+        "maxInputTokens": 128000,
+        "maxOutputTokens": 16000
+      }
+    ]
+  }
+]
