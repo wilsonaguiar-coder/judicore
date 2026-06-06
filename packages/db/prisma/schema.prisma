@@ -328,7 +328,7 @@ model ReviewRewrite {
 model ReviewDraftVersion {
   id            String   @id @default(cuid())
   sessionId     String   @map("session_id")
-  sourceType    String // "ORIGINAL" | "REWRITE"
+  sourceType    String   @map("source_type") // "ORIGINAL" | "REWRITE"
   rewriteId     String?  @map("rewrite_id")
   versionNumber Int      @map("version_number")
   content       String   @db.Text
