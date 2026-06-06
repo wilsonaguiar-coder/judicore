@@ -1,14 +1,15 @@
+"use client";
+
 import Image from "next/image";
 import Link from "next/link";
 import { ArrowLeft, Shield } from "lucide-react";
-
-export const metadata = { title: "Privacidade — JudiCore" };
+import { motion } from "framer-motion";
 
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
   return (
-    <section className="mb-6 bg-white/[0.03] border border-white/[0.06] rounded-2xl p-6">
+    <section className="mb-6 bg-white/[0.02] border border-white/[0.06] rounded-2xl p-6 backdrop-blur-xl hover:border-violet-500/25 transition-all duration-500 hover:neon-border-indigo">
       <h2 className="text-base font-bold text-white mb-3">{title}</h2>
-      <div className="text-white/60 leading-relaxed space-y-2">{children}</div>
+      <div className="text-white/60 leading-relaxed space-y-2 font-light">{children}</div>
     </section>
   );
 }
@@ -16,33 +17,58 @@ function Section({ title, children }: { title: string; children: React.ReactNode
 function Li({ children }: { children: React.ReactNode }) {
   return (
     <li className="flex gap-2 items-start">
-      <span className="mt-1.5 w-1.5 h-1.5 rounded-full bg-indigo-400/60 shrink-0" />
-      <span className="text-white/60">{children}</span>
+      <span className="mt-2 w-1.5 h-1.5 rounded-full bg-gradient-to-br from-indigo-400 to-violet-500 shrink-0 shadow-[0_0_8px_rgba(129,140,248,0.8)]" />
+      <span className="text-white/60 font-light">{children}</span>
     </li>
   );
 }
 
 export default function PrivacidadePage() {
   return (
-    <div className="min-h-screen bg-[#080c14] text-white">
+    <div className="min-h-screen bg-[#030014] text-white flex flex-col selection:bg-indigo-500/30 overflow-x-hidden relative">
 
       {/* Ambient glow */}
       <div className="pointer-events-none fixed inset-0 overflow-hidden" aria-hidden>
-        <div className="absolute -top-48 left-1/2 -translate-x-1/2 w-[900px] h-[600px] rounded-full bg-indigo-600/10 blur-3xl" />
-        <div className="absolute top-[40%] -left-48 w-[500px] h-[500px] rounded-full bg-violet-700/[0.07] blur-3xl" />
-        <div
-          className="absolute inset-0 opacity-[0.025]"
-          style={{
-            backgroundImage: "linear-gradient(rgba(255,255,255,0.3) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,0.3) 1px,transparent 1px)",
-            backgroundSize: "60px 60px",
+        <motion.div 
+          animate={{ 
+            x: [0, 80, -80, 0],
+            y: [0, -80, 80, 0],
+            scale: [1, 1.2, 1],
+            opacity: [0.5, 0.7, 0.5] 
           }}
+          transition={{ duration: 15, repeat: Infinity, ease: "linear" }}
+          className="absolute -top-48 -left-48 w-[600px] h-[600px] rounded-full bg-indigo-500/30 blur-[120px]" 
         />
+        <motion.div 
+          animate={{ 
+            x: [0, -100, 100, 0],
+            y: [0, 80, -80, 0],
+            scale: [1, 1.3, 1],
+            opacity: [0.4, 0.6, 0.4] 
+          }}
+          transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
+          className="absolute top-[20%] -right-48 w-[700px] h-[700px] rounded-full bg-fuchsia-500/25 blur-[120px]" 
+        />
+        <motion.div 
+          animate={{ 
+            x: [0, 120, -120, 0],
+            y: [0, 60, -60, 0],
+            scale: [1, 1.1, 1],
+            opacity: [0.5, 0.7, 0.5] 
+          }}
+          transition={{ duration: 25, repeat: Infinity, ease: "linear" }}
+          className="absolute -bottom-48 left-[20%] w-[800px] h-[800px] rounded-full bg-cyan-500/25 blur-[120px]" 
+        />
+        <div className="absolute inset-0 bg-[linear-gradient(to_right,#ffffff0a_1px,transparent_1px),linear-gradient(to_bottom,#ffffff0a_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_80%_60%_at_50%_40%,#000_70%,transparent_100%)]" />
       </div>
 
       {/* Header */}
-      <header className="relative z-20 w-full px-6 md:px-12 py-4 flex items-center justify-between border-b border-white/[0.05] bg-[#080c14]/80 backdrop-blur-xl">
-        <Link href="/" className="flex items-center gap-3">
-          <Image src="/logo.png" alt="JudiCore" width={110} height={36} className="object-contain" />
+      <header className="relative z-20 w-full px-6 md:px-14 py-4 flex items-center justify-between border-b border-white/[0.04] bg-[#030014]/65 backdrop-blur-2xl">
+        <Link href="/" className="flex items-center gap-4 hover:opacity-80 transition-opacity">
+          <Image src="/logo.png" alt="JudiCore" width={112} height={38} className="object-contain" priority />
+          <span className="hidden sm:inline text-xs text-white/35 border-l border-white/10 pl-4 tracking-wide font-light">
+            SUÍTE DE INTELIGÊNCIA JURÍDICA
+          </span>
         </Link>
         <Link href="/" className="flex items-center gap-1.5 text-sm text-white/45 hover:text-white/80 transition-colors">
           <ArrowLeft size={15} />
@@ -51,7 +77,7 @@ export default function PrivacidadePage() {
       </header>
 
       {/* Content */}
-      <main className="relative z-10 max-w-3xl mx-auto px-6 md:px-8 py-16">
+      <main className="relative z-10 max-w-3xl mx-auto px-6 md:px-8 py-16 flex-1 w-full">
 
         {/* Título */}
         <div className="mb-12">
@@ -59,7 +85,7 @@ export default function PrivacidadePage() {
             <Shield size={11} />
             LGPD — LEI Nº 13.709/2018
           </div>
-          <h1 className="text-4xl md:text-5xl font-extrabold leading-[1.1] mb-4">
+          <h1 className="text-4xl md:text-5xl font-black leading-[1.1] mb-4">
             Política de{" "}
             <span className="bg-gradient-to-r from-indigo-400 via-sky-400 to-cyan-400 bg-clip-text text-transparent">
               Privacidade
@@ -154,14 +180,14 @@ export default function PrivacidadePage() {
           </p>
         </Section>
 
-
-
       </main>
 
       {/* Footer */}
-      <footer className="relative z-10 px-6 md:px-12 py-5 mt-8 border-t border-white/[0.05] flex items-center justify-between">
-        <Image src="/logo.png" alt="JudiCore" width={80} height={26} className="object-contain opacity-20" />
-        <p className="text-[11px] text-white/20">© {new Date().getFullYear()} JudiCore. Todos os direitos reservados.</p>
+      <footer className="relative z-10 py-8 px-6 md:px-14 border-t border-white/[0.04] flex flex-col md:flex-row items-center justify-between gap-4 bg-[#030014]/50 backdrop-blur-xl">
+        <div className="flex items-center gap-3 opacity-40 hover:opacity-100 transition-opacity">
+          <Image src="/logo.png" alt="JudiCore" width={80} height={26} className="object-contain grayscale hover:grayscale-0 transition-all" />
+        </div>
+        <p className="text-xs text-white/30 font-medium tracking-wide">© {new Date().getFullYear()} JudiCore. Todos os direitos reservados.</p>
       </footer>
     </div>
   );

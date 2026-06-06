@@ -12,6 +12,7 @@ import { VersionTimeline } from "../../../components/review-studio/VersionTimeli
 import { VersionPreview } from "../../../components/review-studio/VersionPreview";
 import { ReviewWorkflowStepper, WorkflowStep } from "../../../components/review-studio/ReviewWorkflowStepper";
 import { AuditEntrypointCard } from "../../../components/review-studio/AuditEntrypointCard";
+import { AiLegalReviewCard } from "../../../components/review-studio/AiLegalReviewCard";
 
 const DEMO_ID = "teste-1";
 
@@ -138,6 +139,8 @@ export default function ReviewStudioPage({ params }: { params: { id: string } })
   const [decisionLoading, setDecisionLoading] = useState<string | null>(null);
   const [rewriteLoading, setRewriteLoading] = useState(false);
   const [rewriteError, setRewriteError] = useState<string | null>(null);
+  const [aiReview, setAiReview] = useState<any>(null);
+  const [aiReviewLoading, setAiReviewLoading] = useState(false);
 
   // ─── Derived state ────────────────────────────────────────────────────────
 
@@ -198,17 +201,41 @@ export default function ReviewStudioPage({ params }: { params: { id: string } })
   /**
    * Trigger audit via POST — works for demo and real docs.
    */
+  const runAiReview = async (auditResult: any, draft: string) => {
+    if (!auditResult) return;
+    setAiReviewLoading(true);
+    try {
+      const res = await fetch(`/api/review-studio/${params.id}/ai-review`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          draft,
+          classification: auditResult.classification ?? "CIVIL_PETICAO_INICIAL",
+          audit: { pieceId: params.id, audit: auditResult },
+          correctionPlan: data?.correctionPlan ?? null,
+        }),
+      });
+      if (res.ok) setAiReview((await res.json()) ?? null);
+    } catch (e) {
+      console.error("AI Review error:", e);
+    } finally {
+      setAiReviewLoading(false);
+    }
+  };
+
   const handleRunAudit = async () => {
     setAuditLoading(true);
     try {
       const res = await fetch(`/api/review-studio/${params.id}/audit`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({}), // backend picks up demo draft automatically
+        body: JSON.stringify({}),
       });
       const d = await res.json();
       setData(d ?? {});
       await loadVersions();
+      // AiLegalReviewerService roda após a auditoria determinística
+      await runAiReview(d?.audit, d?.session?.originalDraft ?? "");
     } catch (e) {
       console.error("Audit error:", e);
     } finally {
@@ -426,6 +453,7 @@ export default function ReviewStudioPage({ params }: { params: { id: string } })
                 nonFatalErrors={audit.nonFatalErrors ?? []}
                 strengths={audit.strengths ?? []}
               />
+              <AiLegalReviewCard result={aiReview} loading={aiReviewLoading} domain={audit?.domain ?? audit?.classification} />
               <CorrectionPlanList items={correctionPlanItems} />
               <HistoryTimeline timeline={timeline} />
             </div>

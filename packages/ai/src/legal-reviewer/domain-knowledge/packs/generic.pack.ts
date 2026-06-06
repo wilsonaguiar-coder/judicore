@@ -1,0 +1,67 @@
+import type { DomainKnowledgePack } from "../domain-knowledge.types.js";
+
+export const genericLegalKnowledgePack: DomainKnowledgePack = {
+  domain: "GENERIC",
+  label: "Direito Geral",
+  description: "Pack genérico utilizado como fallback quando nenhum pack especializado está disponível.",
+  reviewerGoals: [
+    "Demonstrar os fatos com clareza e precisão documental",
+    "Fundamentar as teses com base normativa explícita",
+    "Fortalecer o nexo causal entre fatos e consequências jurídicas",
+    "Antecipar argumentos contrários previsíveis",
+    "Documentar todos os elementos relevantes para a tese",
+    "Apresentar os pedidos com correspondência fática na narrativa",
+  ],
+  commonDocuments: [
+    "Documentos de identificação das partes",
+    "Contratos e instrumentos formalizadores",
+    "Comprovantes de pagamento ou prestação",
+    "Comunicações formais (notificações, intimações, correspondências)",
+    "Laudos e pareceres técnicos",
+    "Decisões administrativas ou judiciais anteriores relevantes",
+  ],
+  commonProofs: [
+    "Prova documental (originais ou cópias autenticadas)",
+    "Prova testemunhal",
+    "Prova pericial",
+    "Prova digital (prints, e-mails, mensagens, registros de acesso)",
+    "Prova emprestada de outros processos",
+  ],
+  commonWeaknesses: [
+    "Fatos afirmados sem demonstração documental correspondente",
+    "Tese sem fundamento normativo explícito",
+    "Nexo causal entre fato e dano pouco demonstrado",
+    "Ausência de memória de cálculo quando há pedido de valor",
+    "Pedidos sem correspondência fática na narrativa",
+    "Ausência de linha do tempo dos fatos relevantes",
+  ],
+  commonDemonstrations: [
+    "Linha do tempo dos fatos relevantes",
+    "Quadro de correspondência entre fato e fundamento legal",
+    "Demonstração da legitimidade das partes",
+    "Demonstração do interesse processual",
+    "Demonstração do nexo causal",
+  ],
+  commonCalculations: [],
+  commonCounterArguments: [
+    "Preliminares processuais (ilegitimidade, prescrição, litispendência, carência de ação)",
+    "Negativa dos fatos constitutivos do direito",
+    "Excludentes de responsabilidade ou culpa exclusiva",
+    "Impugnação de cálculos ou valores",
+    "Ausência de dano ou dano não comprovado",
+  ],
+  strengtheningOpportunities: [
+    "Explicitar o nexo normativo entre fatos e pedidos",
+    "Incluir linha do tempo dos fatos relevantes",
+    "Antecipar e responder preliminares previsíveis",
+    "Documentar tentativas de solução extrajudicial",
+    "Reforçar o embasamento dos pedidos com valores e cálculos",
+    "Explicitar o dano concreto sofrido",
+  ],
+  cautionaryNotes: [
+    "Este pack é genérico: findings específicos de domínios especializados NÃO se aplicam aqui — a ausência de itens típicos de um ramo específico não é fragilidade quando o domínio é desconhecido",
+    "Sem contexto de domínio, não presuma qual documentação seria esperada — cada área do direito tem documentos e provas próprios",
+    "Placeholders são sempre esperados em peças elaboradas com dados pendentes de confirmação — não gere finding apenas por sua presença",
+  ],
+  placeholderGuidance: "Dados tipicamente pendentes de confirmação variam conforme o domínio. Placeholders comuns em qualquer domínio: [PARTES], [VALOR DA CAUSA], [DATA DOS FATOS], [FUNDAMENTO LEGAL], [PEDIDO ESPECÍFICO].",
+};

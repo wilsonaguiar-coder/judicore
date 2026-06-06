@@ -19,3 +19,5 @@ export type { ArticleContext } from "./article-context.js";
 export { validateLegalContradictions } from "./legal-contradiction.validator.js";
 export { validateRequestDispositive } from "./request-dispositive.validator.js";
 export { validateEvidenceConclusion } from "./evidence-conclusion.validator.js";
+export { validateOutcomeConformance } from "./outcome-conformance.validator.js";
+export { validateFictitiousData, FICTITIOUS_DATA_PATTERNS } from "./fictitious-data.validator.js";

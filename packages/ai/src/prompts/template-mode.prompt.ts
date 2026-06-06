@@ -4,41 +4,42 @@ import { TEMPLATE_MODEL_PROHIBITIONS } from "../rules/legal_rules.js";
 export function buildModeBlock(mode: GenerationMode): string {
   if (mode === "TEMPLATE_MODEL") {
     return `
-⚡ MODO GENÉRICO DESENVOLVIDO — dados parciais disponíveis
+⚡ MODO MODELO ESTRUTURADO — dados parciais disponíveis
 
-O caso forneceu informações parciais. Gere uma peça JURIDICAMENTE COMPLETA usando dados genéricos plausíveis onde necessário.
+O caso forneceu informações parciais. Gere uma peça JURIDICAMENTE COMPLETA com placeholders obrigatórios para os dados ausentes.
 
-REGRAS ABSOLUTAS:
-1. PROIBIDO COMPLETAMENTE: colchetes, placeholders, marcadores de ausência.
-   Nunca escreva: [INSERIR], [NOME], [A DETERMINAR], [PREENCHER], [DATA], [VALOR], [VERIFICAR].
-2. Onde faltarem dados concretos, use dados genéricos plausíveis:
-   — Nomes: "João da Silva" (autor), "Empresa Ré Ltda." ou órgão público pertinente (réu)
-   — Datas: datas aproximadas coerentes com o tipo de caso (ex: "em março de 2024")
-   — Valores: valores redondos estimados (ex: "R$ 15.000,00")
-3. Desenvolva fundamentação jurídica completa: norma → aplicação → conclusão.
+REGRAS ABSOLUTAS (FASE 8.4.2-R):
+1. PROIBIDO inventar, inferir ou estimar dados não fornecidos.
+   NUNCA use nomes fictícios, datas aproximadas, valores estimados ou fatos não informados.
+2. Onde faltarem dados concretos, use OBRIGATORIAMENTE placeholder entre colchetes:
+   — Nome do autor: [AUTOR]
+   — Nome do réu: [RÉU]
+   — Número do processo: [PROCESSO]
+   — CPF/RG: [CPF] / [RG]
+   — Datas não fornecidas: [DATA]
+   — Valores não informados: [VALOR DA CAUSA]
+   — Qualquer dado ausente: [DADO NÃO FORNECIDO]
+3. Desenvolva fundamentação jurídica completa com os dados disponíveis: norma → aplicação → conclusão.
 4. Estrutura completa com todas as seções do tipo de peça.
-5. AO FINAL DA PEÇA, após o fechamento e assinatura, inclua obrigatoriamente esta nota literal:
-   "⚠ Peça gerada com dados genéricos por insuficiência de informações. Substitua nomes, datas, valores e fatos específicos pelos dados reais do caso antes de qualquer uso."
+5. Os placeholders entre colchetes devem ser preenchidos pelo usuário antes de qualquer uso.
 
 `;
   }
 
   if (mode === "SAFE_SKELETON") {
     return `
-⚡ MODO GENÉRICO SIMPLIFICADO — informações mínimas
+⚡ MODO ESQUELETO SEGURO — informações mínimas
 
-O caso tem informações mínimas. Gere uma peça JURIDICAMENTE DESENVOLVIDA, simples, com dados genéricos plausíveis.
+O caso tem informações mínimas. Gere uma peça ESTRUTURALMENTE COMPLETA com placeholders obrigatórios para todos os dados não fornecidos.
 
-REGRAS ABSOLUTAS:
-1. PROIBIDO COMPLETAMENTE: colchetes, placeholders, marcadores de ausência.
-   Nunca escreva: [INSERIR], [NOME], [A DETERMINAR], [PREENCHER], [VERIFICAR].
-2. Use dados genéricos plausíveis para o tipo de caso identificado:
-   — Nomes de partes fictícias mas verossímeis
-   — Fatos genéricos típicos do assunto jurídico
-   — Fundamentação baseada nas normas aplicáveis ao tipo de caso
-3. Peça completa: abertura, fatos genéricos coerentes, direito desenvolvido, pedidos concretos.
-4. AO FINAL DA PEÇA, após o fechamento e assinatura, inclua obrigatoriamente esta nota literal:
-   "⚠ Peça gerada com dados genéricos por insuficiência de informações. Substitua nomes, datas, valores e fatos específicos pelos dados reais do caso antes de qualquer uso."
+REGRAS ABSOLUTAS (FASE 8.4.2-R):
+1. PROIBIDO inventar, inferir ou estimar dados não fornecidos.
+   NUNCA use nomes fictícios, datas aproximadas, valores estimados ou fatos não informados.
+2. Use OBRIGATORIAMENTE placeholders entre colchetes para dados ausentes:
+   — [AUTOR], [RÉU], [PROCESSO], [DATA], [VALOR DA CAUSA], [FATOS DO CASO], [DADO NÃO FORNECIDO]
+3. Fundamentação baseada nas normas aplicáveis ao tipo de caso identificado.
+4. Estrutura completa: abertura, seção de fatos com placeholders, direito desenvolvido, pedidos.
+5. Os placeholders entre colchetes devem ser preenchidos pelo usuário antes de qualquer uso.
 
 `;
   }
@@ -48,9 +49,9 @@ REGRAS ABSOLUTAS:
 
 Você está em FINAL_DRAFT. Produza peça juridicamente robusta, densa e persuasiva. Não faça resumo. Não seja sintético. Desenvolva as teses em profundidade.
 
-PROIBIÇÃO ABSOLUTA — PLACEHOLDERS (FASE 5.4):
-NUNCA use colchetes ou marcadores de ausência: [INSERIR], [A DETERMINAR], [NOME], [CPF], [VALOR], [DATA], [PREENCHER].
-Se um dado específico não foi fornecido: use dado genérico plausível (nome fictício, data aproximada, valor estimado).
+REGRA ABSOLUTA — DADOS NÃO FORNECIDOS (FASE 8.4.2-R):
+Se um dado específico não foi fornecido pelo usuário: use OBRIGATORIAMENTE placeholder entre colchetes — NUNCA invente, estime ou infira.
+  Exemplos: [AUTOR], [RÉU], [PROCESSO], [DATA], [VALOR DA CAUSA], [CPF], [CARGO], [DADO NÃO FORNECIDO]
 EXCEÇÃO: jurisprudência — cite APENAS decisões fornecidas pelo sistema. Não invente números de processo.
 
 Para PETICAO_INICIAL, a seção DO DIREITO deve conter no mínimo 6 subtópicos jurídicos, salvo impossibilidade material:

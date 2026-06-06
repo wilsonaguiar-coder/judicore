@@ -34,11 +34,7 @@ Retorne SOMENTE um JSON válido com esta estrutura:
 
 REGRAS:
 - fatos: lista os fatos materiais concretos e específicos do caso (mínimo 3)
-- pedidos: lista os pedidos inferíveis do caso (mínimo 2). Para casos TRABALHISTAS (Justiça do TRABALHO / regime CLT), infira automaticamente os pedidos típicos com base no contexto:
-  • Dispensa por justa causa → "Nulidade da justa causa", "Aviso prévio indenizado", "Verbas rescisórias", "Multa de 40% do FGTS", "Liberação do FGTS"
-  • Dispensa sem justa causa → "Aviso prévio", "FGTS 40%", "Verbas rescisórias", "Seguro-desemprego"
-  • Horas extras → "Horas extras e reflexos", "Adicional noturno (se noturno)"
-  • Adicional de insalubridade/periculosidade → deduzir o pedido e seus reflexos
+- pedidos: lista APENAS os pedidos explicitamente mencionados ou inequivocamente identificáveis no texto do caso (mínimo 1, sem mínimo obrigatório se o caso for vago). NÃO infira, deduza ou complete pedidos não mencionados — se o usuário não indicou o pedido, não o inclua. Se nenhum pedido for identificável, retorne array vazio e classifique como INSUFICIENTE
 - questoes_juridicas: questões de direito que precisam ser resolvidas (mínimo 2)
 - artigos_citados: artigos mencionados no caso ou evidentemente aplicáveis
 - jurisprudencias_relevantes: SOMENTE IDs de jurisprudências TEMATICAMENTE RELEVANTES ao assunto "${classification.assunto_principal}". Se nenhuma for relevante, retorne array vazio.

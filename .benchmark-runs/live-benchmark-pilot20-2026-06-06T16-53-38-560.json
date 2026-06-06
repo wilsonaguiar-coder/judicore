@@ -1,0 +1,922 @@
+{
+  "runId": "pilot20-2026-06-06T16-53-38-560",
+  "startedAt": "2026-06-06T16:53:38.562Z",
+  "config": {
+    "enabled": false,
+    "dryRun": true,
+    "providers": [
+      "openai",
+      "gemini",
+      "deepseek"
+    ],
+    "maxDocumentsPerProvider": 20,
+    "costLimits": {
+      "openai": {
+        "maxUsd": 3
+      },
+      "gemini": {
+        "maxUsd": 3
+      },
+      "deepseek": {
+        "maxUsd": 2
+      }
+    },
+    "modelByProvider": {
+      "openai": "gpt-5.4",
+      "gemini": "gemini-2.5-pro",
+      "deepseek": "deepseek-reasoner"
+    },
+    "maxInputTokensPerDocument": 18000,
+    "maxOutputTokensPerDocument": 4000,
+    "persistRawResponses": true,
+    "resume": true,
+    "includeCaseIds": [
+      "RGPS-002",
+      "RGPS-003",
+      "RGPS-008",
+      "RGPS-015",
+      "TRIB-002",
+      "TRIB-004",
+      "TRIB-007",
+      "FAM-001",
+      "FAM-004",
+      "FAM-007",
+      "CONS-001",
+      "CONS-006",
+      "CONS-008",
+      "CRIM-002",
+      "CRIM-005",
+      "CRIM-007",
+      "FAZ-002",
+      "FAZ-004",
+      "CIV-007",
+      "JEC-002"
+    ]
+  },
+  "results": [
+    {
+      "providerId": "openai",
+      "model": "gpt-5.4",
+      "caseId": "RGPS-002",
+      "domain": "RGPS",
+      "review": null,
+      "usage": {
+        "inputTokens": 562,
+        "outputTokens": 0,
+        "totalTokens": 562,
+        "estimatedCostUsd": 0
+      },
+      "durationMs": 0
+    },
+    {
+      "providerId": "openai",
+      "model": "gpt-5.4",
+      "caseId": "RGPS-003",
+      "domain": "RGPS",
+      "review": null,
+      "usage": {
+        "inputTokens": 507,
+        "outputTokens": 0,
+        "totalTokens": 507,
+        "estimatedCostUsd": 0
+      },
+      "durationMs": 0
+    },
+    {
+      "providerId": "openai",
+      "model": "gpt-5.4",
+      "caseId": "RGPS-008",
+      "domain": "RGPS",
+      "review": null,
+      "usage": {
+        "inputTokens": 542,
+        "outputTokens": 0,
+        "totalTokens": 542,
+        "estimatedCostUsd": 0
+      },
+      "durationMs": 0
+    },
+    {
+      "providerId": "openai",
+      "model": "gpt-5.4",
+      "caseId": "RGPS-015",
+      "domain": "RGPS",
+      "review": null,
+      "usage": {
+        "inputTokens": 802,
+        "outputTokens": 0,
+        "totalTokens": 802,
+        "estimatedCostUsd": 0
+      },
+      "durationMs": 0
+    },
+    {
+      "providerId": "openai",
+      "model": "gpt-5.4",
+      "caseId": "TRIB-002",
+      "domain": "TRIBUTARIO",
+      "review": null,
+      "usage": {
+        "inputTokens": 516,
+        "outputTokens": 0,
+        "totalTokens": 516,
+        "estimatedCostUsd": 0
+      },
+      "durationMs": 0
+    },
+    {
+      "providerId": "openai",
+      "model": "gpt-5.4",
+      "caseId": "TRIB-004",
+      "domain": "TRIBUTARIO",
+      "review": null,
+      "usage": {
+        "inputTokens": 520,
+        "outputTokens": 0,
+        "totalTokens": 520,
+        "estimatedCostUsd": 0
+      },
+      "durationMs": 0
+    },
+    {
+      "providerId": "openai",
+      "model": "gpt-5.4",
+      "caseId": "TRIB-007",
+      "domain": "TRIBUTARIO",
+      "review": null,
+      "usage": {
+        "inputTokens": 535,
+        "outputTokens": 0,
+        "totalTokens": 535,
+        "estimatedCostUsd": 0
+      },
+      "durationMs": 0
+    },
+    {
+      "providerId": "openai",
+      "model": "gpt-5.4",
+      "caseId": "FAM-001",
+      "domain": "FAMILIA",
+      "review": null,
+      "usage": {
+        "inputTokens": 738,
+        "outputTokens": 0,
+        "totalTokens": 738,
+        "estimatedCostUsd": 0
+      },
+      "durationMs": 0
+    },
+    {
+      "providerId": "openai",
+      "model": "gpt-5.4",
+      "caseId": "FAM-004",
+      "domain": "FAMILIA",
+      "review": null,
+      "usage": {
+        "inputTokens": 537,
+        "outputTokens": 0,
+        "totalTokens": 537,
+        "estimatedCostUsd": 0
+      },
+      "durationMs": 0
+    },
+    {
+      "providerId": "openai",
+      "model": "gpt-5.4",
+      "caseId": "FAM-007",
+      "domain": "FAMILIA",
+      "review": null,
+      "usage": {
+        "inputTokens": 527,
+        "outputTokens": 0,
+        "totalTokens": 527,
+        "estimatedCostUsd": 0
+      },
+      "durationMs": 0
+    },
+    {
+      "providerId": "openai",
+      "model": "gpt-5.4",
+      "caseId": "CONS-001",
+      "domain": "CONSUMIDOR",
+      "review": null,
+      "usage": {
+        "inputTokens": 767,
+        "outputTokens": 0,
+        "totalTokens": 767,
+        "estimatedCostUsd": 0
+      },
+      "durationMs": 0
+    },
+    {
+      "providerId": "openai",
+      "model": "gpt-5.4",
+      "caseId": "CONS-006",
+      "domain": "CONSUMIDOR",
+      "review": null,
+      "usage": {
+        "inputTokens": 544,
+        "outputTokens": 0,
+        "totalTokens": 544,
+        "estimatedCostUsd": 0
+      },
+      "durationMs": 0
+    },
+    {
+      "providerId": "openai",
+      "model": "gpt-5.4",
+      "caseId": "CONS-008",
+      "domain": "CONSUMIDOR",
+      "review": null,
+      "usage": {
+        "inputTokens": 518,
+        "outputTokens": 0,
+        "totalTokens": 518,
+        "estimatedCostUsd": 0
+      },
+      "durationMs": 0
+    },
+    {
+      "providerId": "openai",
+      "model": "gpt-5.4",
+      "caseId": "CRIM-002",
+      "domain": "CRIMINAL",
+      "review": null,
+      "usage": {
+        "inputTokens": 527,
+        "outputTokens": 0,
+        "totalTokens": 527,
+        "estimatedCostUsd": 0
+      },
+      "durationMs": 0
+    },
+    {
+      "providerId": "openai",
+      "model": "gpt-5.4",
+      "caseId": "CRIM-005",
+      "domain": "CRIMINAL",
+      "review": null,
+      "usage": {
+        "inputTokens": 526,
+        "outputTokens": 0,
+        "totalTokens": 526,
+        "estimatedCostUsd": 0
+      },
+      "durationMs": 0
+    },
+    {
+      "providerId": "openai",
+      "model": "gpt-5.4",
+      "caseId": "CRIM-007",
+      "domain": "CRIMINAL",
+      "review": null,
+      "usage": {
+        "inputTokens": 702,
+        "outputTokens": 0,
+        "totalTokens": 702,
+        "estimatedCostUsd": 0
+      },
+      "durationMs": 0
+    },
+    {
+      "providerId": "openai",
+      "model": "gpt-5.4",
+      "caseId": "FAZ-002",
+      "domain": "FAZENDA_PUBLICA",
+      "review": null,
+      "usage": {
+        "inputTokens": 546,
+        "outputTokens": 0,
+        "totalTokens": 546,
+        "estimatedCostUsd": 0
+      },
+      "durationMs": 0
+    },
+    {
+      "providerId": "openai",
+      "model": "gpt-5.4",
+      "caseId": "FAZ-004",
+      "domain": "FAZENDA_PUBLICA",
+      "review": null,
+      "usage": {
+        "inputTokens": 535,
+        "outputTokens": 0,
+        "totalTokens": 535,
+        "estimatedCostUsd": 0
+      },
+      "durationMs": 0
+    },
+    {
+      "providerId": "openai",
+      "model": "gpt-5.4",
+      "caseId": "CIV-007",
+      "domain": "CIVEL",
+      "review": null,
+      "usage": {
+        "inputTokens": 522,
+        "outputTokens": 0,
+        "totalTokens": 522,
+        "estimatedCostUsd": 0
+      },
+      "durationMs": 0
+    },
+    {
+      "providerId": "openai",
+      "model": "gpt-5.4",
+      "caseId": "JEC-002",
+      "domain": "JUIZADO_ESPECIAL",
+      "review": null,
+      "usage": {
+        "inputTokens": 523,
+        "outputTokens": 0,
+        "totalTokens": 523,
+        "estimatedCostUsd": 0
+      },
+      "durationMs": 0
+    },
+    {
+      "providerId": "gemini",
+      "model": "gemini-2.5-pro",
+      "caseId": "RGPS-002",
+      "domain": "RGPS",
+      "review": null,
+      "usage": {
+        "inputTokens": 562,
+        "outputTokens": 0,
+        "totalTokens": 562,
+        "estimatedCostUsd": 0
+      },
+      "durationMs": 0
+    },
+    {
+      "providerId": "gemini",
+      "model": "gemini-2.5-pro",
+      "caseId": "RGPS-003",
+      "domain": "RGPS",
+      "review": null,
+      "usage": {
+        "inputTokens": 507,
+        "outputTokens": 0,
+        "totalTokens": 507,
+        "estimatedCostUsd": 0
+      },
+      "durationMs": 0
+    },
+    {
+      "providerId": "gemini",
+      "model": "gemini-2.5-pro",
+      "caseId": "RGPS-008",
+      "domain": "RGPS",
+      "review": null,
+      "usage": {
+        "inputTokens": 542,
+        "outputTokens": 0,
+        "totalTokens": 542,
+        "estimatedCostUsd": 0
+      },
+      "durationMs": 0
+    },
+    {
+      "providerId": "gemini",
+      "model": "gemini-2.5-pro",
+      "caseId": "RGPS-015",
+      "domain": "RGPS",
+      "review": null,
+      "usage": {
+        "inputTokens": 802,
+        "outputTokens": 0,
+        "totalTokens": 802,
+        "estimatedCostUsd": 0
+      },
+      "durationMs": 0
+    },
+    {
+      "providerId": "gemini",
+      "model": "gemini-2.5-pro",
+      "caseId": "TRIB-002",
+      "domain": "TRIBUTARIO",
+      "review": null,
+      "usage": {
+        "inputTokens": 516,
+        "outputTokens": 0,
+        "totalTokens": 516,
+        "estimatedCostUsd": 0
+      },
+      "durationMs": 0
+    },
+    {
+      "providerId": "gemini",
+      "model": "gemini-2.5-pro",
+      "caseId": "TRIB-004",
+      "domain": "TRIBUTARIO",
+      "review": null,
+      "usage": {
+        "inputTokens": 520,
+        "outputTokens": 0,
+        "totalTokens": 520,
+        "estimatedCostUsd": 0
+      },
+      "durationMs": 0
+    },
+    {
+      "providerId": "gemini",
+      "model": "gemini-2.5-pro",
+      "caseId": "TRIB-007",
+      "domain": "TRIBUTARIO",
+      "review": null,
+      "usage": {
+        "inputTokens": 535,
+        "outputTokens": 0,
+        "totalTokens": 535,
+        "estimatedCostUsd": 0
+      },
+      "durationMs": 0
+    },
+    {
+      "providerId": "gemini",
+      "model": "gemini-2.5-pro",
+      "caseId": "FAM-001",
+      "domain": "FAMILIA",
+      "review": null,
+      "usage": {
+        "inputTokens": 738,
+        "outputTokens": 0,
+        "totalTokens": 738,
+        "estimatedCostUsd": 0
+      },
+      "durationMs": 0
+    },
+    {
+      "providerId": "gemini",
+      "model": "gemini-2.5-pro",
+      "caseId": "FAM-004",
+      "domain": "FAMILIA",
+      "review": null,
+      "usage": {
+        "inputTokens": 537,
+        "outputTokens": 0,
+        "totalTokens": 537,
+        "estimatedCostUsd": 0
+      },
+      "durationMs": 0
+    },
+    {
+      "providerId": "gemini",
+      "model": "gemini-2.5-pro",
+      "caseId": "FAM-007",
+      "domain": "FAMILIA",
+      "review": null,
+      "usage": {
+        "inputTokens": 527,
+        "outputTokens": 0,
+        "totalTokens": 527,
+        "estimatedCostUsd": 0
+      },
+      "durationMs": 0
+    },
+    {
+      "providerId": "gemini",
+      "model": "gemini-2.5-pro",
+      "caseId": "CONS-001",
+      "domain": "CONSUMIDOR",
+      "review": null,
+      "usage": {
+        "inputTokens": 767,
+        "outputTokens": 0,
+        "totalTokens": 767,
+        "estimatedCostUsd": 0
+      },
+      "durationMs": 0
+    },
+    {
+      "providerId": "gemini",
+      "model": "gemini-2.5-pro",
+      "caseId": "CONS-006",
+      "domain": "CONSUMIDOR",
+      "review": null,
+      "usage": {
+        "inputTokens": 544,
+        "outputTokens": 0,
+        "totalTokens": 544,
+        "estimatedCostUsd": 0
+      },
+      "durationMs": 0
+    },
+    {
+      "providerId": "gemini",
+      "model": "gemini-2.5-pro",
+      "caseId": "CONS-008",
+      "domain": "CONSUMIDOR",
+      "review": null,
+      "usage": {
+        "inputTokens": 518,
+        "outputTokens": 0,
+        "totalTokens": 518,
+        "estimatedCostUsd": 0
+      },
+      "durationMs": 0
+    },
+    {
+      "providerId": "gemini",
+      "model": "gemini-2.5-pro",
+      "caseId": "CRIM-002",
+      "domain": "CRIMINAL",
+      "review": null,
+      "usage": {
+        "inputTokens": 527,
+        "outputTokens": 0,
+        "totalTokens": 527,
+        "estimatedCostUsd": 0
+      },
+      "durationMs": 0
+    },
+    {
+      "providerId": "gemini",
+      "model": "gemini-2.5-pro",
+      "caseId": "CRIM-005",
+      "domain": "CRIMINAL",
+      "review": null,
+      "usage": {
+        "inputTokens": 526,
+        "outputTokens": 0,
+        "totalTokens": 526,
+        "estimatedCostUsd": 0
+      },
+      "durationMs": 0
+    },
+    {
+      "providerId": "gemini",
+      "model": "gemini-2.5-pro",
+      "caseId": "CRIM-007",
+      "domain": "CRIMINAL",
+      "review": null,
+      "usage": {
+        "inputTokens": 702,
+        "outputTokens": 0,
+        "totalTokens": 702,
+        "estimatedCostUsd": 0
+      },
+      "durationMs": 0
+    },
+    {
+      "providerId": "gemini",
+      "model": "gemini-2.5-pro",
+      "caseId": "FAZ-002",
+      "domain": "FAZENDA_PUBLICA",
+      "review": null,
+      "usage": {
+        "inputTokens": 546,
+        "outputTokens": 0,
+        "totalTokens": 546,
+        "estimatedCostUsd": 0
+      },
+      "durationMs": 0
+    },
+    {
+      "providerId": "gemini",
+      "model": "gemini-2.5-pro",
+      "caseId": "FAZ-004",
+      "domain": "FAZENDA_PUBLICA",
+      "review": null,
+      "usage": {
+        "inputTokens": 535,
+        "outputTokens": 0,
+        "totalTokens": 535,
+        "estimatedCostUsd": 0
+      },
+      "durationMs": 0
+    },
+    {
+      "providerId": "gemini",
+      "model": "gemini-2.5-pro",
+      "caseId": "CIV-007",
+      "domain": "CIVEL",
+      "review": null,
+      "usage": {
+        "inputTokens": 522,
+        "outputTokens": 0,
+        "totalTokens": 522,
+        "estimatedCostUsd": 0
+      },
+      "durationMs": 0
+    },
+    {
+      "providerId": "gemini",
+      "model": "gemini-2.5-pro",
+      "caseId": "JEC-002",
+      "domain": "JUIZADO_ESPECIAL",
+      "review": null,
+      "usage": {
+        "inputTokens": 523,
+        "outputTokens": 0,
+        "totalTokens": 523,
+        "estimatedCostUsd": 0
+      },
+      "durationMs": 0
+    },
+    {
+      "providerId": "deepseek",
+      "model": "deepseek-reasoner",
+      "caseId": "RGPS-002",
+      "domain": "RGPS",
+      "review": null,
+      "usage": {
+        "inputTokens": 562,
+        "outputTokens": 0,
+        "totalTokens": 562,
+        "estimatedCostUsd": 0
+      },
+      "durationMs": 0
+    },
+    {
+      "providerId": "deepseek",
+      "model": "deepseek-reasoner",
+      "caseId": "RGPS-003",
+      "domain": "RGPS",
+      "review": null,
+      "usage": {
+        "inputTokens": 507,
+        "outputTokens": 0,
+        "totalTokens": 507,
+        "estimatedCostUsd": 0
+      },
+      "durationMs": 0
+    },
+    {
+      "providerId": "deepseek",
+      "model": "deepseek-reasoner",
+      "caseId": "RGPS-008",
+      "domain": "RGPS",
+      "review": null,
+      "usage": {
+        "inputTokens": 542,
+        "outputTokens": 0,
+        "totalTokens": 542,
+        "estimatedCostUsd": 0
+      },
+      "durationMs": 0
+    },
+    {
+      "providerId": "deepseek",
+      "model": "deepseek-reasoner",
+      "caseId": "RGPS-015",
+      "domain": "RGPS",
+      "review": null,
+      "usage": {
+        "inputTokens": 802,
+        "outputTokens": 0,
+        "totalTokens": 802,
+        "estimatedCostUsd": 0
+      },
+      "durationMs": 0
+    },
+    {
+      "providerId": "deepseek",
+      "model": "deepseek-reasoner",
+      "caseId": "TRIB-002",
+      "domain": "TRIBUTARIO",
+      "review": null,
+      "usage": {
+        "inputTokens": 516,
+        "outputTokens": 0,
+        "totalTokens": 516,
+        "estimatedCostUsd": 0
+      },
+      "durationMs": 0
+    },
+    {
+      "providerId": "deepseek",
+      "model": "deepseek-reasoner",
+      "caseId": "TRIB-004",
+      "domain": "TRIBUTARIO",
+      "review": null,
+      "usage": {
+        "inputTokens": 520,
+        "outputTokens": 0,
+        "totalTokens": 520,
+        "estimatedCostUsd": 0
+      },
+      "durationMs": 0
+    },
+    {
+      "providerId": "deepseek",
+      "model": "deepseek-reasoner",
+      "caseId": "TRIB-007",
+      "domain": "TRIBUTARIO",
+      "review": null,
+      "usage": {
+        "inputTokens": 535,
+        "outputTokens": 0,
+        "totalTokens": 535,
+        "estimatedCostUsd": 0
+      },
+      "durationMs": 0
+    },
+    {
+      "providerId": "deepseek",
+      "model": "deepseek-reasoner",
+      "caseId": "FAM-001",
+      "domain": "FAMILIA",
+      "review": null,
+      "usage": {
+        "inputTokens": 738,
+        "outputTokens": 0,
+        "totalTokens": 738,
+        "estimatedCostUsd": 0
+      },
+      "durationMs": 0
+    },
+    {
+      "providerId": "deepseek",
+      "model": "deepseek-reasoner",
+      "caseId": "FAM-004",
+      "domain": "FAMILIA",
+      "review": null,
+      "usage": {
+        "inputTokens": 537,
+        "outputTokens": 0,
+        "totalTokens": 537,
+        "estimatedCostUsd": 0
+      },
+      "durationMs": 0
+    },
+    {
+      "providerId": "deepseek",
+      "model": "deepseek-reasoner",
+      "caseId": "FAM-007",
+      "domain": "FAMILIA",
+      "review": null,
+      "usage": {
+        "inputTokens": 527,
+        "outputTokens": 0,
+        "totalTokens": 527,
+        "estimatedCostUsd": 0
+      },
+      "durationMs": 0
+    },
+    {
+      "providerId": "deepseek",
+      "model": "deepseek-reasoner",
+      "caseId": "CONS-001",
+      "domain": "CONSUMIDOR",
+      "review": null,
+      "usage": {
+        "inputTokens": 767,
+        "outputTokens": 0,
+        "totalTokens": 767,
+        "estimatedCostUsd": 0
+      },
+      "durationMs": 0
+    },
+    {
+      "providerId": "deepseek",
+      "model": "deepseek-reasoner",
+      "caseId": "CONS-006",
+      "domain": "CONSUMIDOR",
+      "review": null,
+      "usage": {
+        "inputTokens": 544,
+        "outputTokens": 0,
+        "totalTokens": 544,
+        "estimatedCostUsd": 0
+      },
+      "durationMs": 0
+    },
+    {
+      "providerId": "deepseek",
+      "model": "deepseek-reasoner",
+      "caseId": "CONS-008",
+      "domain": "CONSUMIDOR",
+      "review": null,
+      "usage": {
+        "inputTokens": 518,
+        "outputTokens": 0,
+        "totalTokens": 518,
+        "estimatedCostUsd": 0
+      },
+      "durationMs": 0
+    },
+    {
+      "providerId": "deepseek",
+      "model": "deepseek-reasoner",
+      "caseId": "CRIM-002",
+      "domain": "CRIMINAL",
+      "review": null,
+      "usage": {
+        "inputTokens": 527,
+        "outputTokens": 0,
+        "totalTokens": 527,
+        "estimatedCostUsd": 0
+      },
+      "durationMs": 0
+    },
+    {
+      "providerId": "deepseek",
+      "model": "deepseek-reasoner",
+      "caseId": "CRIM-005",
+      "domain": "CRIMINAL",
+      "review": null,
+      "usage": {
+        "inputTokens": 526,
+        "outputTokens": 0,
+        "totalTokens": 526,
+        "estimatedCostUsd": 0
+      },
+      "durationMs": 0
+    },
+    {
+      "providerId": "deepseek",
+      "model": "deepseek-reasoner",
+      "caseId": "CRIM-007",
+      "domain": "CRIMINAL",
+      "review": null,
+      "usage": {
+        "inputTokens": 702,
+        "outputTokens": 0,
+        "totalTokens": 702,
+        "estimatedCostUsd": 0
+      },
+      "durationMs": 0
+    },
+    {
+      "providerId": "deepseek",
+      "model": "deepseek-reasoner",
+      "caseId": "FAZ-002",
+      "domain": "FAZENDA_PUBLICA",
+      "review": null,
+      "usage": {
+        "inputTokens": 546,
+        "outputTokens": 0,
+        "totalTokens": 546,
+        "estimatedCostUsd": 0
+      },
+      "durationMs": 0
+    },
+    {
+      "providerId": "deepseek",
+      "model": "deepseek-reasoner",
+      "caseId": "FAZ-004",
+      "domain": "FAZENDA_PUBLICA",
+      "review": null,
+      "usage": {
+        "inputTokens": 535,
+        "outputTokens": 0,
+        "totalTokens": 535,
+        "estimatedCostUsd": 0
+      },
+      "durationMs": 0
+    },
+    {
+      "providerId": "deepseek",
+      "model": "deepseek-reasoner",
+      "caseId": "CIV-007",
+      "domain": "CIVEL",
+      "review": null,
+      "usage": {
+        "inputTokens": 522,
+        "outputTokens": 0,
+        "totalTokens": 522,
+        "estimatedCostUsd": 0
+      },
+      "durationMs": 0
+    },
+    {
+      "providerId": "deepseek",
+      "model": "deepseek-reasoner",
+      "caseId": "JEC-002",
+      "domain": "JUIZADO_ESPECIAL",
+      "review": null,
+      "usage": {
+        "inputTokens": 523,
+        "outputTokens": 0,
+        "totalTokens": 523,
+        "estimatedCostUsd": 0
+      },
+      "durationMs": 0
+    }
+  ],
+  "totalsByProvider": {
+    "openai": {
+      "documentsCompleted": 20,
+      "documentsFailed": 0,
+      "estimatedCostUsd": 0,
+      "inputTokens": 11496,
+      "outputTokens": 0
+    },
+    "gemini": {
+      "documentsCompleted": 20,
+      "documentsFailed": 0,
+      "estimatedCostUsd": 0,
+      "inputTokens": 11496,
+      "outputTokens": 0
+    },
+    "deepseek": {
+      "documentsCompleted": 20,
+      "documentsFailed": 0,
+      "estimatedCostUsd": 0,
+      "inputTokens": 11496,
+      "outputTokens": 0
+    }
+  },
+  "completedAt": "2026-06-06T16:53:38.591Z"
+}

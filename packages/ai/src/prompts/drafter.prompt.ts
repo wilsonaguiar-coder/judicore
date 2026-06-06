@@ -1,7 +1,8 @@
-import type { LegalClassification, LegalExtraction, ArgumentationMatrix, JurisprudenciaAnalyzed, GenerationMode } from "../pipeline/types.js";
+import type { LegalClassification, LegalExtraction, ArgumentationMatrix, JurisprudenciaAnalyzed, GenerationMode, DecidedOutcome } from "../pipeline/types.js";
 import { PIECE_TEMPLATES, APPEAL_RULES, getJurisdicaoRules } from "../rules/legal_rules.js";
 import { buildModeBlock } from "./template-mode.prompt.js";
 import { buildSentencaPrompt } from "./sentenca.prompt.js";
+import { buildDecisionDirectiveBlock } from "../pipeline/outcome-extractor.js";
 
 const TUTELA_KEYWORDS_RE = /previdenci|pensão\s+por\s+morte|benefício|servidor\s+públic|alimentar|saúde|remuneratório|salarial|vencimentos|proventos|aposentadori|paridade|reajuste/i;
 
@@ -22,6 +23,7 @@ export function buildDraftPrompt(
   instruction?: string,
   corrections?: string,
   mode: GenerationMode = "FINAL_DRAFT",
+  decidedOutcome?: DecidedOutcome,
 ): string {
   const rules = getJurisdicaoRules(classification.tipo_justica);
   const template = PIECE_TEMPLATES[classification.tipo_peca];
@@ -78,6 +80,10 @@ export function buildDraftPrompt(
     ?.map((s, i) => `${i + 1}. ${s}`)
     .join("\n") ?? "";
 
+  const decisionDirectiveBlock = decidedOutcome
+    ? buildDecisionDirectiveBlock(decidedOutcome, classification.tipo_peca)
+    : "";
+
   const modeBlock = buildModeBlock(mode);
 
   const sentencaBlock = (mode === "FINAL_DRAFT" && classification.tipo_peca === "SENTENCA")
@@ -93,7 +99,7 @@ export function buildDraftPrompt(
     return `\n📋 PETICAO_INICIAL FINAL_DRAFT — EXIGÊNCIAS MÍNIMAS:\nA seção DO DIREITO DEVE conter no mínimo 6 subtópicos com numeração romana (I, II, III, IV, V, VI...):\n  I — Competência e fundamento jurisdicional\n  II — Regime jurídico aplicável\n  III — Norma principal do direito pleiteado\n  IV — Requisitos legais e aplicação ao caso concreto\n  V — Resistência administrativa ou lesão ao direito${hasTutela ? "\n  VI — Efeitos financeiros e/ou prescrição\n  VII — Da Tutela de Urgência (obrigatório)" : "\n  VI — Efeitos financeiros e/ou prescrição"}\nCada subtópico: 2-4 parágrafos. Tese → norma → aplicação → objeção → resposta → conclusão.${tutelaInstrucao}`;
   })();
 
-  return `${modeBlock}${sentencaBlock}${peticaoInicialBlock}
+  return `${decisionDirectiveBlock}${modeBlock}${sentencaBlock}${peticaoInicialBlock}
 Redija a peça jurídica com base na classificação, extração e matriz de argumentação abaixo.
 
 CLASSIFICAÇÃO:
@@ -130,7 +136,7 @@ REGRA CRÍTICA — POSICIONAMENTO DE JURISPRUDÊNCIAS:
 - Jamais escreva "conforme entendimento do [tribunal]" usando decisão classificada como CONTRÁRIA
 - Use SOMENTE os dados reais dos tribunais/números/relatores listados acima
 - NUNCA escreva "[JUR-1]", "[JUR-N]" ou qualquer rótulo no texto final
-- NUNCA use colchetes em qualquer outra parte da peça: [NOME], [CPF], [DATA], [VALOR], [INSERIR], [A DETERMINAR], [PREENCHER] são proibidos absolutamente — use dado genérico plausível se o dado real não foi fornecido
+- Se um dado não foi fornecido, use OBRIGATORIAMENTE placeholder entre colchetes: [AUTOR], [RÉU], [PROCESSO], [CPF], [DATA], [VALOR DA CAUSA], [CARGO], [ÓRGÃO RESPONSÁVEL], [DADO NÃO FORNECIDO]. NUNCA invente, estime ou infira dados ausentes
 
-${instruction ? `INSTRUÇÃO ADICIONAL DO USUÁRIO: ${instruction}` : ""}`;
+${instruction ? `INSTRUÇÃO DO USUÁRIO: ${instruction}` : ""}`;
 }

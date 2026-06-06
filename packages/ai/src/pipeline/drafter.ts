@@ -1,7 +1,7 @@
 import { getOpenAIClient, MODEL } from "../client.js";
 import { buildSystemPrompt } from "../prompts/system.prompt.js";
 import { buildDraftPrompt } from "../prompts/drafter.prompt.js";
-import type { LegalClassification, LegalExtraction, ArgumentationMatrix, JurisprudenciaAnalyzed, GenerationMode } from "./types.js";
+import type { LegalClassification, LegalExtraction, ArgumentationMatrix, JurisprudenciaAnalyzed, GenerationMode, DecidedOutcome } from "./types.js";
 
 export class LegalDraftService {
   async *draft(
@@ -13,6 +13,7 @@ export class LegalDraftService {
     instruction?: string,
     corrections?: string,
     mode: GenerationMode = "FINAL_DRAFT",
+    decidedOutcome?: DecidedOutcome,
   ): AsyncGenerator<string> {
     const client = getOpenAIClient();
     const isPostulatorio = classification.tipo_peca === "PETICAO_INICIAL" || classification.tipo_peca === "RECURSO";
@@ -25,7 +26,7 @@ export class LegalDraftService {
         { role: "system", content: buildSystemPrompt() },
         {
           role: "user",
-          content: buildDraftPrompt(classification, extraction, matrix, jurisprudencias, instruction, corrections, mode),
+          content: buildDraftPrompt(classification, extraction, matrix, jurisprudencias, instruction, corrections, mode, decidedOutcome),
         },
       ],
       stream: true,

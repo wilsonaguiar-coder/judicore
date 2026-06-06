@@ -8,7 +8,10 @@ import type {
   ValidationError,
   DocumentStatus,
   EvidenceAnalysis,
+  DecidedOutcome,
 } from "../pipeline/types.js";
+import { validateOutcomeConformance } from "./outcome-conformance.validator.js";
+import { validateFictitiousData } from "./fictitious-data.validator.js";
 import { StructuralValidator } from "./structural.validator.js";
 import { LegalRulesValidator } from "./legal.validator.js";
 import { AppealValidator } from "./appeal.validator.js";
@@ -125,6 +128,7 @@ export class FinalValidator {
     jurisprudencias: JurisprudenciaInput[],
     mode: GenerationMode,
     evidenceAnalyses: EvidenceAnalysis[] = [],
+    decidedOutcome?: DecidedOutcome,
   ): FinalValidationResult {
     const allErrors: ValidationError[] = [];
 
@@ -216,16 +220,26 @@ export class FinalValidator {
       }));
     }
 
-    // 9. Template não preenchido — FATAL independente de modo
-    // Detecta placeholders literais com 3+ chars: [ENDEREÇAMENTO], [A DETERMINAR], etc.
+    // 9. Template não preenchido — FATAL em FINAL_DRAFT com >= 1 placeholder;
+    //    em TEMPLATE_MODEL/SAFE_SKELETON placeholders são esperados (apenas aviso).
     const PLACEHOLDER_RE = /\[[A-ZÁÀÂÃÉÊÍÓÔÕÚÇ0-9\s.,;:!?\/_\-]{3,}\]/gi;
     const placeholders = [...draft.matchAll(PLACEHOLDER_RE)];
-    if (placeholders.length >= 3) {
+    if (placeholders.length >= 1) {
       allErrors.push({
         rule: "UNFILLED_TEMPLATE_PLACEHOLDERS",
         message: `Minuta contém ${placeholders.length} campo(s) de template não preenchido(s) — exemplo: "${placeholders[0]![0]}"`,
-        fatal: true,
+        fatal: mode === "FINAL_DRAFT",
       });
+    }
+
+    // 9b. Dados fictícios conhecidos — FATAL sempre (FASE 8.4.2-R)
+    if (mode === "FINAL_DRAFT") {
+      allErrors.push(...validateFictitiousData(draft));
+    }
+
+    // 9c. Conformidade da direção decisória — FATAL quando violada (FASE 8.4.2-R)
+    if (mode === "FINAL_DRAFT" && decidedOutcome) {
+      allErrors.push(...validateOutcomeConformance(draft, decidedOutcome));
     }
 
     // 10. Minuta vazia ou esqueleto — FATAL quando o conteúdo útil é insuficiente

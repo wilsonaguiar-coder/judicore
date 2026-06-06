@@ -7,6 +7,7 @@ import { useAuthStore } from "@/store/auth";
 import { api } from "@/lib/api";
 import { ArrowLeft } from "lucide-react";
 import Image from "next/image";
+import { motion } from "framer-motion";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -36,8 +37,36 @@ export default function LoginPage() {
 
       {/* Ambient glow */}
       <div className="pointer-events-none fixed inset-0 overflow-hidden" aria-hidden>
-        <div className="absolute -top-48 left-1/2 -translate-x-1/2 w-[700px] h-[700px] rounded-full bg-indigo-500/30 blur-[120px]" />
-        <div className="absolute bottom-0 right-0 w-[500px] h-[500px] rounded-full bg-violet-600/20 blur-[120px]" />
+        <motion.div 
+          animate={{ 
+            x: [0, 80, -80, 0],
+            y: [0, -80, 80, 0],
+            scale: [1, 1.2, 1],
+            opacity: [0.4, 0.6, 0.4] 
+          }}
+          transition={{ duration: 15, repeat: Infinity, ease: "linear" }}
+          className="absolute -top-48 -left-48 w-[600px] h-[600px] rounded-full bg-indigo-500/30 blur-[120px]" 
+        />
+        <motion.div 
+          animate={{ 
+            x: [0, -100, 100, 0],
+            y: [0, 80, -80, 0],
+            scale: [1, 1.3, 1],
+            opacity: [0.3, 0.5, 0.3] 
+          }}
+          transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
+          className="absolute top-[20%] -right-48 w-[700px] h-[700px] rounded-full bg-fuchsia-500/25 blur-[120px]" 
+        />
+        <motion.div 
+          animate={{ 
+            x: [0, 120, -120, 0],
+            y: [0, 60, -60, 0],
+            scale: [1, 1.1, 1],
+            opacity: [0.4, 0.6, 0.4] 
+          }}
+          transition={{ duration: 25, repeat: Infinity, ease: "linear" }}
+          className="absolute -bottom-48 left-[20%] w-[800px] h-[800px] rounded-full bg-cyan-500/25 blur-[120px]" 
+        />
         <div className="absolute inset-0 bg-[linear-gradient(to_right,#ffffff0a_1px,transparent_1px),linear-gradient(to_bottom,#ffffff0a_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_60%_60%_at_50%_50%,#000_70%,transparent_100%)]" />
       </div>
 
@@ -53,13 +82,13 @@ export default function LoginPage() {
       {/* Card */}
       <div className="relative z-10 w-full max-w-sm">
 
-        {/* Logo */}
-        <div className="flex justify-center mb-8">
-          <Image src="/logo.png" alt="JudiCore" width={120} height={40} className="object-contain" priority />
-        </div>
-
         {/* Form */}
-        <div className="bg-white/[0.04] border border-white/[0.08] rounded-3xl p-8 backdrop-blur-xl shadow-2xl">
+        <div className="bg-white/[0.02] border border-white/[0.06] rounded-3xl p-8 backdrop-blur-2xl shadow-2xl hover:border-violet-500/35 transition-all duration-500 hover:neon-border-indigo">
+
+          {/* Logo */}
+          <div className="flex justify-center mb-6">
+            <Image src="/logo.png" alt="JudiCore" width={120} height={40} className="object-contain" priority />
+          </div>
 
           <div className="text-center mb-7">
             <h1 className="text-xl font-bold text-white leading-tight">

@@ -127,7 +127,7 @@ const PRODUCTS: Product[] = [
   },
   {
     icon: ClipboardCheck,
-    name: "Análise de Peças Judiciais",
+    name: "Criação e Análise de Peças Judiciais",
     tagline: "Auditoria Inteligente de Peças",
     features: [
       "Score de qualidade (0–100)",
@@ -212,7 +212,7 @@ export default function LandingPage() {
       </div>
 
       {/* ── Header ───────────────────────────────────────────────────────── */}
-      <header className="relative z-20 w-full px-6 md:px-14 py-4 flex items-center justify-between border-b border-white/[0.05] bg-[#030014]/50 backdrop-blur-xl">
+      <header className="relative z-20 w-full px-6 md:px-14 py-4 flex items-center justify-between border-b border-white/[0.04] bg-[#030014]/65 backdrop-blur-2xl">
         <div className="flex items-center gap-4 hover:opacity-80 transition-opacity">
           <Image src="/logo.png" alt="Judicore" width={112} height={38} className="object-contain" priority />
           <span className="hidden sm:inline text-xs text-white/35 border-l border-white/10 pl-4 tracking-wide font-light">
@@ -291,9 +291,9 @@ export default function LandingPage() {
           <div className="grid md:grid-cols-3 gap-5 relative z-[2]">
             {PRODUCTS.map((p, idx) => {
               const colorClasses = {
-                indigo: "from-indigo-600/20 hover:shadow-indigo-500/30 group-hover:border-indigo-500/40",
-                amber:  "from-amber-600/20 hover:shadow-amber-500/30 group-hover:border-amber-500/40",
-                cyan:   "from-cyan-600/20 hover:shadow-cyan-500/30 group-hover:border-cyan-500/40",
+                indigo: "from-indigo-600/20 hover:shadow-indigo-500/30 group-hover:border-indigo-500/45 hover:neon-border-indigo",
+                amber:  "from-amber-600/20 hover:shadow-amber-500/30 group-hover:border-amber-500/45 hover:neon-border-amber",
+                cyan:   "from-cyan-600/20 hover:shadow-cyan-500/30 group-hover:border-cyan-500/45 hover:neon-border-cyan",
               }[p.colorName] ?? "";
 
               return (
@@ -306,7 +306,7 @@ export default function LandingPage() {
                 >
                   <Link
                     href={p.link}
-                    className={`group relative flex flex-col h-full rounded-3xl bg-white/[0.04] border border-white/[0.08] overflow-hidden transition-all duration-500 hover:-translate-y-2 hover:bg-white/[0.06] shadow-2xl backdrop-blur-xl ${colorClasses}`}
+                    className={`group relative flex flex-col h-full rounded-3xl bg-white/[0.02] border border-white/[0.06] overflow-hidden transition-all duration-500 hover:-translate-y-2 hover:bg-white/[0.04] shadow-2xl backdrop-blur-2xl ${colorClasses}`}
                   >
                     <div className={`absolute inset-0 bg-gradient-to-br ${colorClasses.split(" ")[0]} via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500`} />
                     <div className="absolute -inset-px bg-gradient-to-b from-white/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 rounded-3xl pointer-events-none" />

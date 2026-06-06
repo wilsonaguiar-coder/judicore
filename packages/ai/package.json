@@ -21,7 +21,11 @@
     "quality:cases": "tsx quality-lab/case-factory.ts",
     "quality:run": "tsx quality-lab/quality-runner.ts",
     "quality:report": "tsx quality-lab/quality-report.ts",
-    "benchmark:providers": "tsx scripts/run-provider-evaluation.ts"
+    "benchmark:providers": "tsx scripts/run-provider-evaluation.ts",
+    "benchmark:pilot20:dry": "tsx scripts/run-live-benchmark-pilot-20.ts --dry-run",
+    "benchmark:pilot20:live": "LIVE_BENCHMARK_ENABLED=true tsx scripts/run-live-benchmark-pilot-20.ts",
+    "benchmark:pilot50:dry": "tsx scripts/run-pilot-50.ts --dry-run",
+    "benchmark:pilot50:live": "LIVE_BENCHMARK_ENABLED=true tsx scripts/run-pilot-50.ts"
   },
   "dependencies": {
     "openai": "^6.39.1"

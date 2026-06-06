@@ -6,6 +6,7 @@ import { LegalAuditService } from "./auditor.js";
 import { LegalValidator } from "./validator.js";
 import { EvidenceAnalyzerService } from "./evidence-analyzer.js";
 import { FinalValidator, MatrixQualityValidator, StanceConsistencyValidator, resolveDocumentStatus } from "../validators/index.js";
+import { extractDecidedOutcome } from "./outcome-extractor.js";
 import { AuditReportEngine } from "../audit-report/audit-report.engine.js";
 import { StanceAnalyzer } from "../stance/stance-analyzer.js";
 import type { FinalValidationResult } from "../validators/index.js";
@@ -177,6 +178,7 @@ export class LegalPipeline {
       documentType: input.documentType,
       jurisprudencias: input.jurisprudencias,
       instruction: input.instruction,
+      decidedOutcome: extractDecidedOutcome(input.instruction),
       retryOf: input.retryOf,
       corrections: input.corrections,
     };
@@ -240,8 +242,16 @@ export class LegalPipeline {
     if (ctx.jurisprudencias.length > 0) {
       const jurTexts = StanceAnalyzer.toJurisprudenceTexts(ctx.jurisprudencias);
       const tipoPeca = ctx.classification!.tipo_peca;
-      const requestedOutcome: import("../stance/stance-types.js").RequestedOutcome =
-        tipoPeca === "PETICAO_INICIAL" || tipoPeca === "RECURSO" ? "PROCEDENCIA" : "IMPROCEDENCIA";
+      // Usa a direção decisória extraída da instrução do usuário;
+      // fallback para heurística por tipo de peça apenas quando não há instrução.
+      const requestedOutcome: import("../stance/stance-types.js").RequestedOutcome = (() => {
+        if (ctx.decidedOutcome === "PROCEDENTE" || ctx.decidedOutcome === "PARCIALMENTE_PROCEDENTE"
+          || ctx.decidedOutcome === "DEFIRO" || ctx.decidedOutcome === "CONCEDO_ORDEM"
+          || ctx.decidedOutcome === "CONDENO") return "PROCEDENCIA";
+        if (ctx.decidedOutcome === "IMPROCEDENTE" || ctx.decidedOutcome === "INDEFIRO"
+          || ctx.decidedOutcome === "DENEGO_ORDEM" || ctx.decidedOutcome === "ABSOLVO") return "IMPROCEDENCIA";
+        return tipoPeca === "PETICAO_INICIAL" || tipoPeca === "RECURSO" ? "PROCEDENCIA" : "IMPROCEDENCIA";
+      })();
       const stanceInput: import("../stance/stance-types.js").StanceInput = {
         claim: ctx.caseDescription,
         legislation: [],
@@ -359,6 +369,7 @@ export class LegalPipeline {
         ctx.instruction,
         ctx.corrections,
         mode,
+        ctx.decidedOutcome,
       );
       for await (const chunk of draftStream) {
         fullDraft += chunk;
@@ -407,6 +418,7 @@ export class LegalPipeline {
         ctx.jurisprudencias,
         mode,
         ctx.evidenceAnalysis ?? [],
+        ctx.decidedOutcome,
       );
       if (finalResult.errors.length > 0) {
         yield { event: "validation_errors", data: finalResult.errors };

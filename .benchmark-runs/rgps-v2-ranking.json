@@ -1,0 +1,119 @@
+[
+  {
+    "rank": 1,
+    "provider": "openai",
+    "model": "gpt-4o",
+    "totalCases": 15,
+    "casesWithError": 0,
+    "tp": 5,
+    "fp": 6,
+    "fn": 7,
+    "precision": 0.45454545454545453,
+    "recall": 0.4166666666666667,
+    "f1": 0.43478260869565216,
+    "casePassRate": 0.6,
+    "scorePassRate": 0.5333333333333333,
+    "goodCases": [
+      {
+        "caseId": "RGPS-001",
+        "findingsGenerated": 0
+      },
+      {
+        "caseId": "RGPS-005",
+        "findingsGenerated": 3
+      },
+      {
+        "caseId": "RGPS-011",
+        "findingsGenerated": 0
+      },
+      {
+        "caseId": "RGPS-013",
+        "findingsGenerated": 0
+      },
+      {
+        "caseId": "RGPS-015",
+        "findingsGenerated": 0
+      }
+    ],
+    "estimatedCostUsd": 3.741,
+    "avgDurationMs": 3681.733333333333
+  },
+  {
+    "rank": 2,
+    "provider": "deepseek",
+    "model": "deepseek-reasoner",
+    "totalCases": 15,
+    "casesWithError": 0,
+    "tp": 11,
+    "fp": 43,
+    "fn": 1,
+    "precision": 0.2037037037037037,
+    "recall": 0.9166666666666666,
+    "f1": 0.3333333333333333,
+    "casePassRate": 0.6666666666666666,
+    "scorePassRate": 0.26666666666666666,
+    "goodCases": [
+      {
+        "caseId": "RGPS-001",
+        "findingsGenerated": 0
+      },
+      {
+        "caseId": "RGPS-005",
+        "findingsGenerated": 5
+      },
+      {
+        "caseId": "RGPS-011",
+        "findingsGenerated": 5
+      },
+      {
+        "caseId": "RGPS-013",
+        "findingsGenerated": 3
+      },
+      {
+        "caseId": "RGPS-015",
+        "findingsGenerated": 4
+      }
+    ],
+    "estimatedCostUsd": 0.3741000000000001,
+    "avgDurationMs": 14371.2
+  },
+  {
+    "rank": 3,
+    "provider": "gemini",
+    "model": "gemini-2.5-pro",
+    "totalCases": 15,
+    "casesWithError": 0,
+    "tp": 11,
+    "fp": 47,
+    "fn": 1,
+    "precision": 0.1896551724137931,
+    "recall": 0.9166666666666666,
+    "f1": 0.31428571428571433,
+    "casePassRate": 0.6,
+    "scorePassRate": 0.4,
+    "goodCases": [
+      {
+        "caseId": "RGPS-001",
+        "findingsGenerated": 5
+      },
+      {
+        "caseId": "RGPS-005",
+        "findingsGenerated": 4
+      },
+      {
+        "caseId": "RGPS-011",
+        "findingsGenerated": 6
+      },
+      {
+        "caseId": "RGPS-013",
+        "findingsGenerated": 5
+      },
+      {
+        "caseId": "RGPS-015",
+        "findingsGenerated": 4
+      }
+    ],
+    "estimatedCostUsd": 1.8705,
+    "avgDurationMs": 32337.133333333335
+  }
+]

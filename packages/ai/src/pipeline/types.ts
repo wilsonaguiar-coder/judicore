@@ -1,4 +1,15 @@
 export type GenerationMode = "FINAL_DRAFT" | "TEMPLATE_MODEL" | "SAFE_SKELETON";
+
+export type DecidedOutcome =
+  | "PROCEDENTE"
+  | "IMPROCEDENTE"
+  | "PARCIALMENTE_PROCEDENTE"
+  | "DEFIRO"
+  | "INDEFIRO"
+  | "CONCEDO_ORDEM"
+  | "DENEGO_ORDEM"
+  | "CONDENO"
+  | "ABSOLVO";
 export type ExtractionQuality = "SUFICIENTE" | "PARCIAL" | "INSUFICIENTE";
 
 export type TipoJustica =
@@ -139,6 +150,7 @@ export interface PipelineContext {
   documentType: TipoPeca;
   jurisprudencias: JurisprudenciaInput[];
   instruction?: string | undefined;
+  decidedOutcome?: DecidedOutcome | undefined;
   classification?: LegalClassification | undefined;
   extraction?: LegalExtraction | undefined;
   matrix?: ArgumentationMatrix | undefined;
