@@ -83,7 +83,7 @@ export function AuditSummaryCard({ score, classification, fatalErrors, nonFatalE
         )}
 
         {empty && (
-          <p className="text-sm text-slate-400 italic">Sem dados disponíveis.</p>
+          <p className="text-sm text-slate-400 italic">Aguardando auditoria.</p>
         )}
       </div>
     </div>

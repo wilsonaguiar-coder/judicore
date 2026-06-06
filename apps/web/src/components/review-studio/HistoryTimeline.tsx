@@ -9,7 +9,7 @@ export function HistoryTimeline({ timeline }: { timeline?: any | null }) {
     return (
       <div className="bg-white p-6 rounded-lg shadow-sm mb-6">
         <h2 className="text-xl font-bold mb-4">Timeline de Auditoria</h2>
-        <p className="text-sm text-slate-400 italic">Sem dados disponíveis.</p>
+        <p className="text-sm text-slate-400 italic">Nenhum evento registrado.</p>
       </div>
     );
   }

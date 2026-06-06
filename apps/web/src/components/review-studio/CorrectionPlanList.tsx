@@ -38,7 +38,7 @@ export function CorrectionPlanList({ items }: { items?: CorrectionItem[] | null 
           );
         })}
         {safeItems.length === 0 && (
-          <p className="text-sm text-slate-500 italic">Sem dados disponíveis.</p>
+          <p className="text-sm text-slate-500 italic">Nenhum plano disponível. Execute a auditoria.</p>
         )}
       </div>
     </div>
