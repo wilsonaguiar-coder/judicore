@@ -19,7 +19,8 @@ export class ReviewStudioRepository {
     // Create ORIGINAL version snapshot
     await this.createDraftVersion(session.id, "ORIGINAL", null, 1, originalDraft, { createdVia: "session_init" });
 
-    return session;
+    // Return the full session with include to match getSession return type
+    return this.getSession(session.id);
   }
 
   public async getSession(sessionId: string) {

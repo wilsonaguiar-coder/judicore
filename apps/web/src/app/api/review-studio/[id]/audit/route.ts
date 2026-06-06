@@ -27,7 +27,7 @@ export async function GET(req: Request, { params }: { params: { id: string } }) 
       (auditResult as any).guidedRevision
     );
 
-    session = await repo.getSession(session.id);
+    session = (await repo.getSession(session.id)) as any;
   }
 
   const latestAudit = session?.audits?.[session.audits.length - 1];
