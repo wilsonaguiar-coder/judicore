@@ -18,8 +18,8 @@ export type ReviewTimeline = {
 export class ReviewStudioTimelineService {
   private repo = new ReviewStudioRepository();
 
-  public async buildTimeline(sessionId: string): Promise<ReviewTimeline> {
-    const session = await this.repo.getSession(sessionId);
+  public async buildTimeline(pieceId: string): Promise<ReviewTimeline> {
+    const session = await this.repo.getSessionByPieceId(pieceId);
     if (!session) throw new Error("Session not found");
 
     const events: TimelineEvent[] = [];
@@ -89,7 +89,7 @@ export class ReviewStudioTimelineService {
     events.sort((a, b) => a.timestamp.getTime() - b.timestamp.getTime());
 
     return {
-      sessionId,
+      sessionId: session.id,
       versions: session.versions,
       events,
       recommendedVersionId: recommendedVersion?.id || null

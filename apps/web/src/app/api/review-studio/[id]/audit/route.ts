@@ -23,7 +23,7 @@ async function runAuditForSession(
   docId: string,
   draft: string
 ) {
-  let session = await repo.getSession(docId);
+  let session = await repo.getSessionByPieceId(docId);
 
   if (!session) {
     session = await repo.createSession(docId, "user-1", "CIVIL_PETICAO_INICIAL", draft);
@@ -50,7 +50,7 @@ async function runAuditForSession(
 // ─── GET — return existing audit without triggering a new one ────────────────
 export async function GET(_req: Request, { params }: { params: { id: string } }) {
   const repo = new ReviewStudioRepository();
-  const session = await repo.getSession(params.id);
+  const session = await repo.getSessionByPieceId(params.id);
 
   if (!session) {
     return NextResponse.json({ audit: null, correctionPlan: null, session: null });

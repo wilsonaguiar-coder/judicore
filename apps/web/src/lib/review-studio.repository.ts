@@ -56,6 +56,23 @@ export class ReviewStudioRepository {
     });
   }
 
+  public async getSessionByPieceId(pieceId: string): Promise<ReviewSessionWithRelations | null> {
+    return prisma.reviewSession.findFirst({
+      where: { pieceId },
+      orderBy: { createdAt: "desc" },
+      include: {
+        audits: true,
+        suggestions: true,
+        decisions: true,
+        rewrites: true,
+        reAudits: true,
+        versions: {
+          orderBy: { versionNumber: "asc" }
+        }
+      },
+    });
+  }
+
   public async saveAudit(sessionId: string, auditJson: any, feedbackJson: any, correctionPlanJson: any, guidedRevisionJson: any) {
     return prisma.reviewAudit.create({
       data: {

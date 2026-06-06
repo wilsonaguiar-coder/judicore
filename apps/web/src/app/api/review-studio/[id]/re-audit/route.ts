@@ -4,7 +4,7 @@ import { ReAuditService } from "@judicore/ai";
 
 export async function POST(req: Request, { params }: { params: { id: string } }) {
   const repo = new ReviewStudioRepository();
-  const session = await repo.getSession(params.id);
+  const session = await repo.getSessionByPieceId(params.id);
 
   if (!session) {
     return NextResponse.json({ error: "Session not found" }, { status: 404 });
