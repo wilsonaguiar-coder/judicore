@@ -2,7 +2,7 @@
 
 import { useRouter, usePathname } from "next/navigation";
 import { useAuthStore } from "@/store/auth";
-import { LogOut, Search, Settings, BarChart2, FlaskConical, Users, Star } from "lucide-react";
+import { LogOut, Search, Settings, BarChart2, FlaskConical, Users, Star, LayoutDashboard, FileText, Scale, Calculator } from "lucide-react";
 import Image from "next/image";
 import type { User } from "@/types";
 
@@ -42,16 +42,25 @@ export function Sidebar({ user }: { user: User | null }) {
 
       {/* Nav */}
       <nav className="flex-1 px-2 py-4 space-y-0.5">
-        {navItem("Pesquisa", <Search size={15} />, "/dashboard")}
-        {navItem("JudiAudit", <Star size={15} />, "/dashboard/judiaudit")}
-        {user?.role === "ADMIN" &&
-          navItem("Indexação", <Settings size={15} />, "/dashboard/admin")}
-        {user?.role === "ADMIN" &&
-          navItem("Uso de IA", <BarChart2 size={15} />, "/dashboard/admin/uso")}
-        {user?.role === "ADMIN" &&
-          navItem("Usuários", <Users size={15} />, "/dashboard/admin/usuarios")}
-        {user?.role === "ADMIN" &&
-          navItem("Testes", <FlaskConical size={15} />, "/dashboard/admin/testes")}
+        {user?.role === "ADMIN" ? (
+          <>
+            {navItem("Pesquisa", <Search size={15} />, "/dashboard")}
+            {navItem("JudiAudit", <Star size={15} />, "/dashboard/judiaudit")}
+            {navItem("Indexação", <Settings size={15} />, "/dashboard/admin")}
+            {navItem("Uso de IA", <BarChart2 size={15} />, "/dashboard/admin/uso")}
+            {navItem("Usuários", <Users size={15} />, "/dashboard/admin/usuarios")}
+            {navItem("Testes", <FlaskConical size={15} />, "/dashboard/admin/testes")}
+          </>
+        ) : (
+          <>
+            {navItem("Dashboard", <LayoutDashboard size={15} />, "/dashboard")}
+            {navItem("Pesquisa de Jurisprudência", <Search size={15} />, "/dashboard/search")}
+            {navItem("Peças Jurídicas", <FileText size={15} />, "/dashboard/pieces")}
+            {navItem("Integração com PJE", <Scale size={15} />, "/dashboard/pje")}
+            {navItem("Cálculos Previdenciários", <Calculator size={15} />, "/dashboard/social-security-calculations")}
+            {navItem("Configurações", <Settings size={15} />, "/dashboard/settings")}
+          </>
+        )}
       </nav>
 
       {/* User / Logout */}
