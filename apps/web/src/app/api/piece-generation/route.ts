@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { GenerationPipeline } from "@judicore/ai/src/generation-pipeline/generation.pipeline.js";
+import { GenerationPipeline } from "@judicore/ai";
 
 // Limite de timeout da API (Vercel maxDuration) - 60s em Hobby, maior em Pro
 export const maxDuration = 300; 

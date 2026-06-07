@@ -9,7 +9,11 @@ export type { DocumentStatus } from "./pipeline/types.js";
 export { AuditReportEngine } from "./audit-report/audit-report.engine.js";
 export type { AuditReport, AuditClassificacao, AuditItem, FundamentacaoJuridicaItem, QualidadeScore, ConsistenciaArgumentativa, QualidadeArgumentativa } from "./audit-report/audit-report.types.js";
 
-// Exporta\u00E7\u00F5es das Fases 8.x
+// Generation Pipeline Fase 12
+export { GenerationPipeline } from "./generation-pipeline/generation.pipeline.js";
+export type { GenerationInput } from "./generation-pipeline/generation.pipeline.js";
+
+// Exportações das Fases 8.x
 export * from "./audit/audit.service.js";
 export * from "./audit/correction-plan.service.js";
 export * from "./audit/assisted-revision/assisted-revision.service.js";
