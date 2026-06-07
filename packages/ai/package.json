@@ -28,6 +28,8 @@
     "benchmark:pilot50:live": "LIVE_BENCHMARK_ENABLED=true tsx scripts/run-pilot-50.ts"
   },
   "dependencies": {
+    "@judicore/db": "workspace:*",
+    "@judicore/search": "workspace:*",
     "openai": "^6.39.1"
   },
   "devDependencies": {

@@ -3,8 +3,8 @@
 import { useState, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { ArrowLeft, UploadCloud, X, File as FileIcon, FileText, Info, AlertCircle } from "lucide-react";
-
 import { useAuthStore } from "@/store/auth";
+import { PieceEvaluationForm } from "./piece-evaluation-form";
 
 interface PieceCreationFormProps {
   title: string;
@@ -43,12 +43,16 @@ export function PieceCreationForm({ title, description, auxiliaryText }: PieceCr
   const quotaTotal = user?.monthlyPieceLimit ?? 50;
   const isBlocked = quotaUsed >= quotaTotal;
 
+  const [isGenerating, setIsGenerating] = useState(false);
+  const [generatedDraft, setGeneratedDraft] = useState<string | null>(null);
+  const [generationId, setGenerationId] = useState<string | null>(null);
+
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files.length > 0) {
       const newFiles = Array.from(e.target.files).map((file) => ({
         id: Math.random().toString(36).substring(7),
         file,
-        category: "Outros",
+        category: "Documento principal",
       }));
       setFiles((prev) => [...prev, ...newFiles]);
     }
@@ -70,15 +74,79 @@ export function PieceCreationForm({ title, description, auxiliaryText }: PieceCr
     return parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + " " + sizes[i];
   };
 
-  const handleGenerate = () => {
+  const handleGenerate = async () => {
     if (isBlocked) {
       setShowBlockToast(true);
       setTimeout(() => setShowBlockToast(false), 5000);
       return;
     }
-    setShowToast(true);
-    setTimeout(() => setShowToast(false), 4000);
+    
+    if (!user) return;
+    
+    setIsGenerating(true);
+    setGeneratedDraft(null);
+
+    try {
+      const formData = new FormData();
+      formData.append("userId", user.id);
+      formData.append("pieceType", title);
+      formData.append("userOrientation", orientation);
+
+      files.forEach((f, idx) => {
+        formData.append(`file_${idx}`, f.file);
+        formData.append(`category_${idx}`, f.category);
+      });
+
+      const res = await fetch("/api/piece-generation", {
+        method: "POST",
+        body: formData,
+      });
+
+      const data = await res.json();
+      if (!res.ok) {
+        throw new Error(data.error || "Falha na geração da peça");
+      }
+
+      setGeneratedDraft(data.draft);
+      setGenerationId(data.generationId);
+      
+      // Track view
+      if (data.generationId) {
+        fetch(`/api/piece-evaluation/${data.generationId}/view`, { method: "POST" }).catch(() => {});
+      }
+      
+      // Update store to decrement quota visually (optional, just syncs the state)
+      useAuthStore.setState((state) => {
+        if (state.user) {
+          return { user: { ...state.user, piecesUsedCurrentCycle: (state.user.piecesUsedCurrentCycle || 0) + 1 } };
+        }
+        return state;
+      });
+
+    } catch (err: any) {
+      alert("Erro na geração: " + err.message);
+    } finally {
+      setIsGenerating(false);
+    }
   };
+
+  if (generatedDraft) {
+    return (
+      <div className="flex flex-col flex-1 h-full max-w-4xl mx-auto w-full pb-20 relative animate-in fade-in zoom-in-95 duration-300">
+        <div className="flex items-center mb-6">
+          <button onClick={() => setGeneratedDraft(null)} className="flex items-center text-slate-400 hover:text-white transition-colors mr-4">
+            <ArrowLeft className="w-5 h-5 mr-1" />
+            Voltar
+          </button>
+          <h2 className="text-2xl font-bold text-white flex-1">{title} (Rascunho)</h2>
+        </div>
+        <div className="bg-slate-900/50 backdrop-blur-xl border border-slate-800 rounded-2xl p-8 overflow-y-auto max-h-[60vh] mb-4">
+          <pre className="text-slate-300 whitespace-pre-wrap font-sans text-sm leading-relaxed">{generatedDraft}</pre>
+        </div>
+        {generationId && <PieceEvaluationForm generationId={generationId} />}
+      </div>
+    );
+  }
 
   return (
     <div className="flex flex-col flex-1 h-full max-w-4xl mx-auto w-full pb-20 relative">
@@ -207,9 +275,17 @@ export function PieceCreationForm({ title, description, auxiliaryText }: PieceCr
         <div className="flex justify-end pt-2">
           <button
             onClick={handleGenerate}
-            className="bg-violet-600 hover:bg-violet-700 text-white font-medium py-2.5 px-6 rounded-lg transition-colors shadow-sm"
+            disabled={isGenerating}
+            className={`font-medium py-2.5 px-6 rounded-lg transition-colors shadow-sm flex items-center gap-2
+              ${isGenerating ? "bg-violet-400 cursor-not-allowed text-white" : "bg-violet-600 hover:bg-violet-700 text-white"}`}
           >
-            Gerar rascunho da peça
+            {isGenerating && (
+              <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+              </svg>
+            )}
+            {isGenerating ? "Processando IA..." : "Gerar rascunho da peça"}
           </button>
         </div>
 

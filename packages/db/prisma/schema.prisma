@@ -47,7 +47,8 @@ model User {
   createdAt              DateTime   @default(now()) @map("created_at")
   updatedAt              DateTime   @updatedAt @map("updated_at")
 
-  cases Case[]
+  cases       Case[]
+  evaluations PieceEvaluation[]
 
   @@map("users")
 }
@@ -377,4 +378,56 @@ model PieceDocumentMetadata {
 
   @@index([generationId])
   @@map("piece_document_metadata")
+}
+
+enum PieceGenerationStatus {
+  PENDING
+  PROCESSING
+  COMPLETED
+  FAILED
+  TIMEOUT
+  CANCELED
+}
+
+model PieceGeneration {
+  id                 String                @id @default(cuid())
+  userId             String                @map("user_id")
+  pieceType          String                @map("piece_type")
+  userOrientation    String?               @map("user_orientation") @db.Text
+  status             PieceGenerationStatus @default(PENDING)
+  inputTokensGemini  Int                   @default(0) @map("input_tokens_gemini")
+  outputTokensGemini Int                   @default(0) @map("output_tokens_gemini")
+  inputTokensGpt     Int                   @default(0) @map("input_tokens_gpt")
+  outputTokensGpt    Int                   @default(0) @map("output_tokens_gpt")
+  processingTimeMs   Int?                  @map("processing_time_ms")
+  timeGeminiMs       Int?                  @map("time_gemini_ms")
+  timeLanceDbMs      Int?                  @map("time_lancedb_ms")
+  timeLexMlMs        Int?                  @map("time_lexml_ms")
+  timeGptMs          Int?                  @map("time_gpt_ms")
+  researchResultsCount Int?                @map("research_results_count")
+  errorMessage       String?               @map("error_message") @db.Text
+  generatedText      String?               @map("generated_text") @db.Text
+  createdAt          DateTime              @default(now()) @map("created_at")
+  completedAt        DateTime?             @map("completed_at")
+  viewedAt           DateTime?             @map("viewed_at")
+  evaluatedAt        DateTime?             @map("evaluated_at")
+
+  evaluation         PieceEvaluation?
+
+  @@map("piece_generations")
+}
+
+model PieceEvaluation {
+  id           String          @id @default(cuid())
+  generationId String          @unique @map("generation_id")
+  userId       String          @map("user_id")
+  rating       Int             // 1 a 5
+  category     String?         // BUG, UX, PERFORMANCE, JURIDICO, SUGESTAO
+  feedback     String?         @db.Text
+  createdAt    DateTime        @default(now()) @map("created_at")
+
+  generation   PieceGeneration @relation(fields: [generationId], references: [id], onDelete: Cascade)
+  user         User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("piece_evaluations")
 }

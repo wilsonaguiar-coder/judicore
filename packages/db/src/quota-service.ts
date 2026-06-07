@@ -50,17 +50,17 @@ export class QuotaService {
   }
 
   /**
-   * Consome 1 cota de peça do usuário apenas se a geração foi concluída com sucesso (APPROVED).
+   * Consome 1 cota de peça do usuário apenas se a geração foi concluída com sucesso (COMPLETED).
    */
   static async consumePieceQuota(userId: string, generationId: string) {
     // 1. Verifica status da geração
-    const generation = await prisma.legalGeneration.findUnique({ where: { id: generationId } });
+    const generation = await prisma.pieceGeneration.findUnique({ where: { id: generationId } });
     if (!generation) {
       throw new Error("Geração não encontrada");
     }
 
-    if (generation.status !== "APPROVED") {
-      throw new Error("Cota só pode ser consumida para peças concluídas/aprovadas.");
+    if (generation.status !== "COMPLETED") {
+      throw new Error("Cota só pode ser consumida para peças concluídas com sucesso.");
     }
 
     // 2. Renova ciclo se necessário
