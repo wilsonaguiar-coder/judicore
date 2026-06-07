@@ -2,23 +2,71 @@
 
 import { useAuthStore } from "@/store/auth";
 import { Sidebar } from "@/components/sidebar";
-import { FileText } from "lucide-react";
+import { FileText, ArrowRight } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { useEffect } from "react";
 
 export default function PiecesPage() {
   const { user } = useAuthStore();
+  const router = useRouter();
+
+  // Redirecionar Admin
+  useEffect(() => {
+    if (user?.role === "ADMIN") {
+      router.push("/dashboard");
+    }
+  }, [user, router]);
+
+  if (user?.role === "ADMIN") return null;
+
+  const comumCards = [
+    { title: "Petição Inicial", desc: "Elaboração de petições iniciais para ajuizamento de ações.", path: "/dashboard/pieces/initial-petition" },
+    { title: "Contestação", desc: "Resposta do réu aos pedidos formulados na petição inicial.", path: "/dashboard/pieces/contestation" },
+    { title: "Réplica", desc: "Manifestação do autor sobre a contestação apresentada.", path: "/dashboard/pieces/reply" },
+    { title: "Impugnação", desc: "Impugnação de documentos, cálculos, laudos ou manifestações.", path: "/dashboard/pieces/objection" },
+    { title: "Recurso", desc: "Interposição de recursos contra decisões judiciais.", path: "/dashboard/pieces/appeal" },
+    { title: "Contrarrazões", desc: "Resposta ao recurso interposto pela parte contrária.", path: "/dashboard/pieces/counterarguments" },
+    { title: "Embargos de Declaração", desc: "Pedido de esclarecimento, integração ou correção da decisão.", path: "/dashboard/pieces/embargos" },
+  ];
+
+  const servidorCards = [
+    { title: "Sentença", desc: "Minuta de sentença judicial.", path: "/dashboard/pieces/sentence" },
+    { title: "Decisão", desc: "Minuta de decisão interlocutória.", path: "/dashboard/pieces/decision" },
+    { title: "Despacho", desc: "Minuta de despacho ordinatório ou de impulso processual.", path: "/dashboard/pieces/order" },
+  ];
+
+  const cards = user?.role === "SERVIDOR" ? servidorCards : comumCards;
 
   return (
     <div className="flex h-screen bg-background">
       <Sidebar user={user} />
-      <main className="flex-1 flex flex-col items-center justify-center p-8 bg-slate-50/50">
-        <div className="flex flex-col items-center max-w-md text-center">
-          <div className="w-16 h-16 bg-violet-600/10 text-violet-600 flex items-center justify-center rounded-2xl mb-6">
-            <FileText size={32} />
+      <main className="flex-1 overflow-auto bg-slate-50/50">
+        <div className="max-w-5xl mx-auto px-8 py-10">
+          <div className="mb-8">
+            <h1 className="text-2xl font-bold text-slate-800">Peças Jurídicas</h1>
+            <p className="text-sm text-slate-500 mt-1">Selecione o tipo de documento que deseja elaborar.</p>
           </div>
-          <h1 className="text-2xl font-bold text-slate-800 mb-3">Peças Jurídicas</h1>
-          <p className="text-slate-600">
-            Área destinada à geração, edição e exportação de peças jurídicas. Esta funcionalidade será configurada nas próximas etapas do MVP.
-          </p>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+            {cards.map((item) => (
+              <button
+                key={item.path}
+                onClick={() => router.push(item.path)}
+                className="flex flex-col text-left bg-white rounded-xl border border-slate-200 overflow-hidden hover:border-violet-500/50 hover:shadow-md transition-all group"
+              >
+                <div className="p-5 flex-1 flex flex-col w-full">
+                  <div className="w-10 h-10 rounded-lg bg-violet-600/10 text-violet-600 flex items-center justify-center mb-4 group-hover:bg-violet-600 group-hover:text-white transition-colors">
+                    <FileText size={20} />
+                  </div>
+                  <h3 className="text-base font-semibold text-slate-800 mb-2">{item.title}</h3>
+                  <p className="text-sm text-slate-600 line-clamp-3 mb-4 flex-1">{item.desc}</p>
+                  <div className="flex items-center justify-end mt-auto pt-4 border-t border-slate-100 text-violet-600 font-medium text-sm">
+                    Elaborar <ArrowRight size={14} className="ml-1.5 transform group-hover:translate-x-1 transition-transform" />
+                  </div>
+                </div>
+              </button>
+            ))}
+          </div>
         </div>
       </main>
     </div>
