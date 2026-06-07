@@ -4,7 +4,7 @@ import type { OpportunityLevel } from "../enums/opportunity-level.enum.js";
 import { buildStrengthReviewerPrompt } from "../prompts/strength-reviewer.prompt.js";
 
 const DEEPSEEK_MODEL = "deepseek-chat";
-const OPENAI_MODEL = "gpt-4o";
+const OPENAI_MODEL = "gpt-5.5-pro";
 
 const SYSTEM_MESSAGE =
   "Você é um advogado sênior especializado em fortalecimento de peças jurídicas. " +
@@ -105,6 +105,7 @@ export class AiLegalStrengthReviewerProvider {
   }
 
   private async callOpenAI(request: AiLegalStrengthReviewRequest): Promise<RawStrengthFinding[]> {
+    const OPENAI_MODEL = "gpt-4o";
     const response = await fetch("https://api.openai.com/v1/chat/completions", {
       method: "POST",
       headers: {

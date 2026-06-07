@@ -21,3 +21,5 @@ export { validateRequestDispositive } from "./request-dispositive.validator.js";
 export { validateEvidenceConclusion } from "./evidence-conclusion.validator.js";
 export { validateOutcomeConformance } from "./outcome-conformance.validator.js";
 export { validateFictitiousData, FICTITIOUS_DATA_PATTERNS } from "./fictitious-data.validator.js";
+export { FundamentalIntegrityValidator } from "./fundamental-integrity.validator.js";
+export type { FundamentalIntegrityFinding } from "./fundamental-integrity.types.js";

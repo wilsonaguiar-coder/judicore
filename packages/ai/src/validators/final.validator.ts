@@ -31,6 +31,7 @@ import { validateCoverage } from "./coverage.validator.js";
 import { validateLegalContradictions } from "./legal-contradiction.validator.js";
 import { validateRequestDispositive } from "./request-dispositive.validator.js";
 import { validateEvidenceConclusion } from "./evidence-conclusion.validator.js";
+import { FundamentalIntegrityValidator } from "./fundamental-integrity.validator.js";
 
 export interface FinalValidationResult {
   valid: boolean;
@@ -118,6 +119,7 @@ export class FinalValidator {
   private execution = new ExecutionValidator();
   private jefCivel = new JefCivelValidator();
   private stanceContradiction = new StanceContradictionValidator();
+  private fundamentalIntegrity = new FundamentalIntegrityValidator();
 
   validate(
     draft: string,
@@ -269,6 +271,17 @@ export class FinalValidator {
 
     // ── FASE 5.9.0 — Evidence × Conclusion Audit (provas × conclusão) ────────────
     allErrors.push(...validateEvidenceConclusion(draft));
+
+    // ── FASE 10.1.2 — Fundamental Integrity (suporte concreto para conclusões) ───
+    const integrityFindings = this.fundamentalIntegrity.validate(draft, classification.tipo_peca);
+    for (const finding of integrityFindings) {
+      allErrors.push({
+        rule: finding.code,
+        message: `${finding.reason} ${finding.suggestedFix} (Expressão: "${finding.expression}")`,
+        fatal: finding.severity === "FATAL",
+        details: { excerpt: finding.excerpt }
+      });
+    }
 
     // ── FASE 5.5 — alertas materiais específicos por domínio ─────────────────────
 

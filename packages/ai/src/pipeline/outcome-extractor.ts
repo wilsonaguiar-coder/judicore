@@ -12,6 +12,10 @@ const OUTCOME_PATTERNS: Array<{ pattern: RegExp; outcome: DecidedOutcome }> = [
   // Decisão interlocutória
   { pattern: /\bindefiro\b|\bindeferido\b|\bindefiro\s+o\s+pedido\b/i, outcome: "INDEFIRO" },
   { pattern: /\bdefiro\b|\bdeferido\b|\bdefiro\s+o\s+pedido\b/i, outcome: "DEFIRO" },
+  // Extinção sem resolução do mérito (mais específico antes de procedente/improcedente)
+  { pattern: /extinguir?\s+sem\s+resolu[cç][aã]o|extinto\s+sem\s+(?:resolu[cç][aã]o|m[eé]rito)|extin[cç][aã]o\s+sem\s+(?:resolu[cç][aã]o|m[eé]rito)|julgar\s+extinto\s+sem\b|art\.?\s*485\s+(?:do\s+)?CPC/i, outcome: "EXTINCAO_SEM_RESOLUCAO" },
+  // Homologação de acordo/transação
+  { pattern: /\bhomolog(?:ar|a[cç][aã]o)\s+(?:d[oae]\s+)?acordo\b|\bhomolog(?:ar|a[cç][aã]o)\s+(?:d[oae]\s+)?transa[cç][aã]o\b|\bhomologar\s+o?\s*acordo\b/i, outcome: "HOMOLOGACAO" },
   // Sentença cível/previdenciária/trabalhista — parcialmente procedente primeiro (mais específico)
   { pattern: /\bparcialmente\s+procedente\b|\bprocedente\s+em\s+parte\b|\bprocedência\s+parcial\b/i, outcome: "PARCIALMENTE_PROCEDENTE" },
   { pattern: /\bimprocedente\b|\bimprocedência\b|\bimprocedentes?\b|\bjulgar\s+improcedente\b|\bsentença\s+de\s+improcedência\b/i, outcome: "IMPROCEDENTE" },
@@ -84,6 +88,16 @@ const OUTCOME_EXPECTATIONS: Record<DecidedOutcome, OutcomeExpectation> = {
     positivePatterns: [/\babsolvo\b/i],
     negativePatterns: [/\bcondeno\b/i],
   },
+  EXTINCAO_SEM_RESOLUCAO: {
+    label: "EXTINÇÃO SEM RESOLUÇÃO DO MÉRITO",
+    positivePatterns: [/julg(?:o|amos)\s+extinto?\s+(?:o\s+processo[,\s]+)?sem\s+resolu[cç][aã]o/i, /art\.?\s*485/i],
+    negativePatterns: [/julg(?:o|amos)\s+(procedente|improcedente)/i],
+  },
+  HOMOLOGACAO: {
+    label: "HOMOLOGAÇÃO",
+    positivePatterns: [/\bhomolog(?:o|amos)\b/i, /\bhomologad[oa]\b/i],
+    negativePatterns: [],
+  },
 };
 
 export function getOutcomeExpectation(outcome: DecidedOutcome): OutcomeExpectation {
@@ -93,27 +107,31 @@ export function getOutcomeExpectation(outcome: DecidedOutcome): OutcomeExpectati
 // ── Gerador do bloco "SENTIDO DO JULGAMENTO" ─────────────────────────────────
 
 const OUTCOME_LABEL: Record<DecidedOutcome, string> = {
-  PROCEDENTE:            "PROCEDENTE",
-  IMPROCEDENTE:          "IMPROCEDENTE",
-  PARCIALMENTE_PROCEDENTE: "PARCIALMENTE PROCEDENTE",
-  DEFIRO:                "DEFIRO (deferido)",
-  INDEFIRO:              "INDEFIRO (indeferido)",
-  CONCEDO_ORDEM:         "CONCEDO A ORDEM",
-  DENEGO_ORDEM:          "DENEGO A ORDEM",
-  CONDENO:               "CONDENO",
-  ABSOLVO:               "ABSOLVO",
+  PROCEDENTE:               "PROCEDENTE",
+  IMPROCEDENTE:             "IMPROCEDENTE",
+  PARCIALMENTE_PROCEDENTE:  "PARCIALMENTE PROCEDENTE",
+  EXTINCAO_SEM_RESOLUCAO:   "EXTINÇÃO SEM RESOLUÇÃO DO MÉRITO",
+  HOMOLOGACAO:              "HOMOLOGAÇÃO",
+  DEFIRO:                   "DEFIRO (deferido)",
+  INDEFIRO:                 "INDEFIRO (indeferido)",
+  CONCEDO_ORDEM:            "CONCEDO A ORDEM",
+  DENEGO_ORDEM:             "DENEGO A ORDEM",
+  CONDENO:                  "CONDENO",
+  ABSOLVO:                  "ABSOLVO",
 };
 
 const OUTCOME_DISPOSITIVO: Record<DecidedOutcome, string> = {
-  PROCEDENTE:            '"Julgo PROCEDENTE o pedido" ou "Julgo PROCEDENTE os pedidos"',
-  IMPROCEDENTE:          '"Julgo IMPROCEDENTE o pedido" ou "Julgo IMPROCEDENTE os pedidos"',
+  PROCEDENTE:              '"Julgo PROCEDENTE o pedido" ou "Julgo PROCEDENTE os pedidos"',
+  IMPROCEDENTE:            '"Julgo IMPROCEDENTE o pedido" ou "Julgo IMPROCEDENTE os pedidos"',
   PARCIALMENTE_PROCEDENTE: '"Julgo PARCIALMENTE PROCEDENTE o pedido" especificando quais pedidos são acolhidos e quais são rejeitados',
-  DEFIRO:                '"Defiro o pedido" ou "Defiro o requerimento"',
-  INDEFIRO:              '"Indefiro o pedido" ou "Indefiro o requerimento"',
-  CONCEDO_ORDEM:         '"Concedo a ordem" com indicação do efeito prático',
-  DENEGO_ORDEM:          '"Denego a ordem"',
-  CONDENO:               '"Condeno o réu [NOME] pela prática do art. [X]..." com dosimetria completa',
-  ABSOLVO:               '"Absolvo o réu [NOME], da imputação do art. [X], com fundamento no art. 386, [INCISO], do CPP"',
+  EXTINCAO_SEM_RESOLUCAO:  '"Julgo extinto o processo, sem resolução do mérito, nos termos do art. 485, [INCISO], do CPC"',
+  HOMOLOGACAO:             '"Homologo o acordo celebrado entre as partes" com cláusulas transcritas ou resumidas',
+  DEFIRO:                  '"Defiro o pedido" ou "Defiro o requerimento"',
+  INDEFIRO:                '"Indefiro o pedido" ou "Indefiro o requerimento"',
+  CONCEDO_ORDEM:           '"Concedo a ordem" com indicação do efeito prático',
+  DENEGO_ORDEM:            '"Denego a ordem"',
+  CONDENO:                 '"Condeno o réu [NOME] pela prática do art. [X]..." com dosimetria completa',
+  ABSOLVO:                 '"Absolvo o réu [NOME], da imputação do art. [X], com fundamento no art. 386, [INCISO], do CPP"',
 };
 
 /**

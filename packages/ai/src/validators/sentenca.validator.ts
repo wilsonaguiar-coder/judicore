@@ -122,6 +122,34 @@ export class SentencaValidator {
       }
     }
 
+    // ── BLOCO 2: Contradição fundamentação × dispositivo — Criminal absolvição ──
+    if (sections.fundamentacao && sections.dispositivo) {
+      const FUND_ABSOLUTORIO_RE =
+        /in\s+dubio\s+pro\s+r[eé]u|presun[cç][aã]o\s+de\s+inocência|insuficiência\s+probatória|autoria\s+n[aã]o\s+(?:comprovad[ao]|demonstrad[ao])|materialidade\s+n[aã]o\s+(?:comprovad[ao]|demonstrad[ao]|configurad[ao])|prova\s+insuficiente\s+para\s+condena[cç][aã]o/i;
+      const DISP_CONDENO_AQUI_RE = /\bcondeno\b/i;
+      if (FUND_ABSOLUTORIO_RE.test(sections.fundamentacao) && DISP_CONDENO_AQUI_RE.test(sections.dispositivo)) {
+        errors.push({
+          rule: "CRIMINAL_REASONING_DISPOSITIVE_CONTRADICTION",
+          message: "Contradição em sentença criminal: a fundamentação contém elementos absolvitórios (in dubio pro reo / insuficiência probatória / autoria não comprovada) mas o dispositivo condena o réu. Verifique a coerência da sentença.",
+          fatal: true,
+        });
+      }
+    }
+
+    // ── BLOCO 4: Contradição fundamentação × dispositivo — Criminal condenação ─
+    if (sections.fundamentacao && sections.dispositivo) {
+      const FUND_CONDENATORIO_RE =
+        /autoria\s+(?:e\s+materialidade\s+)?(?:comprovad[ao]|demonstrad[ao])|materialidade\s+(?:e\s+autoria\s+)?(?:comprovad[ao]|demonstrad[ao])|dolo\s+(?:comprovado|demonstrado|configurado)|conduta\s+dolosa\s+(?:comprovada|demonstrada)/i;
+      const DISP_ABSOLVO_AQUI_RE = /\babsolvo\b/i;
+      if (FUND_CONDENATORIO_RE.test(sections.fundamentacao) && DISP_ABSOLVO_AQUI_RE.test(sections.dispositivo)) {
+        errors.push({
+          rule: "CRIMINAL_CONDENATORY_REASONING_ABSOLVES",
+          message: "Contradição em sentença criminal: a fundamentação confirma autoria e materialidade mas o dispositivo absolve o réu. Verifique a coerência da sentença.",
+          fatal: true,
+        });
+      }
+    }
+
     // Dispositivo genérico sem identificar pedido ou benefício específico
     if (sections.dispositivo && DISPOSITIVO_VAGUE_RE.test(sections.dispositivo.trim())) {
       errors.push({

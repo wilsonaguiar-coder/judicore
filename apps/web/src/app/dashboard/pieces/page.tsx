@@ -2,6 +2,7 @@
 
 import { useAuthStore } from "@/store/auth";
 import { Sidebar } from "@/components/sidebar";
+import { QuotaCard } from "@/components/quota-card";
 import { FileText, ArrowRight } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
@@ -37,14 +38,25 @@ export default function PiecesPage() {
 
   const cards = user?.role === "SERVIDOR" ? servidorCards : comumCards;
 
+  // Mocking quotas for MVP view
+  const quotaUsed = user?.piecesUsedCurrentCycle ?? 23;
+  const quotaTotal = user?.monthlyPieceLimit ?? 50;
+  const daysToRenew = 12;
+
   return (
     <div className="flex h-screen bg-background">
       <Sidebar user={user} />
       <main className="flex-1 overflow-auto bg-slate-50/50">
         <div className="max-w-5xl mx-auto px-8 py-10">
-          <div className="mb-8">
-            <h1 className="text-2xl font-bold text-slate-800">Peças Jurídicas</h1>
-            <p className="text-sm text-slate-500 mt-1">Selecione o tipo de documento que deseja elaborar.</p>
+          <div className="flex flex-col md:flex-row md:items-start justify-between gap-6 mb-8">
+            <div>
+              <h1 className="text-2xl font-bold text-slate-800">Peças Jurídicas</h1>
+              <p className="text-sm text-slate-500 mt-1">Selecione o tipo de documento que deseja elaborar.</p>
+            </div>
+            
+            <div className="w-full md:w-72 shrink-0">
+              <QuotaCard used={quotaUsed} total={quotaTotal} daysToRenew={daysToRenew} />
+            </div>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">

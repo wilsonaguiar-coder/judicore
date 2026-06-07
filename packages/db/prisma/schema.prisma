@@ -37,11 +37,15 @@ model User {
   email           String     @unique
   name            String
   passwordHash    String     @map("password_hash")
-  role            UserRole   @default(COMUM)
-  defaultArea     LegalArea? @map("default_area")
-  accessExpiresAt DateTime?  @map("access_expires_at")
-  createdAt       DateTime   @default(now()) @map("created_at")
-  updatedAt       DateTime   @updatedAt @map("updated_at")
+  role                   UserRole   @default(COMUM)
+  defaultArea            LegalArea? @map("default_area")
+  accessExpiresAt        DateTime?  @map("access_expires_at")
+  monthlyPieceLimit      Int        @default(50) @map("monthly_piece_limit")
+  piecesUsedCurrentCycle Int        @default(0) @map("pieces_used_current_cycle")
+  currentCycleStart      DateTime?  @map("current_cycle_start")
+  currentCycleEnd        DateTime?  @map("current_cycle_end")
+  createdAt              DateTime   @default(now()) @map("created_at")
+  updatedAt              DateTime   @updatedAt @map("updated_at")
 
   cases Case[]
 
@@ -359,4 +363,18 @@ model ReviewReAudit {
   session ReviewSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
 
   @@map("review_re_audits")
+}
+
+model PieceDocumentMetadata {
+  id           String   @id @default(cuid())
+  generationId String?  @map("generation_id") // Link para futura geração
+  originalName String   @map("original_name")
+  extension    String
+  size         Int
+  category     String
+  hash         String?
+  createdAt    DateTime @default(now()) @map("created_at")
+
+  @@index([generationId])
+  @@map("piece_document_metadata")
 }

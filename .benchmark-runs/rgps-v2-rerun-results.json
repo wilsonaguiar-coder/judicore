@@ -1,0 +1,1054 @@
+[
+  {
+    "caseId": "RGPS-001",
+    "quality": "GOOD",
+    "provider": "openai",
+    "model": "gpt-4o",
+    "expectedFindings": [],
+    "actualFindingTitles": [],
+    "tp": 0,
+    "fp": 0,
+    "fn": 0,
+    "precision": 1,
+    "recall": 1,
+    "f1": 1,
+    "casePass": true,
+    "score": 95,
+    "scorePass": true,
+    "durationMs": 1959
+  },
+  {
+    "caseId": "RGPS-002",
+    "quality": "MODERATE_ISSUES",
+    "provider": "openai",
+    "model": "gpt-4o",
+    "expectedFindings": [
+      "ausência de análise concreta do PPP",
+      "ausência de habitualidade/permanência"
+    ],
+    "actualFindingTitles": [],
+    "tp": 0,
+    "fp": 0,
+    "fn": 2,
+    "precision": 0,
+    "recall": 0,
+    "f1": 0,
+    "casePass": false,
+    "score": 95,
+    "scorePass": false,
+    "durationMs": 1432
+  },
+  {
+    "caseId": "RGPS-003",
+    "quality": "SEVERE_ISSUES",
+    "provider": "openai",
+    "model": "gpt-4o",
+    "expectedFindings": [
+      "enfrentamento insuficiente da prova pericial",
+      "ausência de contraponto técnico"
+    ],
+    "actualFindingTitles": [
+      "Demonstração da incapacidade laboral",
+      "Fundamentação legal para concessão do benefício por incapacidade",
+      "Antecipação de argumentos contrários sobre capacidade laboral residual"
+    ],
+    "tp": 2,
+    "fp": 1,
+    "fn": 0,
+    "precision": 0.6666666666666666,
+    "recall": 1,
+    "f1": 0.8,
+    "casePass": true,
+    "score": 45,
+    "scorePass": true,
+    "durationMs": 5280
+  },
+  {
+    "caseId": "RGPS-004",
+    "quality": "MODERATE_ISSUES",
+    "provider": "openai",
+    "model": "gpt-4o",
+    "expectedFindings": [
+      "análise socioeconômica insuficiente"
+    ],
+    "actualFindingTitles": [],
+    "tp": 0,
+    "fp": 0,
+    "fn": 1,
+    "precision": 0,
+    "recall": 0,
+    "f1": 0,
+    "casePass": false,
+    "score": 95,
+    "scorePass": false,
+    "durationMs": 1491
+  },
+  {
+    "caseId": "RGPS-005",
+    "quality": "GOOD",
+    "provider": "openai",
+    "model": "gpt-4o",
+    "expectedFindings": [],
+    "actualFindingTitles": [],
+    "tp": 0,
+    "fp": 0,
+    "fn": 0,
+    "precision": 1,
+    "recall": 1,
+    "f1": 1,
+    "casePass": true,
+    "score": 95,
+    "scorePass": true,
+    "durationMs": 1418
+  },
+  {
+    "caseId": "RGPS-006",
+    "quality": "MODERATE_ISSUES",
+    "provider": "openai",
+    "model": "gpt-4o",
+    "expectedFindings": [
+      "prova rural insuficientemente demonstrada"
+    ],
+    "actualFindingTitles": [
+      "Incluir documentos de comprovação do trabalho rural",
+      "Detalhar o período de trabalho rural"
+    ],
+    "tp": 1,
+    "fp": 0,
+    "fn": 0,
+    "precision": 1,
+    "recall": 1,
+    "f1": 1,
+    "casePass": true,
+    "score": 60,
+    "scorePass": true,
+    "durationMs": 5061
+  },
+  {
+    "caseId": "RGPS-007",
+    "quality": "LIGHT_ISSUES",
+    "provider": "openai",
+    "model": "gpt-4o",
+    "expectedFindings": [
+      "fundamentação técnica incompleta"
+    ],
+    "actualFindingTitles": [],
+    "tp": 0,
+    "fp": 0,
+    "fn": 1,
+    "precision": 0,
+    "recall": 0,
+    "f1": 0,
+    "casePass": false,
+    "score": 95,
+    "scorePass": false,
+    "durationMs": 1697
+  },
+  {
+    "caseId": "RGPS-008",
+    "quality": "MODERATE_ISSUES",
+    "provider": "openai",
+    "model": "gpt-4o",
+    "expectedFindings": [
+      "ausência de memória de cálculo verificável"
+    ],
+    "actualFindingTitles": [],
+    "tp": 0,
+    "fp": 0,
+    "fn": 1,
+    "precision": 0,
+    "recall": 0,
+    "f1": 0,
+    "casePass": false,
+    "score": 95,
+    "scorePass": false,
+    "durationMs": 1134
+  },
+  {
+    "caseId": "RGPS-009",
+    "quality": "LIGHT_ISSUES",
+    "provider": "openai",
+    "model": "gpt-4o",
+    "expectedFindings": [
+      "oportunidade argumentativa não explorada"
+    ],
+    "actualFindingTitles": [],
+    "tp": 0,
+    "fp": 0,
+    "fn": 1,
+    "precision": 0,
+    "recall": 0,
+    "f1": 0,
+    "casePass": false,
+    "score": 95,
+    "scorePass": false,
+    "durationMs": 1091
+  },
+  {
+    "caseId": "RGPS-010",
+    "quality": "MODERATE_ISSUES",
+    "provider": "openai",
+    "model": "gpt-4o",
+    "expectedFindings": [
+      "qualidade de segurado mal fundamentada"
+    ],
+    "actualFindingTitles": [],
+    "tp": 0,
+    "fp": 0,
+    "fn": 1,
+    "precision": 0,
+    "recall": 0,
+    "f1": 0,
+    "casePass": false,
+    "score": 95,
+    "scorePass": false,
+    "durationMs": 1279
+  },
+  {
+    "caseId": "RGPS-011",
+    "quality": "GOOD",
+    "provider": "openai",
+    "model": "gpt-4o",
+    "expectedFindings": [],
+    "actualFindingTitles": [],
+    "tp": 0,
+    "fp": 0,
+    "fn": 0,
+    "precision": 1,
+    "recall": 1,
+    "f1": 1,
+    "casePass": true,
+    "score": 95,
+    "scorePass": true,
+    "durationMs": 1271
+  },
+  {
+    "caseId": "RGPS-012",
+    "quality": "LIGHT_ISSUES",
+    "provider": "openai",
+    "model": "gpt-4o",
+    "expectedFindings": [
+      "tese de conversão pouco desenvolvida"
+    ],
+    "actualFindingTitles": [],
+    "tp": 0,
+    "fp": 0,
+    "fn": 1,
+    "precision": 0,
+    "recall": 0,
+    "f1": 0,
+    "casePass": false,
+    "score": 95,
+    "scorePass": false,
+    "durationMs": 1201
+  },
+  {
+    "caseId": "RGPS-013",
+    "quality": "GOOD",
+    "provider": "openai",
+    "model": "gpt-4o",
+    "expectedFindings": [],
+    "actualFindingTitles": [],
+    "tp": 0,
+    "fp": 0,
+    "fn": 0,
+    "precision": 1,
+    "recall": 1,
+    "f1": 1,
+    "casePass": true,
+    "score": 95,
+    "scorePass": true,
+    "durationMs": 1116
+  },
+  {
+    "caseId": "RGPS-014",
+    "quality": "MODERATE_ISSUES",
+    "provider": "openai",
+    "model": "gpt-4o",
+    "expectedFindings": [
+      "prova de dependência econômica insuficiente"
+    ],
+    "actualFindingTitles": [
+      "Incluir documentos que comprovem a dependência econômica",
+      "Indicar expressamente o fundamento legal aplicável à tese"
+    ],
+    "tp": 1,
+    "fp": 0,
+    "fn": 0,
+    "precision": 1,
+    "recall": 1,
+    "f1": 1,
+    "casePass": true,
+    "score": 60,
+    "scorePass": true,
+    "durationMs": 4713
+  },
+  {
+    "caseId": "RGPS-015",
+    "quality": "GOOD",
+    "provider": "openai",
+    "model": "gpt-4o",
+    "expectedFindings": [],
+    "actualFindingTitles": [],
+    "tp": 0,
+    "fp": 0,
+    "fn": 0,
+    "precision": 1,
+    "recall": 1,
+    "f1": 1,
+    "casePass": true,
+    "score": 95,
+    "scorePass": true,
+    "durationMs": 1244
+  },
+  {
+    "caseId": "RGPS-001",
+    "quality": "GOOD",
+    "provider": "gemini",
+    "model": "gemini-2.5-pro",
+    "expectedFindings": [],
+    "actualFindingTitles": [
+      "Reforçar a Evidente Ilegalidade do Indeferimento Administrativo",
+      "Incluir Memória de Cálculo das Parcelas Vencidas",
+      "Apresentar Quadro Resumo do Tempo de Contribuição",
+      "Fundamentar Faticamente o Pedido de Justiça Gratuita"
+    ],
+    "tp": 0,
+    "fp": 4,
+    "fn": 0,
+    "precision": 0,
+    "recall": 1,
+    "f1": 0,
+    "casePass": false,
+    "score": 25,
+    "scorePass": false,
+    "durationMs": 32392
+  },
+  {
+    "caseId": "RGPS-002",
+    "quality": "MODERATE_ISSUES",
+    "provider": "gemini",
+    "model": "gemini-2.5-pro",
+    "expectedFindings": [
+      "ausência de análise concreta do PPP",
+      "ausência de habitualidade/permanência"
+    ],
+    "actualFindingTitles": [
+      "Detalhar o Agente Nocivo e o Enquadramento Legal do Tempo Especial",
+      "Incluir Quadro Demonstrativo do Tempo de Contribuição Especial",
+      "Especificar o Requisito de Tempo Aplicável ao Agente Nocivo",
+      "Apresentar Memória de Cálculo do Valor da Causa",
+      "Demonstrar Expressamente o Cumprimento do Requisito de Carência"
+    ],
+    "tp": 2,
+    "fp": 2,
+    "fn": 0,
+    "precision": 0.5,
+    "recall": 1,
+    "f1": 0.6666666666666666,
+    "casePass": true,
+    "score": 10,
+    "scorePass": false,
+    "durationMs": 29116
+  },
+  {
+    "caseId": "RGPS-003",
+    "quality": "SEVERE_ISSUES",
+    "provider": "gemini",
+    "model": "gemini-2.5-pro",
+    "expectedFindings": [
+      "enfrentamento insuficiente da prova pericial",
+      "ausência de contraponto técnico"
+    ],
+    "actualFindingTitles": [
+      "Desenvolver a impugnação técnica ao laudo pericial",
+      "Contrastar o laudo judicial com o conjunto probatório dos autos",
+      "Incluir fundamento jurídico sobre a livre valoração da prova",
+      "Contextualizar a incapacidade com as atividades habituais do segurado"
+    ],
+    "tp": 2,
+    "fp": 0,
+    "fn": 0,
+    "precision": 1,
+    "recall": 1,
+    "f1": 1,
+    "casePass": true,
+    "score": 25,
+    "scorePass": true,
+    "durationMs": 27126
+  },
+  {
+    "caseId": "RGPS-004",
+    "quality": "MODERATE_ISSUES",
+    "provider": "gemini",
+    "model": "gemini-2.5-pro",
+    "expectedFindings": [
+      "análise socioeconômica insuficiente"
+    ],
+    "actualFindingTitles": [
+      "Demonstrar Faticamente o Requisito de Miserabilidade",
+      "Detalhar a Deficiência e suas Limitações Funcionais",
+      "Contextualizar o Indeferimento Administrativo",
+      "Fundamentar a Flexibilização do Critério de Renda"
+    ],
+    "tp": 1,
+    "fp": 3,
+    "fn": 0,
+    "precision": 0.25,
+    "recall": 1,
+    "f1": 0.4,
+    "casePass": true,
+    "score": 25,
+    "scorePass": true,
+    "durationMs": 27578
+  },
+  {
+    "caseId": "RGPS-005",
+    "quality": "GOOD",
+    "provider": "gemini",
+    "model": "gemini-2.5-pro",
+    "expectedFindings": [],
+    "actualFindingTitles": [
+      "Incluir Tabela Comparativa dos Salários de Contribuição",
+      "Apresentar Memória de Cálculo da RMI Revisada e dos Atrasados",
+      "Detalhar o Fundamento da Sentença Recorrida para Refutá-lo Diretamente",
+      "Referenciar Expressamente o Processo Administrativo"
+    ],
+    "tp": 0,
+    "fp": 4,
+    "fn": 0,
+    "precision": 0,
+    "recall": 1,
+    "f1": 0,
+    "casePass": false,
+    "score": 25,
+    "scorePass": false,
+    "durationMs": 31361
+  },
+  {
+    "caseId": "RGPS-006",
+    "quality": "MODERATE_ISSUES",
+    "provider": "gemini",
+    "model": "gemini-2.5-pro",
+    "expectedFindings": [
+      "prova rural insuficientemente demonstrada"
+    ],
+    "actualFindingTitles": [
+      "Demonstrar o cumprimento do requisito etário",
+      "Indicar o início de prova material do labor rural",
+      "Detalhar as condições e o período do labor rural",
+      "Apresentar quadro demonstrativo do período rural para comprovar a carência",
+      "Fortalecer a fundamentação jurídica com o artigo permanente do benefício",
+      "Ancorar a Data de Entrada do Requerimento (DER) em documento"
+    ],
+    "tp": 1,
+    "fp": 1,
+    "fn": 0,
+    "precision": 0.5,
+    "recall": 1,
+    "f1": 0.6666666666666666,
+    "casePass": true,
+    "score": 0,
+    "scorePass": false,
+    "durationMs": 32384
+  },
+  {
+    "caseId": "RGPS-007",
+    "quality": "LIGHT_ISSUES",
+    "provider": "gemini",
+    "model": "gemini-2.5-pro",
+    "expectedFindings": [
+      "fundamentação técnica incompleta"
+    ],
+    "actualFindingTitles": [
+      "Detalhar a Composição do Tempo de Contribuição Especial",
+      "Desenvolver a Análise Técnica do Perfil Profissiográfico Previdenciário (PPP)",
+      "Apresentar o Cálculo da Renda Mensal Inicial (RMI) e dos Valores Atrasados",
+      "Contextualizar o Indeferimento Administrativo",
+      "Referenciar Documentos Essenciais para a Comprovação do Direito"
+    ],
+    "tp": 1,
+    "fp": 4,
+    "fn": 0,
+    "precision": 0.2,
+    "recall": 1,
+    "f1": 0.33333333333333337,
+    "casePass": true,
+    "score": 5,
+    "scorePass": false,
+    "durationMs": 34504
+  },
+  {
+    "caseId": "RGPS-008",
+    "quality": "MODERATE_ISSUES",
+    "provider": "gemini",
+    "model": "gemini-2.5-pro",
+    "expectedFindings": [
+      "ausência de memória de cálculo verificável"
+    ],
+    "actualFindingTitles": [
+      "Apresentar Memória de Cálculo Detalhada",
+      "Especificar a Modalidade de Pagamento como RPV",
+      "Fundamentar o Pedido de Destaque dos Honorários Contratuais",
+      "Mencionar a Juntada do Contrato de Honorários",
+      "Especificar o Ato Processual de Comunicação ao INSS"
+    ],
+    "tp": 1,
+    "fp": 4,
+    "fn": 0,
+    "precision": 0.2,
+    "recall": 1,
+    "f1": 0.33333333333333337,
+    "casePass": true,
+    "score": 25,
+    "scorePass": true,
+    "durationMs": 28205
+  },
+  {
+    "caseId": "RGPS-009",
+    "quality": "LIGHT_ISSUES",
+    "provider": "gemini",
+    "model": "gemini-2.5-pro",
+    "expectedFindings": [
+      "oportunidade argumentativa não explorada"
+    ],
+    "actualFindingTitles": [
+      "Demonstrar numericamente o cumprimento da carência na DER reafirmada",
+      "Reforçar a fundamentação jurídica com referência ao Tema 995 do STJ",
+      "Confirmar o preenchimento do requisito etário"
+    ],
+    "tp": 0,
+    "fp": 3,
+    "fn": 1,
+    "precision": 0,
+    "recall": 0,
+    "f1": 0,
+    "casePass": false,
+    "score": 45,
+    "scorePass": true,
+    "durationMs": 26667
+  },
+  {
+    "caseId": "RGPS-010",
+    "quality": "MODERATE_ISSUES",
+    "provider": "gemini",
+    "model": "gemini-2.5-pro",
+    "expectedFindings": [
+      "qualidade de segurado mal fundamentada"
+    ],
+    "actualFindingTitles": [
+      "Revisar a cronologia e o cálculo do período de graça para sustentar a qualidade de segurado",
+      "Detalhar a incapacidade laboral decorrente do diagnóstico médico",
+      "Incluir informações sobre o prévio requerimento administrativo",
+      "Desenvolver a fundamentação jurídica do direito ao benefício",
+      "Referenciar expressamente os documentos probatórios na petição"
+    ],
+    "tp": 1,
+    "fp": 3,
+    "fn": 0,
+    "precision": 0.25,
+    "recall": 1,
+    "f1": 0.4,
+    "casePass": true,
+    "score": 5,
+    "scorePass": false,
+    "durationMs": 31149
+  },
+  {
+    "caseId": "RGPS-011",
+    "quality": "GOOD",
+    "provider": "gemini",
+    "model": "gemini-2.5-pro",
+    "expectedFindings": [],
+    "actualFindingTitles": [
+      "Demonstrar o Cumprimento do Requisito Etário",
+      "Refutar Proativamente o Motivo do Indeferimento Administrativo",
+      "Referenciar e Juntar a Carta de Indeferimento do Benefício",
+      "Incluir Memória de Cálculo da Renda Mensal Inicial (RMI)",
+      "Fundamentar o Pedido de Assistência Judiciária Gratuita"
+    ],
+    "tp": 0,
+    "fp": 5,
+    "fn": 0,
+    "precision": 0,
+    "recall": 1,
+    "f1": 0,
+    "casePass": false,
+    "score": 5,
+    "scorePass": false,
+    "durationMs": 32761
+  },
+  {
+    "caseId": "RGPS-012",
+    "quality": "LIGHT_ISSUES",
+    "provider": "gemini",
+    "model": "gemini-2.5-pro",
+    "expectedFindings": [
+      "tese de conversão pouco desenvolvida"
+    ],
+    "actualFindingTitles": [
+      "Detalhar os fundamentos probatórios que rebatem a insuficiência de provas apontada na sentença",
+      "Especificar os períodos que compõem o tempo especial pleiteado",
+      "Incluir os fundamentos legais e jurisprudenciais da pretensão",
+      "Demonstrar que a conversão do tempo especial resulta no direito à aposentadoria"
+    ],
+    "tp": 1,
+    "fp": 1,
+    "fn": 0,
+    "precision": 0.5,
+    "recall": 1,
+    "f1": 0.6666666666666666,
+    "casePass": true,
+    "score": 15,
+    "scorePass": false,
+    "durationMs": 34057
+  },
+  {
+    "caseId": "RGPS-013",
+    "quality": "GOOD",
+    "provider": "gemini",
+    "model": "gemini-2.5-pro",
+    "expectedFindings": [],
+    "actualFindingTitles": [
+      "Expor e Refutar o Motivo do Indeferimento Administrativo",
+      "Detalhar a Conexão Causal entre a Patologia e a Incapacidade Laboral Específica",
+      "Justificar a Data de Início do Benefício (DIB) Pleiteada",
+      "Fundamentar Expressamente a Manutenção da Qualidade de Segurado",
+      "Fundamentar o Pedido de Assistência Judiciária Gratuita"
+    ],
+    "tp": 0,
+    "fp": 5,
+    "fn": 0,
+    "precision": 0,
+    "recall": 1,
+    "f1": 0,
+    "casePass": false,
+    "score": 20,
+    "scorePass": false,
+    "durationMs": 32160
+  },
+  {
+    "caseId": "RGPS-014",
+    "quality": "MODERATE_ISSUES",
+    "provider": "gemini",
+    "model": "gemini-2.5-pro",
+    "expectedFindings": [
+      "prova de dependência econômica insuficiente"
+    ],
+    "actualFindingTitles": [
+      "Reforçar a tese de dependência econômica com base na presunção legal",
+      "Demonstrar concretamente a qualidade de segurado do falecido",
+      "Contextualizar a lide com informações do processo administrativo",
+      "Fundamentar o pedido de Assistência Judiciária Gratuita (AJG)",
+      "Apresentar demonstrativo de cálculo dos valores atrasados"
+    ],
+    "tp": 1,
+    "fp": 4,
+    "fn": 0,
+    "precision": 0.2,
+    "recall": 1,
+    "f1": 0.33333333333333337,
+    "casePass": true,
+    "score": 5,
+    "scorePass": false,
+    "durationMs": 31000
+  },
+  {
+    "caseId": "RGPS-015",
+    "quality": "GOOD",
+    "provider": "gemini",
+    "model": "gemini-2.5-pro",
+    "expectedFindings": [],
+    "actualFindingTitles": [
+      "Esclarecer a Relação entre a Concessão Administrativa e a DIB Judicial",
+      "Especificar a Natureza e o Fundamento do Pedido de Honorários",
+      "Incluir Fundamento Legal para o Cumprimento de Sentença",
+      "Referenciar Expressamente os Documentos Essenciais Anexados"
+    ],
+    "tp": 0,
+    "fp": 4,
+    "fn": 0,
+    "precision": 0,
+    "recall": 1,
+    "f1": 0,
+    "casePass": false,
+    "score": 25,
+    "scorePass": false,
+    "durationMs": 32818
+  },
+  {
+    "caseId": "RGPS-001",
+    "quality": "GOOD",
+    "provider": "deepseek",
+    "model": "deepseek-reasoner",
+    "expectedFindings": [],
+    "actualFindingTitles": [
+      "Incluir quadro demonstrativo da carência e do tempo de contribuição",
+      "Apresentar memória de cálculo da RMI e das parcelas vencidas",
+      "Ancorar a idade do autor na DER com referência documental",
+      "Referenciar a carta de indeferimento do INSS como prova do reconhecimento da carência",
+      "Antecipar possível contestação sobre a qualidade de segurado na DER"
+    ],
+    "tp": 0,
+    "fp": 5,
+    "fn": 0,
+    "precision": 0,
+    "recall": 1,
+    "f1": 0,
+    "casePass": false,
+    "score": 10,
+    "scorePass": false,
+    "durationMs": 13850
+  },
+  {
+    "caseId": "RGPS-002",
+    "quality": "MODERATE_ISSUES",
+    "provider": "deepseek",
+    "model": "deepseek-reasoner",
+    "expectedFindings": [
+      "ausência de análise concreta do PPP",
+      "ausência de habitualidade/permanência"
+    ],
+    "actualFindingTitles": [
+      "Demonstrar o tempo especial com quadro de períodos, agentes nocivos e enquadramento legal",
+      "Apresentar memória de cálculo do tempo total de contribuição especial e da RMI",
+      "Ancorar a DER e a DIB com referência ao protocolo administrativo",
+      "Fundamentar o direito à aposentadoria especial com os requisitos legais completos",
+      "Antecipar a contestação sobre a eficácia do EPI e a habitualidade da exposição"
+    ],
+    "tp": 1,
+    "fp": 3,
+    "fn": 1,
+    "precision": 0.25,
+    "recall": 0.5,
+    "f1": 0.3333333333333333,
+    "casePass": false,
+    "score": 10,
+    "scorePass": false,
+    "durationMs": 14332
+  },
+  {
+    "caseId": "RGPS-003",
+    "quality": "SEVERE_ISSUES",
+    "provider": "deepseek",
+    "model": "deepseek-reasoner",
+    "expectedFindings": [
+      "enfrentamento insuficiente da prova pericial",
+      "ausência de contraponto técnico"
+    ],
+    "actualFindingTitles": [
+      "Incluir contraponto técnico ao laudo pericial",
+      "Ancorar a DIB com referência documental",
+      "Demonstrar a qualidade de segurado na DER",
+      "Antecipar contestação sobre capacidade laboral residual",
+      "Incluir demonstração da carência"
+    ],
+    "tp": 2,
+    "fp": 3,
+    "fn": 0,
+    "precision": 0.4,
+    "recall": 1,
+    "f1": 0.5714285714285715,
+    "casePass": true,
+    "score": 10,
+    "scorePass": true,
+    "durationMs": 10002
+  },
+  {
+    "caseId": "RGPS-004",
+    "quality": "MODERATE_ISSUES",
+    "provider": "deepseek",
+    "model": "deepseek-reasoner",
+    "expectedFindings": [
+      "análise socioeconômica insuficiente"
+    ],
+    "actualFindingTitles": [
+      "Demonstrar a composição do núcleo familiar e a renda per capita",
+      "Detalhar a deficiência com laudo médico e demonstrar a incapacidade para a vida independente e o trabalho",
+      "Ancorar a Data de Entrada do Requerimento (DER) com referência ao processo administrativo",
+      "Apresentar memória de cálculo dos atrasados",
+      "Fundamentar o pedido de Assistência Judiciária Gratuita (AJG)"
+    ],
+    "tp": 1,
+    "fp": 3,
+    "fn": 0,
+    "precision": 0.25,
+    "recall": 1,
+    "f1": 0.4,
+    "casePass": true,
+    "score": 10,
+    "scorePass": false,
+    "durationMs": 14676
+  },
+  {
+    "caseId": "RGPS-005",
+    "quality": "GOOD",
+    "provider": "deepseek",
+    "model": "deepseek-reasoner",
+    "expectedFindings": [],
+    "actualFindingTitles": [
+      "Demonstrar a divergência salarial com quadro comparativo detalhado",
+      "Apresentar memória de cálculo do impacto na RMI e dos atrasados",
+      "Fixar a DIB (Data de Início do Benefício) para cálculo dos atrasados",
+      "Reforçar a prevalência do CNIS sobre os lançamentos administrativos com base no art. 29-A da Lei 8.213/1991",
+      "Antecipar possível contestação do INSS sobre a validade dos dados do CNIS"
+    ],
+    "tp": 0,
+    "fp": 5,
+    "fn": 0,
+    "precision": 0,
+    "recall": 1,
+    "f1": 0,
+    "casePass": false,
+    "score": 10,
+    "scorePass": false,
+    "durationMs": 12819
+  },
+  {
+    "caseId": "RGPS-006",
+    "quality": "MODERATE_ISSUES",
+    "provider": "deepseek",
+    "model": "deepseek-reasoner",
+    "expectedFindings": [
+      "prova rural insuficientemente demonstrada"
+    ],
+    "actualFindingTitles": [
+      "Demonstrar o tempo de atividade rural com quadro de períodos",
+      "Ancorar a DER e a DIB com referência documental",
+      "Apresentar memória de cálculo dos atrasados",
+      "Fundamentar o pedido de AJG com base legal",
+      "Reforçar a conexão entre início de prova material e a Súmula 149/STJ",
+      "Antecipar objeção sobre insuficiência de início de prova material"
+    ],
+    "tp": 1,
+    "fp": 3,
+    "fn": 0,
+    "precision": 0.25,
+    "recall": 1,
+    "f1": 0.4,
+    "casePass": true,
+    "score": 0,
+    "scorePass": false,
+    "durationMs": 15427
+  },
+  {
+    "caseId": "RGPS-007",
+    "quality": "LIGHT_ISSUES",
+    "provider": "deepseek",
+    "model": "deepseek-reasoner",
+    "expectedFindings": [
+      "fundamentação técnica incompleta"
+    ],
+    "actualFindingTitles": [
+      "Demonstrar o tempo especial com quadro detalhado de períodos, agentes e enquadramento",
+      "Apresentar memória de cálculo do tempo total de contribuição especial",
+      "Ancorar a DER e a DIB com referência documental e linha do tempo",
+      "Fortalecer a fundamentação jurídica com a demonstração dos requisitos do art. 57 da Lei n.º 8.213/1991",
+      "Antecipar e responder à possível contestação sobre eficácia do EPI"
+    ],
+    "tp": 1,
+    "fp": 2,
+    "fn": 0,
+    "precision": 0.3333333333333333,
+    "recall": 1,
+    "f1": 0.5,
+    "casePass": true,
+    "score": 10,
+    "scorePass": false,
+    "durationMs": 13629
+  },
+  {
+    "caseId": "RGPS-008",
+    "quality": "MODERATE_ISSUES",
+    "provider": "deepseek",
+    "model": "deepseek-reasoner",
+    "expectedFindings": [
+      "ausência de memória de cálculo verificável"
+    ],
+    "actualFindingTitles": [
+      "Incluir memória de cálculo detalhada por competência",
+      "Ancorar a DIB com referência ao título executivo",
+      "Demonstrar a composição do valor total do débito",
+      "Fundamentar os critérios de atualização monetária e juros",
+      "Antecipar eventual impugnação do INSS sobre a prescrição quinquenal"
+    ],
+    "tp": 1,
+    "fp": 4,
+    "fn": 0,
+    "precision": 0.2,
+    "recall": 1,
+    "f1": 0.33333333333333337,
+    "casePass": true,
+    "score": 25,
+    "scorePass": true,
+    "durationMs": 10802
+  },
+  {
+    "caseId": "RGPS-009",
+    "quality": "LIGHT_ISSUES",
+    "provider": "deepseek",
+    "model": "deepseek-reasoner",
+    "expectedFindings": [
+      "oportunidade argumentativa não explorada"
+    ],
+    "actualFindingTitles": [
+      "Demonstrar o cumprimento da carência com quadro de contribuições",
+      "Ancorar a DER original e a DIB pretendida com referências documentais",
+      "Reforçar o fundamento jurídico da reafirmação da DER com jurisprudência consolidada",
+      "Antecipar a objeção de que a reafirmação da DER depende de requerimento administrativo"
+    ],
+    "tp": 0,
+    "fp": 4,
+    "fn": 1,
+    "precision": 0,
+    "recall": 0,
+    "f1": 0,
+    "casePass": false,
+    "score": 25,
+    "scorePass": false,
+    "durationMs": 11227
+  },
+  {
+    "caseId": "RGPS-010",
+    "quality": "MODERATE_ISSUES",
+    "provider": "deepseek",
+    "model": "deepseek-reasoner",
+    "expectedFindings": [
+      "qualidade de segurado mal fundamentada"
+    ],
+    "actualFindingTitles": [
+      "Demonstrar a qualidade de segurado na DER com quadro de períodos de graça",
+      "Ancorar a DER (Data de Entrada do Requerimento) no processo administrativo",
+      "Apresentar memória de cálculo dos atrasados",
+      "Fundamentar o pedido de auxílio por incapacidade com os requisitos legais"
+    ],
+    "tp": 1,
+    "fp": 1,
+    "fn": 0,
+    "precision": 0.5,
+    "recall": 1,
+    "f1": 0.6666666666666666,
+    "casePass": true,
+    "score": 25,
+    "scorePass": true,
+    "durationMs": 13233
+  },
+  {
+    "caseId": "RGPS-011",
+    "quality": "GOOD",
+    "provider": "deepseek",
+    "model": "deepseek-reasoner",
+    "expectedFindings": [],
+    "actualFindingTitles": [],
+    "tp": 0,
+    "fp": 0,
+    "fn": 0,
+    "precision": 1,
+    "recall": 1,
+    "f1": 1,
+    "casePass": true,
+    "score": 95,
+    "scorePass": true,
+    "durationMs": 15828
+  },
+  {
+    "caseId": "RGPS-012",
+    "quality": "LIGHT_ISSUES",
+    "provider": "deepseek",
+    "model": "deepseek-reasoner",
+    "expectedFindings": [
+      "tese de conversão pouco desenvolvida"
+    ],
+    "actualFindingTitles": [
+      "Demonstrar o período especial com detalhamento dos agentes nocivos e enquadramento profissional",
+      "Fixar a DER e a DIB pretendida para ancorar o pedido de conversão",
+      "Apresentar memória de cálculo do tempo total de contribuição com a conversão",
+      "Reforçar a conexão entre a documentação existente e a comprovação da especialidade",
+      "Antecipar e rebater o argumento de EPI eficaz",
+      "Indicar o fundamento legal da conversão de tempo especial"
+    ],
+    "tp": 1,
+    "fp": 3,
+    "fn": 0,
+    "precision": 0.25,
+    "recall": 1,
+    "f1": 0.4,
+    "casePass": true,
+    "score": 0,
+    "scorePass": false,
+    "durationMs": 14803
+  },
+  {
+    "caseId": "RGPS-013",
+    "quality": "GOOD",
+    "provider": "deepseek",
+    "model": "deepseek-reasoner",
+    "expectedFindings": [],
+    "actualFindingTitles": [
+      "Demonstrar a qualidade de segurado na data da incapacidade",
+      "Apresentar memória de cálculo dos atrasados",
+      "Ancorar a data do laudo médico e exames com referência documental",
+      "Reforçar a conexão entre a incapacidade e a atividade profissional",
+      "Antecipar contestação sobre capacidade laboral residual"
+    ],
+    "tp": 0,
+    "fp": 5,
+    "fn": 0,
+    "precision": 0,
+    "recall": 1,
+    "f1": 0,
+    "casePass": false,
+    "score": 10,
+    "scorePass": false,
+    "durationMs": 10992
+  },
+  {
+    "caseId": "RGPS-014",
+    "quality": "MODERATE_ISSUES",
+    "provider": "deepseek",
+    "model": "deepseek-reasoner",
+    "expectedFindings": [
+      "prova de dependência econômica insuficiente"
+    ],
+    "actualFindingTitles": [
+      "Demonstrar a qualidade de dependente da autora com provas documentais",
+      "Ancorar a data do óbito com referência documental explícita",
+      "Fundamentar a qualidade de segurado do falecido com base legal",
+      "Apresentar memória de cálculo dos atrasados",
+      "Referenciar a certidão de casamento como prova de dependência presumida",
+      "Reforçar a conexão entre a qualidade de segurado e o CNIS"
+    ],
+    "tp": 1,
+    "fp": 4,
+    "fn": 0,
+    "precision": 0.2,
+    "recall": 1,
+    "f1": 0.33333333333333337,
+    "casePass": true,
+    "score": 0,
+    "scorePass": false,
+    "durationMs": 10369
+  },
+  {
+    "caseId": "RGPS-015",
+    "quality": "GOOD",
+    "provider": "deepseek",
+    "model": "deepseek-reasoner",
+    "expectedFindings": [],
+    "actualFindingTitles": [
+      "Demonstrar a qualidade de segurado na DIB",
+      "Detalhar a memória de cálculo com todas as competências",
+      "Antecipar a prescrição quinquenal das parcelas anteriores ao ajuizamento"
+    ],
+    "tp": 0,
+    "fp": 3,
+    "fn": 0,
+    "precision": 0,
+    "recall": 1,
+    "f1": 0,
+    "casePass": false,
+    "score": 50,
+    "scorePass": false,
+    "durationMs": 9504
+  }
+]

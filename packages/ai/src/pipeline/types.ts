@@ -4,6 +4,8 @@ export type DecidedOutcome =
   | "PROCEDENTE"
   | "IMPROCEDENTE"
   | "PARCIALMENTE_PROCEDENTE"
+  | "EXTINCAO_SEM_RESOLUCAO"
+  | "HOMOLOGACAO"
   | "DEFIRO"
   | "INDEFIRO"
   | "CONCEDO_ORDEM"

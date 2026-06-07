@@ -1,0 +1,3089 @@
+{
+  "runId": "rgps-v2-rerun-2026-06-06",
+  "startedAt": "2026-06-06T21:37:36.109Z",
+  "config": {
+    "enabled": true,
+    "dryRun": false,
+    "providers": [
+      "openai",
+      "gemini",
+      "deepseek"
+    ],
+    "maxDocumentsPerProvider": 15,
+    "costLimits": {
+      "openai": {
+        "maxUsd": 4
+      },
+      "gemini": {
+        "maxUsd": 4
+      },
+      "deepseek": {
+        "maxUsd": 2
+      }
+    },
+    "modelByProvider": {
+      "openai": "gpt-4o",
+      "gemini": "gemini-2.5-pro",
+      "deepseek": "deepseek-reasoner"
+    },
+    "maxInputTokensPerDocument": 16000,
+    "maxOutputTokensPerDocument": 8192,
+    "persistRawResponses": false,
+    "resume": true
+  },
+  "results": [
+    {
+      "providerId": "openai",
+      "model": "gpt-4o",
+      "caseId": "RGPS-001",
+      "domain": "RGPS",
+      "review": {
+        "findings": [],
+        "summary": "Peça sólida — nenhuma oportunidade de fortalecimento identificada.",
+        "provider": "OPENAI",
+        "model": "gpt-4o",
+        "generatedAt": "2026-06-06T21:37:38.068Z",
+        "requiresHumanReview": true
+      },
+      "usage": {
+        "inputTokens": 790,
+        "outputTokens": 8192,
+        "totalTokens": 8982,
+        "estimatedCostUsd": 0.25366
+      },
+      "durationMs": 1959
+    },
+    {
+      "providerId": "openai",
+      "model": "gpt-4o",
+      "caseId": "RGPS-002",
+      "domain": "RGPS",
+      "review": {
+        "findings": [],
+        "summary": "Peça sólida — nenhuma oportunidade de fortalecimento identificada.",
+        "provider": "OPENAI",
+        "model": "gpt-4o",
+        "generatedAt": "2026-06-06T21:37:39.501Z",
+        "requiresHumanReview": true
+      },
+      "usage": {
+        "inputTokens": 394,
+        "outputTokens": 8192,
+        "totalTokens": 8586,
+        "estimatedCostUsd": 0.2497
+      },
+      "durationMs": 1432
+    },
+    {
+      "providerId": "openai",
+      "model": "gpt-4o",
+      "caseId": "RGPS-003",
+      "domain": "RGPS",
+      "review": {
+        "findings": [
+          {
+            "id": "8d08e609-ee74-4bda-8e38-e4b9a8952a2e",
+            "type": "MISSING_DEMONSTRATION",
+            "opportunity": "IMPACTFUL",
+            "title": "Demonstração da incapacidade laboral",
+            "rationale": "A peça menciona a ausência de incapacidade laboral conforme o laudo pericial, mas não apresenta contraprovas ou argumentos técnicos que demonstrem a incapacidade do apelante.",
+            "evidenceFromText": [
+              "O recurso menciona o laudo pericial de fls. 123 que concluiu pela ausência de incapacidade, sem enfrentar tecnicamente sua fundamentação."
+            ],
+            "suggestion": "Incluir laudos médicos, exames ou atestados que demonstrem a incapacidade laboral do apelante, além de uma análise técnica que contraponha as conclusões do laudo pericial.",
+            "confidence": 0.9,
+            "requiresHumanReview": true
+          },
+          {
+            "id": "d160b964-5214-43c4-a5e3-a7d5cd25e4f8",
+            "type": "MISSING_LEGAL_ANCHOR",
+            "opportunity": "COMPLEMENTARY",
+            "title": "Fundamentação legal para concessão do benefício por incapacidade",
+            "rationale": "A peça solicita a concessão do benefício por incapacidade, mas não apresenta fundamentos legais específicos que sustentem o pedido.",
+            "evidenceFromText": [
+              "Requer o PROVIMENTO do recurso para reformar a sentença e conceder o benefício por incapacidade com DIB na data do requerimento administrativo (14/11/2020), com pagamento de atrasados corrigidos."
+            ],
+            "suggestion": "Indicar expressamente o fundamento legal aplicável à tese de concessão do benefício por incapacidade.",
+            "confidence": 0.8,
+            "requiresHumanReview": true
+          },
+          {
+            "id": "7136cfcf-95a2-4a70-b698-3906c9b61f6b",
+            "type": "ANTICIPATE_COUNTERARGUMENT",
+            "opportunity": "COMPLEMENTARY",
+            "title": "Antecipação de argumentos contrários sobre capacidade laboral residual",
+            "rationale": "A decisão recorrida baseia-se na capacidade laboral residual do apelante, um argumento previsível que pode ser antecipado e respondido na peça.",
+            "evidenceFromText": [
+              "A r. sentença de fls. 153 julgou IMPROCEDENTE o pedido de auxílio por incapacidade, acolhendo integralmente o laudo pericial de fls. 123, subscrito pelo perito judicial nomeado pelo Juízo, que concluiu pela AUSÊNCIA de incapacidade laboral, reconhecendo capacidade residual para atividades de menor esforço físico."
+            ],
+            "suggestion": "Incluir argumentos que refutem a conclusão de capacidade laboral residual, demonstrando a impossibilidade de o apelante realizar atividades de menor esforço físico.",
+            "confidence": 0.85,
+            "requiresHumanReview": true
+          }
+        ],
+        "summary": "3 oportunidades de fortalecimento identificadas: 1 impactante, 2 complementares.",
+        "provider": "OPENAI",
+        "model": "gpt-4o",
+        "generatedAt": "2026-06-06T21:37:44.784Z",
+        "requiresHumanReview": true
+      },
+      "usage": {
+        "inputTokens": 310,
+        "outputTokens": 8192,
+        "totalTokens": 8502,
+        "estimatedCostUsd": 0.24886
+      },
+      "durationMs": 5280
+    },
+    {
+      "providerId": "openai",
+      "model": "gpt-4o",
+      "caseId": "RGPS-004",
+      "domain": "RGPS",
+      "review": {
+        "findings": [],
+        "summary": "Peça sólida — nenhuma oportunidade de fortalecimento identificada.",
+        "provider": "OPENAI",
+        "model": "gpt-4o",
+        "generatedAt": "2026-06-06T21:37:46.279Z",
+        "requiresHumanReview": true
+      },
+      "usage": {
+        "inputTokens": 310,
+        "outputTokens": 8192,
+        "totalTokens": 8502,
+        "estimatedCostUsd": 0.24886
+      },
+      "durationMs": 1491
+    },
+    {
+      "providerId": "openai",
+      "model": "gpt-4o",
+      "caseId": "RGPS-005",
+      "domain": "RGPS",
+      "review": {
+        "findings": [],
+        "summary": "Peça sólida — nenhuma oportunidade de fortalecimento identificada.",
+        "provider": "OPENAI",
+        "model": "gpt-4o",
+        "generatedAt": "2026-06-06T21:37:47.701Z",
+        "requiresHumanReview": true
+      },
+      "usage": {
+        "inputTokens": 430,
+        "outputTokens": 8192,
+        "totalTokens": 8622,
+        "estimatedCostUsd": 0.25006
+      },
+      "durationMs": 1418
+    },
+    {
+      "providerId": "openai",
+      "model": "gpt-4o",
+      "caseId": "RGPS-006",
+      "domain": "RGPS",
+      "review": {
+        "findings": [
+          {
+            "id": "fc972098-55a6-4381-8414-530e4cf9a001",
+            "type": "MISSING_SUPPORTING_DOCUMENT",
+            "opportunity": "IMPACTFUL",
+            "title": "Incluir documentos de comprovação do trabalho rural",
+            "rationale": "A inclusão de documentos que comprovem o trabalho rural é essencial para fortalecer a demonstração do tempo de serviço como segurado especial, que é um requisito fundamental para a concessão da aposentadoria rural por idade.",
+            "evidenceFromText": [
+              "O(A) autor(a), Aparecida Nunes Batista, trabalhou como trabalhador(a) rural (segurado especial) por aproximadamente 28 anos na região de Porto Alegre, cultivando lavoura de subsistência em regime de economia familiar.",
+              "[início de prova material do labor rural não indicado ou insuficientemente identificado na peça]"
+            ],
+            "suggestion": "Incluir documentos como declarações de sindicatos rurais, contratos de arrendamento, notas fiscais de venda de produtos agrícolas, ou qualquer outro documento que possa servir como início de prova material do trabalho rural.",
+            "confidence": 0.9,
+            "requiresHumanReview": true
+          },
+          {
+            "id": "3ca7789c-4f92-4056-90d5-b9c885a51e44",
+            "type": "MISSING_DEMONSTRATION",
+            "opportunity": "COMPLEMENTARY",
+            "title": "Detalhar o período de trabalho rural",
+            "rationale": "Detalhar os períodos específicos de trabalho rural pode ajudar a demonstrar de forma mais clara o cumprimento do tempo necessário para a concessão do benefício.",
+            "evidenceFromText": [
+              "O(A) autor(a), Aparecida Nunes Batista, trabalhou como trabalhador(a) rural (segurado especial) por aproximadamente 28 anos na região de Porto Alegre, cultivando lavoura de subsistência em regime de economia familiar."
+            ],
+            "suggestion": "Apresentar um quadro detalhado com os períodos exatos de trabalho rural, indicando datas de início e término, para cada fase ou local de trabalho.",
+            "confidence": 0.8,
+            "requiresHumanReview": true
+          }
+        ],
+        "summary": "2 oportunidades de fortalecimento identificadas: 1 impactante, 1 complementar.",
+        "provider": "OPENAI",
+        "model": "gpt-4o",
+        "generatedAt": "2026-06-06T21:37:52.761Z",
+        "requiresHumanReview": true
+      },
+      "usage": {
+        "inputTokens": 317,
+        "outputTokens": 8192,
+        "totalTokens": 8509,
+        "estimatedCostUsd": 0.24893
+      },
+      "durationMs": 5061
+    },
+    {
+      "providerId": "openai",
+      "model": "gpt-4o",
+      "caseId": "RGPS-007",
+      "domain": "RGPS",
+      "review": {
+        "findings": [],
+        "summary": "Peça sólida — nenhuma oportunidade de fortalecimento identificada.",
+        "provider": "OPENAI",
+        "model": "gpt-4o",
+        "generatedAt": "2026-06-06T21:37:54.460Z",
+        "requiresHumanReview": true
+      },
+      "usage": {
+        "inputTokens": 216,
+        "outputTokens": 8192,
+        "totalTokens": 8408,
+        "estimatedCostUsd": 0.24792
+      },
+      "durationMs": 1697
+    },
+    {
+      "providerId": "openai",
+      "model": "gpt-4o",
+      "caseId": "RGPS-008",
+      "domain": "RGPS",
+      "review": {
+        "findings": [],
+        "summary": "Peça sólida — nenhuma oportunidade de fortalecimento identificada.",
+        "provider": "OPENAI",
+        "model": "gpt-4o",
+        "generatedAt": "2026-06-06T21:37:55.598Z",
+        "requiresHumanReview": true
+      },
+      "usage": {
+        "inputTokens": 336,
+        "outputTokens": 8192,
+        "totalTokens": 8528,
+        "estimatedCostUsd": 0.24912
+      },
+      "durationMs": 1134
+    },
+    {
+      "providerId": "openai",
+      "model": "gpt-4o",
+      "caseId": "RGPS-009",
+      "domain": "RGPS",
+      "review": {
+        "findings": [],
+        "summary": "Peça sólida — nenhuma oportunidade de fortalecimento identificada.",
+        "provider": "OPENAI",
+        "model": "gpt-4o",
+        "generatedAt": "2026-06-06T21:37:56.690Z",
+        "requiresHumanReview": true
+      },
+      "usage": {
+        "inputTokens": 297,
+        "outputTokens": 8192,
+        "totalTokens": 8489,
+        "estimatedCostUsd": 0.24873
+      },
+      "durationMs": 1091
+    },
+    {
+      "providerId": "openai",
+      "model": "gpt-4o",
+      "caseId": "RGPS-010",
+      "domain": "RGPS",
+      "review": {
+        "findings": [],
+        "summary": "Peça sólida — nenhuma oportunidade de fortalecimento identificada.",
+        "provider": "OPENAI",
+        "model": "gpt-4o",
+        "generatedAt": "2026-06-06T21:37:57.973Z",
+        "requiresHumanReview": true
+      },
+      "usage": {
+        "inputTokens": 277,
+        "outputTokens": 8192,
+        "totalTokens": 8469,
+        "estimatedCostUsd": 0.24853
+      },
+      "durationMs": 1279
+    },
+    {
+      "providerId": "openai",
+      "model": "gpt-4o",
+      "caseId": "RGPS-011",
+      "domain": "RGPS",
+      "review": {
+        "findings": [],
+        "summary": "Peça sólida — nenhuma oportunidade de fortalecimento identificada.",
+        "provider": "OPENAI",
+        "model": "gpt-4o",
+        "generatedAt": "2026-06-06T21:37:59.249Z",
+        "requiresHumanReview": true
+      },
+      "usage": {
+        "inputTokens": 448,
+        "outputTokens": 8192,
+        "totalTokens": 8640,
+        "estimatedCostUsd": 0.25024
+      },
+      "durationMs": 1271
+    },
+    {
+      "providerId": "openai",
+      "model": "gpt-4o",
+      "caseId": "RGPS-012",
+      "domain": "RGPS",
+      "review": {
+        "findings": [],
+        "summary": "Peça sólida — nenhuma oportunidade de fortalecimento identificada.",
+        "provider": "OPENAI",
+        "model": "gpt-4o",
+        "generatedAt": "2026-06-06T21:38:00.450Z",
+        "requiresHumanReview": true
+      },
+      "usage": {
+        "inputTokens": 229,
+        "outputTokens": 8192,
+        "totalTokens": 8421,
+        "estimatedCostUsd": 0.24805
+      },
+      "durationMs": 1201
+    },
+    {
+      "providerId": "openai",
+      "model": "gpt-4o",
+      "caseId": "RGPS-013",
+      "domain": "RGPS",
+      "review": {
+        "findings": [],
+        "summary": "Peça sólida — nenhuma oportunidade de fortalecimento identificada.",
+        "provider": "OPENAI",
+        "model": "gpt-4o",
+        "generatedAt": "2026-06-06T21:38:01.569Z",
+        "requiresHumanReview": true
+      },
+      "usage": {
+        "inputTokens": 436,
+        "outputTokens": 8192,
+        "totalTokens": 8628,
+        "estimatedCostUsd": 0.25012
+      },
+      "durationMs": 1116
+    },
+    {
+      "providerId": "openai",
+      "model": "gpt-4o",
+      "caseId": "RGPS-014",
+      "domain": "RGPS",
+      "review": {
+        "findings": [
+          {
+            "id": "bd1cbc25-bcf8-4c8f-84d2-9f15ac4c4973",
+            "type": "MISSING_SUPPORTING_DOCUMENT",
+            "opportunity": "IMPACTFUL",
+            "title": "Incluir documentos que comprovem a dependência econômica",
+            "rationale": "A demonstração da dependência econômica é crucial para a concessão da pensão por morte. A inclusão de documentos como extratos bancários, declaração de imposto de renda conjunta ou outros comprovantes de dependência fortaleceria a tese.",
+            "evidenceFromText": [
+              "A dependência econômica da autora é alegada. [extratos, declaração de IR e demais provas de dependência não apresentadas ou não analisadas]"
+            ],
+            "suggestion": "Anexar documentos que comprovem a dependência econômica da autora em relação ao falecido, como extratos bancários, declaração de imposto de renda conjunta ou outros comprovantes pertinentes.",
+            "confidence": 0.9,
+            "requiresHumanReview": true
+          },
+          {
+            "id": "55c33ee4-05be-44e3-9f33-49d06b5885ca",
+            "type": "MISSING_LEGAL_ANCHOR",
+            "opportunity": "COMPLEMENTARY",
+            "title": "Indicar expressamente o fundamento legal aplicável à tese",
+            "rationale": "Embora o artigo 74 da Lei n.º 8.213/1991 seja mencionado, a peça poderia ser fortalecida com a inclusão de fundamentos legais adicionais que sustentem a qualidade de segurado e a dependência econômica.",
+            "evidenceFromText": [
+              "Nos termos do art. 74 da Lei n.º 8.213/1991, a pensão por morte é devida ao conjunto dos dependentes do segurado falecido a partir do óbito (24/01/2020)."
+            ],
+            "suggestion": "Incluir referências a outros dispositivos legais que sustentem a qualidade de segurado e a dependência econômica, reforçando a base normativa da peça.",
+            "confidence": 0.8,
+            "requiresHumanReview": true
+          }
+        ],
+        "summary": "2 oportunidades de fortalecimento identificadas: 1 impactante, 1 complementar.",
+        "provider": "OPENAI",
+        "model": "gpt-4o",
+        "generatedAt": "2026-06-06T21:38:06.283Z",
+        "requiresHumanReview": true
+      },
+      "usage": {
+        "inputTokens": 287,
+        "outputTokens": 8192,
+        "totalTokens": 8479,
+        "estimatedCostUsd": 0.24863000000000002
+      },
+      "durationMs": 4713
+    },
+    {
+      "providerId": "openai",
+      "model": "gpt-4o",
+      "caseId": "RGPS-015",
+      "domain": "RGPS",
+      "review": {
+        "findings": [],
+        "summary": "Peça sólida — nenhuma oportunidade de fortalecimento identificada.",
+        "provider": "OPENAI",
+        "model": "gpt-4o",
+        "generatedAt": "2026-06-06T21:38:07.528Z",
+        "requiresHumanReview": true
+      },
+      "usage": {
+        "inputTokens": 477,
+        "outputTokens": 8192,
+        "totalTokens": 8669,
+        "estimatedCostUsd": 0.25053000000000003
+      },
+      "durationMs": 1244
+    },
+    {
+      "providerId": "gemini",
+      "model": "gemini-2.5-pro",
+      "caseId": "RGPS-001",
+      "domain": "RGPS",
+      "review": {
+        "findings": [
+          {
+            "id": "1756462a-1036-4a9e-a626-b9f4b0e3dbca",
+            "type": "STRENGTHEN_ARGUMENT",
+            "opportunity": "IMPACTFUL",
+            "title": "Reforçar a Evidente Ilegalidade do Indeferimento Administrativo",
+            "rationale": "O motivo do indeferimento pelo INSS (idade mínima não atingida) é o ponto central do conflito e é factualmente absurdo para um segurado de 76 anos. Explicitar e atacar diretamente essa contradição manifesta fortalece a pretensão judicial, demonstrando a arbitrariedade da decisão administrativa e a necessidade de tutela jurisdicional.",
+            "evidenceFromText": [
+              "Na ocasião, o INSS reconheceu o cumprimento da carência mas indeferiu o benefício por entender, equivocadamente, não ter sido atingida a idade mínima."
+            ],
+            "suggestion": "Desenvolver um tópico específico para impugnar o motivo do indeferimento, demonstrando numericamente que na DER (06/03/2019), o autor, nascido há 76 anos, já contava com idade muito superior aos 65 anos exigidos. Argumentar que tal erro grosseiro torna a decisão administrativa manifestamente ilegal e desprovida de qualquer fundamento.",
+            "availableSource": null,
+            "confidence": 1,
+            "requiresHumanReview": true
+          },
+          {
+            "id": "9213ac0c-9b51-4cc9-a176-2ca177474fc5",
+            "type": "MISSING_CALCULATION",
+            "opportunity": "IMPACTFUL",
+            "title": "Incluir Memória de Cálculo das Parcelas Vencidas",
+            "rationale": "A peça apresenta um valor estimado para as parcelas vencidas sem demonstrar como chegou a esse número. A inclusão de uma memória de cálculo confere transparência e credibilidade ao pleito financeiro, facilita a análise do juízo e serve como parâmetro objetivo para a condenação, evitando questionamentos sobre o montante devido.",
+            "evidenceFromText": [
+              "o pagamento das parcelas vencidas desde a DER, ora estimadas em R$ 16618,03"
+            ],
+            "suggestion": "Anexar e referenciar na petição uma planilha ou memória de cálculo detalhada das parcelas vencidas. O cálculo deve partir da RMI (R$ 4.236,00), aplicando a correção monetária (INPC) e juros de mora para cada competência, desde a DIB (06/03/2019) até a data do ajuizamento, para justificar o valor total pleiteado.",
+            "availableSource": null,
+            "confidence": 1,
+            "requiresHumanReview": true
+          },
+          {
+            "id": "eff93c2d-489a-4a94-b7d9-b149607b30b1",
+            "type": "MISSING_DEMONSTRATION",
+            "opportunity": "COMPLEMENTARY",
+            "title": "Apresentar Quadro Resumo do Tempo de Contribuição",
+            "rationale": "Embora a peça afirme o total de contribuições e liste os vínculos principais, a apresentação de um quadro-resumo consolida visualmente a informação. Isso torna a verificação do cumprimento do requisito da carência mais rápida e persuasiva para o magistrado, organizando os dados do CNIS de forma clara e direta.",
+            "evidenceFromText": [
+              "O(A) autor(a) comprova, pelo CNIS atualizado emitido em 06/03/2019, 214 contribuições mensais ao RGPS...",
+              "O CNIS de Manoel Antônio Rocha (CPF 037.396.992-57), emitido em 06/03/2019, registra os seguintes vínculos principais: (a) Empresa Alfa Indústria Ltda...; (b) Empresa Beta Comércio S/A..."
+            ],
+            "suggestion": "Inserir um quadro-resumo na seção 'DOS FATOS' ou 'DO DIREITO', detalhando cada vínculo contributivo com colunas para 'Empregador', 'Data de Início', 'Data de Fim' e 'Nº de Contribuições', finalizando com a soma total que comprova as 214 contribuições e o cumprimento da carência de 180 meses.",
+            "availableSource": null,
+            "confidence": 1,
+            "requiresHumanReview": true
+          },
+          {
+            "id": "3d6a02a6-6ae7-47f5-a3ae-6db2ad19e652",
+            "type": "WEAK_FACTUAL_FOUNDATION",
+            "opportunity": "COMPLEMENTARY",
+            "title": "Fundamentar Faticamente o Pedido de Justiça Gratuita",
+            "rationale": "O pedido de Assistência Judiciária Gratuita está formulado apenas com base na menção ao dispositivo legal, sem qualquer suporte fático. Adicionar uma breve declaração sobre a condição de hipossuficiência do autor fortalece o pedido, alinhando-o à presunção de veracidade do art. 99, § 3º, do CPC e prevenindo despachos para comprovação de renda.",
+            "evidenceFromText": [
+              "benefícios da Assistência Judiciária Gratuita (art. 98 a 102 do CPC/2015)."
+            ],
+            "suggestion": "Incluir um parágrafo específico para o pedido de gratuidade de justiça, afirmando que o autor não possui condições de arcar com as custas e despesas processuais sem prejuízo do seu sustento e de sua família, e mencionar a juntada de declaração de hipossuficiência para corroborar a alegação.",
+            "availableSource": null,
+            "confidence": 1,
+            "requiresHumanReview": true
+          }
+        ],
+        "summary": "4 oportunidades de fortalecimento identificadas.",
+        "provider": "GEMINI",
+        "model": "gemini-2.5-pro",
+        "generatedAt": "2026-06-06T21:38:39.921Z",
+        "requiresHumanReview": true
+      },
+      "usage": {
+        "inputTokens": 790,
+        "outputTokens": 8192,
+        "totalTokens": 8982,
+        "estimatedCostUsd": 0.12683
+      },
+      "durationMs": 32392
+    },
+    {
+      "providerId": "gemini",
+      "model": "gemini-2.5-pro",
+      "caseId": "RGPS-002",
+      "domain": "RGPS",
+      "review": {
+        "findings": [
+          {
+            "id": "e22dd992-93ed-4ea3-bb15-d02cbfa20a93",
+            "type": "MISSING_DEMONSTRATION",
+            "opportunity": "IMPACTFUL",
+            "title": "Detalhar o Agente Nocivo e o Enquadramento Legal do Tempo Especial",
+            "rationale": "A simples menção à exposição a agentes nocivos é insuficiente para caracterizar o tempo como especial. É crucial detalhar qual agente nocivo (físico, químico ou biológico) estava presente, sua intensidade/concentração (conforme o caso) e o correspondente enquadramento nos decretos regulamentadores (e.g., Decreto nº 3.048/99), pois essa é a premissa fática e jurídica central do pedido.",
+            "evidenceFromText": [
+              "[a identificação do agente nocivo específico, sua intensidade e o enquadramento no Decreto n.º 3.048/1999 não foram desenvolvidos na peça]"
+            ],
+            "suggestion": "Com base nas informações do PPP e do LTCAT, descrever objetivamente o agente nocivo a que o autor esteve exposto (ex: ruído, hidrocarbonetos, etc.), o nível de exposição (ex: 90 dB(A)) e o código de enquadramento legal correspondente previsto nos anexos do Decreto nº 3.048/99, demonstrando a habitualidade e permanência da exposição.",
+            "availableSource": null,
+            "confidence": 1,
+            "requiresHumanReview": true
+          },
+          {
+            "id": "18ab082d-1d0d-4885-a557-0acf278c925e",
+            "type": "MISSING_COMPARATIVE_TABLE",
+            "opportunity": "IMPACTFUL",
+            "title": "Incluir Quadro Demonstrativo do Tempo de Contribuição Especial",
+            "rationale": "A afirmação de que o autor possui 22 anos de tempo especial precisa ser demonstrada de forma clara e organizada para facilitar a análise do juízo. Um quadro-resumo que detalha cada período, o empregador e o tempo apurado confere clareza e poder de persuasão à petição, transformando a alegação em prova visual.",
+            "evidenceFromText": [
+              "O(A) autor(a), Benedito Souza Carvalho, CPF 036.230.184-61, trabalhou por 22 anos em condições especiais com exposição a agentes nocivos à saúde, conforme registrado no CNIS (255 contribuições até a DER de 22/12/2020) e no PPP (PPP-4070) emitido pelo empregador."
+            ],
+            "suggestion": "Inserir uma tabela ou quadro detalhado com as seguintes colunas: Empregador, Período (Início e Fim), Função, Agente Nocivo, Enquadramento Legal e Tempo Especial Apurado (Anos, Meses, Dias). Ao final, apresentar a soma total do tempo especial, confirmando os 22 anos alegados.",
+            "availableSource": null,
+            "confidence": 1,
+            "requiresHumanReview": true
+          },
+          {
+            "id": "b1258046-c686-48df-8247-b7063bd321c6",
+            "type": "STRENGTHEN_ARGUMENT",
+            "opportunity": "COMPLEMENTARY",
+            "title": "Especificar o Requisito de Tempo Aplicável ao Agente Nocivo",
+            "rationale": "O art. 57 da Lei nº 8.213/91 estabelece diferentes tempos de contribuição (15, 20 ou 25 anos) a depender da agressividade do agente nocivo. A peça alega 20 anos como requisito, mas não o conecta ao agente específico. Vincular o agente nocivo ao tempo de contribuição exigido pela legislação fortalece a fundamentação jurídica.",
+            "evidenceFromText": [
+              "Nos termos do art. 57 da Lei n.º 8.213/1991, a aposentadoria especial é devida ao segurado que tiver trabalhado 20 anos sob condições especiais."
+            ],
+            "suggestion": "Após identificar o agente nocivo, esclarecer que, para tal agente, a legislação previdenciária (Decreto nº 3.048/99, Anexo IV) exige especificamente 20 anos de contribuição, e que o autor supera este requisito com seus 22 anos de trabalho comprovado.",
+            "availableSource": null,
+            "confidence": 0.95,
+            "requiresHumanReview": true
+          },
+          {
+            "id": "cd02a130-4f24-42e2-8e96-a3ed6b7219c8",
+            "type": "MISSING_CALCULATION",
+            "opportunity": "COMPLEMENTARY",
+            "title": "Apresentar Memória de Cálculo do Valor da Causa",
+            "rationale": "A indicação de um valor da causa sem um demonstrativo de como foi apurado pode enfraquecer a pretensão econômica. Apresentar uma memória de cálculo, ainda que por estimativa, confere transparência, fundamenta o valor atribuído e demonstra a diligência na quantificação do pedido.",
+            "evidenceFromText": [
+              "Processo n.º 8360799-09.2019.7.61.2635 — Valor: R$ 204.600,00",
+              "parcelas vencidas com correção e juros"
+            ],
+            "suggestion": "Incluir um tópico específico ou uma nota de rodapé com a memória de cálculo do valor da causa, detalhando a Renda Mensal Inicial (RMI) estimada, o número de parcelas vencidas desde a DER (22/12/2020) até o ajuizamento, e a soma das 12 parcelas vincendas, conforme exigência legal.",
+            "availableSource": null,
+            "confidence": 0.9,
+            "requiresHumanReview": true
+          },
+          {
+            "id": "5be19c11-f3c7-4ba4-9928-41555a720629",
+            "type": "MISSING_DEMONSTRATION",
+            "opportunity": "COMPLEMENTARY",
+            "title": "Demonstrar Expressamente o Cumprimento do Requisito de Carência",
+            "rationale": "Embora o número de contribuições (255) seja superior à carência mínima (180 meses), a peça não aborda explicitamente o cumprimento deste requisito legal. Dedicar um parágrafo para afirmar e demonstrar o preenchimento da carência torna a petição mais completa e previne eventuais questionamentos sobre a ausência de um dos pressupostos do benefício.",
+            "evidenceFromText": [
+              "conforme registrado no CNIS (255 contribuições até a DER de 22/12/2020)"
+            ],
+            "suggestion": "Adicionar um tópico ou parágrafo intitulado \"Da Carência\", informando que o art. 25, II, da Lei nº 8.213/91 exige 180 contribuições mensais para a aposentadoria especial e que o autor cumpre o requisito com 255 contribuições, conforme extrato do CNIS anexo.",
+            "availableSource": null,
+            "confidence": 0.85,
+            "requiresHumanReview": true
+          }
+        ],
+        "summary": "5 oportunidades de fortalecimento identificadas.",
+        "provider": "GEMINI",
+        "model": "gemini-2.5-pro",
+        "generatedAt": "2026-06-06T21:39:09.038Z",
+        "requiresHumanReview": true
+      },
+      "usage": {
+        "inputTokens": 394,
+        "outputTokens": 8192,
+        "totalTokens": 8586,
+        "estimatedCostUsd": 0.12485
+      },
+      "durationMs": 29116
+    },
+    {
+      "providerId": "gemini",
+      "model": "gemini-2.5-pro",
+      "caseId": "RGPS-003",
+      "domain": "RGPS",
+      "review": {
+        "findings": [
+          {
+            "id": "d5d20585-7de9-4070-8c30-5c6f03477f4d",
+            "type": "STRENGTHEN_ARGUMENT",
+            "opportunity": "IMPACTFUL",
+            "title": "Desenvolver a impugnação técnica ao laudo pericial",
+            "rationale": "A sentença baseou-se integralmente no laudo pericial que concluiu pela ausência de incapacidade. O recurso, para ter êxito, precisa atacar diretamente os fundamentos dessa prova, demonstrando por que ela está equivocada ou por que não deveria prevalecer sobre as demais evidências.",
+            "evidenceFromText": [
+              "O recurso menciona o laudo pericial de fls. 123 que concluiu pela ausência de incapacidade, sem enfrentar tecnicamente sua fundamentação.",
+              "[o apelante não apresenta contraponto técnico às conclusões periciais]"
+            ],
+            "suggestion": "Detalhar os pontos de discordância com o laudo pericial. Sugere-se apontar eventuais contradições no laudo, confrontar suas conclusões com os documentos médicos do Apelante (exames, laudos de especialistas), ou questionar se a análise do perito considerou adequadamente as condições específicas de trabalho e as patologias do segurado.",
+            "availableSource": null,
+            "confidence": 1,
+            "requiresHumanReview": true
+          },
+          {
+            "id": "19feae6d-9b3f-4bd1-a165-245d1a0c07a3",
+            "type": "MISSING_DEMONSTRATION",
+            "opportunity": "IMPACTFUL",
+            "title": "Contrastar o laudo judicial com o conjunto probatório dos autos",
+            "rationale": "A peça não menciona nem explora outras provas que possam existir nos autos (laudos de médicos assistentes, exames, prontuários) para contrapor à conclusão do perito judicial. Apresentar esse contraponto é crucial para demonstrar que a decisão do juiz, ao se ater exclusivamente ao laudo, ignorou outras evidências relevantes.",
+            "evidenceFromText": [
+              "A r. sentença de fls. 153 julgou IMPROCEDENTE o pedido de auxílio por incapacidade, acolhendo integralmente o laudo pericial de fls. 123...",
+              "O recurso menciona o laudo pericial de fls. 123 que concluiu pela ausência de incapacidade, sem enfrentar tecnicamente sua fundamentação."
+            ],
+            "suggestion": "Fazer referência expressa aos documentos médicos juntados pelo Apelante ao longo do processo, destacando os diagnósticos (com CID), os tratamentos realizados e as conclusões dos médicos especialistas que atestam a incapacidade. O objetivo é mostrar que o laudo judicial é uma prova isolada e dissonante do restante do conjunto probatório.",
+            "availableSource": null,
+            "confidence": 1,
+            "requiresHumanReview": true
+          },
+          {
+            "id": "2a81b6d6-d234-4ddd-9630-cda9510b98b5",
+            "type": "MISSING_LEGAL_ANCHOR",
+            "opportunity": "COMPLEMENTARY",
+            "title": "Incluir fundamento jurídico sobre a livre valoração da prova",
+            "rationale": "A argumentação pode ser fortalecida ao se invocar o princípio do livre convencimento motivado, que estabelece que o juiz não está adstrito ao laudo pericial e pode formar sua convicção com base em outros elementos de prova. Isso confere uma base jurídica sólida ao pedido de reforma da sentença.",
+            "evidenceFromText": [
+              "O MM. Juízo a quo entendeu que o laudo pericial é prova técnica prevalente."
+            ],
+            "suggestion": "Adicionar um tópico ou parágrafo para argumentar que, conforme o princípio do livre convencimento motivado, o magistrado não é mero homologador de laudos periciais, devendo analisar todo o conjunto fático-probatório para formar sua decisão, especialmente quando há outras provas robustas que indicam a incapacidade.",
+            "availableSource": null,
+            "confidence": 0.95,
+            "requiresHumanReview": true
+          },
+          {
+            "id": "51fa37c3-8492-4193-afda-d6f96018702a",
+            "type": "WEAK_FACTUAL_FOUNDATION",
+            "opportunity": "COMPLEMENTARY",
+            "title": "Contextualizar a incapacidade com as atividades habituais do segurado",
+            "rationale": "A peça não descreve qual é a atividade laboral habitual do Apelante. Demonstrar a incompatibilidade entre as patologias diagnosticadas e as exigências específicas de sua profissão torna a alegação de incapacidade mais concreta e persuasiva, mesmo diante de um laudo que reconhece apenas uma 'capacidade residual'.",
+            "evidenceFromText": [
+              "...concluiu pela AUSÊNCIA de incapacidade laboral, reconhecendo capacidade residual para atividades de menor esforço físico."
+            ],
+            "suggestion": "Incluir uma breve descrição da profissão e das tarefas habitualmente desempenhadas pelo Apelante, explicando como as limitações físicas impostas por suas doenças o impedem de exercer essa função específica, ainda que exista uma capacidade residual para outras atividades.",
+            "availableSource": null,
+            "confidence": 0.9,
+            "requiresHumanReview": true
+          }
+        ],
+        "summary": "4 oportunidades de fortalecimento identificadas.",
+        "provider": "GEMINI",
+        "model": "gemini-2.5-pro",
+        "generatedAt": "2026-06-06T21:39:36.167Z",
+        "requiresHumanReview": true
+      },
+      "usage": {
+        "inputTokens": 310,
+        "outputTokens": 8192,
+        "totalTokens": 8502,
+        "estimatedCostUsd": 0.12443
+      },
+      "durationMs": 27126
+    },
+    {
+      "providerId": "gemini",
+      "model": "gemini-2.5-pro",
+      "caseId": "RGPS-004",
+      "domain": "RGPS",
+      "review": {
+        "findings": [
+          {
+            "id": "98134564-09d2-41b9-b8a9-bffb4296d318",
+            "type": "MISSING_DEMONSTRATION",
+            "opportunity": "IMPACTFUL",
+            "title": "Demonstrar Faticamente o Requisito de Miserabilidade",
+            "rationale": "O benefício BPC/LOAS exige a comprovação da vulnerabilidade socioeconômica. A peça afirma que o requisito está preenchido, mas não apresenta qualquer dado fático que sustente essa alegação, como a composição do grupo familiar, a renda de cada membro e o cálculo da renda per capita. A ausência dessa demonstração torna a petição inicial inepta quanto a um de seus requisitos essenciais.",
+            "evidenceFromText": [
+              "[análise socioeconômica do grupo familiar não desenvolvida — renda per capita, composição familiar e CadÚnico não apresentados na peça]",
+              "Ambos os requisitos restam demonstrados."
+            ],
+            "suggestion": "Incluir um tópico específico para detalhar a situação de vulnerabilidade, apresentando um quadro com os membros do grupo familiar, suas respectivas fontes de renda (ou a ausência delas) e o cálculo final da renda per capita. Mencionar a inscrição no CadÚnico e juntar o respectivo extrato, se houver.",
+            "availableSource": null,
+            "confidence": 1,
+            "requiresHumanReview": true
+          },
+          {
+            "id": "05488525-f945-4f73-92bb-deb50697dc1d",
+            "type": "WEAK_FACTUAL_FOUNDATION",
+            "opportunity": "IMPACTFUL",
+            "title": "Detalhar a Deficiência e suas Limitações Funcionais",
+            "rationale": "A petição menciona a existência de um laudo e uma 'limitação funcional de longa duração', mas não descreve a patologia, seus sintomas e, principalmente, como ela impede a participação plena e efetiva da parte autora na sociedade. A descrição detalhada das barreiras enfrentadas no dia a dia é crucial para conectar o diagnóstico médico ao conceito legal de deficiência para fins do BPC.",
+            "evidenceFromText": [
+              "é portador(a) de deficiência diagnosticada em 19/08/2017, conforme laudo médico do Dr. [Médico Assistente], CRM 12597, que atesta limitação funcional de longa duração impeditiva de participação plena e efetiva na sociedade."
+            ],
+            "suggestion": "Expandir a narrativa fática para descrever a condição de saúde da parte autora, incluindo o CID (se disponível), os tratamentos realizados e, de forma concreta, como a deficiência afeta suas atividades diárias, capacidade de trabalho, locomoção e interação social. Isso fortalece a percepção da gravidade da condição antes mesmo da perícia judicial.",
+            "availableSource": null,
+            "confidence": 1,
+            "requiresHumanReview": true
+          },
+          {
+            "id": "eed8c275-063d-4d43-9891-43b9face2297",
+            "type": "STRENGTHEN_ARGUMENT",
+            "opportunity": "COMPLEMENTARY",
+            "title": "Contextualizar o Indeferimento Administrativo",
+            "rationale": "A peça judicializa uma pretensão já analisada administrativamente, mas não informa o número do benefício (NB) nem os motivos do indeferimento pelo INSS. Apresentar esses dados desde o início demonstra a origem da lide e permite que a argumentação jurídica seja direcionada para refutar especificamente as razões da autarquia, tornando a peça mais objetiva e persuasiva.",
+            "evidenceFromText": [
+              "Requer: (a) concessão do BPC/LOAS com DIB no requerimento administrativo (03/05/2017);"
+            ],
+            "suggestion": "Na seção 'DOS FATOS', informar o número do benefício (NB) do requerimento administrativo e transcrever ou resumir os motivos que constam na carta de indeferimento do INSS. Anexar a referida carta e o processo administrativo como prova.",
+            "availableSource": null,
+            "confidence": 1,
+            "requiresHumanReview": true
+          },
+          {
+            "id": "11f71e1d-cc0e-4fa3-8ef6-631b70e1533f",
+            "type": "MISSING_LEGAL_ANCHOR",
+            "opportunity": "COMPLEMENTARY",
+            "title": "Fundamentar a Flexibilização do Critério de Renda",
+            "rationale": "A peça menciona apenas o critério legal estrito de 1/4 do salário mínimo. A jurisprudência pacificada do STF e do STJ já relativizou esse critério, permitindo a comprovação da miserabilidade por outros meios. Incluir essa tese jurídica fortalece o pedido, especialmente se a renda familiar for ligeiramente superior ao limite legal.",
+            "evidenceFromText": [
+              "exigindo deficiência e renda per capita inferior a 1/4 do salário mínimo."
+            ],
+            "suggestion": "Na seção 'DO DIREITO', adicionar um parágrafo argumentando que o critério de renda previsto na LOAS não é absoluto, conforme entendimento consolidado dos Tribunais Superiores (e.g., Tema 187 do STJ), devendo a condição de vulnerabilidade ser analisada no caso concreto a partir de outros elementos.",
+            "availableSource": null,
+            "confidence": 1,
+            "requiresHumanReview": true
+          }
+        ],
+        "summary": "4 oportunidades de fortalecimento identificadas.",
+        "provider": "GEMINI",
+        "model": "gemini-2.5-pro",
+        "generatedAt": "2026-06-06T21:40:03.748Z",
+        "requiresHumanReview": true
+      },
+      "usage": {
+        "inputTokens": 310,
+        "outputTokens": 8192,
+        "totalTokens": 8502,
+        "estimatedCostUsd": 0.12443
+      },
+      "durationMs": 27578
+    },
+    {
+      "providerId": "gemini",
+      "model": "gemini-2.5-pro",
+      "caseId": "RGPS-005",
+      "domain": "RGPS",
+      "review": {
+        "findings": [
+          {
+            "id": "308fb79d-e163-4626-8c00-940c8c561c34",
+            "type": "MISSING_COMPARATIVE_TABLE",
+            "opportunity": "IMPACTFUL",
+            "title": "Incluir Tabela Comparativa dos Salários de Contribuição",
+            "rationale": "Uma tabela comparando os valores utilizados pelo INSS com os valores corretos registrados no CNIS para o período controvertido (01/2008 a 12/2010) tornaria o erro material imediatamente visível e compreensível para o julgador, aumentando a clareza e a força persuasiva do recurso.",
+            "evidenceFromText": [
+              "desconsiderando a impugnação do apelante quanto aos salários de contribuição das competências 01/2008 a 12/2010, que o INSS lançou como R$ 2156,82/mês quando o CNIS registra R$ 3499,68/mês para o mesmo período."
+            ],
+            "suggestion": "Adicionar um tópico ou quadro demonstrativo com o título 'Do Erro Material no Cálculo do PBC', apresentando uma tabela com as colunas: 'Competência', 'Valor Correto (CNIS)', 'Valor Utilizado pelo INSS' e 'Diferença'. Isso evidenciará de forma inequívoca a discrepância em cada uma das 36 competências.",
+            "availableSource": null,
+            "confidence": 1,
+            "requiresHumanReview": true
+          },
+          {
+            "id": "bcecbef2-a7ef-4d86-ba1d-2e46834400e6",
+            "type": "MISSING_CALCULATION",
+            "opportunity": "IMPACTFUL",
+            "title": "Apresentar Memória de Cálculo da RMI Revisada e dos Atrasados",
+            "rationale": "A peça afirma que o erro gerou uma redução na RMI e direito a diferenças, mas não quantifica o impacto. Apresentar uma memória de cálculo, ainda que por estimativa, da nova RMI e do montante dos valores atrasados confere materialidade ao pedido, demonstra a extensão do prejuízo e facilita a análise e o convencimento do Tribunal.",
+            "evidenceFromText": [
+              "A diferença no PBC acarreta redução indevida de aproximadamente 8,3% na RMI, gerando atrasados desde a DIB.",
+              "Requer o PROVIMENTO para: (...) (b) recalcular a RMI; (c) pagar diferenças com correção."
+            ],
+            "suggestion": "Incluir um tópico específico com a memória de cálculo da RMI revisada, demonstrando como a substituição dos salários de contribuição altera o valor final do benefício. Adicionalmente, apresentar uma planilha simplificada com a estimativa dos valores atrasados devidos desde a DIB, aplicando os índices de correção monetária pertinentes.",
+            "availableSource": null,
+            "confidence": 1,
+            "requiresHumanReview": true
+          },
+          {
+            "id": "462f6c99-398d-4aab-9be8-b69f75f89b79",
+            "type": "STRENGTHEN_ARGUMENT",
+            "opportunity": "COMPLEMENTARY",
+            "title": "Detalhar o Fundamento da Sentença Recorrida para Refutá-lo Diretamente",
+            "rationale": "O recurso informa que a sentença manteve o cálculo administrativo, mas não especifica qual foi o fundamento utilizado pelo juízo de primeiro grau para desconsiderar os dados do CNIS. Explicitar e refutar diretamente a tese da decisão recorrida fortalece a apelação, pois demonstra que o recorrente está atacando os pilares da sentença, e não apenas reapresentando sua tese inicial.",
+            "evidenceFromText": [
+              "A r. sentença manteve o cálculo administrativo da aposentadoria (NB 78916817), desconsiderando a impugnação do apelante quanto aos salários de contribuição..."
+            ],
+            "suggestion": "No tópico 'DA DECISÃO RECORRIDA', detalhar o argumento central da sentença para justificar a manutenção do cálculo do INSS (ex: 'A r. sentença entendeu que... por tal motivo...'). Em seguida, nas 'RAZÕES RECURSAIS', construir a argumentação para desconstituir especificamente esse fundamento, demonstrando seu equívoco à luz da legislação e jurisprudência.",
+            "availableSource": null,
+            "confidence": 0.9,
+            "requiresHumanReview": true
+          },
+          {
+            "id": "8275f2aa-7b2e-4a6d-8295-2950e2536650",
+            "type": "MISSING_SUPPORTING_DOCUMENT",
+            "opportunity": "COMPLEMENTARY",
+            "title": "Referenciar Expressamente o Processo Administrativo",
+            "rationale": "A peça se baseia na divergência entre o cálculo do INSS e os dados do CNIS. Fazer referência expressa ao Processo Administrativo (PA) e à sua análise, onde a decisão original foi tomada, pode revelar a origem do erro e reforçar que a informação correta já estava, ou deveria estar, disponível para a autarquia desde o requerimento.",
+            "evidenceFromText": [
+              "A r. sentença manteve o cálculo administrativo da aposentadoria (NB 78916817)..."
+            ],
+            "suggestion": "Sugerir a juntada ou, caso já conste nos autos, fazer referência expressa ao Processo Administrativo (PA) que concedeu o benefício, indicando que a análise dos documentos contidos nele (como a própria Carta de Concessão e seus anexos) pode elucidar a origem do erro de cálculo cometido pela autarquia.",
+            "availableSource": null,
+            "confidence": 0.8,
+            "requiresHumanReview": true
+          }
+        ],
+        "summary": "4 oportunidades de fortalecimento identificadas.",
+        "provider": "GEMINI",
+        "model": "gemini-2.5-pro",
+        "generatedAt": "2026-06-06T21:40:35.110Z",
+        "requiresHumanReview": true
+      },
+      "usage": {
+        "inputTokens": 430,
+        "outputTokens": 8192,
+        "totalTokens": 8622,
+        "estimatedCostUsd": 0.12503
+      },
+      "durationMs": 31361
+    },
+    {
+      "providerId": "gemini",
+      "model": "gemini-2.5-pro",
+      "caseId": "RGPS-006",
+      "domain": "RGPS",
+      "review": {
+        "findings": [
+          {
+            "id": "24b95f0a-b93f-4f47-ab80-d143e13f9404",
+            "type": "MISSING_DEMONSTRATION",
+            "opportunity": "IMPACTFUL",
+            "title": "Demonstrar o cumprimento do requisito etário",
+            "rationale": "A aposentadoria por idade rural exige o cumprimento de dois requisitos cumulativos: idade mínima e exercício de atividade rural (carência). A peça foca na atividade rural, mas omite qualquer menção à data de nascimento da autora ou à idade que ela possuía na DER, deixando de demonstrar um dos pilares do direito pleiteado.",
+            "evidenceFromText": [
+              "AÇÃO DE APOSENTADORIA RURAL POR IDADE"
+            ],
+            "suggestion": "Informar a data de nascimento da parte autora e, com base nela, demonstrar que na Data de Entrada do Requerimento (DER - 25/03/2016) já havia implementado a idade mínima de 55 anos, conforme exigido pelo art. 48, §1º, da Lei 8.213/91.",
+            "availableSource": null,
+            "confidence": 0.98,
+            "requiresHumanReview": true
+          },
+          {
+            "id": "f55d5e10-5344-46c3-8468-7d9c8eafb234",
+            "type": "MISSING_SUPPORTING_DOCUMENT",
+            "opportunity": "IMPACTFUL",
+            "title": "Indicar o início de prova material do labor rural",
+            "rationale": "O direito do segurado especial à aposentadoria rural depende de um início de prova material, conforme a Súmula 149/STJ citada na própria peça. A petição não menciona quais documentos serão utilizados para esse fim, o que fragiliza a demonstração inicial do direito e pode levar a um despacho para emenda.",
+            "evidenceFromText": [
+              "[início de prova material do labor rural não indicado ou insuficientemente identificado na peça]",
+              "A Súmula 149/STJ dispensa contribuições para o segurado especial que comprova trabalho rural por início de prova material."
+            ],
+            "suggestion": "Listar e descrever objetivamente os documentos que constituem o início de prova material do labor rural, como notas fiscais de produtor, declaração de sindicato, contratos de arrendamento, certidão de casamento com a profissão de lavradora, entre outros pertinentes ao caso, e indicar que serão juntados aos autos.",
+            "availableSource": null,
+            "confidence": 0.97,
+            "requiresHumanReview": true
+          },
+          {
+            "id": "98274c99-0a35-4c3e-a0ec-98cc9a0213e2",
+            "type": "WEAK_FACTUAL_FOUNDATION",
+            "opportunity": "IMPACTFUL",
+            "title": "Detalhar as condições e o período do labor rural",
+            "rationale": "A narrativa fática genérica sobre o trabalho rural enfraquece a comprovação do regime de economia familiar e do exercício contínuo da atividade. Detalhes específicos sobre a propriedade, as atividades e o núcleo familiar conferem verossimilhança e robustez à alegação, elementos cruciais para a formação do convencimento do juiz.",
+            "evidenceFromText": [
+              "O(A) autor(a), Aparecida Nunes Batista, trabalhou como trabalhador(a) rural (segurado especial) por aproximadamente 28 anos na região de Porto Alegre, cultivando lavoura de subsistência em regime de economia familiar."
+            ],
+            "suggestion": "Descrever com maior detalhe o labor rural, indicando o nome da propriedade, sua localização, o período exato (data de início e fim), os produtos cultivados e quem compunha o núcleo familiar que trabalhava em mútua colaboração para a subsistência.",
+            "availableSource": null,
+            "confidence": 0.95,
+            "requiresHumanReview": true
+          },
+          {
+            "id": "5377f888-706c-426b-ae1e-930aa03f10f8",
+            "type": "MISSING_DEMONSTRATION",
+            "opportunity": "COMPLEMENTARY",
+            "title": "Apresentar quadro demonstrativo do período rural para comprovar a carência",
+            "rationale": "A afirmação de 'aproximadamente 28 anos' é menos persuasiva do que uma demonstração visual e organizada. Um quadro detalhado facilita a análise pelo julgador e comprova objetivamente o cumprimento da carência exigida por lei (180 meses), conectando a prova documental à alegação.",
+            "evidenceFromText": [
+              "trabalhou como trabalhador(a) rural (segurado especial) por aproximadamente 28 anos"
+            ],
+            "suggestion": "Inserir um quadro ou tabela que detalhe o período de atividade rural, com data de início e fim, para demonstrar de forma inequívoca o tempo total de labor e o cumprimento da carência legal de 180 meses.",
+            "availableSource": null,
+            "confidence": 0.92,
+            "requiresHumanReview": true
+          },
+          {
+            "id": "be7e6e87-20ef-4acf-9092-11f73b0b8c42",
+            "type": "MISSING_LEGAL_ANCHOR",
+            "opportunity": "COMPLEMENTARY",
+            "title": "Fortalecer a fundamentação jurídica com o artigo permanente do benefício",
+            "rationale": "A peça cita o art. 143 da Lei 8.213/91, que é uma regra de transição. Para maior solidez, é recomendável citar também o fundamento permanente do direito, o art. 48, §1º, da mesma lei, que estabelece os requisitos de idade e comprovação de atividade rural para o segurado especial.",
+            "evidenceFromText": [
+              "O art. 143 da Lei n.º 8.213/1991 assegura ao trabalhador rural o direito à aposentadoria por idade sem exigência de contribuições..."
+            ],
+            "suggestion": "Adicionar à fundamentação jurídica a menção ao art. 48, §1º, e ao art. 201, §7º, II, da Constituição Federal, que são os fundamentos permanentes para a concessão da aposentadoria por idade rural ao segurado especial.",
+            "availableSource": null,
+            "confidence": 0.9,
+            "requiresHumanReview": true
+          },
+          {
+            "id": "50873b37-ac77-4b6d-96a1-7f548cda2073",
+            "type": "MISSING_DATE_ANCHOR",
+            "opportunity": "COMPLEMENTARY",
+            "title": "Ancorar a Data de Entrada do Requerimento (DER) em documento",
+            "rationale": "A fixação da DIB na DER é um pedido central, mas a data de 25/03/2016 é apresentada sem referência a um documento comprobatório. Vincular essa data ao processo administrativo ou à carta de indeferimento do INSS confere objetividade e suporte probatório ao pedido.",
+            "evidenceFromText": [
+              "Requer: (a) concessão da aposentadoria rural por idade com DIB na DER (25/03/2016);"
+            ],
+            "suggestion": "Esclarecer a origem da DER (25/03/2016), fazendo referência expressa ao documento que a comprova, como por exemplo: 'conforme carta de indeferimento anexa (NB [Número do Benefício])'.",
+            "availableSource": null,
+            "confidence": 0.88,
+            "requiresHumanReview": true
+          }
+        ],
+        "summary": "6 oportunidades de fortalecimento identificadas.",
+        "provider": "GEMINI",
+        "model": "gemini-2.5-pro",
+        "generatedAt": "2026-06-06T21:41:07.496Z",
+        "requiresHumanReview": true
+      },
+      "usage": {
+        "inputTokens": 317,
+        "outputTokens": 8192,
+        "totalTokens": 8509,
+        "estimatedCostUsd": 0.124465
+      },
+      "durationMs": 32384
+    },
+    {
+      "providerId": "gemini",
+      "model": "gemini-2.5-pro",
+      "caseId": "RGPS-007",
+      "domain": "RGPS",
+      "review": {
+        "findings": [
+          {
+            "id": "5aef845b-207f-4a26-80fd-f5b84f729b40",
+            "type": "MISSING_DEMONSTRATION",
+            "opportunity": "IMPACTFUL",
+            "title": "Detalhar a Composição do Tempo de Contribuição Especial",
+            "rationale": "A afirmação genérica de '25 anos em condições especiais' é uma conclusão que precisa ser demonstrada. A ausência de uma discriminação dos períodos, empregadores e funções impede que o julgador verifique, de plano, o preenchimento do requisito temporal, fragilizando a petição.",
+            "evidenceFromText": [
+              "trabalhou 25 anos em condições especiais, conforme PPP n.º PPP-3393 juntado."
+            ],
+            "suggestion": "Incluir um quadro-resumo detalhando cada vínculo empregatício que compõe o tempo especial, com as seguintes colunas: Empregador, Período (início e fim), Função/Cargo, Agente(s) Nocivo(s) e Tempo de Contribuição (Anos, Meses, Dias). Ao final, apresentar a soma total para comprovar os 25 anos.",
+            "availableSource": null,
+            "confidence": 1,
+            "requiresHumanReview": true
+          },
+          {
+            "id": "e5f9c72e-87ee-407a-95c6-c6a7d54a3125",
+            "type": "STRENGTHEN_ARGUMENT",
+            "opportunity": "IMPACTFUL",
+            "title": "Desenvolver a Análise Técnica do Perfil Profissiográfico Previdenciário (PPP)",
+            "rationale": "A peça menciona o PPP, mas admite que a análise técnica não foi desenvolvida. O PPP é a prova central da aposentadoria especial. É crucial extrair e argumentar sobre os dados técnicos do documento para conectar a prova ao direito pleiteado.",
+            "evidenceFromText": [
+              "PPP n.º PPP-3393 juntado. [análise técnica dos campos específicos — intensidade do agente, eficácia do EPI e enquadramento no Decreto n.º 3.048/1999 — não desenvolvida]"
+            ],
+            "suggestion": "Extrair do PPP as informações cruciais e apresentá-las na petição. Detalhar o agente nocivo, a intensidade da exposição, o período, a habitualidade e permanência, e correlacionar esses dados com os códigos e limites de tolerância previstos nos anexos do Decreto n.º 3.048/1999, fundamentando o enquadramento legal de cada período.",
+            "availableSource": null,
+            "confidence": 1,
+            "requiresHumanReview": true
+          },
+          {
+            "id": "66c6034c-ad50-48a2-a2f8-cec313c7ac5e",
+            "type": "MISSING_CALCULATION",
+            "opportunity": "IMPACTFUL",
+            "title": "Apresentar o Cálculo da Renda Mensal Inicial (RMI) e dos Valores Atrasados",
+            "rationale": "O pedido de concessão de benefício tem natureza econômica. A ausência de uma estimativa do valor da causa, da RMI e dos atrasados deixa a pretensão ilíquida e menos concreta, além de ser uma informação essencial para o processamento da causa, especialmente nos Juizados Especiais Federais.",
+            "evidenceFromText": [
+              "Requer a concessão da aposentadoria especial com DIB na DER (10/06/2016)."
+            ],
+            "suggestion": "Incluir um tópico específico para demonstrar o valor do benefício pretendido. Apresentar uma memória de cálculo, ainda que por estimativa, da Renda Mensal Inicial (RMI) e do montante total das parcelas vencidas desde a DER (10/06/2016) até a data do ajuizamento, com a devida correção monetária e juros, para fundamentar o valor da causa.",
+            "availableSource": null,
+            "confidence": 1,
+            "requiresHumanReview": true
+          },
+          {
+            "id": "186c3f17-7eba-4eb0-82da-adde38774af2",
+            "type": "WEAK_FACTUAL_FOUNDATION",
+            "opportunity": "COMPLEMENTARY",
+            "title": "Contextualizar o Indeferimento Administrativo",
+            "rationale": "A petição não narra o histórico administrativo, como o número do benefício (NB) indeferido e os motivos da negativa do INSS. Apresentar esse contexto é fundamental para demonstrar o interesse de agir e para direcionar a argumentação jurídica contra as razões específicas do indeferimento.",
+            "evidenceFromText": [
+              "DOS FATOS",
+              "O(A) autor(a), Raimundo Alves Costa, CPF 018.957.495-69, trabalhou 25 anos em condições especiais, conforme PPP n.º PPP-3393 juntado."
+            ],
+            "suggestion": "Na seção 'DOS FATOS', narrar o histórico do requerimento administrativo, informando o número do benefício (NB), a DER, e transcrevendo ou explicando os motivos exatos pelos quais o INSS indeferiu o pedido. Isso estabelece o objeto da controvérsia judicial.",
+            "availableSource": null,
+            "confidence": 0.95,
+            "requiresHumanReview": true
+          },
+          {
+            "id": "2224d765-a76c-4f69-8a07-ec8620fe4eae",
+            "type": "MISSING_SUPPORTING_DOCUMENT",
+            "opportunity": "COMPLEMENTARY",
+            "title": "Referenciar Documentos Essenciais para a Comprovação do Direito",
+            "rationale": "A petição se baseia unicamente na menção a um PPP. Para uma análise completa, outros documentos são praxe e fortalecem a postulação, como a carta de indeferimento (que prova a pretensão resistida) e o CNIS (que mostra o histórico contributivo).",
+            "evidenceFromText": [
+              "conforme PPP n.º PPP-3393 juntado."
+            ],
+            "suggestion": "Além do PPP, referenciar no corpo da petição e na lista de documentos anexos a juntada da Carta de Indeferimento do benefício, a cópia do Processo Administrativo e o Cadastro Nacional de Informações Sociais (CNIS), explicando brevemente a relevância de cada um para o caso.",
+            "availableSource": null,
+            "confidence": 0.9,
+            "requiresHumanReview": true
+          }
+        ],
+        "summary": "5 oportunidades de fortalecimento identificadas.",
+        "provider": "GEMINI",
+        "model": "gemini-2.5-pro",
+        "generatedAt": "2026-06-06T21:41:42.004Z",
+        "requiresHumanReview": true
+      },
+      "usage": {
+        "inputTokens": 216,
+        "outputTokens": 8192,
+        "totalTokens": 8408,
+        "estimatedCostUsd": 0.12396
+      },
+      "durationMs": 34504
+    },
+    {
+      "providerId": "gemini",
+      "model": "gemini-2.5-pro",
+      "caseId": "RGPS-008",
+      "domain": "RGPS",
+      "review": {
+        "findings": [
+          {
+            "id": "19346e5d-5b47-422f-a3b7-c00ecbee8e12",
+            "type": "MISSING_CALCULATION",
+            "opportunity": "IMPACTFUL",
+            "title": "Apresentar Memória de Cálculo Detalhada",
+            "rationale": "A apresentação de um valor global, sem o demonstrativo que o originou, fragiliza a execução. A memória de cálculo detalhada é um requisito para demonstrar a liquidez e certeza do débito, permitindo a conferência pelo juízo e pela parte executada, além de ser fundamental para prevenir impugnações que podem atrasar o pagamento.",
+            "evidenceFromText": [
+              "[memória de cálculo detalhada não apresentada — valor global informado sem demonstrativo por competência]"
+            ],
+            "suggestion": "Incluir uma planilha ou tabela detalhada que demonstre, competência por competência, a evolução do débito. A memória de cálculo deve discriminar: a Renda Mensal devida, os valores pagos administrativamente (se houver), a diferença apurada, o índice de correção monetária aplicado e os juros de mora incidentes, culminando no valor total executado.",
+            "availableSource": null,
+            "confidence": 1,
+            "requiresHumanReview": true
+          },
+          {
+            "id": "1bb2348c-6088-48e2-ad17-6ca9b55796d6",
+            "type": "STRENGTHEN_ARGUMENT",
+            "opportunity": "COMPLEMENTARY",
+            "title": "Especificar a Modalidade de Pagamento como RPV",
+            "rationale": "A petição solicita a expedição de 'RPV ou precatório'. Dado que o valor executado (R$ 38.933,44) é inferior ao teto de 60 salários mínimos, o pagamento se dará necessariamente por Requisição de Pequeno Valor (RPV). Especificar a modalidade correta demonstra diligência e direciona o pedido de forma mais assertiva, agilizando a análise judicial.",
+            "evidenceFromText": [
+              "expedição de RPV ou precatório conforme valor apurado (R$ 38933,44)"
+            ],
+            "suggestion": "Direcionar o pedido para a expedição de Requisição de Pequeno Valor (RPV), justificando que o montante executado é inferior ao limite legal para precatórios, o que assegura um rito de pagamento mais célere.",
+            "availableSource": null,
+            "confidence": 1,
+            "requiresHumanReview": true
+          },
+          {
+            "id": "2180851f-ab58-470a-a7f0-0267773bbd83",
+            "type": "MISSING_LEGAL_ANCHOR",
+            "opportunity": "COMPLEMENTARY",
+            "title": "Fundamentar o Pedido de Destaque dos Honorários Contratuais",
+            "rationale": "O pedido de reserva de honorários, embora comum, ganha robustez e formalidade ao ser amparado pelo dispositivo legal que o autoriza. A menção expressa ao Estatuto da Advocacia confere maior rigor técnico à postulação.",
+            "evidenceFromText": [
+              "(b) reserva de honorários de 10%;"
+            ],
+            "suggestion": "Indicar o fundamento legal para o pedido de destaque dos honorários contratuais, como o art. 22, § 4º, da Lei nº 8.906/94 (Estatuto da Advocacia e da OAB), e mencionar que o respectivo contrato de honorários será juntado aos autos.",
+            "availableSource": null,
+            "confidence": 0.9,
+            "requiresHumanReview": true
+          },
+          {
+            "id": "74f3a2d8-5e5a-4283-8ff0-f30c39706679",
+            "type": "MISSING_SUPPORTING_DOCUMENT",
+            "opportunity": "COMPLEMENTARY",
+            "title": "Mencionar a Juntada do Contrato de Honorários",
+            "rationale": "O deferimento do pedido de destaque dos honorários contratuais é condicionado à apresentação do respectivo contrato. Mencionar na peça que o documento está sendo anexado fortalece o pedido e cumpre um requisito processual indispensável para seu acolhimento.",
+            "evidenceFromText": [
+              "(b) reserva de honorários de 10%;"
+            ],
+            "suggestion": "Acrescentar ao pedido de reserva a informação de que o contrato de honorários advocatícios, que comprova o ajuste do percentual, está sendo anexado ao processo.",
+            "availableSource": null,
+            "confidence": 0.9,
+            "requiresHumanReview": true
+          },
+          {
+            "id": "fa410620-23af-45f2-946c-e5ad15c5b1a9",
+            "type": "MISSING_LEGAL_ANCHOR",
+            "opportunity": "OPTIONAL",
+            "title": "Especificar o Ato Processual de Comunicação ao INSS",
+            "rationale": "O pedido de 'intimação do INSS' é genérico. Utilizar a terminologia técnica do Código de Processo Civil, que prevê a citação da Fazenda Pública para opor embargos à execução, torna a peça mais precisa e alinhada ao rito processual específico.",
+            "evidenceFromText": [
+              "(c) intimação do INSS."
+            ],
+            "suggestion": "Refinar o pedido para requerer a citação do INSS, na pessoa de seu representante legal, para, querendo, opor embargos no prazo legal, nos termos do art. 535 do Código de Processo Civil.",
+            "availableSource": null,
+            "confidence": 0.8,
+            "requiresHumanReview": true
+          }
+        ],
+        "summary": "5 oportunidades de fortalecimento identificadas.",
+        "provider": "GEMINI",
+        "model": "gemini-2.5-pro",
+        "generatedAt": "2026-06-06T21:42:10.211Z",
+        "requiresHumanReview": true
+      },
+      "usage": {
+        "inputTokens": 336,
+        "outputTokens": 8192,
+        "totalTokens": 8528,
+        "estimatedCostUsd": 0.12456
+      },
+      "durationMs": 28205
+    },
+    {
+      "providerId": "gemini",
+      "model": "gemini-2.5-pro",
+      "caseId": "RGPS-009",
+      "domain": "RGPS",
+      "review": {
+        "findings": [
+          {
+            "id": "3c9a5dcc-d3df-41c1-95ae-be23367d0daf",
+            "type": "MISSING_COMPARATIVE_TABLE",
+            "opportunity": "IMPACTFUL",
+            "title": "Demonstrar numericamente o cumprimento da carência na DER reafirmada",
+            "rationale": "A peça afirma que a carência foi cumprida em 03/02/2023, mas não apresenta uma demonstração numérica. Um quadro comparativo evidenciaria de forma clara e imediata a evolução do número de contribuições entre a DER original e a data proposta para reafirmação, tornando o argumento fático incontestável perante o Tribunal.",
+            "evidenceFromText": [
+              "o apelante passou a cumprir a carência em 03/02/2023, data posterior à DER original, quando atingiu 180 contribuições mensais."
+            ],
+            "suggestion": "Incluir um quadro demonstrativo simples que compare o número de contribuições na DER original (27/12/2020) com o número de contribuições na data da reafirmação (03/02/2023), destacando o atingimento do requisito de 180 meses.",
+            "availableSource": null,
+            "confidence": 1,
+            "requiresHumanReview": true
+          },
+          {
+            "id": "c69fa6ea-9860-4bbc-a98d-2a926d0ee8c2",
+            "type": "STRENGTHEN_ARGUMENT",
+            "opportunity": "COMPLEMENTARY",
+            "title": "Reforçar a fundamentação jurídica com referência ao Tema 995 do STJ",
+            "rationale": "A peça cita um precedente do STJ, mas a menção expressa ao Tema Repetitivo 995 do STJ, que consolidou a tese sobre a reafirmação da DER, confere maior autoridade e força vinculante ao argumento, demonstrando que a matéria já foi pacificada em sede de recurso repetitivo.",
+            "evidenceFromText": [
+              "A reafirmação da DER é direito assegurado pela IN PRES/INSS n.º 77/2015 e pela jurisprudência consolidada do STJ (REsp 1.412.136/SC)."
+            ],
+            "suggestion": "Adicionar menção expressa ao Tema 995 do STJ ao lado do REsp citado, explicando que a tese firmada permite a reafirmação da DER para o momento em que os requisitos para a concessão do benefício foram preenchidos, mesmo que no curso do processo judicial, até o julgamento em segunda instância.",
+            "availableSource": null,
+            "confidence": 1,
+            "requiresHumanReview": true
+          },
+          {
+            "id": "9432d09f-9344-4366-aa03-3c90e0fa34e4",
+            "type": "MISSING_DEMONSTRATION",
+            "opportunity": "COMPLEMENTARY",
+            "title": "Confirmar o preenchimento do requisito etário",
+            "rationale": "O recurso foca exclusivamente na carência, omitindo a confirmação do cumprimento do requisito etário para a aposentadoria por idade. Embora seja provável que esteja preenchido, declarar expressamente que a idade mínima já estava implementada na DER original (ou na reafirmada) elimina qualquer dúvida e apresenta um quadro completo do direito da parte.",
+            "evidenceFromText": [
+              "A sentença denegou a aposentadoria sob o fundamento de que, na DER original (27/12/2020), o apelante não havia cumprido a carência mínima de 180 contribuições..."
+            ],
+            "suggestion": "Incluir uma breve passagem para afirmar que o requisito etário para a aposentadoria por idade já se encontrava preenchido na data do requerimento administrativo original, restando pendente apenas o implemento da carência para a concessão do benefício.",
+            "availableSource": null,
+            "confidence": 0.9,
+            "requiresHumanReview": true
+          }
+        ],
+        "summary": "3 oportunidades de fortalecimento identificadas.",
+        "provider": "GEMINI",
+        "model": "gemini-2.5-pro",
+        "generatedAt": "2026-06-06T21:42:36.881Z",
+        "requiresHumanReview": true
+      },
+      "usage": {
+        "inputTokens": 297,
+        "outputTokens": 8192,
+        "totalTokens": 8489,
+        "estimatedCostUsd": 0.124365
+      },
+      "durationMs": 26667
+    },
+    {
+      "providerId": "gemini",
+      "model": "gemini-2.5-pro",
+      "caseId": "RGPS-010",
+      "domain": "RGPS",
+      "review": {
+        "findings": [
+          {
+            "id": "1cd87363-eed6-4816-bf3d-e0d2e83260e7",
+            "type": "STRENGTHEN_ARGUMENT",
+            "opportunity": "IMPACTFUL",
+            "title": "Revisar a cronologia e o cálculo do período de graça para sustentar a qualidade de segurado",
+            "rationale": "A peça apresenta uma contradição lógica que invalida o argumento central da qualidade de segurado. Afirma-se que o período de graça terminou em 12/2021, mas a incapacidade ocorreu em 22/10/2022. A conclusão de que a data do fim do período de graça é 'posterior ao acidente' está factualmente incorreta e compromete a demonstração de um requisito essencial para o benefício.",
+            "evidenceFromText": [
+              "O(A) autor(a) ficou incapacitado(a) em 22/10/2022 por acidente de trabalho...",
+              "O período de graça de 12 meses (art. 15, II, Lei n.º 8.213/1991) mantém a qualidade de segurado até 12/2021, data posterior ao acidente, configurando a qualidade de segurado exigida."
+            ],
+            "suggestion": "Revisar urgentemente o cálculo do período de graça. Verificar a possibilidade de prorrogações previstas no art. 15 da Lei n.º 8.213/91 (ex: +12 meses por desemprego involuntário ou +12 meses por mais de 120 contribuições sem perda da qualidade de segurado). Apresentar uma linha do tempo clara e um cálculo detalhado que demonstre que a qualidade de segurado estava mantida na data de início da incapacidade (22/10/2022).",
+            "availableSource": null,
+            "confidence": 1,
+            "requiresHumanReview": true
+          },
+          {
+            "id": "dd7f8df9-c223-4522-999e-5adc4ff174f8",
+            "type": "MISSING_DEMONSTRATION",
+            "opportunity": "IMPACTFUL",
+            "title": "Detalhar a incapacidade laboral decorrente do diagnóstico médico",
+            "rationale": "A petição apenas menciona o CID da doença (M51.0), mas não descreve como essa condição efetivamente incapacita o autor para o trabalho. Para a concessão de benefício por incapacidade, é crucial demonstrar não apenas a existência da doença, mas suas consequências funcionais e as limitações impostas às atividades laborais habituais.",
+            "evidenceFromText": [
+              "O(A) autor(a) ficou incapacitado(a) em 22/10/2022 por acidente de trabalho, conforme laudo médico do Dr. [Médico], CRM 43703, com diagnóstico CID M51.0."
+            ],
+            "suggestion": "Descrever de forma detalhada as limitações funcionais do autor (ex: dores, dificuldade de locomoção, impossibilidade de carregar peso, restrições de movimento) e conectar explicitamente essas limitações à impossibilidade de exercer sua profissão habitual. Se possível, citar trechos do laudo médico que corroborem essa descrição.",
+            "availableSource": null,
+            "confidence": 1,
+            "requiresHumanReview": true
+          },
+          {
+            "id": "010fdfa3-89d0-4478-ac20-df4fa14e2745",
+            "type": "WEAK_FACTUAL_FOUNDATION",
+            "opportunity": "IMPACTFUL",
+            "title": "Incluir informações sobre o prévio requerimento administrativo",
+            "rationale": "A peça não menciona a existência de um requerimento administrativo prévio junto ao INSS, que é, em regra, uma condição de procedibilidade para a ação judicial (interesse de agir). A ausência dessa informação pode levar à extinção do processo sem resolução de mérito.",
+            "evidenceFromText": [
+              "AÇÃO DE BENEFÍCIO POR INCAPACIDADE",
+              "Processo n.º 5042651-85.2022.6.33.4092"
+            ],
+            "suggestion": "Informar os dados do requerimento administrativo, como o número do benefício (NB), a Data de Entrada do Requerimento (DER) e o motivo do indeferimento pelo INSS. Anexar e referenciar a carta de indeferimento como prova do esgotamento da via administrativa.",
+            "availableSource": null,
+            "confidence": 0.95,
+            "requiresHumanReview": true
+          },
+          {
+            "id": "eb974bab-d293-46c7-80b3-9cb14a2db736",
+            "type": "MISSING_LEGAL_ANCHOR",
+            "opportunity": "COMPLEMENTARY",
+            "title": "Desenvolver a fundamentação jurídica do direito ao benefício",
+            "rationale": "A seção 'DO DIREITO' está vazia e contém um comentário indicando que a fundamentação foi ignorada. Uma peça robusta deve apresentar os fundamentos legais que amparam a pretensão, demonstrando o preenchimento de cada requisito do benefício pleiteado.",
+            "evidenceFromText": [
+              "DO DIREITO",
+              "[período de graça ignorado na fundamentação jurídica — art. 15 da Lei n.º 8.213/1991 não analisado em face dos dados do segurado]"
+            ],
+            "suggestion": "Elaborar a seção 'DO DIREITO', citando os dispositivos legais aplicáveis ao benefício por incapacidade pretendido (ex: arts. 42 ou 59 da Lei 8.213/91). Argumentar de forma estruturada como o autor preenche cada um dos requisitos legais: qualidade de segurado, carência (se aplicável) e a incapacidade laboral.",
+            "availableSource": null,
+            "confidence": 1,
+            "requiresHumanReview": true
+          },
+          {
+            "id": "36a658a9-258f-4f3a-9f0a-55fb7c926b99",
+            "type": "MISSING_SUPPORTING_DOCUMENT",
+            "opportunity": "COMPLEMENTARY",
+            "title": "Referenciar expressamente os documentos probatórios na petição",
+            "rationale": "A peça menciona um laudo médico e a existência de contribuições, mas não indica de forma explícita quais documentos estão sendo juntados para comprovar tais alegações. Referenciar os documentos no corpo do texto facilita a análise do juiz e fortalece a conexão entre os fatos narrados e as provas apresentadas.",
+            "evidenceFromText": [
+              "conforme laudo médico do Dr. [Médico], CRM 43703...",
+              "com última contribuição em 05/2019."
+            ],
+            "suggestion": "Indicar, ao longo da narrativa dos fatos e do direito, os documentos que comprovam cada alegação, por exemplo: '(conforme laudo médico anexo, doc. 01)', '(comprovado pelo extrato do CNIS, doc. 02)', '(conforme carta de indeferimento administrativa, doc. 03)'.",
+            "availableSource": null,
+            "confidence": 0.9,
+            "requiresHumanReview": true
+          }
+        ],
+        "summary": "5 oportunidades de fortalecimento identificadas.",
+        "provider": "GEMINI",
+        "model": "gemini-2.5-pro",
+        "generatedAt": "2026-06-06T21:43:08.032Z",
+        "requiresHumanReview": true
+      },
+      "usage": {
+        "inputTokens": 277,
+        "outputTokens": 8192,
+        "totalTokens": 8469,
+        "estimatedCostUsd": 0.124265
+      },
+      "durationMs": 31149
+    },
+    {
+      "providerId": "gemini",
+      "model": "gemini-2.5-pro",
+      "caseId": "RGPS-011",
+      "domain": "RGPS",
+      "review": {
+        "findings": [
+          {
+            "id": "a6ca4a94-2c3a-45d8-a3ad-0532478b3ea0",
+            "type": "MISSING_DEMONSTRATION",
+            "opportunity": "IMPACTFUL",
+            "title": "Demonstrar o Cumprimento do Requisito Etário",
+            "rationale": "A Aposentadoria por Idade Urbana exige a comprovação de dois requisitos cumulativos: idade mínima e carência. A peça foca exclusivamente na comprovação da carência, mas omite qualquer menção à idade do autor, que é um elemento constitutivo do direito pleiteado. A ausência dessa demonstração torna a petição inicial incompleta em um de seus pontos fundamentais.",
+            "evidenceFromText": [
+              "AÇÃO DE CONCESSÃO DE APOSENTADORIA POR IDADE (URBANA)"
+            ],
+            "suggestion": "Incluir a data de nascimento do(a) autor(a), calcular sua idade na Data de Entrada do Requerimento (DER 28/07/2017) e afirmar expressamente o cumprimento do requisito etário conforme a legislação aplicável à época.",
+            "availableSource": null,
+            "confidence": 1,
+            "requiresHumanReview": true
+          },
+          {
+            "id": "3fee74e2-10dc-41fa-9a95-a2e14531e94b",
+            "type": "ANTICIPATE_COUNTERARGUMENT",
+            "opportunity": "IMPACTFUL",
+            "title": "Refutar Proativamente o Motivo do Indeferimento Administrativo",
+            "rationale": "A peça identifica que o cerne da controvérsia são as 'inconsistências' no CNIS que levaram o INSS a desconsiderar 35 contribuições. Contudo, a petição não avança para refutar essa alegação, deixando de apresentar a tese defensiva e as provas que demonstram a regularidade dos recolhimentos. Antecipar e rebater o argumento do INSS fortalece a causa de pedir e direciona a instrução processual.",
+            "evidenceFromText": [
+              "O INSS, contudo, indeferiu o benefício sob o fundamento de que o CNIS apresentava inconsistências no período de 01/2000 a 12/2004, desconsiderando 35 competências regularmente recolhidas."
+            ],
+            "suggestion": "Detalhar a natureza das supostas 'inconsistências' apontadas pelo INSS e apresentar a contraprova para o período controvertido (01/2000 a 12/2004), indicando os documentos que comprovam a regularidade dos recolhimentos, como cópia da CTPS, carnês de recolhimento (GPS), ou outros meios de prova pertinentes.",
+            "availableSource": null,
+            "confidence": 1,
+            "requiresHumanReview": true
+          },
+          {
+            "id": "1dff8361-b520-43b6-991a-19ca5ab9d0ea",
+            "type": "MISSING_SUPPORTING_DOCUMENT",
+            "opportunity": "IMPACTFUL",
+            "title": "Referenciar e Juntar a Carta de Indeferimento do Benefício",
+            "rationale": "A carta de indeferimento é o documento que formaliza a pretensão resistida e detalha o fundamento exato utilizado pelo INSS para negar o benefício. Sua ausência na lista de provas enfraquece a comprovação do interesse de agir e a delimitação do objeto da lide. A peça menciona o protocolo, mas não a decisão em si.",
+            "evidenceFromText": [
+              "Junta-se CNIS de 28/07/2017 com 215 contribuições organizadas em planilha; RG e CPF 030.085.164-43; protocolo administrativo n.º 180831565/2024; comprovantes de contribuições dos últimos 36 meses."
+            ],
+            "suggestion": "Incluir na relação de provas e juntar aos autos a cópia da comunicação de decisão (carta de indeferimento) referente ao protocolo n.º 180831565/2024, para comprovar formalmente o motivo da negativa administrativa.",
+            "availableSource": null,
+            "confidence": 1,
+            "requiresHumanReview": true
+          },
+          {
+            "id": "cba8e51b-4580-4d07-82dd-f734bd73fc6c",
+            "type": "MISSING_CALCULATION",
+            "opportunity": "COMPLEMENTARY",
+            "title": "Incluir Memória de Cálculo da Renda Mensal Inicial (RMI)",
+            "rationale": "O pedido de condenação a uma RMI específica ganha força e credibilidade quando acompanhado de uma memória de cálculo, ainda que simplificada. Apresentar o valor 'médio' de R$ 4.236,00 sem demonstrar como foi apurado pode ser visto como mera estimativa, fragilizando o pedido financeiro.",
+            "evidenceFromText": [
+              "RMI calculada sobre 215 salários de contribuição (R$ 4.236,00 médio)"
+            ],
+            "suggestion": "Anexar uma planilha ou incluir um tópico na petição com a memória de cálculo da RMI, demonstrando a apuração do salário de benefício com base nos 215 salários de contribuição e a aplicação do coeficiente de cálculo para se chegar ao valor pretendido.",
+            "availableSource": null,
+            "confidence": 0.95,
+            "requiresHumanReview": true
+          },
+          {
+            "id": "dca2c426-aa11-493e-894d-eb80ad938404",
+            "type": "MISSING_DEMONSTRATION",
+            "opportunity": "COMPLEMENTARY",
+            "title": "Fundamentar o Pedido de Assistência Judiciária Gratuita",
+            "rationale": "O pedido de Assistência Judiciária Gratuita (AJG) é apresentado de forma genérica no rol de pedidos, sem qualquer fundamentação fática no corpo da petição. Para maior robustez, é praxe forense incluir um tópico específico ou parágrafo que afirme a condição de hipossuficiência do autor.",
+            "evidenceFromText": [
+              "Requer: (...) (e) AJG."
+            ],
+            "suggestion": "Inserir um tópico ou parágrafo na petição para fundamentar o pedido de gratuidade de justiça, afirmando que o(a) autor(a) não possui condições de arcar com as custas processuais sem prejuízo do seu sustento e de sua família, requerendo o benefício nos termos da lei e juntando declaração de hipossuficiência.",
+            "availableSource": null,
+            "confidence": 0.9,
+            "requiresHumanReview": true
+          }
+        ],
+        "summary": "5 oportunidades de fortalecimento identificadas.",
+        "provider": "GEMINI",
+        "model": "gemini-2.5-pro",
+        "generatedAt": "2026-06-06T21:43:40.795Z",
+        "requiresHumanReview": true
+      },
+      "usage": {
+        "inputTokens": 448,
+        "outputTokens": 8192,
+        "totalTokens": 8640,
+        "estimatedCostUsd": 0.12512
+      },
+      "durationMs": 32761
+    },
+    {
+      "providerId": "gemini",
+      "model": "gemini-2.5-pro",
+      "caseId": "RGPS-012",
+      "domain": "RGPS",
+      "review": {
+        "findings": [
+          {
+            "id": "dc910099-fe29-47c9-a8bf-da6cd01b6168",
+            "type": "STRENGTHEN_ARGUMENT",
+            "opportunity": "IMPACTFUL",
+            "title": "Detalhar os fundamentos probatórios que rebatem a insuficiência de provas apontada na sentença",
+            "rationale": "A sentença negou o pedido por 'documentação juntada era insuficiente'. O recurso precisa atacar diretamente este fundamento, demonstrando, de forma específica, como as provas dos autos (ex: PPP, LTCAT) são, de fato, suficientes para comprovar a exposição aos agentes nocivos e a especialidade do labor, justificando a reforma da decisão.",
+            "evidenceFromText": [
+              "A sentença negou a conversão do tempo especial (11 anos) em comum aplicando fator 1,2 (25 para 30 anos), por entender que a documentação juntada era insuficiente para comprovar a especialidade do período.",
+              "A conversão do tempo especial é cabível. [fundamentação genérica — fator de conversão aplicável, período exato e jurisprudência do STJ não desenvolvidos em face da decisão recorrida]"
+            ],
+            "suggestion": "Desenvolver a argumentação recursal para além da afirmação genérica de que a conversão é cabível. Detalhar, para cada período especial, qual documento comprova a especialidade, qual agente nocivo está descrito, e como essa prova atende aos requisitos da legislação previdenciária vigente à época do trabalho, rebatendo ponto a ponto o motivo do indeferimento em primeira instância.",
+            "availableSource": null,
+            "confidence": 1,
+            "requiresHumanReview": true
+          },
+          {
+            "id": "8cd01aa7-5210-466e-8291-1538be90aacc",
+            "type": "MISSING_DEMONSTRATION",
+            "opportunity": "IMPACTFUL",
+            "title": "Especificar os períodos que compõem o tempo especial pleiteado",
+            "rationale": "A menção genérica a '11 anos' de tempo especial dificulta a análise do Tribunal. A individualização dos períodos (com datas de início e fim, empregador e função) é essencial para que a Corte possa analisar a documentação correspondente a cada vínculo e decidir sobre a especialidade de forma precisa.",
+            "evidenceFromText": [
+              "A sentença negou a conversão do tempo especial (11 anos) em comum...",
+              "Requer o PROVIMENTO para reconhecer 11 anos especiais convertidos..."
+            ],
+            "suggestion": "Incluir um quadro ou uma lista detalhada que discrimine cada um dos períodos que compõem os 11 anos de tempo especial. Para cada período, informar: o empregador, o cargo/função, a data de início, a data de fim e o agente nocivo correspondente.",
+            "availableSource": null,
+            "confidence": 1,
+            "requiresHumanReview": true
+          },
+          {
+            "id": "57b32901-0013-4598-ab55-3176436c8e92",
+            "type": "MISSING_LEGAL_ANCHOR",
+            "opportunity": "IMPACTFUL",
+            "title": "Incluir os fundamentos legais e jurisprudenciais da pretensão",
+            "rationale": "O recurso não pode se limitar a afirmar o direito; deve fundamentá-lo. A ausência de citação das normas legais (leis, decretos) e da jurisprudência aplicável (súmulas, temas repetitivos) que amparam o reconhecimento da especialidade e a conversão do tempo enfraquece drasticamente a peça, tornando-a uma mera manifestação de inconformismo.",
+            "evidenceFromText": [
+              "A conversão do tempo especial é cabível. [fundamentação genérica — fator de conversão aplicável, período exato e jurisprudência do STJ não desenvolvidos em face da decisão recorrida]"
+            ],
+            "suggestion": "Fundamentar o pedido de conversão com base na legislação previdenciária pertinente (ex: art. 57 da Lei 8.213/91 e decretos regulamentadores aplicáveis a cada período). Adicionalmente, reforçar a tese com a jurisprudência consolidada dos Tribunais Superiores (STF/STJ) e do próprio Tribunal Regional Federal sobre o tema, especialmente quanto à validade dos documentos probatórios apresentados.",
+            "availableSource": null,
+            "confidence": 1,
+            "requiresHumanReview": true
+          },
+          {
+            "id": "fed58d94-0fa4-40e2-b563-d8fac3de95e4",
+            "type": "MISSING_DEMONSTRATION",
+            "opportunity": "IMPACTFUL",
+            "title": "Demonstrar que a conversão do tempo especial resulta no direito à aposentadoria",
+            "rationale": "O pedido final é a concessão da aposentadoria, mas a peça não demonstra que a conversão do tempo especial é o fator que completa o tempo de contribuição necessário. É fundamental apresentar o cálculo que comprove que, uma vez reconhecido e convertido o período especial, a segurada atinge o direito ao benefício.",
+            "evidenceFromText": [
+              "...e conceder a aposentadoria por tempo de contribuição."
+            ],
+            "suggestion": "Apresentar uma memória de cálculo ou um quadro de tempo de contribuição que some o tempo comum incontroverso ao tempo especial convertido. O resultado deve demonstrar, de forma clara, que a segurada preenche o tempo mínimo exigido para a aposentadoria por tempo de contribuição na data do requerimento administrativo (DER) ou em data passível de reafirmação.",
+            "availableSource": null,
+            "confidence": 1,
+            "requiresHumanReview": true
+          }
+        ],
+        "summary": "4 oportunidades de fortalecimento identificadas.",
+        "provider": "GEMINI",
+        "model": "gemini-2.5-pro",
+        "generatedAt": "2026-06-06T21:44:14.856Z",
+        "requiresHumanReview": true
+      },
+      "usage": {
+        "inputTokens": 229,
+        "outputTokens": 8192,
+        "totalTokens": 8421,
+        "estimatedCostUsd": 0.124025
+      },
+      "durationMs": 34057
+    },
+    {
+      "providerId": "gemini",
+      "model": "gemini-2.5-pro",
+      "caseId": "RGPS-013",
+      "domain": "RGPS",
+      "review": {
+        "findings": [
+          {
+            "id": "fbdd9019-20c9-4e07-9a54-9f4926021e1e",
+            "type": "ANTICIPATE_COUNTERARGUMENT",
+            "opportunity": "IMPACTFUL",
+            "title": "Expor e Refutar o Motivo do Indeferimento Administrativo",
+            "rationale": "A peça menciona o protocolo administrativo, mas omite o resultado e a fundamentação da decisão do INSS. Apresentar o motivo do indeferimento (ex: perícia médica contrária) e refutá-lo de imediato demonstra a pretensão resistida e direciona a instrução processual para o ponto controvertido, fortalecendo a tese autoral desde o início.",
+            "evidenceFromText": [
+              "Junta-se: ... (5) protocolo administrativo n.º 908797108/2024."
+            ],
+            "suggestion": "Detalhar o resultado do requerimento administrativo (protocolo n.º 908797108/2024), indicando que foi indeferido e qual a justificativa apresentada pelo INSS. Em seguida, apresentar contra-argumentos específicos para refutar a decisão administrativa, utilizando as provas documentais anexadas (laudos, exames).",
+            "availableSource": null,
+            "confidence": 1,
+            "requiresHumanReview": true
+          },
+          {
+            "id": "d63be3cc-c83c-4508-8d01-58ba7dc78710",
+            "type": "STRENGTHEN_ARGUMENT",
+            "opportunity": "IMPACTFUL",
+            "title": "Detalhar a Conexão Causal entre a Patologia e a Incapacidade Laboral Específica",
+            "rationale": "A petição afirma a existência de 'limitação funcional total', mas não descreve como a patologia (CID M46.7) impede concretamente as tarefas da profissão de 'auxiliar de produção'. Detalhar essa conexão torna a incapacidade mais tangível e persuasiva para o julgador.",
+            "evidenceFromText": [
+              "A patologia acarreta limitação funcional total para as atividades de auxiliar de produção, conforme declaração médica e resultado de exames de imagem juntados."
+            ],
+            "suggestion": "Descrever as atividades habituais da profissão de 'auxiliar de produção' (ex: levantamento de peso, longos períodos em pé, movimentos repetitivos) e conectar explicitamente os sintomas e limitações decorrentes da patologia a cada uma dessas atividades, demonstrando a impossibilidade fática de seu exercício.",
+            "availableSource": null,
+            "confidence": 1,
+            "requiresHumanReview": true
+          },
+          {
+            "id": "2912cab1-6d00-4bf9-87f7-f72516cd82cb",
+            "type": "MISSING_DEMONSTRATION",
+            "opportunity": "COMPLEMENTARY",
+            "title": "Justificar a Data de Início do Benefício (DIB) Pleiteada",
+            "rationale": "A peça solicita a DIB na data de início da incapacidade (21/06/2022), mas a fixação da DIB segue regras específicas (art. 60 da Lei 8.213/91), que dependem da data do afastamento e da data do requerimento administrativo (DER). A ausência da DER e da data de afastamento do trabalho fragiliza a fundamentação do marco inicial do benefício.",
+            "evidenceFromText": [
+              "Requer: (a) concessão do auxílio com DIB em 21/06/2022;"
+            ],
+            "suggestion": "Esclarecer a data do requerimento administrativo (DER) e, se aplicável, a data do efetivo afastamento do trabalho. Justificar o pedido de fixação da DIB em 21/06/2022 com base nos critérios do art. 60 da Lei nº 8.213/91, demonstrando que o requerimento foi feito dentro do prazo legal ou que a DIB deve retroagir à data da incapacidade por outra razão legal.",
+            "availableSource": null,
+            "confidence": 1,
+            "requiresHumanReview": true
+          },
+          {
+            "id": "fcc0c6ff-eb98-4580-a70a-7e6893947bd9",
+            "type": "ANTICIPATE_COUNTERARGUMENT",
+            "opportunity": "COMPLEMENTARY",
+            "title": "Fundamentar Expressamente a Manutenção da Qualidade de Segurado",
+            "rationale": "A data da última contribuição (04/2022) é anterior à data de início da incapacidade (21/06/2022). Embora o lapso seja curto, antecipar uma possível alegação do INSS sobre a perda da qualidade de segurado, demonstrando que a autora se encontrava no 'período de graça', robustece a petição.",
+            "evidenceFromText": [
+              "Na data da incapacidade (21/06/2022), o(a) autor(a) era segurado(a) do RGPS...",
+              "Última contribuição: 04/2022."
+            ],
+            "suggestion": "Explicitar que, embora a última contribuição tenha ocorrido em 04/2022, a qualidade de segurado na data da incapacidade (21/06/2022) estava mantida, conforme o período de graça previsto no art. 15 da Lei nº 8.213/1991.",
+            "availableSource": null,
+            "confidence": 0.9,
+            "requiresHumanReview": true
+          },
+          {
+            "id": "58867b3e-1ad1-440d-9004-1eb2e4828947",
+            "type": "MISSING_DEMONSTRATION",
+            "opportunity": "OPTIONAL",
+            "title": "Fundamentar o Pedido de Assistência Judiciária Gratuita",
+            "rationale": "O pedido de AJG é formulado de maneira genérica ao final da peça. A inclusão de um tópico específico, ainda que breve, para fundamentar o pedido com base na declaração de hipossuficiência e na legislação aplicável (CPC, Art. 98 e seguintes) confere maior formalidade e robustez à solicitação.",
+            "evidenceFromText": [
+              "Requer: ... (d) AJG."
+            ],
+            "suggestion": "Inserir um tópico específico antes dos pedidos, ou um parágrafo na seção dos fatos, afirmando que a parte autora não possui condições de arcar com as custas processuais sem prejuízo do próprio sustento, requerendo os benefícios da gratuidade da justiça nos termos do Art. 98 do CPC, conforme declaração anexa.",
+            "availableSource": null,
+            "confidence": 1,
+            "requiresHumanReview": true
+          }
+        ],
+        "summary": "5 oportunidades de fortalecimento identificadas.",
+        "provider": "GEMINI",
+        "model": "gemini-2.5-pro",
+        "generatedAt": "2026-06-06T21:44:47.021Z",
+        "requiresHumanReview": true
+      },
+      "usage": {
+        "inputTokens": 436,
+        "outputTokens": 8192,
+        "totalTokens": 8628,
+        "estimatedCostUsd": 0.12506
+      },
+      "durationMs": 32160
+    },
+    {
+      "providerId": "gemini",
+      "model": "gemini-2.5-pro",
+      "caseId": "RGPS-014",
+      "domain": "RGPS",
+      "review": {
+        "findings": [
+          {
+            "id": "6743908f-8a83-4c99-96e9-1a32d3a5e5df",
+            "type": "STRENGTHEN_ARGUMENT",
+            "opportunity": "IMPACTFUL",
+            "title": "Reforçar a tese de dependência econômica com base na presunção legal",
+            "rationale": "A dependência econômica do cônjuge é legalmente presumida (art. 16, § 4º, da Lei 8.213/91). Substituir a afirmação de que a dependência é meramente 'alegada' por uma assertiva baseada na presunção legal fortalece a petição, transferindo o ônus da prova para o INSS.",
+            "evidenceFromText": [
+              "A dependência econômica da autora é alegada."
+            ],
+            "suggestion": "Substituir a frase 'A dependência econômica da autora é alegada' pela afirmação de que tal dependência é legalmente presumida, por se tratar de cônjuge, conforme dispõe o art. 16, inciso I e § 4º, da Lei nº 8.213/91.",
+            "availableSource": null,
+            "confidence": 0.98,
+            "requiresHumanReview": true
+          },
+          {
+            "id": "d23f8015-0f5e-4569-85a0-9577fd5c6c62",
+            "type": "MISSING_DEMONSTRATION",
+            "opportunity": "IMPACTFUL",
+            "title": "Demonstrar concretamente a qualidade de segurado do falecido",
+            "rationale": "A peça afirma que a qualidade de segurado é comprovada pelo CNIS, mas não apresenta os elementos que sustentam essa conclusão. Detalhar como o CNIS comprova o requisito (ex: última contribuição, vínculo ativo, período de graça) transforma uma alegação genérica em uma demonstração fática robusta.",
+            "evidenceFromText": [
+              "A qualidade de segurado de Francisco Costa à data do óbito é comprovada pelo CNIS."
+            ],
+            "suggestion": "Detalhar os fatos que demonstram a manutenção da qualidade de segurado na data do óbito, como a data da última contribuição, a existência de vínculo empregatício ativo ou o enquadramento no período de graça, conforme o art. 15 da Lei 8.213/91.",
+            "availableSource": null,
+            "confidence": 0.95,
+            "requiresHumanReview": true
+          },
+          {
+            "id": "10d582b1-8d49-4fbb-823f-4d1523c75865",
+            "type": "WEAK_FACTUAL_FOUNDATION",
+            "opportunity": "IMPACTFUL",
+            "title": "Contextualizar a lide com informações do processo administrativo",
+            "rationale": "A petição não menciona o requerimento administrativo prévio, a data (DER) ou os motivos do indeferimento pelo INSS. A inclusão desses dados é fundamental para demonstrar o interesse de agir e para direcionar a argumentação jurídica contra os fundamentos da decisão administrativa.",
+            "evidenceFromText": [
+              "DOS FATOS",
+              "Em 24/01/2020 faleceu Francisco Costa, segurado do RGPS com NB ativo..."
+            ],
+            "suggestion": "Incluir na narrativa dos fatos o histórico do requerimento administrativo, informando o número do benefício (NB) indeferido, a Data de Entrada do Requerimento (DER) e os motivos específicos apresentados pelo INSS na carta de indeferimento para justificar a negativa do pedido.",
+            "availableSource": null,
+            "confidence": 0.92,
+            "requiresHumanReview": true
+          },
+          {
+            "id": "c02315ad-ef84-4db4-a7e1-a5bcf2674024",
+            "type": "MISSING_DEMONSTRATION",
+            "opportunity": "COMPLEMENTARY",
+            "title": "Fundamentar o pedido de Assistência Judiciária Gratuita (AJG)",
+            "rationale": "O pedido de AJG é feito apenas no rol de pedidos, sem qualquer fundamentação no corpo da peça. A inclusão de um tópico específico com a declaração de hipossuficiência, conforme exige a legislação processual, previne despachos para emenda e confere maior formalidade ao requerimento.",
+            "evidenceFromText": [
+              "Requer: (a) pensão por morte com DIB na data do óbito (24/01/2020); (b) atrasados; (c) AJG."
+            ],
+            "suggestion": "Adicionar um tópico específico para o pedido de Justiça Gratuita, contendo a declaração de hipossuficiência da parte autora e o fundamento legal correspondente (art. 98 e seguintes do CPC).",
+            "availableSource": null,
+            "confidence": 0.9,
+            "requiresHumanReview": true
+          },
+          {
+            "id": "f747e91b-b31e-4939-a9ce-5e24407b70aa",
+            "type": "MISSING_CALCULATION",
+            "opportunity": "COMPLEMENTARY",
+            "title": "Apresentar demonstrativo de cálculo dos valores atrasados",
+            "rationale": "O pedido de pagamento de 'atrasados' é genérico. Apresentar uma memória de cálculo, ainda que de forma estimada, confere liquidez ao pedido, auxilia na fixação do valor da causa e demonstra a extensão econômica da pretensão ao juízo.",
+            "evidenceFromText": [
+              "Requer: ... (b) atrasados;"
+            ],
+            "suggestion": "Incluir ou anexar à petição uma planilha ou memória de cálculo com a estimativa dos valores retroativos devidos desde a DIB (24/01/2020) até a data do ajuizamento, aplicando-se os índices de correção monetária e juros pertinentes.",
+            "availableSource": null,
+            "confidence": 0.85,
+            "requiresHumanReview": true
+          }
+        ],
+        "summary": "5 oportunidades de fortalecimento identificadas.",
+        "provider": "GEMINI",
+        "model": "gemini-2.5-pro",
+        "generatedAt": "2026-06-06T21:45:18.023Z",
+        "requiresHumanReview": true
+      },
+      "usage": {
+        "inputTokens": 287,
+        "outputTokens": 8192,
+        "totalTokens": 8479,
+        "estimatedCostUsd": 0.12431500000000001
+      },
+      "durationMs": 31000
+    },
+    {
+      "providerId": "gemini",
+      "model": "gemini-2.5-pro",
+      "caseId": "RGPS-015",
+      "domain": "RGPS",
+      "review": {
+        "findings": [
+          {
+            "id": "08f93d4e-fca3-41e3-b84d-f4eb19bbaadb",
+            "type": "STRENGTHEN_ARGUMENT",
+            "opportunity": "IMPACTFUL",
+            "title": "Esclarecer a Relação entre a Concessão Administrativa e a DIB Judicial",
+            "rationale": "A peça menciona um benefício concedido administrativamente em 2022 e, simultaneamente, uma Data de Início do Benefício (DIB) fixada judicialmente para 2024. Essa aparente contradição pode gerar dúvidas no juízo e motivar um despacho para esclarecimentos, atrasando a expedição do pagamento. Clarificar a relação entre os dois eventos (ex: se a sentença revisou a DIB de um benefício já ativo) torna a petição mais clara e direta.",
+            "evidenceFromText": [
+              "Benefício NB 96524265 concedido administrativamente em 2022",
+              "DIB: 20/02/2024"
+            ],
+            "suggestion": "Aclarar, no tópico 'DO TÍTULO EXECUTIVO', a natureza da decisão judicial em face do benefício já concedido. Por exemplo, indicar se a sentença revisou a DIB de um benefício ativo ou se determinou a implantação de um novo benefício com DIB futura, para evitar qualquer ambiguidade sobre o marco inicial dos valores atrasados.",
+            "availableSource": null,
+            "confidence": 0.95,
+            "requiresHumanReview": true
+          },
+          {
+            "id": "15d7ce4d-88fd-4306-8e66-e10a13345c05",
+            "type": "STRENGTHEN_ARGUMENT",
+            "opportunity": "IMPACTFUL",
+            "title": "Especificar a Natureza e o Fundamento do Pedido de Honorários",
+            "rationale": "O pedido de 'reserva de honorários (10%)' é genérico e pode ser insuficiente para o deferimento imediato. É crucial especificar se são honorários contratuais ou de sucumbência. Se contratuais, a menção ao contrato anexo e ao destaque do percentual sobre o crédito principal é fundamental para a expedição do RPV/precatório em nome do advogado, evitando a necessidade de emenda.",
+            "evidenceFromText": [
+              "(b) reserva de honorários (10%)"
+            ],
+            "suggestion": "Detalhar o pedido de honorários, especificando se são contratuais e, nesse caso, requerer o destaque com base no contrato de honorários anexo, conforme faculta o Estatuto da Advocacia e da OAB. Exemplo: 'o destaque dos honorários contratuais, no percentual de 10% sobre o crédito principal do Exequente, com a expedição de RPV/precatório em separado e em nome da sociedade de advogados, conforme contrato anexo'.",
+            "availableSource": null,
+            "confidence": 0.95,
+            "requiresHumanReview": true
+          },
+          {
+            "id": "2f76e3ca-3c16-4b36-816d-22e792ecc8af",
+            "type": "MISSING_LEGAL_ANCHOR",
+            "opportunity": "COMPLEMENTARY",
+            "title": "Incluir Fundamento Legal para o Cumprimento de Sentença",
+            "rationale": "A peça apresenta os fatos e cálculos, mas não ancora o procedimento no Código de Processo Civil. A menção expressa aos artigos que regem o cumprimento de sentença contra a Fazenda Pública confere maior formalidade e solidez jurídica à petição, demonstrando o alinhamento do pedido com as normas processuais vigentes.",
+            "evidenceFromText": [
+              "CUMPRIMENTO DE SENTENÇA PREVIDENCIÁRIA"
+            ],
+            "suggestion": "Adicionar, no início da peça ou em um tópico específico, o fundamento legal para o pedido de cumprimento de sentença, como os artigos 534 e 535 do Código de Processo Civil, que tratam da execução contra a Fazenda Pública.",
+            "availableSource": null,
+            "confidence": 0.9,
+            "requiresHumanReview": true
+          },
+          {
+            "id": "59262d88-81ae-4d90-96e0-b4e5cfecc7a8",
+            "type": "MISSING_SUPPORTING_DOCUMENT",
+            "opportunity": "COMPLEMENTARY",
+            "title": "Referenciar Expressamente os Documentos Essenciais Anexados",
+            "rationale": "A petição executa um título judicial e apresenta cálculos, mas não menciona textualmente que a cópia da sentença, a certidão de trânsito em julgado e a planilha detalhada estão sendo juntadas. Fazer referência explícita a esses documentos no corpo do texto organiza a petição e facilita a verificação por parte do juízo.",
+            "evidenceFromText": [
+              "Trata-se de cumprimento da sentença proferida em 2021 (transitada em julgado em 2022)",
+              "[...planilha completa em anexo com todas as competências]"
+            ],
+            "suggestion": "No início da peça, ao descrever o título executivo e os cálculos, fazer referência direta aos documentos que comprovam as alegações. Exemplo: '...conforme sentença (doc. anexo) e respectiva certidão de trânsito em julgado (doc. anexo). O valor devido é de R$ 40.110,87, apurado conforme memória de cálculo detalhada (doc. anexo)'.",
+            "availableSource": null,
+            "confidence": 0.85,
+            "requiresHumanReview": true
+          }
+        ],
+        "summary": "4 oportunidades de fortalecimento identificadas.",
+        "provider": "GEMINI",
+        "model": "gemini-2.5-pro",
+        "generatedAt": "2026-06-06T21:45:50.847Z",
+        "requiresHumanReview": true
+      },
+      "usage": {
+        "inputTokens": 477,
+        "outputTokens": 8192,
+        "totalTokens": 8669,
+        "estimatedCostUsd": 0.12526500000000002
+      },
+      "durationMs": 32818
+    },
+    {
+      "providerId": "deepseek",
+      "model": "deepseek-reasoner",
+      "caseId": "RGPS-001",
+      "domain": "RGPS",
+      "review": {
+        "findings": [
+          {
+            "id": "58ba0aea-dd0b-4089-9370-f442c116294f",
+            "type": "MISSING_DEMONSTRATION",
+            "opportunity": "IMPACTFUL",
+            "title": "Incluir quadro demonstrativo da carência e do tempo de contribuição",
+            "rationale": "A peça afirma que o autor possui 214 contribuições e supera a carência de 180, mas não apresenta um quadro discriminado dos períodos, meses e anos de contribuição. Um quadro detalhado fortalece a demonstração do cumprimento dos requisitos legais e facilita a verificação pelo juízo.",
+            "evidenceFromText": [
+              "O(A) autor(a) comprova, pelo CNIS atualizado emitido em 06/03/2019, 214 contribuições mensais ao RGPS, superando a carência mínima de 180 contribuições exigida pelo art. 25, II, da Lei n.º 8.213/1991.",
+              "Total de contribuições: 214."
+            ],
+            "suggestion": "Adicionar um quadro discriminando todos os períodos de contribuição (mês/ano de início e fim, número de meses, total acumulado), com destaque para o cumprimento da carência de 180 contribuições e do tempo de contribuição total.",
+            "availableSource": "",
+            "confidence": 0.95,
+            "requiresHumanReview": true
+          },
+          {
+            "id": "adb452ec-e66d-4c8d-bec7-b5901ec9ed03",
+            "type": "MISSING_CALCULATION",
+            "opportunity": "IMPACTFUL",
+            "title": "Apresentar memória de cálculo da RMI e das parcelas vencidas",
+            "rationale": "A peça pede RMI de R$ 4.236,00 e parcelas vencidas de R$ 16.618,03, mas não apresenta a memória de cálculo que justifica esses valores. A ausência de cálculo pode gerar questionamentos sobre a correção dos valores e enfraquecer a pretensão financeira.",
+            "evidenceFromText": [
+              "A RMI apurada pelo INSS administrativamente foi de R$ 4.236,00, valor ora confirmado pelo cálculo do escritório com base nas competências do CNIS.",
+              "o pagamento das parcelas vencidas desde a DER, ora estimadas em R$ 16618,03, com correção pelo INPC e juros de 1% ao mês",
+              "RMI inicial de R$ 4.236,00"
+            ],
+            "suggestion": "Incluir planilha ou demonstrativo detalhado do cálculo da RMI (média dos salários de contribuição, aplicação do fator previdenciário, se houver) e do montante das parcelas vencidas (período, valor de cada parcela, correção monetária e juros).",
+            "availableSource": "",
+            "confidence": 0.95,
+            "requiresHumanReview": true
+          },
+          {
+            "id": "fd35be6d-ba6a-4af3-8571-9d0d1249a336",
+            "type": "MISSING_DATE_ANCHOR",
+            "opportunity": "COMPLEMENTARY",
+            "title": "Ancorar a idade do autor na DER com referência documental",
+            "rationale": "A peça afirma que o autor tinha 76 anos na DER, mas não vincula essa informação a um documento específico (ex.: certidão de nascimento, RG). Ancorar a idade em documento fortalece a comprovação do requisito etário.",
+            "evidenceFromText": [
+              "O(A) autor(a), com 76 anos à DER (06/03/2019)"
+            ],
+            "suggestion": "Mencionar expressamente que a idade de 76 anos é comprovada pela Certidão de Nascimento ou RG já juntados aos autos, indicando o documento correspondente.",
+            "availableSource": "",
+            "confidence": 0.85,
+            "requiresHumanReview": true
+          },
+          {
+            "id": "6a6253b8-1a74-4416-95e1-706bf2f3233b",
+            "type": "MISSING_SUPPORTING_DOCUMENT",
+            "opportunity": "COMPLEMENTARY",
+            "title": "Referenciar a carta de indeferimento do INSS como prova do reconhecimento da carência",
+            "rationale": "A peça menciona que o INSS reconheceu a carência mas indeferiu por idade, mas não detalha o conteúdo da carta de indeferimento. Referenciar esse documento como prova do reconhecimento administrativo fortalece a tese de que o único óbice foi a idade, já superada.",
+            "evidenceFromText": [
+              "Na ocasião, o INSS reconheceu o cumprimento da carência mas indeferiu o benefício por entender, equivocadamente, não ter sido atingida a idade mínima.",
+              "(5) Carta de indeferimento do INSS, protocolo n.º 032358455/2024"
+            ],
+            "suggestion": "Transcrever ou resumir o trecho da carta de indeferimento que reconhece a carência, demonstrando que o INSS já validou esse requisito.",
+            "availableSource": "",
+            "confidence": 0.8,
+            "requiresHumanReview": true
+          },
+          {
+            "id": "2a6215e0-c133-4ef6-aa3f-6e90e6e8d74e",
+            "type": "ANTICIPATE_COUNTERARGUMENT",
+            "opportunity": "COMPLEMENTARY",
+            "title": "Antecipar possível contestação sobre a qualidade de segurado na DER",
+            "rationale": "Embora a peça mencione contribuições ininterruptas até a DER, não aborda expressamente a manutenção da qualidade de segurado. O INSS pode questionar se houve perda da qualidade entre o último recolhimento e a DER, especialmente se houver lacunas. Antecipar esse argumento fortalece a tese.",
+            "evidenceFromText": [
+              "O vínculo mais antigo registrado data de 1972, com contribuições ininterruptas comprovadas até a DER.",
+              "Empresa Beta Comércio S/A, CNPJ 98.765.432/0001-11, de 08/2002 a 03/2019 — vínculos ativos."
+            ],
+            "suggestion": "Incluir parágrafo demonstrando que o autor manteve a qualidade de segurado na DER, com base no art. 15 da Lei 8.213/1991, mencionando que o último vínculo (Empresa Beta) se estende até a DER, ou, se houver período de graça, explicitá-lo.",
+            "availableSource": "",
+            "confidence": 0.75,
+            "requiresHumanReview": true
+          }
+        ],
+        "summary": "5 oportunidades de fortalecimento identificadas: 2 impactantes, 3 complementares.",
+        "provider": "DEEPSEEK",
+        "model": "deepseek-chat",
+        "generatedAt": "2026-06-06T21:46:04.700Z",
+        "requiresHumanReview": true
+      },
+      "usage": {
+        "inputTokens": 790,
+        "outputTokens": 8192,
+        "totalTokens": 8982,
+        "estimatedCostUsd": 0.025366
+      },
+      "durationMs": 13850
+    },
+    {
+      "providerId": "deepseek",
+      "model": "deepseek-reasoner",
+      "caseId": "RGPS-002",
+      "domain": "RGPS",
+      "review": {
+        "findings": [
+          {
+            "id": "1ea01f9c-b299-454c-b17b-42097c88df7c",
+            "type": "MISSING_DEMONSTRATION",
+            "opportunity": "IMPACTFUL",
+            "title": "Demonstrar o tempo especial com quadro de períodos, agentes nocivos e enquadramento legal",
+            "rationale": "A peça afirma que o autor trabalhou 22 anos em condições especiais, mas não discrimina os períodos, os agentes nocivos específicos, a intensidade e o enquadramento no Decreto n.º 3.048/1999. Isso fragiliza a demonstração do requisito legal e pode ser contestado pelo INSS.",
+            "evidenceFromText": [
+              "trabalhou por 22 anos em condições especiais com exposição a agentes nocivos à saúde",
+              "[a identificação do agente nocivo específico, sua intensidade e o enquadramento no Decreto n.º 3.048/1999 não foram desenvolvidos na peça]"
+            ],
+            "suggestion": "Incluir um quadro discriminando cada período de trabalho especial, com datas, empregador, agente nocivo (ruído, químicos, etc.), intensidade (ex.: nível de ruído em dB), habitualidade e permanência, e o enquadramento no Anexo IV do Decreto n.º 3.048/1999 ou no Anexo do Decreto n.º 53.831/1964, conforme o caso.",
+            "availableSource": "",
+            "confidence": 0.95,
+            "requiresHumanReview": true
+          },
+          {
+            "id": "e6d98a73-36d9-40dd-934e-0df90df473b0",
+            "type": "MISSING_CALCULATION",
+            "opportunity": "IMPACTFUL",
+            "title": "Apresentar memória de cálculo do tempo total de contribuição especial e da RMI",
+            "rationale": "O pedido de concessão de aposentadoria especial e o valor da causa (R$ 204.600,00) não são acompanhados de demonstração numérica do tempo total de contribuição especial (22 anos) nem do cálculo da Renda Mensal Inicial (RMI). Isso enfraquece a fundamentação do valor pretendido e pode gerar questionamentos sobre a correção do cálculo.",
+            "evidenceFromText": [
+              "trabalhou por 22 anos em condições especiais",
+              "Valor: R$ 204.600,00"
+            ],
+            "suggestion": "Incluir memória de cálculo detalhada: (a) quadro com todos os períodos de contribuição especial, convertidos para tempo total (se houver períodos comuns); (b) cálculo da média dos salários de contribuição (art. 29 da Lei n.º 8.213/1991); (c) demonstração do valor da RMI; (d) cálculo dos atrasados desde a DER (22/12/2020) até a data da propositura, com índices de correção e juros.",
+            "availableSource": "",
+            "confidence": 0.9,
+            "requiresHumanReview": true
+          },
+          {
+            "id": "b0745e02-0d36-423e-9098-045458397b7d",
+            "type": "MISSING_DATE_ANCHOR",
+            "opportunity": "COMPLEMENTARY",
+            "title": "Ancorar a DER e a DIB com referência ao protocolo administrativo",
+            "rationale": "A DER (22/12/2020) é mencionada, mas não há referência explícita ao protocolo administrativo que a comprova. Isso pode gerar dúvida sobre a data exata do requerimento administrativo.",
+            "evidenceFromText": [
+              "DER de 22/12/2020",
+              "Protocolo administrativo n.º 245236601/2024"
+            ],
+            "suggestion": "Vincular a DER ao protocolo administrativo, indicando que a DER de 22/12/2020 corresponde à data do requerimento administrativo formalizado sob o n.º 245236601/2024, conforme documento anexo.",
+            "availableSource": "",
+            "confidence": 0.85,
+            "requiresHumanReview": true
+          },
+          {
+            "id": "ec795aaf-2102-4722-bb2f-b333ba515f41",
+            "type": "MISSING_LEGAL_ANCHOR",
+            "opportunity": "COMPLEMENTARY",
+            "title": "Fundamentar o direito à aposentadoria especial com os requisitos legais completos",
+            "rationale": "A peça cita apenas o art. 57 da Lei n.º 8.213/1991, mas não menciona os requisitos complementares (carência, qualidade de segurado, comprovação da exposição) nem os dispositivos regulamentadores (Decreto n.º 3.048/1999). Isso pode ser visto como fundamentação insuficiente.",
+            "evidenceFromText": [
+              "Nos termos do art. 57 da Lei n.º 8.213/1991, a aposentadoria especial é devida ao segurado que tiver trabalhado 20 anos sob condições especiais."
+            ],
+            "suggestion": "Indicar expressamente os fundamentos legais aplicáveis: art. 57 e 58 da Lei n.º 8.213/1991 (requisitos e comprovação), art. 64 e seguintes do Decreto n.º 3.048/1999 (enquadramento), e art. 29 da Lei n.º 8.213/1991 (cálculo da RMI). Não inventar artigos não presentes no contexto.",
+            "availableSource": "",
+            "confidence": 0.8,
+            "requiresHumanReview": true
+          },
+          {
+            "id": "7767b38c-a500-44dd-9aa7-fa24924aa97e",
+            "type": "ANTICIPATE_COUNTERARGUMENT",
+            "opportunity": "COMPLEMENTARY",
+            "title": "Antecipar a contestação sobre a eficácia do EPI e a habitualidade da exposição",
+            "rationale": "O INSS frequentemente contesta a aposentadoria especial argumentando que o EPI era eficaz para neutralizar o agente nocivo ou que a exposição não era habitual e permanente. A peça não aborda esses pontos, deixando a tese vulnerável.",
+            "evidenceFromText": [
+              "trabalhou por 22 anos em condições especiais com exposição a agentes nocivos à saúde"
+            ],
+            "suggestion": "Incluir argumentação de que a exposição era habitual e permanente, conforme exigido pelo art. 57, §3º, da Lei n.º 8.213/1991, e que o PPP e o LTCAT demonstram a impossibilidade de neutralização do agente nocivo por EPI, ou, se aplicável, que o EPI não era suficiente para eliminar o risco. Mencionar que a Súmula 198 do TFR e a jurisprudência do STJ (REsp 1.306.113/SC) afastam a eficácia do EPI para agentes nocivos como ruído acima do limite legal.",
+            "availableSource": "",
+            "confidence": 0.75,
+            "requiresHumanReview": true
+          }
+        ],
+        "summary": "5 oportunidades de fortalecimento identificadas: 2 impactantes, 3 complementares.",
+        "provider": "DEEPSEEK",
+        "model": "deepseek-chat",
+        "generatedAt": "2026-06-06T21:46:19.034Z",
+        "requiresHumanReview": true
+      },
+      "usage": {
+        "inputTokens": 394,
+        "outputTokens": 8192,
+        "totalTokens": 8586,
+        "estimatedCostUsd": 0.02497
+      },
+      "durationMs": 14332
+    },
+    {
+      "providerId": "deepseek",
+      "model": "deepseek-reasoner",
+      "caseId": "RGPS-003",
+      "domain": "RGPS",
+      "review": {
+        "findings": [
+          {
+            "id": "e41fbc68-391e-460e-84a5-00528cf5ca8d",
+            "type": "MISSING_DEMONSTRATION",
+            "opportunity": "IMPACTFUL",
+            "title": "Incluir contraponto técnico ao laudo pericial",
+            "rationale": "A peça reconhece que o laudo pericial concluiu pela ausência de incapacidade, mas não apresenta qualquer análise técnica que contrarie essa conclusão. Sem um contraponto fundamentado, o recurso perde força persuasiva perante o Tribunal.",
+            "evidenceFromText": [
+              "O recurso menciona o laudo pericial de fls. 123 que concluiu pela ausência de incapacidade, sem enfrentar tecnicamente sua fundamentação.",
+              "[o apelante não apresenta contraponto técnico às conclusões periciais]"
+            ],
+            "suggestion": "Adicionar seção específica que analise criticamente o laudo pericial, apontando eventuais contradições, omissões ou fragilidades na fundamentação do perito, como a ausência de consideração sobre a natureza da atividade laboral do autor ou a falta de exames complementares que corroborem a conclusão.",
+            "availableSource": "",
+            "confidence": 0.95,
+            "requiresHumanReview": true
+          },
+          {
+            "id": "72c45ee0-450b-4920-b298-4ca5dbaf9289",
+            "type": "MISSING_DATE_ANCHOR",
+            "opportunity": "COMPLEMENTARY",
+            "title": "Ancorar a DIB com referência documental",
+            "rationale": "A peça menciona a DIB na data do requerimento administrativo (14/11/2020), mas não faz referência ao documento que comprova essa data, como a carta de indeferimento ou o protocolo administrativo. Isso enfraquece a precisão do pedido.",
+            "evidenceFromText": [
+              "Requer o PROVIMENTO do recurso para reformar a sentença e conceder o benefício por incapacidade com DIB na data do requerimento administrativo (14/11/2020)"
+            ],
+            "suggestion": "Indicar expressamente o documento que comprova a data do requerimento administrativo, como 'conforme consta do processo administrativo NB [NB/PA]' ou 'conforme protocolo de requerimento anexo aos autos'.",
+            "availableSource": "",
+            "confidence": 0.85,
+            "requiresHumanReview": true
+          },
+          {
+            "id": "5f023e59-5f18-4381-b774-06e5f2c898e9",
+            "type": "MISSING_DEMONSTRATION",
+            "opportunity": "COMPLEMENTARY",
+            "title": "Demonstrar a qualidade de segurado na DER",
+            "rationale": "Em benefícios por incapacidade, a qualidade de segurado na DER é requisito essencial. A peça não menciona se o autor mantinha essa qualidade na data do requerimento, o que pode ser questionado pelo INSS.",
+            "evidenceFromText": [
+              "Requer o PROVIMENTO do recurso para reformar a sentença e conceder o benefício por incapacidade com DIB na data do requerimento administrativo (14/11/2020)"
+            ],
+            "suggestion": "Incluir parágrafo demonstrando que o autor estava na qualidade de segurado na DER, com base no CNIS ou em períodos de graça, indicando a data da última contribuição e o período de graça aplicável, se for o caso.",
+            "availableSource": "",
+            "confidence": 0.8,
+            "requiresHumanReview": true
+          },
+          {
+            "id": "0e1b234b-73ee-4ad1-a4c7-89dba4f72ac5",
+            "type": "ANTICIPATE_COUNTERARGUMENT",
+            "opportunity": "IMPACTFUL",
+            "title": "Antecipar contestação sobre capacidade laboral residual",
+            "rationale": "O laudo pericial reconheceu capacidade residual para atividades de menor esforço físico. O INSS provavelmente usará esse argumento para negar o benefício. A peça não antecipa essa objeção, o que a torna vulnerável.",
+            "evidenceFromText": [
+              "que concluiu pela AUSÊNCIA de incapacidade laboral, reconhecendo capacidade residual para atividades de menor esforço físico."
+            ],
+            "suggestion": "Adicionar argumentação demonstrando que, mesmo com capacidade residual, o autor não possui qualificação profissional ou condições de readaptação para atividades de menor esforço, considerando sua idade, histórico laboral e condições de saúde. Citar jurisprudência sobre a impossibilidade de reabilitação profissional quando o segurado não tem formação ou experiência compatível.",
+            "availableSource": "",
+            "confidence": 0.9,
+            "requiresHumanReview": true
+          },
+          {
+            "id": "f811f1ff-3a01-47fb-a8a2-80b7f2d69891",
+            "type": "MISSING_DEMONSTRATION",
+            "opportunity": "COMPLEMENTARY",
+            "title": "Incluir demonstração da carência",
+            "rationale": "Para concessão de auxílio por incapacidade, é necessário cumprir carência de 12 contribuições mensais. A peça não menciona se esse requisito foi cumprido, o que pode ser questionado.",
+            "evidenceFromText": [
+              "Requer o PROVIMENTO do recurso para reformar a sentença e conceder o benefício por incapacidade"
+            ],
+            "suggestion": "Incluir quadro demonstrativo das contribuições realizadas nos 12 meses anteriores à DER, com base no CNIS, comprovando o cumprimento da carência. Se houver período de graça, explicar sua aplicação para dispensa de carência.",
+            "availableSource": "",
+            "confidence": 0.75,
+            "requiresHumanReview": true
+          }
+        ],
+        "summary": "5 oportunidades de fortalecimento identificadas: 2 impactantes, 3 complementares.",
+        "provider": "DEEPSEEK",
+        "model": "deepseek-chat",
+        "generatedAt": "2026-06-06T21:46:29.042Z",
+        "requiresHumanReview": true
+      },
+      "usage": {
+        "inputTokens": 310,
+        "outputTokens": 8192,
+        "totalTokens": 8502,
+        "estimatedCostUsd": 0.024886000000000002
+      },
+      "durationMs": 10002
+    },
+    {
+      "providerId": "deepseek",
+      "model": "deepseek-reasoner",
+      "caseId": "RGPS-004",
+      "domain": "RGPS",
+      "review": {
+        "findings": [
+          {
+            "id": "9ce5fdf4-f08e-42bb-a7e2-73822337a97f",
+            "type": "MISSING_DEMONSTRATION",
+            "opportunity": "IMPACTFUL",
+            "title": "Demonstrar a composição do núcleo familiar e a renda per capita",
+            "rationale": "O BPC/LOAS exige comprovação de miserabilidade com renda per capita inferior a 1/4 do salário mínimo. A peça afirma que o requisito está demonstrado, mas não apresenta a composição do grupo familiar nem o cálculo da renda per capita, fragilizando a tese.",
+            "evidenceFromText": [
+              "[análise socioeconômica do grupo familiar não desenvolvida — renda per capita, composição familiar e CadÚnico não apresentados na peça]",
+              "O BPC/LOAS está previsto no art. 203, V, da CF/88 e regulamentado pelo art. 20 da Lei n.º 8.742/1993 (LOAS), exigindo deficiência e renda per capita inferior a 1/4 do salário mínimo. Ambos os requisitos restam demonstrados."
+            ],
+            "suggestion": "Incluir quadro demonstrativo com a composição do núcleo familiar (nome, idade, grau de parentesco, renda individual de cada membro), o total da renda familiar, o número de pessoas e o cálculo da renda per capita, comparando-a com o limite de 1/4 do salário mínimo vigente na DER. Mencionar a inscrição no CadÚnico, se houver.",
+            "availableSource": "",
+            "confidence": 0.95,
+            "requiresHumanReview": true
+          },
+          {
+            "id": "81102fb4-a031-453b-961a-47440cc2c837",
+            "type": "MISSING_DEMONSTRATION",
+            "opportunity": "IMPACTFUL",
+            "title": "Detalhar a deficiência com laudo médico e demonstrar a incapacidade para a vida independente e o trabalho",
+            "rationale": "O BPC/LOAS exige deficiência de longa duração que cause impedimento de participação plena na sociedade. A peça menciona laudo médico, mas não desenvolve a demonstração da incapacidade, nem especifica as limitações funcionais, o CID, a data de início da deficiência e o grau de impedimento.",
+            "evidenceFromText": [
+              "O(A) autor(a), Antônia Pereira Lima, CPF 019.642.236-86, é portador(a) de deficiência diagnosticada em 19/08/2017, conforme laudo médico do Dr. [Médico Assistente], CRM 12597, que atesta limitação funcional de longa duração impeditiva de participação plena e efetiva na sociedade."
+            ],
+            "suggestion": "Incluir quadro com: CID da deficiência, data do diagnóstico, descrição das limitações funcionais (físicas, mentais, intelectuais ou sensoriais), impacto na vida diária e na capacidade laborativa, e menção a exames complementares. Se possível, referenciar laudo pericial do INSS ou judicial que confirme a condição.",
+            "availableSource": "",
+            "confidence": 0.9,
+            "requiresHumanReview": true
+          },
+          {
+            "id": "8724298e-8dfa-4ac7-8a27-c934a3cbfa43",
+            "type": "MISSING_DATE_ANCHOR",
+            "opportunity": "COMPLEMENTARY",
+            "title": "Ancorar a Data de Entrada do Requerimento (DER) com referência ao processo administrativo",
+            "rationale": "A DIB (Data de Início do Benefício) é fixada na DER (03/05/2017), mas a peça não menciona o número do benefício (NB) ou do processo administrativo (PA), nem faz referência ao indeferimento administrativo. Isso dificulta a verificação do requerimento e o cálculo dos atrasados.",
+            "evidenceFromText": [
+              "Requer: (a) concessão do BPC/LOAS com DIB no requerimento administrativo (03/05/2017)"
+            ],
+            "suggestion": "Incluir o número do NB/PA do requerimento administrativo, a data do protocolo e a data do indeferimento (se houver). Mencionar que o pedido foi indeferido pelo INSS, demonstrando o esgotamento da via administrativa.",
+            "availableSource": "",
+            "confidence": 0.85,
+            "requiresHumanReview": true
+          },
+          {
+            "id": "bedff4ad-8bb6-4540-90f0-b4f880548605",
+            "type": "MISSING_CALCULATION",
+            "opportunity": "COMPLEMENTARY",
+            "title": "Apresentar memória de cálculo dos atrasados",
+            "rationale": "O pedido de pagamento dos atrasados não é acompanhado de memória de cálculo, o que pode gerar questionamentos sobre o valor devido e a prescrição quinquenal. A demonstração do cálculo fortalece a pretensão financeira.",
+            "evidenceFromText": [
+              "Requer: (b) pagamento dos atrasados com correção"
+            ],
+            "suggestion": "Incluir planilha com: DIB (03/05/2017), data do ajuizamento, parcelas vencidas mês a mês, valor de cada parcela (1 salário mínimo vigente na época), correção monetária e juros de mora, indicando o total devido. Mencionar a prescrição quinquenal apenas das parcelas anteriores a 5 anos do ajuizamento, se aplicável.",
+            "availableSource": "",
+            "confidence": 0.8,
+            "requiresHumanReview": true
+          },
+          {
+            "id": "8119d599-0be5-42c9-bfe6-c817f034ff81",
+            "type": "MISSING_LEGAL_ANCHOR",
+            "opportunity": "COMPLEMENTARY",
+            "title": "Fundamentar o pedido de Assistência Judiciária Gratuita (AJG)",
+            "rationale": "O pedido de AJG é feito sem qualquer fundamentação legal ou demonstração da hipossuficiência. A simples menção 'AJG' pode ser insuficiente para o deferimento, especialmente se não houver declaração de pobreza.",
+            "evidenceFromText": [
+              "Requer: (c) AJG."
+            ],
+            "suggestion": "Incluir fundamento legal (art. 5º, LXXIV, da CF/88 e art. 98 e seguintes do CPC) e declaração de hipossuficiência, afirmando que a autora não possui condições de arcar com as custas processuais sem prejuízo do próprio sustento. Se houver, mencionar a renda familiar já demonstrada.",
+            "availableSource": "",
+            "confidence": 0.75,
+            "requiresHumanReview": true
+          }
+        ],
+        "summary": "5 oportunidades de fortalecimento identificadas: 2 impactantes, 3 complementares.",
+        "provider": "DEEPSEEK",
+        "model": "deepseek-chat",
+        "generatedAt": "2026-06-06T21:46:43.722Z",
+        "requiresHumanReview": true
+      },
+      "usage": {
+        "inputTokens": 310,
+        "outputTokens": 8192,
+        "totalTokens": 8502,
+        "estimatedCostUsd": 0.024886000000000002
+      },
+      "durationMs": 14676
+    },
+    {
+      "providerId": "deepseek",
+      "model": "deepseek-reasoner",
+      "caseId": "RGPS-005",
+      "domain": "RGPS",
+      "review": {
+        "findings": [
+          {
+            "id": "53895490-3fe3-4fa5-b95b-08e400b3b52e",
+            "type": "MISSING_DEMONSTRATION",
+            "opportunity": "IMPACTFUL",
+            "title": "Demonstrar a divergência salarial com quadro comparativo detalhado",
+            "rationale": "A peça alega divergência entre os salários de contribuição do CNIS e os utilizados pelo INSS, mas não apresenta um quadro comparativo que evidencie, mês a mês, a diferença. Isso enfraquece a demonstração do erro material e do impacto no cálculo da RMI.",
+            "evidenceFromText": [
+              "O CNIS atualizado, emitido em 21/10/2021, registra salários de contribuição de R$ 3499,68/mês no período de 01/2008 a 12/2010, divergindo do valor de R$ 2156,82/mês utilizado pelo INSS.",
+              "A diferença no PBC acarreta redução indevida de aproximadamente 8,3% na RMI, gerando atrasados desde a DIB."
+            ],
+            "suggestion": "Incluir um quadro comparativo discriminando, mês a mês, os salários de contribuição registrados no CNIS e os utilizados pelo INSS para o período de 01/2008 a 12/2010, destacando a diferença mensal e o total acumulado. Isso tornará a divergência mais clara e robusta.",
+            "availableSource": "",
+            "confidence": 0.95,
+            "requiresHumanReview": true
+          },
+          {
+            "id": "c7ba6aec-4269-4480-a3f5-9659ef9c28a5",
+            "type": "MISSING_CALCULATION",
+            "opportunity": "IMPACTFUL",
+            "title": "Apresentar memória de cálculo do impacto na RMI e dos atrasados",
+            "rationale": "A peça menciona uma redução de aproximadamente 8,3% na RMI e a existência de atrasados, mas não apresenta nenhum cálculo demonstrativo. Isso fragiliza o pedido de recálculo e pagamento de diferenças, pois o tribunal não pode verificar a procedência do valor pretendido.",
+            "evidenceFromText": [
+              "A diferença no PBC acarreta redução indevida de aproximadamente 8,3% na RMI, gerando atrasados desde a DIB.",
+              "(b) recalcular a RMI; (c) pagar diferenças com correção."
+            ],
+            "suggestion": "Incluir uma memória de cálculo que demonstre: (1) a RMI calculada com os salários corretos do CNIS; (2) a RMI calculada com os salários utilizados pelo INSS; (3) a diferença percentual e absoluta entre ambas; (4) o valor total dos atrasados desde a DIB até a data do recurso, com correção monetária e juros. Isso fundamenta numericamente o pedido.",
+            "availableSource": "",
+            "confidence": 0.95,
+            "requiresHumanReview": true
+          },
+          {
+            "id": "7c973ef8-e99c-4d64-85c5-500ac5b89f18",
+            "type": "MISSING_DATE_ANCHOR",
+            "opportunity": "COMPLEMENTARY",
+            "title": "Fixar a DIB (Data de Início do Benefício) para cálculo dos atrasados",
+            "rationale": "A peça menciona 'atrasados desde a DIB', mas não informa qual é a DIB do benefício. Sem essa data, o tribunal não pode precisar o período de atrasados, o que enfraquece o pedido de pagamento.",
+            "evidenceFromText": [
+              "A diferença no PBC acarreta redução indevida de aproximadamente 8,3% na RMI, gerando atrasados desde a DIB."
+            ],
+            "suggestion": "Indicar expressamente a DIB do benefício (ex: 'DIB em [DATA]'), com referência ao documento onde consta (ex: Carta de Concessão). Se a DIB não estiver disponível, sugerir que seja extraída do processo administrativo e incluída na peça.",
+            "availableSource": "",
+            "confidence": 0.85,
+            "requiresHumanReview": true
+          },
+          {
+            "id": "c3523ffa-2977-44c9-b5c0-53303a96c925",
+            "type": "STRENGTHEN_ARGUMENT",
+            "opportunity": "COMPLEMENTARY",
+            "title": "Reforçar a prevalência do CNIS sobre os lançamentos administrativos com base no art. 29-A da Lei 8.213/1991",
+            "rationale": "A peça já cita o art. 29-A, mas não desenvolve o argumento de que o CNIS é o documento oficial e vinculante para o cálculo do PBC. Reforçar essa premissa com a explicação de que o INSS não pode se afastar dos dados do CNIS sem justificativa robusta fortalece a tese.",
+            "evidenceFromText": [
+              "O art. 29-A impõe ao INSS a obrigação de utilizar os dados do CNIS.",
+              "O erro material apurado é corrigível, pois os dados do CNIS prevalecem sobre os lançamentos administrativos (art. 29-A da Lei n.º 8.213/1991; STJ, REsp 1.348.173/RS)."
+            ],
+            "suggestion": "Explicitar que o CNIS é o documento oficial de registro dos vínculos e contribuições, e que o INSS, ao utilizar valor diverso, violou o art. 29-A, que determina a utilização dos dados do CNIS para o cálculo do PBC. Mencionar que a jurisprudência do STJ (REsp 1.348.173/RS) consolida esse entendimento.",
+            "availableSource": "",
+            "confidence": 0.9,
+            "requiresHumanReview": true
+          },
+          {
+            "id": "eec2b149-69d8-4a72-8045-f7d7e366322f",
+            "type": "ANTICIPATE_COUNTERARGUMENT",
+            "opportunity": "COMPLEMENTARY",
+            "title": "Antecipar possível contestação do INSS sobre a validade dos dados do CNIS",
+            "rationale": "O INSS pode argumentar que os dados do CNIS para o período de 01/2008 a 12/2010 são inconsistentes ou que houve erro no registro. Antecipar essa objeção e demonstrar que o CNIS é atualizado e confiável fortalece a tese.",
+            "evidenceFromText": [
+              "O CNIS atualizado, emitido em 21/10/2021, registra salários de contribuição de R$ 3499,68/mês no período de 01/2008 a 12/2010, divergindo do valor de R$ 2156,82/mês utilizado pelo INSS."
+            ],
+            "suggestion": "Incluir argumento de que o CNIS é emitido pelo próprio INSS e goza de presunção de veracidade, cabendo ao INSS o ônus de provar eventual erro no registro. Se houver documento que comprove a correção dos dados (ex: guias de recolhimento), mencioná-lo.",
+            "availableSource": "",
+            "confidence": 0.8,
+            "requiresHumanReview": true
+          }
+        ],
+        "summary": "5 oportunidades de fortalecimento identificadas: 2 impactantes, 3 complementares.",
+        "provider": "DEEPSEEK",
+        "model": "deepseek-chat",
+        "generatedAt": "2026-06-06T21:46:56.543Z",
+        "requiresHumanReview": true
+      },
+      "usage": {
+        "inputTokens": 430,
+        "outputTokens": 8192,
+        "totalTokens": 8622,
+        "estimatedCostUsd": 0.025006
+      },
+      "durationMs": 12819
+    },
+    {
+      "providerId": "deepseek",
+      "model": "deepseek-reasoner",
+      "caseId": "RGPS-006",
+      "domain": "RGPS",
+      "review": {
+        "findings": [
+          {
+            "id": "a166d043-c914-4c65-84d0-0d306abba5ba",
+            "type": "MISSING_DEMONSTRATION",
+            "opportunity": "IMPACTFUL",
+            "title": "Demonstrar o tempo de atividade rural com quadro de períodos",
+            "rationale": "A peça afirma que a autora trabalhou como segurada especial por aproximadamente 28 anos, mas não discrimina os períodos, locais, atividades ou documentos que comprovam cada intervalo. Um quadro detalhado fortalece a comprovação da carência e do tempo de atividade rural exigido pelo art. 143 da Lei 8.213/1991.",
+            "evidenceFromText": [
+              "trabalhou como trabalhador(a) rural (segurado especial) por aproximadamente 28 anos na região de Porto Alegre, cultivando lavoura de subsistência em regime de economia familiar"
+            ],
+            "suggestion": "Incluir quadro demonstrativo com os períodos de atividade rural (datas de início e fim), a localização da propriedade ou imóvel rural, a atividade exercida (ex.: cultivo de feijão, milho, mandioca) e o regime de economia familiar, indicando para cada período o documento que serve como início de prova material (ex.: contrato de arrendamento, declaração do sindicato, certidão de casamento, histórico escolar dos filhos, notas fiscais de venda da produção).",
+            "availableSource": "",
+            "confidence": 0.9,
+            "requiresHumanReview": true
+          },
+          {
+            "id": "26c36f68-bd2f-4a66-845b-7dc63f15a7cb",
+            "type": "MISSING_DATE_ANCHOR",
+            "opportunity": "IMPACTFUL",
+            "title": "Ancorar a DER e a DIB com referência documental",
+            "rationale": "A peça menciona a DER (25/03/2016) e a DIB, mas não vincula essas datas a nenhum documento do processo administrativo (ex.: carta de indeferimento, protocolo do requerimento). Isso fragiliza a fixação do termo inicial dos atrasados e do marco para verificação da carência.",
+            "evidenceFromText": [
+              "concessão da aposentadoria rural por idade com DIB na DER (25/03/2016)"
+            ],
+            "suggestion": "Indicar expressamente que a DER de 25/03/2016 consta do processo administrativo nº [NB/PA] (anexo), e que a DIB deve ser fixada nessa data, conforme requerimento administrativo protocolado pelo segurado. Se houver carta de indeferimento, mencionar a data da ciência do indeferimento.",
+            "availableSource": "",
+            "confidence": 0.85,
+            "requiresHumanReview": true
+          },
+          {
+            "id": "ee5437f4-3dad-4285-a072-42cec180d413",
+            "type": "MISSING_CALCULATION",
+            "opportunity": "COMPLEMENTARY",
+            "title": "Apresentar memória de cálculo dos atrasados",
+            "rationale": "O pedido de pagamento de atrasados não é acompanhado de qualquer demonstrativo numérico. A ausência de cálculo prejudica a delimitação do valor devido e pode gerar questionamentos sobre a prescrição quinquenal.",
+            "evidenceFromText": [
+              "pagamento de atrasados"
+            ],
+            "suggestion": "Incluir planilha ou memória de cálculo dos atrasados, considerando a DIB (25/03/2016) até a data da citação (ou data do acordo), com a RMI estimada com base no salário mínimo vigente em cada competência, e indicando as parcelas prescritas (anteriores a 5 anos do ajuizamento) e as não prescritas.",
+            "availableSource": "",
+            "confidence": 0.8,
+            "requiresHumanReview": true
+          },
+          {
+            "id": "73873a9d-c6c6-46b8-a346-7fc2ea9f5c0f",
+            "type": "MISSING_LEGAL_ANCHOR",
+            "opportunity": "COMPLEMENTARY",
+            "title": "Fundamentar o pedido de AJG com base legal",
+            "rationale": "O pedido de assistência judiciária gratuita (AJG) é feito sem qualquer fundamentação legal ou declaração de hipossuficiência. Isso pode levar à rejeição do pedido ou à necessidade de emenda.",
+            "evidenceFromText": [
+              "AJG"
+            ],
+            "suggestion": "Incluir o fundamento legal do pedido de AJG (art. 5º, LXXIV, da Constituição Federal e art. 98 e seguintes do CPC/2015) e anexar declaração de hipossuficiência firmada pela autora, nos termos do art. 99, §3º, do CPC.",
+            "availableSource": "",
+            "confidence": 0.75,
+            "requiresHumanReview": true
+          },
+          {
+            "id": "5921ec2d-627b-4d65-9feb-0e4f1835cbfb",
+            "type": "STRENGTHEN_ARGUMENT",
+            "opportunity": "COMPLEMENTARY",
+            "title": "Reforçar a conexão entre início de prova material e a Súmula 149/STJ",
+            "rationale": "A peça cita a Súmula 149/STJ, mas não indica quais documentos específicos constituem o início de prova material do labor rural. Sem essa indicação, o argumento fica genérico e menos persuasivo.",
+            "evidenceFromText": [
+              "A Súmula 149/STJ dispensa contribuições para o segurado especial que comprova trabalho rural por início de prova material"
+            ],
+            "suggestion": "Listar os documentos que compõem o início de prova material (ex.: certidão de casamento com qualificação de 'agricultor', histórico escolar dos filhos com indicação de profissão dos pais, contrato de arrendamento, declaração do sindicato rural, notas fiscais de venda da produção) e explicar como cada um deles se relaciona com o período de atividade rural alegado.",
+            "availableSource": "",
+            "confidence": 0.85,
+            "requiresHumanReview": true
+          },
+          {
+            "id": "0811c535-3712-4cb6-9bca-c99fa6a2d0e5",
+            "type": "ANTICIPATE_COUNTERARGUMENT",
+            "opportunity": "COMPLEMENTARY",
+            "title": "Antecipar objeção sobre insuficiência de início de prova material",
+            "rationale": "O INSS frequentemente contesta a aposentadoria rural por idade alegando que o início de prova material é insuficiente ou não contemporâneo ao período alegado. A peça atual não enfrenta essa objeção.",
+            "evidenceFromText": [
+              "[início de prova material do labor rural não indicado ou insuficientemente identificado na peça]"
+            ],
+            "suggestion": "Incluir argumentação de que o início de prova material não precisa abranger todo o período de carência, bastando que seja contemporâneo a parte dele (Súmula 149/STJ), e que pode ser complementado por prova testemunhal. Se houver documentos de diferentes épocas, destacar a contemporaneidade de cada um.",
+            "availableSource": "",
+            "confidence": 0.9,
+            "requiresHumanReview": true
+          }
+        ],
+        "summary": "6 oportunidades de fortalecimento identificadas: 2 impactantes, 4 complementares.",
+        "provider": "DEEPSEEK",
+        "model": "deepseek-chat",
+        "generatedAt": "2026-06-06T21:47:11.973Z",
+        "requiresHumanReview": true
+      },
+      "usage": {
+        "inputTokens": 317,
+        "outputTokens": 8192,
+        "totalTokens": 8509,
+        "estimatedCostUsd": 0.024893000000000002
+      },
+      "durationMs": 15427
+    },
+    {
+      "providerId": "deepseek",
+      "model": "deepseek-reasoner",
+      "caseId": "RGPS-007",
+      "domain": "RGPS",
+      "review": {
+        "findings": [
+          {
+            "id": "5a0fc2d9-8111-446d-bb14-14c9512bd112",
+            "type": "MISSING_DEMONSTRATION",
+            "opportunity": "IMPACTFUL",
+            "title": "Demonstrar o tempo especial com quadro detalhado de períodos, agentes e enquadramento",
+            "rationale": "A peça afirma que o autor trabalhou 25 anos em condições especiais, mas não discrimina os períodos, os agentes nocivos, o enquadramento legal e a habitualidade. Sem essa demonstração, o juízo não pode verificar o cumprimento do requisito temporal para a aposentadoria especial.",
+            "evidenceFromText": [
+              "trabalhou 25 anos em condições especiais, conforme PPP n.º PPP-3393 juntado.",
+              "PPP n.º PPP-3393 juntado. [análise técnica dos campos específicos — intensidade do agente, eficácia do EPI e enquadramento no Decreto n.º 3.048/1999 — não desenvolvida]"
+            ],
+            "suggestion": "Incluir quadro discriminando cada período de trabalho especial com: empresa, cargo, data inicial e final, agente nocivo (físico, químico ou biológico), enquadramento no Anexo do Decreto n.º 3.048/1999, habitualidade e permanência, e eficácia do EPI (se houver). Esse quadro deve totalizar os 25 anos de tempo especial.",
+            "availableSource": "",
+            "confidence": 0.95,
+            "requiresHumanReview": true
+          },
+          {
+            "id": "c4dbc333-0d9a-48c9-8479-0f6e3b37035d",
+            "type": "MISSING_CALCULATION",
+            "opportunity": "IMPACTFUL",
+            "title": "Apresentar memória de cálculo do tempo total de contribuição especial",
+            "rationale": "O pedido de concessão de aposentadoria especial depende da comprovação de 25 anos de tempo especial. A peça não apresenta cálculo que some os períodos e demonstre o cumprimento desse requisito, o que fragiliza a pretensão.",
+            "evidenceFromText": [
+              "trabalhou 25 anos em condições especiais",
+              "Requer a concessão da aposentadoria especial com DIB na DER (10/06/2016)."
+            ],
+            "suggestion": "Elaborar e incluir memória de cálculo detalhada do tempo especial, convertendo anos, meses e dias, e demonstrando que o total atinge ou supera 25 anos na DER (10/06/2016). Se houver períodos comuns, indicar a conversão pelo fator 1,4.",
+            "availableSource": "",
+            "confidence": 0.9,
+            "requiresHumanReview": true
+          },
+          {
+            "id": "7f769ec7-8a60-4a9b-b11d-31d4922756d4",
+            "type": "MISSING_DATE_ANCHOR",
+            "opportunity": "COMPLEMENTARY",
+            "title": "Ancorar a DER e a DIB com referência documental e linha do tempo",
+            "rationale": "A DER (10/06/2016) é mencionada, mas não há referência ao documento que a comprova (ex.: protocolo administrativo, carta de indeferimento). Isso pode gerar dúvida sobre a data efetiva do requerimento administrativo.",
+            "evidenceFromText": [
+              "Requer a concessão da aposentadoria especial com DIB na DER (10/06/2016)."
+            ],
+            "suggestion": "Indicar expressamente o documento que comprova a DER (ex.: protocolo do requerimento administrativo, carta de indeferimento do INSS) e, se possível, incluir linha do tempo desde o início das atividades especiais até a DER, demonstrando a continuidade do tempo especial.",
+            "availableSource": "",
+            "confidence": 0.85,
+            "requiresHumanReview": true
+          },
+          {
+            "id": "68b1e263-1fb0-493c-9f7a-72c5c74d4f54",
+            "type": "STRENGTHEN_ARGUMENT",
+            "opportunity": "COMPLEMENTARY",
+            "title": "Fortalecer a fundamentação jurídica com a demonstração dos requisitos do art. 57 da Lei n.º 8.213/1991",
+            "rationale": "O art. 57 é citado, mas a peça não desenvolve como cada requisito (tempo especial, carência, qualidade de segurado) é preenchido no caso concreto. Isso enfraquece a argumentação jurídica.",
+            "evidenceFromText": [
+              "Art. 57 da Lei n.º 8.213/1991. Enquadramento pelo Decreto n.º 3.048/1999."
+            ],
+            "suggestion": "Explicitar, após citar o art. 57, que o autor preenche os requisitos de: (a) tempo especial de 25 anos, conforme quadro demonstrativo; (b) carência de 180 contribuições, se aplicável; (c) qualidade de segurado na DER. Vincular cada requisito aos documentos e períodos apresentados.",
+            "availableSource": "",
+            "confidence": 0.8,
+            "requiresHumanReview": true
+          },
+          {
+            "id": "11d91598-2d2a-4d12-b6a2-96f3adc60653",
+            "type": "ANTICIPATE_COUNTERARGUMENT",
+            "opportunity": "COMPLEMENTARY",
+            "title": "Antecipar e responder à possível contestação sobre eficácia do EPI",
+            "rationale": "O INSS frequentemente contesta a aposentadoria especial alegando que o EPI era eficaz para neutralizar o agente nocivo. A peça atual não aborda esse ponto, deixando a tese vulnerável.",
+            "evidenceFromText": [
+              "PPP n.º PPP-3393 juntado. [análise técnica dos campos específicos — intensidade do agente, eficácia do EPI e enquadramento no Decreto n.º 3.048/1999 — não desenvolvida]"
+            ],
+            "suggestion": "Incluir parágrafo antecipando que, se o PPP indicar EPI eficaz, deve-se demonstrar que a exposição era habitual e permanente, ou que o EPI não eliminava o risco (ex.: agentes químicos ou ruído acima do limite). Se o PPP não indicar EPI eficaz, afirmar que a Súmula 9 da TNU ou jurisprudência consolidada afasta a exigência de EPI para agentes nocivos listados.",
+            "availableSource": "",
+            "confidence": 0.75,
+            "requiresHumanReview": true
+          }
+        ],
+        "summary": "5 oportunidades de fortalecimento identificadas: 2 impactantes, 3 complementares.",
+        "provider": "DEEPSEEK",
+        "model": "deepseek-chat",
+        "generatedAt": "2026-06-06T21:47:25.605Z",
+        "requiresHumanReview": true
+      },
+      "usage": {
+        "inputTokens": 216,
+        "outputTokens": 8192,
+        "totalTokens": 8408,
+        "estimatedCostUsd": 0.024792
+      },
+      "durationMs": 13629
+    },
+    {
+      "providerId": "deepseek",
+      "model": "deepseek-reasoner",
+      "caseId": "RGPS-008",
+      "domain": "RGPS",
+      "review": {
+        "findings": [
+          {
+            "id": "d3d8e6fa-384f-440c-b065-88d148503348",
+            "type": "MISSING_CALCULATION",
+            "opportunity": "IMPACTFUL",
+            "title": "Incluir memória de cálculo detalhada por competência",
+            "rationale": "A peça informa o valor total do débito, mas não apresenta demonstrativo discriminado por competência, impossibilitando a verificação da correção dos cálculos e dificultando a impugnação pelo INSS. A ausência de memória de cálculo fragiliza a pretensão executiva.",
+            "evidenceFromText": [
+              "Valor total apurado: R$ 38933,44. [memória de cálculo detalhada não apresentada — valor global informado sem demonstrativo por competência]"
+            ],
+            "suggestion": "Elaborar planilha discriminando mês a mês: competência, valor do benefício devido, valor pago (se houver), diferença, correção monetária (INPC) e juros de mora (1% a.m.), com totalização ao final. Anexar a planilha como documento integrante da peça.",
+            "availableSource": "",
+            "confidence": 0.95,
+            "requiresHumanReview": true
+          },
+          {
+            "id": "9429b0cd-b8a8-4801-9802-c0f307790974",
+            "type": "MISSING_DATE_ANCHOR",
+            "opportunity": "COMPLEMENTARY",
+            "title": "Ancorar a DIB com referência ao título executivo",
+            "rationale": "A DIB é fixada em 01/07/2024, mas não há referência expressa ao título executivo que a estabeleceu. Isso pode gerar dúvida sobre a origem da data e sua correlação com o trânsito em julgado.",
+            "evidenceFromText": [
+              "que condenou o INSS a conceder aposentadoria por invalidez ao exequente (NB 88655902), com DIB em 01/07/2024"
+            ],
+            "suggestion": "Indicar expressamente que a DIB de 01/07/2024 foi fixada na sentença exequenda (ou no acórdão, se houve recurso), transcrita em julgado em 2021, e que o termo inicial das parcelas executadas observa o limite da prescrição quinquenal.",
+            "availableSource": "",
+            "confidence": 0.85,
+            "requiresHumanReview": true
+          },
+          {
+            "id": "01517667-490f-43c4-8199-952f6357088b",
+            "type": "MISSING_DEMONSTRATION",
+            "opportunity": "COMPLEMENTARY",
+            "title": "Demonstrar a composição do valor total do débito",
+            "rationale": "A peça afirma que o valor total é composto por parcelas vencidas, diferenças mensais, correção e juros, mas não discrimina cada componente. Isso reduz a transparência e a possibilidade de conferência pelo juízo.",
+            "evidenceFromText": [
+              "O valor total do débito é de R$ 38933,44, composto por: (a) parcelas vencidas desde a DIB (01/07/2024); (b) diferenças mensais do benefício; (c) correção monetária pelo INPC; (d) juros de mora de 1% a.m."
+            ],
+            "suggestion": "Apresentar quadro demonstrativo com: (i) valor total das parcelas vencidas (principal); (ii) valor total da correção monetária; (iii) valor total dos juros de mora; (iv) valor total geral. Indicar os índices e períodos de cada rubrica.",
+            "availableSource": "",
+            "confidence": 0.9,
+            "requiresHumanReview": true
+          },
+          {
+            "id": "c64823ed-b1fa-4427-b728-20710ee6570e",
+            "type": "MISSING_LEGAL_ANCHOR",
+            "opportunity": "COMPLEMENTARY",
+            "title": "Fundamentar os critérios de atualização monetária e juros",
+            "rationale": "A peça menciona correção pelo INPC e juros de 1% a.m., mas não indica o fundamento legal ou jurisprudencial que ampara esses índices, o que pode gerar questionamento pelo INSS.",
+            "evidenceFromText": [
+              "correção monetária pelo INPC; (d) juros de mora de 1% a.m."
+            ],
+            "suggestion": "Incluir fundamento legal para a correção monetária pelo INPC (art. 1º-F da Lei 9.494/97, com redação dada pela Lei 11.960/09, conforme interpretação do STF no RE 870.947) e para os juros de mora de 1% a.m. (art. 406 do CC c/c art. 161, §1º do CTN, ou Súmula 204 do STJ, conforme o caso).",
+            "availableSource": "",
+            "confidence": 0.8,
+            "requiresHumanReview": true
+          },
+          {
+            "id": "3c135214-2842-4c36-827e-3e2d36fc924e",
+            "type": "ANTICIPATE_COUNTERARGUMENT",
+            "opportunity": "OPTIONAL",
+            "title": "Antecipar eventual impugnação do INSS sobre a prescrição quinquenal",
+            "rationale": "O INSS pode alegar prescrição das parcelas anteriores ao ajuizamento da execução. A peça não aborda esse ponto, o que pode ser explorado em impugnação.",
+            "evidenceFromText": [
+              "com DIB em 01/07/2024, e pagar as diferenças vencidas"
+            ],
+            "suggestion": "Incluir parágrafo demonstrando que as parcelas executadas estão dentro do prazo prescricional de cinco anos, contados do trânsito em julgado ou do ajuizamento da execução, conforme o caso. Mencionar o art. 103 da Lei 8.213/91 e a Súmula 85 do STJ.",
+            "availableSource": "",
+            "confidence": 0.75,
+            "requiresHumanReview": true
+          }
+        ],
+        "summary": "5 oportunidades de fortalecimento identificadas: 1 impactante, 3 complementares, 1 opcional.",
+        "provider": "DEEPSEEK",
+        "model": "deepseek-chat",
+        "generatedAt": "2026-06-06T21:47:36.408Z",
+        "requiresHumanReview": true
+      },
+      "usage": {
+        "inputTokens": 336,
+        "outputTokens": 8192,
+        "totalTokens": 8528,
+        "estimatedCostUsd": 0.024912
+      },
+      "durationMs": 10802
+    },
+    {
+      "providerId": "deepseek",
+      "model": "deepseek-reasoner",
+      "caseId": "RGPS-009",
+      "domain": "RGPS",
+      "review": {
+        "findings": [
+          {
+            "id": "af69319e-9958-442a-92d2-cc47323ccb38",
+            "type": "MISSING_DEMONSTRATION",
+            "opportunity": "IMPACTFUL",
+            "title": "Demonstrar o cumprimento da carência com quadro de contribuições",
+            "rationale": "A peça afirma que a carência foi cumprida em 03/02/2023, mas não apresenta um quadro demonstrativo das contribuições mensais que comprovem esse marco. Isso enfraquece a tese de reafirmação da DER, pois o julgador precisa visualizar claramente o período contributivo.",
+            "evidenceFromText": [
+              "O apelante passou a cumprir a carência em 03/02/2023, data posterior à DER original, quando atingiu 180 contribuições mensais."
+            ],
+            "suggestion": "Incluir um quadro discriminando mês a mês as contribuições realizadas, desde a primeira até a 180ª, indicando a data de cada recolhimento e destacando o marco de 03/02/2023. Se possível, referenciar o CNIS como fonte.",
+            "availableSource": "",
+            "confidence": 0.95,
+            "requiresHumanReview": true
+          },
+          {
+            "id": "17664231-2abf-4815-b200-0aed7a8fc398",
+            "type": "MISSING_DATE_ANCHOR",
+            "opportunity": "COMPLEMENTARY",
+            "title": "Ancorar a DER original e a DIB pretendida com referências documentais",
+            "rationale": "A peça menciona a DER original (27/12/2020) e a data de reafirmação (03/02/2023), mas não as ancora em documentos processuais ou administrativos. Isso pode gerar dúvidas sobre a precisão das datas.",
+            "evidenceFromText": [
+              "na DER original (27/12/2020)",
+              "reafirmação da DER para 03/02/2023"
+            ],
+            "suggestion": "Indicar que a DER original consta do processo administrativo [NB/PA] e que a data de 03/02/2023 é extraída do CNIS ou de comprovantes de contribuição anexados. Se houver carta de indeferimento, mencioná-la como fonte da DER.",
+            "availableSource": "",
+            "confidence": 0.85,
+            "requiresHumanReview": true
+          },
+          {
+            "id": "d7c6f478-9d63-4359-b75c-5058b331dc50",
+            "type": "STRENGTHEN_ARGUMENT",
+            "opportunity": "IMPACTFUL",
+            "title": "Reforçar o fundamento jurídico da reafirmação da DER com jurisprudência consolidada",
+            "rationale": "A peça cita a IN PRES/INSS 77/2015 e o REsp 1.412.136/SC, mas não desenvolve o argumento de que a reafirmação é cabível mesmo quando o benefício é mais vantajoso em data posterior. Isso pode ser aprofundado para maior persuasão.",
+            "evidenceFromText": [
+              "A reafirmação da DER é direito assegurado pela IN PRES/INSS n.º 77/2015 e pela jurisprudência consolidada do STJ (REsp 1.412.136/SC)."
+            ],
+            "suggestion": "Explicitar que o STJ, no REsp 1.412.136/SC (Tema 995), firmou tese de que é possível a reafirmação da DER para data posterior ao requerimento administrativo, desde que preenchidos os requisitos do benefício, e que a IN 77/2015 regulamenta o procedimento. Demonstrar que, no caso, a carência foi cumprida em 03/02/2023, tornando a reafirmação cabível.",
+            "availableSource": "",
+            "confidence": 0.9,
+            "requiresHumanReview": true
+          },
+          {
+            "id": "12200cb8-6790-49c1-b57a-78fdb8a5346c",
+            "type": "ANTICIPATE_COUNTERARGUMENT",
+            "opportunity": "COMPLEMENTARY",
+            "title": "Antecipar a objeção de que a reafirmação da DER depende de requerimento administrativo",
+            "rationale": "O INSS pode argumentar que a reafirmação da DER só é possível se houver pedido administrativo nesse sentido. Antecipar essa objeção fortalece a tese recursal.",
+            "evidenceFromText": [
+              "A sentença denegou a aposentadoria sob o fundamento de que, na DER original (27/12/2020), o apelante não havia cumprido a carência mínima de 180 contribuições, sem analisar a possibilidade de reafirmação da DER."
+            ],
+            "suggestion": "Incluir argumento de que a reafirmação da DER pode ser reconhecida de ofício pelo juiz, independentemente de requerimento administrativo, conforme jurisprudência do STJ (REsp 1.412.136/SC). Destacar que o próprio INSS, pela IN 77/2015, admite a reafirmação em sede administrativa, e que o Judiciário pode fazê-lo com mais razão.",
+            "availableSource": "",
+            "confidence": 0.8,
+            "requiresHumanReview": true
+          }
+        ],
+        "summary": "4 oportunidades de fortalecimento identificadas: 2 impactantes, 2 complementares.",
+        "provider": "DEEPSEEK",
+        "model": "deepseek-chat",
+        "generatedAt": "2026-06-06T21:47:47.638Z",
+        "requiresHumanReview": true
+      },
+      "usage": {
+        "inputTokens": 297,
+        "outputTokens": 8192,
+        "totalTokens": 8489,
+        "estimatedCostUsd": 0.024873
+      },
+      "durationMs": 11227
+    },
+    {
+      "providerId": "deepseek",
+      "model": "deepseek-reasoner",
+      "caseId": "RGPS-010",
+      "domain": "RGPS",
+      "review": {
+        "findings": [
+          {
+            "id": "7b3eaa76-44a7-40b7-895b-1f8fe6acfd53",
+            "type": "MISSING_DEMONSTRATION",
+            "opportunity": "IMPACTFUL",
+            "title": "Demonstrar a qualidade de segurado na DER com quadro de períodos de graça",
+            "rationale": "A peça afirma que o período de graça mantém a qualidade de segurado até 12/2021, mas não apresenta um quadro demonstrativo com as datas exatas de início e fim do período de graça, nem a comprovação de que o segurado não exerceu atividade remunerada nesse interregno. Isso fragiliza a tese perante o INSS e o juízo.",
+            "evidenceFromText": [
+              "O(A) autor(a) era segurado(a) do RGPS na data do acidente, com última contribuição em 05/2019. O período de graça de 12 meses (art. 15, II, Lei n.º 8.213/1991) mantém a qualidade de segurado até 12/2021, data posterior ao acidente, configurando a qualidade de segurado exigida."
+            ],
+            "suggestion": "Incluir um quadro demonstrativo com: (a) data da última contribuição (05/2019); (b) início do período de graça (imediatamente após a última contribuição); (c) término do período de graça (12/2021); (d) data do acidente (22/10/2022) — evidenciando que o acidente ocorreu dentro do período de graça. Adicionalmente, mencionar que o segurado não exerceu atividade remunerada nesse período, conforme documentação a ser juntada (ex.: declaração de próprio punho ou extrato CNIS sem novos vínculos).",
+            "availableSource": "",
+            "confidence": 0.9,
+            "requiresHumanReview": true
+          },
+          {
+            "id": "9dde1af2-cf9b-43c7-ab30-95b6e9730c6b",
+            "type": "MISSING_DATE_ANCHOR",
+            "opportunity": "IMPACTFUL",
+            "title": "Ancorar a DER (Data de Entrada do Requerimento) no processo administrativo",
+            "rationale": "A peça pede DIB em 22/10/2022, mas não menciona a DER (data do requerimento administrativo). A DER é essencial para fixar o termo inicial do benefício e para verificar a qualidade de segurado naquela data. Sem essa ancoragem, o pedido pode ser considerado impreciso.",
+            "evidenceFromText": [
+              "Requer: (a) concessão do auxílio por incapacidade com DIB em 22/10/2022;"
+            ],
+            "suggestion": "Indicar expressamente a DER no corpo da peça, preferencialmente com referência ao número do processo administrativo (NB/PA). Exemplo: 'O autor requereu o benefício administrativamente em [DER], conforme processo NB [NB/PA], tendo sido indeferido em [data do indeferimento].' Se a DER coincidir com a data do acidente (22/10/2022), esclarecer essa circunstância.",
+            "availableSource": "",
+            "confidence": 0.85,
+            "requiresHumanReview": true
+          },
+          {
+            "id": "35348df9-33c2-4812-99b5-7ab0e18af955",
+            "type": "MISSING_CALCULATION",
+            "opportunity": "COMPLEMENTARY",
+            "title": "Apresentar memória de cálculo dos atrasados",
+            "rationale": "O pedido de atrasados (parcelas vencidas entre a DIB e a citação) não é acompanhado de qualquer demonstrativo numérico. Isso pode gerar questionamento sobre o valor devido e dificultar a liquidação da sentença.",
+            "evidenceFromText": [
+              "Requer: (b) atrasados;"
+            ],
+            "suggestion": "Incluir uma planilha ou quadro com: (a) DIB (22/10/2022); (b) data da citação (a ser fixada); (c) número de meses entre essas datas; (d) valor estimado de cada parcela (com base no salário de benefício a ser calculado); (e) total dos atrasados. Se o salário de benefício ainda não foi calculado, indicar que será oportunamente apresentado.",
+            "availableSource": "",
+            "confidence": 0.8,
+            "requiresHumanReview": true
+          },
+          {
+            "id": "0a1b8d66-b0cb-40a2-8093-e191c53a3333",
+            "type": "MISSING_LEGAL_ANCHOR",
+            "opportunity": "COMPLEMENTARY",
+            "title": "Fundamentar o pedido de auxílio por incapacidade com os requisitos legais",
+            "rationale": "A peça afirma o direito ao benefício, mas não indica expressamente os requisitos legais (incapacidade total e temporária para o trabalho habitual, qualidade de segurado, carência). Isso pode ser suprido com referência genérica aos artigos da Lei 8.213/1991.",
+            "evidenceFromText": [
+              "DO DIREITO [período de graça ignorado na fundamentação jurídica — art. 15 da Lei n.º 8.213/1991 não analisado em face dos dados do segurado]"
+            ],
+            "suggestion": "Incluir parágrafo indicando que o auxílio por incapacidade temporária é devido quando o segurado preenche os requisitos do art. 59 da Lei 8.213/1991 (incapacidade total e temporária para o trabalho habitual) e do art. 15 (qualidade de segurado) e art. 25 (carência de 12 contribuições mensais). Não é necessário citar artigos específicos não presentes no contexto, mas a referência genérica fortalece a tese.",
+            "availableSource": "",
+            "confidence": 0.75,
+            "requiresHumanReview": true
+          }
+        ],
+        "summary": "4 oportunidades de fortalecimento identificadas: 2 impactantes, 2 complementares.",
+        "provider": "DEEPSEEK",
+        "model": "deepseek-chat",
+        "generatedAt": "2026-06-06T21:48:00.875Z",
+        "requiresHumanReview": true
+      },
+      "usage": {
+        "inputTokens": 277,
+        "outputTokens": 8192,
+        "totalTokens": 8469,
+        "estimatedCostUsd": 0.024853
+      },
+      "durationMs": 13233
+    },
+    {
+      "providerId": "deepseek",
+      "model": "deepseek-reasoner",
+      "caseId": "RGPS-011",
+      "domain": "RGPS",
+      "review": {
+        "findings": [],
+        "summary": "Peça sólida — nenhuma oportunidade de fortalecimento identificada.",
+        "provider": "DEEPSEEK",
+        "model": "deepseek-chat",
+        "generatedAt": "2026-06-06T21:48:16.705Z",
+        "requiresHumanReview": true
+      },
+      "usage": {
+        "inputTokens": 448,
+        "outputTokens": 8192,
+        "totalTokens": 8640,
+        "estimatedCostUsd": 0.025024
+      },
+      "durationMs": 15828
+    },
+    {
+      "providerId": "deepseek",
+      "model": "deepseek-reasoner",
+      "caseId": "RGPS-012",
+      "domain": "RGPS",
+      "review": {
+        "findings": [
+          {
+            "id": "f0d3316f-7dc0-44dc-bfed-1428c8c9794e",
+            "type": "MISSING_DEMONSTRATION",
+            "opportunity": "IMPACTFUL",
+            "title": "Demonstrar o período especial com detalhamento dos agentes nocivos e enquadramento profissional",
+            "rationale": "A sentença negou a conversão por insuficiência documental. A peça não detalha quais agentes nocivos estavam presentes, a habitualidade e permanência, nem o enquadramento legal (RBPS, Decreto 53.831/64, etc.). Sem essa demonstração, o tribunal pode manter a decisão.",
+            "evidenceFromText": [
+              "A sentença negou a conversão do tempo especial (11 anos) em comum aplicando fator 1,2 (25 para 30 anos), por entender que a documentação juntada era insuficiente para comprovar a especialidade do período.",
+              "[fundamentação genérica — fator de conversão aplicável, período exato e jurisprudência do STJ não desenvolvidos em face da decisão recorrida]"
+            ],
+            "suggestion": "Incluir quadro discriminando cada período especial com: empresa, cargo, setor, agente nocivo (ruído, calor, agentes químicos, etc.), habitualidade e permanência, enquadramento legal (art. 57 da Lei 8.213/91, Decreto 53.831/64, Decreto 83.080/79, Anexos do Decreto 3.048/99), e referência ao PPP ou LTCAT já juntados. Se não houver PPP/LTCAT, indicar a necessidade de prova pericial ou documental substitutiva.",
+            "availableSource": "",
+            "confidence": 0.95,
+            "requiresHumanReview": true
+          },
+          {
+            "id": "229bfcce-7ef0-4453-afd3-ab759a1d7b11",
+            "type": "MISSING_DATE_ANCHOR",
+            "opportunity": "IMPACTFUL",
+            "title": "Fixar a DER e a DIB pretendida para ancorar o pedido de conversão",
+            "rationale": "A peça não menciona a Data de Entrada do Requerimento (DER) nem a Data de Início do Benefício (DIB) pretendida. Sem essas datas, o tribunal não consegue verificar se o tempo especial é anterior à DER, se a carência está cumprida, ou se a reafirmação da DER seria viável.",
+            "evidenceFromText": [
+              "Requer o PROVIMENTO para reconhecer 11 anos especiais convertidos pelo fator 1,2 (25 para 30 anos) e conceder a aposentadoria por tempo de contribuição."
+            ],
+            "suggestion": "Indicar expressamente a DER (data do requerimento administrativo) e a DIB pretendida (data a partir da qual o benefício deve ser concedido). Se a DER não constar no processo, mencionar que será juntada ou que consta dos autos. Isso permite ao tribunal verificar a contemporaneidade do tempo especial e a carência.",
+            "availableSource": "",
+            "confidence": 0.9,
+            "requiresHumanReview": true
+          },
+          {
+            "id": "b3de150e-4654-4057-8074-8b5bf101391f",
+            "type": "MISSING_CALCULATION",
+            "opportunity": "COMPLEMENTARY",
+            "title": "Apresentar memória de cálculo do tempo total de contribuição com a conversão",
+            "rationale": "O pedido de concessão de aposentadoria por tempo de contribuição exige a demonstração do tempo total (comum + especial convertido). Sem o cálculo, o tribunal não pode verificar se o segurado atingiu o mínimo legal (30 anos para mulher, 35 para homem).",
+            "evidenceFromText": [
+              "Requer o PROVIMENTO para reconhecer 11 anos especiais convertidos pelo fator 1,2 (25 para 30 anos) e conceder a aposentadoria por tempo de contribuição."
+            ],
+            "suggestion": "Incluir quadro demonstrativo com: tempo comum já reconhecido, tempo especial de 11 anos, fator de conversão 1,2 (resultando em 13,2 anos de tempo comum), tempo total após conversão, e comparação com o mínimo legal. Se o segurado for mulher, o mínimo é 30 anos; se homem, 35 anos. Indicar se o tempo total atinge esse mínimo.",
+            "availableSource": "",
+            "confidence": 0.85,
+            "requiresHumanReview": true
+          },
+          {
+            "id": "db5adb3d-1a58-4e9d-a552-54fda14f591e",
+            "type": "STRENGTHEN_ARGUMENT",
+            "opportunity": "COMPLEMENTARY",
+            "title": "Reforçar a conexão entre a documentação existente e a comprovação da especialidade",
+            "rationale": "A sentença considerou a documentação insuficiente. A peça precisa demonstrar que os documentos já juntados (PPP, LTCAT, laudos) são suficientes, ou que a prova pericial é necessária. Sem essa conexão, o tribunal pode manter a negativa.",
+            "evidenceFromText": [
+              "A sentença negou a conversão do tempo especial (11 anos) em comum aplicando fator 1,2 (25 para 30 anos), por entender que a documentação juntada era insuficiente para comprovar a especialidade do período."
+            ],
+            "suggestion": "Explicar por que os documentos já nos autos (ex.: PPP, LTCAT, CTPS) comprovam a especialidade, citando trechos específicos (agente nocivo, intensidade, habitualidade). Se faltar documento, requerer a produção de prova pericial ou a juntada de documento faltante, com fundamento no art. 370 do CPC.",
+            "availableSource": "",
+            "confidence": 0.9,
+            "requiresHumanReview": true
+          },
+          {
+            "id": "0492e12a-19a1-4ba8-af43-99ada7ad0f94",
+            "type": "ANTICIPATE_COUNTERARGUMENT",
+            "opportunity": "COMPLEMENTARY",
+            "title": "Antecipar e rebater o argumento de EPI eficaz",
+            "rationale": "O INSS frequentemente alega que o uso de EPI neutraliza o agente nocivo. A peça não aborda esse ponto, o que pode ser explorado pelo tribunal para negar a especialidade.",
+            "evidenceFromText": [
+              "[fundamentação genérica — fator de conversão aplicável, período exato e jurisprudência do STJ não desenvolvidos em face da decisão recorrida]"
+            ],
+            "suggestion": "Incluir argumento de que, conforme jurisprudência do STJ (Tema 1.046), a eficácia do EPI deve ser comprovada pelo INSS, e que, na ausência de prova, presume-se a nocividade. Se houver PPP indicando EPI eficaz, contestar com base em laudo técnico ou perícia.",
+            "availableSource": "",
+            "confidence": 0.8,
+            "requiresHumanReview": true
+          },
+          {
+            "id": "be35537c-5c76-4e41-b678-37da3d64e396",
+            "type": "MISSING_LEGAL_ANCHOR",
+            "opportunity": "COMPLEMENTARY",
+            "title": "Indicar o fundamento legal da conversão de tempo especial",
+            "rationale": "A peça menciona 'conversão do tempo especial' sem citar o dispositivo legal que a autoriza. Isso fragiliza a tese, pois o tribunal pode considerar que o pedido não está juridicamente embasado.",
+            "evidenceFromText": [
+              "A conversão do tempo especial é cabível."
+            ],
+            "suggestion": "Incluir expressamente o fundamento legal: art. 57, §5º, da Lei 8.213/91 (conversão de tempo especial em comum), e art. 70 do Decreto 3.048/99 (fator de conversão). Se houver jurisprudência consolidada, mencionar o Tema 546 do STJ (possibilidade de conversão independentemente da data da atividade).",
+            "availableSource": "",
+            "confidence": 0.85,
+            "requiresHumanReview": true
+          }
+        ],
+        "summary": "6 oportunidades de fortalecimento identificadas: 2 impactantes, 4 complementares.",
+        "provider": "DEEPSEEK",
+        "model": "deepseek-chat",
+        "generatedAt": "2026-06-06T21:48:31.509Z",
+        "requiresHumanReview": true
+      },
+      "usage": {
+        "inputTokens": 229,
+        "outputTokens": 8192,
+        "totalTokens": 8421,
+        "estimatedCostUsd": 0.024805
+      },
+      "durationMs": 14803
+    },
+    {
+      "providerId": "deepseek",
+      "model": "deepseek-reasoner",
+      "caseId": "RGPS-013",
+      "domain": "RGPS",
+      "review": {
+        "findings": [
+          {
+            "id": "8dac1f8f-d6e1-4c73-94aa-168e764befe2",
+            "type": "MISSING_DEMONSTRATION",
+            "opportunity": "IMPACTFUL",
+            "title": "Demonstrar a qualidade de segurado na data da incapacidade",
+            "rationale": "A peça afirma que o autor era segurado na DER, mas não demonstra a manutenção da qualidade de segurado com base no período de graça ou contribuições posteriores. Isso é essencial para evitar contestação do INSS.",
+            "evidenceFromText": [
+              "Na data da incapacidade (21/06/2022), o(a) autor(a) era segurado(a) do RGPS, com 115 contribuições mensais (CNIS de 21/06/2022), cumprindo a carência mínima de 12 contribuições (art. 25, I, da Lei n.º 8.213/1991). Última contribuição: 04/2022."
+            ],
+            "suggestion": "Incluir quadro demonstrativo da qualidade de segurado, indicando a última contribuição (04/2022), a data da incapacidade (21/06/2022) e o período de graça aplicável (art. 15 da Lei 8.213/1991), demonstrando que o autor mantinha a qualidade de segurado na DER.",
+            "availableSource": null,
+            "confidence": 0.95,
+            "requiresHumanReview": true
+          },
+          {
+            "id": "a3fcb3eb-a7f7-4964-a372-f3209c749ba0",
+            "type": "MISSING_CALCULATION",
+            "opportunity": "COMPLEMENTARY",
+            "title": "Apresentar memória de cálculo dos atrasados",
+            "rationale": "O pedido de atrasados sem memória de cálculo ou planilha de valores dificulta a liquidação e pode gerar questionamentos sobre o montante devido.",
+            "evidenceFromText": [
+              "Requer: (a) concessão do auxílio com DIB em 21/06/2022; (b) atrasados com correção; (c) honorários; (d) AJG."
+            ],
+            "suggestion": "Incluir planilha ou demonstrativo dos atrasados desde a DIB (21/06/2022) até a data do ajuizamento ou citação, com correção monetária e juros de mora, conforme índices aplicáveis.",
+            "availableSource": null,
+            "confidence": 0.85,
+            "requiresHumanReview": true
+          },
+          {
+            "id": "58726066-7f76-40aa-a6ea-e242d5659f13",
+            "type": "MISSING_DATE_ANCHOR",
+            "opportunity": "COMPLEMENTARY",
+            "title": "Ancorar a data do laudo médico e exames com referência documental",
+            "rationale": "A peça menciona laudo e exames, mas não vincula expressamente as datas ao protocolo administrativo ou ao CNIS, o que pode gerar dúvidas sobre a contemporaneidade da prova.",
+            "evidenceFromText": [
+              "O(A) autor(a), Francisca Rodrigues Silva, profissão: auxiliar de produção, CPF 030.674.602-56, ficou incapacitado(a) em 21/06/2022 por diagnóstico de M46.7, conforme laudo do Dr. [Nome], CRM 36419, datado de 21/06/2022.",
+              "Junta-se: (1) laudo médico de 21/06/2022 — CID M46.7; (2) exames de imagem; (3) CNIS com 115 contribuições; (4) CPF 030.674.602-56; (5) protocolo administrativo n.º 908797108/2024."
+            ],
+            "suggestion": "Especificar que o laudo médico e os exames de imagem são contemporâneos à data da incapacidade (21/06/2022) e foram apresentados no protocolo administrativo, reforçando a coerência temporal da prova.",
+            "availableSource": null,
+            "confidence": 0.8,
+            "requiresHumanReview": true
+          },
+          {
+            "id": "14e3573a-e6ca-48fd-acb9-e93e9546c553",
+            "type": "STRENGTHEN_ARGUMENT",
+            "opportunity": "COMPLEMENTARY",
+            "title": "Reforçar a conexão entre a incapacidade e a atividade profissional",
+            "rationale": "A peça afirma que a patologia acarreta limitação funcional total para as atividades de auxiliar de produção, mas não detalha como as restrições impedem o exercício da função específica, o que pode ser questionado pelo INSS.",
+            "evidenceFromText": [
+              "A patologia acarreta limitação funcional total para as atividades de auxiliar de produção, conforme declaração médica e resultado de exames de imagem juntados."
+            ],
+            "suggestion": "Descrever as atividades típicas de auxiliar de produção (ex.: movimentação de cargas, operação de máquinas, postura prolongada) e correlacioná-las com as limitações funcionais decorrentes do CID M46.7 (espondilopatia inflamatória), demonstrando a incompatibilidade laboral.",
+            "availableSource": null,
+            "confidence": 0.9,
+            "requiresHumanReview": true
+          },
+          {
+            "id": "ff146bb3-ef21-4eff-b9f3-9bb4117ab5bd",
+            "type": "ANTICIPATE_COUNTERARGUMENT",
+            "opportunity": "IMPACTFUL",
+            "title": "Antecipar contestação sobre capacidade laboral residual",
+            "rationale": "O INSS frequentemente alega capacidade laboral residual para negar o auxílio por incapacidade temporária. A peça não aborda esse ponto, deixando a tese vulnerável.",
+            "evidenceFromText": [
+              "O(A) autor(a), Francisca Rodrigues Silva, profissão: auxiliar de produção, CPF 030.674.602-56, ficou incapacitado(a) em 21/06/2022 por diagnóstico de M46.7, conforme laudo do Dr. [Nome], CRM 36419, datado de 21/06/2022."
+            ],
+            "suggestion": "Incluir argumentação de que a incapacidade é total e temporária para a atividade habitual de auxiliar de produção, com base no laudo médico e exames, e que não há reabilitação profissional viável no curto prazo, afastando a tese de capacidade residual.",
+            "availableSource": null,
+            "confidence": 0.9,
+            "requiresHumanReview": true
+          }
+        ],
+        "summary": "5 oportunidades de fortalecimento identificadas: 2 impactantes, 3 complementares.",
+        "provider": "DEEPSEEK",
+        "model": "deepseek-chat",
+        "generatedAt": "2026-06-06T21:48:42.505Z",
+        "requiresHumanReview": true
+      },
+      "usage": {
+        "inputTokens": 436,
+        "outputTokens": 8192,
+        "totalTokens": 8628,
+        "estimatedCostUsd": 0.025012
+      },
+      "durationMs": 10992
+    },
+    {
+      "providerId": "deepseek",
+      "model": "deepseek-reasoner",
+      "caseId": "RGPS-014",
+      "domain": "RGPS",
+      "review": {
+        "findings": [
+          {
+            "id": "23024897-6093-4ae4-9c18-3378fef2b1f7",
+            "type": "MISSING_DEMONSTRATION",
+            "opportunity": "IMPACTFUL",
+            "title": "Demonstrar a qualidade de dependente da autora com provas documentais",
+            "rationale": "A peça alega dependência econômica, mas não apresenta qualquer documento que a comprove, como declaração de imposto de renda, comprovantes de residência conjunta ou extratos bancários. Isso fragiliza a tese de dependência, essencial para a concessão da pensão por morte.",
+            "evidenceFromText": [
+              "A dependência econômica da autora é alegada.",
+              "[extratos, declaração de IR e demais provas de dependência não apresentadas ou não analisadas]"
+            ],
+            "suggestion": "Incluir um tópico específico demonstrando a dependência econômica com documentos como declaração de imposto de renda, comprovantes de residência conjunta, extratos bancários ou outros meios de prova admitidos em direito. Se a dependência for presumida (cônjuge), esclarecer expressamente essa presunção legal com base no art. 16, I, da Lei 8.213/1991.",
+            "availableSource": "",
+            "confidence": 0.95,
+            "requiresHumanReview": true
+          },
+          {
+            "id": "da876989-8289-48c0-9ba9-809d8b640be5",
+            "type": "MISSING_DATE_ANCHOR",
+            "opportunity": "COMPLEMENTARY",
+            "title": "Ancorar a data do óbito com referência documental explícita",
+            "rationale": "A data do óbito é mencionada, mas sem referência direta ao documento que a comprova (certidão de óbito). Isso pode gerar dúvidas sobre a precisão da informação.",
+            "evidenceFromText": [
+              "Em 24/01/2020 faleceu Francisco Costa",
+              "conforme certidão de óbito e certidão de casamento juntadas"
+            ],
+            "suggestion": "Vincular expressamente a data do óbito à certidão de óbito, por exemplo: 'Conforme certidão de óbito anexa, o falecimento ocorreu em 24/01/2020'.",
+            "availableSource": "",
+            "confidence": 0.9,
+            "requiresHumanReview": true
+          },
+          {
+            "id": "1403e7eb-6cc7-4ed1-a553-7b50bb86ff58",
+            "type": "MISSING_LEGAL_ANCHOR",
+            "opportunity": "COMPLEMENTARY",
+            "title": "Fundamentar a qualidade de segurado do falecido com base legal",
+            "rationale": "A qualidade de segurado é afirmada, mas sem indicar o fundamento legal que a define (art. 15 da Lei 8.213/1991) ou o documento que a comprova (CNIS). Isso enfraquece a argumentação jurídica.",
+            "evidenceFromText": [
+              "A qualidade de segurado de Francisco Costa à data do óbito é comprovada pelo CNIS."
+            ],
+            "suggestion": "Indicar expressamente o fundamento legal aplicável à qualidade de segurado, como o art. 15 da Lei 8.213/1991, e vincular a comprovação ao CNIS anexo.",
+            "availableSource": "",
+            "confidence": 0.85,
+            "requiresHumanReview": true
+          },
+          {
+            "id": "38976b32-d8cf-4ce9-adba-cffbd1492ea0",
+            "type": "MISSING_CALCULATION",
+            "opportunity": "IMPACTFUL",
+            "title": "Apresentar memória de cálculo dos atrasados",
+            "rationale": "O pedido de atrasados é genérico, sem qualquer demonstrativo numérico. Isso dificulta a liquidação e pode ser questionado pelo juízo ou pelo INSS.",
+            "evidenceFromText": [
+              "(b) atrasados;"
+            ],
+            "suggestion": "Incluir uma planilha ou memória de cálculo dos atrasados, considerando a DIB (24/01/2020) até a data do ajuizamento, com os índices de correção monetária e juros aplicáveis.",
+            "availableSource": "",
+            "confidence": 0.9,
+            "requiresHumanReview": true
+          },
+          {
+            "id": "8ab301e4-9798-40f9-977b-1687d4daf6a6",
+            "type": "MISSING_SUPPORTING_DOCUMENT",
+            "opportunity": "COMPLEMENTARY",
+            "title": "Referenciar a certidão de casamento como prova de dependência presumida",
+            "rationale": "A certidão de casamento é mencionada, mas não é explorada como prova de dependência presumida do cônjuge, conforme o art. 16, I, da Lei 8.213/1991. Isso poderia fortalecer a tese sem necessidade de provas adicionais.",
+            "evidenceFromText": [
+              "conforme certidão de óbito e certidão de casamento juntadas"
+            ],
+            "suggestion": "Destacar que a certidão de casamento comprova a condição de cônjuge, que é dependente presumido nos termos do art. 16, I, da Lei 8.213/1991, dispensando prova de dependência econômica.",
+            "availableSource": "",
+            "confidence": 0.8,
+            "requiresHumanReview": true
+          },
+          {
+            "id": "de35efaa-8853-46a2-8eec-cdab8208b038",
+            "type": "STRENGTHEN_ARGUMENT",
+            "opportunity": "COMPLEMENTARY",
+            "title": "Reforçar a conexão entre a qualidade de segurado e o CNIS",
+            "rationale": "A peça afirma que a qualidade de segurado é comprovada pelo CNIS, mas não detalha como o CNIS demonstra essa qualidade (ex: data da última contribuição, período de graça). Isso deixa a argumentação superficial.",
+            "evidenceFromText": [
+              "A qualidade de segurado de Francisco Costa à data do óbito é comprovada pelo CNIS."
+            ],
+            "suggestion": "Explicitar que o CNIS demonstra a qualidade de segurado na data do óbito, indicando a data da última contribuição ou a aplicação do período de graça, se for o caso.",
+            "availableSource": "",
+            "confidence": 0.75,
+            "requiresHumanReview": true
+          }
+        ],
+        "summary": "6 oportunidades de fortalecimento identificadas: 2 impactantes, 4 complementares.",
+        "provider": "DEEPSEEK",
+        "model": "deepseek-chat",
+        "generatedAt": "2026-06-06T21:48:52.877Z",
+        "requiresHumanReview": true
+      },
+      "usage": {
+        "inputTokens": 287,
+        "outputTokens": 8192,
+        "totalTokens": 8479,
+        "estimatedCostUsd": 0.024863
+      },
+      "durationMs": 10369
+    },
+    {
+      "providerId": "deepseek",
+      "model": "deepseek-reasoner",
+      "caseId": "RGPS-015",
+      "domain": "RGPS",
+      "review": {
+        "findings": [
+          {
+            "id": "43a7814f-6e2a-433c-a24f-804d2b283dfe",
+            "type": "MISSING_DEMONSTRATION",
+            "opportunity": "COMPLEMENTARY",
+            "title": "Demonstrar a qualidade de segurado na DIB",
+            "rationale": "A peça afirma a DIB em 20/02/2024, mas não demonstra que o exequente mantinha a qualidade de segurado nessa data, o que é requisito essencial para a aposentadoria por invalidez. Incluir essa demonstração fortalece a tese e antecipa possível contestação do INSS.",
+            "evidenceFromText": [
+              "Trata-se de cumprimento da sentença proferida em 2021 (transitada em julgado em 2022), que condenou o INSS a conceder aposentadoria por invalidez (NB 96524265) com DIB em 20/02/2024",
+              "— DIB: 20/02/2024"
+            ],
+            "suggestion": "Adicionar um parágrafo demonstrando a qualidade de segurado na DIB, indicando o período de contribuição imediatamente anterior, eventual período de graça aplicável (art. 15 da Lei 8.213/91) e a data de início da incapacidade, com base nos documentos dos autos.",
+            "availableSource": "",
+            "confidence": 0.85,
+            "requiresHumanReview": true
+          },
+          {
+            "id": "ac2fdd26-c7a0-4ff4-9905-a117a5bc0223",
+            "type": "MISSING_CALCULATION",
+            "opportunity": "COMPLEMENTARY",
+            "title": "Detalhar a memória de cálculo com todas as competências",
+            "rationale": "A peça apresenta apenas duas competências exemplificativas e um subtotal, sem demonstrar o cálculo completo de cada parcela mensal. Uma memória de cálculo detalhada, competência por competência, aumenta a transparência e facilita a conferência pelo juízo e pelo INSS.",
+            "evidenceFromText": [
+              "Competência 02/2024: RMI R$ 1228,03 × fator INPC 1,0234 = R$ 1256,77",
+              "Competência 03/2024: RMI R$ 1228,03 × fator INPC 1,0251 = R$ 1258,85",
+              "[...planilha completa em anexo com todas as competências]"
+            ],
+            "suggestion": "Incluir no corpo da peça ou no anexo a memória de cálculo completa, discriminando mês a mês desde a DIB (20/02/2024) até a DIP (03/2025), com o valor do INPC aplicado, o valor corrigido de cada parcela, os juros de mora incidentes e o total acumulado.",
+            "availableSource": "",
+            "confidence": 0.9,
+            "requiresHumanReview": true
+          },
+          {
+            "id": "b6dbb8dc-ebeb-496a-9c39-0866185869f0",
+            "type": "ANTICIPATE_COUNTERARGUMENT",
+            "opportunity": "COMPLEMENTARY",
+            "title": "Antecipar a prescrição quinquenal das parcelas anteriores ao ajuizamento",
+            "rationale": "Embora a DIB seja em 20/02/2024, a sentença é de 2021 e o cumprimento foi ajuizado em 2026. O INSS pode alegar prescrição de parcelas anteriores a cinco anos do ajuizamento. Antecipar esse argumento e demonstrar que as parcelas estão dentro do prazo fortalece a peça.",
+            "evidenceFromText": [
+              "Trata-se de cumprimento da sentença proferida em 2021 (transitada em julgado em 2022)",
+              "Belém, 06 de junho de 2026"
+            ],
+            "suggestion": "Incluir parágrafo demonstrando que as parcelas atrasadas (de 20/02/2024 a 03/2025) estão integralmente dentro do prazo prescricional de cinco anos, considerando a data do ajuizamento do cumprimento (06/06/2026), e que não há parcelas prescritas.",
+            "availableSource": "",
+            "confidence": 0.8,
+            "requiresHumanReview": true
+          }
+        ],
+        "summary": "3 oportunidades de fortalecimento identificadas: 3 complementares.",
+        "provider": "DEEPSEEK",
+        "model": "deepseek-chat",
+        "generatedAt": "2026-06-06T21:49:02.384Z",
+        "requiresHumanReview": true
+      },
+      "usage": {
+        "inputTokens": 477,
+        "outputTokens": 8192,
+        "totalTokens": 8669,
+        "estimatedCostUsd": 0.025053
+      },
+      "durationMs": 9504
+    }
+  ],
+  "totalsByProvider": {
+    "openai": {
+      "documentsCompleted": 15,
+      "documentsFailed": 0,
+      "estimatedCostUsd": 3.7419399999999996,
+      "inputTokens": 5554,
+      "outputTokens": 122880
+    },
+    "gemini": {
+      "documentsCompleted": 15,
+      "documentsFailed": 0,
+      "estimatedCostUsd": 1.8709699999999998,
+      "inputTokens": 5554,
+      "outputTokens": 122880
+    },
+    "deepseek": {
+      "documentsCompleted": 15,
+      "documentsFailed": 0,
+      "estimatedCostUsd": 0.374194,
+      "inputTokens": 5554,
+      "outputTokens": 122880
+    }
+  },
+  "completedAt": "2026-06-06T21:49:02.388Z"
+}
