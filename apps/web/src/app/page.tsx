@@ -3,7 +3,7 @@
 import { motion } from "framer-motion";
 import Link from "next/link";
 import Image from "next/image";
-import { Gavel, ClipboardCheck, Check, Scale } from "lucide-react";
+import { Gavel, ClipboardCheck, Check, Scale, Sparkles } from "lucide-react";
 
 // ── Animations ───────────────────────────────────────────────────────────────
 
@@ -273,17 +273,57 @@ export default function LandingPage() {
             </motion.div>
 
             <motion.div
-              initial={{ opacity: 0, x: 24 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.7, delay: 0.08 }}
-              className="hidden md:block absolute right-0 bottom-0 w-[530px] h-[640px] pointer-events-none z-[5]"
+              initial={{ opacity: 0, scale: 0.95, x: 20 }}
+              animate={{ opacity: 1, scale: 1, x: 0 }}
+              transition={{ duration: 0.8, delay: 0.1 }}
+              className="hidden lg:flex absolute right-0 top-1/2 -translate-y-1/2 w-[480px] h-[400px] flex-col rounded-3xl bg-[#09051a]/60 border border-white/[0.08] p-6 backdrop-blur-2xl shadow-2xl shadow-indigo-500/10 z-[5] overflow-hidden"
             >
-              <Image
-                src="/hero.png"
-                alt="Themis"
-                fill
-                sizes="530px"
-                className="object-contain object-bottom drop-shadow-[0_0_50px_rgba(139,92,246,0.3)] filter contrast-[1.15] brightness-90"
-                priority
-              />
+              {/* Decorative top bar */}
+              <div className="flex items-center justify-between pb-4 border-b border-white/[0.06] mb-5">
+                <div className="flex gap-2">
+                  <div className="w-2.5 h-2.5 rounded-full bg-red-500/50" />
+                  <div className="w-2.5 h-2.5 rounded-full bg-yellow-500/50" />
+                  <div className="w-2.5 h-2.5 rounded-full bg-green-500/50" />
+                </div>
+                <div className="px-3 py-1 rounded-full bg-indigo-500/10 border border-indigo-500/20 text-[10px] text-indigo-300 font-bold uppercase tracking-wider flex items-center gap-1.5">
+                  <span className="w-1.5 h-1.5 rounded-full bg-indigo-400 animate-pulse" />
+                  Geração de Peça Ativa
+                </div>
+              </div>
+
+              {/* Document Mock Content */}
+              <div className="space-y-4 flex-1">
+                <div className="text-[10px] text-white/40 font-mono">AO JUÍZO DA 1ª VARA FEDERAL DA SEÇÃO JUDICIÁRIA...</div>
+                <div className="space-y-2">
+                  <div className="h-2.5 bg-white/10 rounded-full w-full" />
+                  <div className="h-2.5 bg-white/10 rounded-full w-11/12" />
+                  <div className="h-2.5 bg-white/10 rounded-full w-full" />
+                </div>
+
+                {/* Highlighted text block representing AI extraction */}
+                <div className="p-3.5 rounded-2xl bg-indigo-600/10 border border-indigo-500/20 space-y-2 relative overflow-hidden">
+                  <div className="absolute top-0 right-0 w-24 h-24 bg-indigo-500/10 blur-xl pointer-events-none" />
+                  <div className="text-[11px] text-indigo-300 font-bold uppercase tracking-wide">Tese Jurisprudencial Relevante</div>
+                  <div className="h-2 bg-indigo-400/30 rounded-full w-5/6" />
+                  <div className="h-2 bg-indigo-400/20 rounded-full w-4/5" />
+                </div>
+
+                <div className="space-y-2">
+                  <div className="h-2.5 bg-white/10 rounded-full w-full" />
+                  <div className="h-2.5 bg-white/5 rounded-full w-3/4" />
+                </div>
+              </div>
+
+              {/* Floating stats card on top */}
+              <div className="absolute bottom-6 right-6 p-4 rounded-2xl bg-[#140b2b]/95 border border-purple-500/35 shadow-xl shadow-purple-500/10 flex items-center gap-4 animate-bounce [animation-duration:5s]">
+                <div className="w-10 h-10 rounded-xl bg-purple-600/20 border border-purple-500/30 flex items-center justify-center">
+                  <Sparkles className="text-purple-300" size={18} />
+                </div>
+                <div>
+                  <div className="text-[10px] text-purple-300 font-bold uppercase tracking-wider">Score de Assertividade</div>
+                  <div className="text-lg font-black text-white leading-none mt-1">98.4%</div>
+                </div>
+              </div>
             </motion.div>
           </div>
 
