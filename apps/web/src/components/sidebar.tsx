@@ -21,7 +21,7 @@ export function Sidebar({ user }: { user: User | null }) {
     return (
       <button
         onClick={() => router.push(path)}
-        className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm transition-colors ${
+        className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm text-left transition-colors ${
           active
             ? "bg-white/10 text-white font-medium"
             : "text-slate-400 hover:text-white hover:bg-white/8"
