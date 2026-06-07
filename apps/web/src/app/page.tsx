@@ -4,6 +4,7 @@ import { motion } from "framer-motion";
 import Link from "next/link";
 import Image from "next/image";
 import { Gavel, ClipboardCheck, Check, Scale, Sparkles } from "lucide-react";
+import { useState, useEffect } from "react";
 
 // ── Animations ───────────────────────────────────────────────────────────────
 
@@ -169,6 +170,169 @@ const STATS = [
 
 // ── Page ─────────────────────────────────────────────────────────────────────
 
+function AnimatedLegalDocument() {
+  const [progress, setProgress] = useState(0);
+
+  useEffect(() => {
+    let startTime = Date.now();
+    const duration = 5000;
+    const pause = 2000;
+    let animationFrame: number;
+
+    const update = () => {
+      const now = Date.now();
+      const elapsed = now - startTime;
+      
+      if (elapsed < duration) {
+        const t = elapsed / duration;
+        const ease = t * t * (3 - 2 * t);
+        setProgress(Math.round(ease * 100));
+        animationFrame = requestAnimationFrame(update);
+      } else if (elapsed < duration + pause) {
+        setProgress(100);
+        animationFrame = requestAnimationFrame(update);
+      } else {
+        startTime = Date.now();
+        setProgress(0);
+        animationFrame = requestAnimationFrame(update);
+      }
+    };
+    animationFrame = requestAnimationFrame(update);
+    return () => cancelAnimationFrame(animationFrame);
+  }, []);
+
+  const originalLines = [
+    "EXCELENTÍSSIMO SENHOR DOUTOR JUIZ DE DIREITO",
+    "DA 1ª VARA CÍVEL DA COMARCA DE SÃO PAULO/SP",
+    "",
+    "Processo nº 0001234-56.2024.8.26.0100",
+    "",
+    "[QUALIFICAÇÃO DO AUTOR INCOMPLETA]",
+    "vem, por seu advogado, apresentar",
+    "[FUNDAMENTAÇÃO GENÉRICA - REVISAR]",
+    "pelos motivos de fato e de direito:",
+    "",
+    "1. DOS FATOS E FUNDAMENTOS",
+    "O autor pleiteia a condenação do réu",
+    "ao pagamento de indenização.",
+  ];
+
+  const correctedLines = [
+    "EXCELENTÍSSIMO SENHOR DOUTOR JUIZ DE DIREITO",
+    "DA 1ª VARA CÍVEL DA COMARCA DE SÃO PAULO/SP",
+    "",
+    "Processo nº 0001234-56.2024.8.26.0100",
+    "",
+    "João da Silva, já devidamente qualificado,",
+    "vem, por seu advogado infra-assinado, apresentar",
+    "RÉPLICA À CONTESTAÇÃO (Art. 350, CPC)",
+    "pelos motivos de fato e de direito:",
+    "",
+    "1. DOS FATOS E FUNDAMENTOS",
+    "O autor pleiteia a condenação do réu",
+    "ao pagamento de indenização por danos morais.",
+  ];
+
+  const currentLine = Math.min(Math.floor((progress / 100) * originalLines.length), originalLines.length - 1);
+  const isFinished = progress === 100;
+
+  const radius = 42;
+  const circumference = 2 * Math.PI * radius;
+  const strokeDashoffset = circumference - (progress / 100) * circumference;
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, scale: 0.95, x: 20 }}
+      animate={{ opacity: 1, scale: 1, x: 0 }}
+      transition={{ duration: 0.8, delay: 0.1 }}
+      className="hidden lg:flex col-span-12 lg:col-span-5 w-full min-h-[400px] flex-col rounded-3xl bg-gradient-to-br from-[#0c0a24]/80 to-[#030014]/95 border border-indigo-500/20 p-6 backdrop-blur-3xl shadow-[0_0_60px_rgba(99,102,241,0.15)] relative z-[5] overflow-hidden group hover:border-violet-500/40 transition-all duration-500"
+    >
+      <div className="absolute -right-20 -top-20 w-48 h-48 bg-indigo-500/10 blur-[50px] pointer-events-none rounded-full" />
+      <div className="absolute -left-20 -bottom-20 w-48 h-48 bg-purple-500/10 blur-[50px] pointer-events-none rounded-full" />
+
+      {/* Decorative top bar */}
+      <div className="flex items-center justify-between pb-3 border-b border-white/[0.08] mb-4 relative z-10">
+        <div className="flex gap-1.5">
+          <span className="w-2.5 h-2.5 rounded-full bg-[#ff5f56]/80 transition-all group-hover:scale-110" />
+          <span className="w-2.5 h-2.5 rounded-full bg-[#ffbd2e]/80 transition-all group-hover:scale-110" />
+          <span className="w-2.5 h-2.5 rounded-full bg-[#27c93f]/80 transition-all group-hover:scale-110" />
+        </div>
+        <div className="px-2.5 py-0.5 rounded-full bg-violet-500/10 border border-violet-500/30 text-[9px] font-bold text-violet-300 tracking-wider flex items-center gap-1.5 shadow-[0_0_15px_rgba(99,102,241,0.1)]">
+          <span className="w-1.5 h-1.5 rounded-full bg-violet-400 animate-pulse" />
+          GERAÇÃO DE PEÇA ATIVA
+        </div>
+      </div>
+
+      {/* Document Content */}
+      <div className="flex-1 relative z-10 font-mono text-[10px] sm:text-[11px] leading-relaxed select-none pt-2">
+        {originalLines.map((line, idx) => {
+          const isCorrected = idx < currentLine || isFinished;
+          const isCurrent = idx === currentLine && !isFinished;
+          
+          let content = isCorrected ? correctedLines[idx] : originalLines[idx];
+          if (!content) content = " ";
+
+          let lineClass = "py-[1px] px-2 rounded transition-all duration-300 inline-block ";
+          
+          if (isCorrected) {
+            lineClass += "text-white/90";
+          } else if (isCurrent) {
+            lineClass += "bg-indigo-500/30 text-indigo-100 shadow-[0_0_10px_rgba(99,102,241,0.2)]";
+          } else {
+            lineClass += "text-white/30";
+            if (content.includes("[")) {
+              lineClass += " bg-red-500/10 text-red-300/80";
+            }
+          }
+
+          return (
+            <div key={idx} className="flex min-h-[1.5rem]">
+              <span className={lineClass}>
+                {content}
+                {isCurrent && <span className="inline-block w-1.5 h-3 bg-indigo-400 ml-1 animate-pulse align-middle" />}
+              </span>
+            </div>
+          );
+        })}
+      </div>
+
+      {/* Floating Circular Chart widget */}
+      <div className="absolute bottom-6 right-6 w-36 h-36 bg-[#030014]/90 backdrop-blur-xl border border-indigo-500/30 rounded-2xl flex flex-col items-center justify-center shadow-2xl z-20">
+        <div className="relative w-20 h-20 flex items-center justify-center">
+          <svg className="absolute inset-0 w-full h-full -rotate-90 drop-shadow-[0_0_8px_rgba(99,102,241,0.5)]" viewBox="0 0 100 100">
+            <circle cx="50" cy="50" r={radius} stroke="currentColor" strokeWidth="6" fill="transparent" className="text-white/5" />
+            <circle 
+              cx="50" cy="50" r={radius} 
+              stroke="url(#progress-gradient)" 
+              strokeWidth="6" 
+              fill="transparent" 
+              strokeDasharray={circumference} 
+              strokeDashoffset={strokeDashoffset} 
+              strokeLinecap="round" 
+              className="transition-all duration-75 ease-linear" 
+            />
+            <defs>
+              <linearGradient id="progress-gradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                <stop offset="0%" stopColor="#8b5cf6" />
+                <stop offset="100%" stopColor="#3b82f6" />
+              </linearGradient>
+            </defs>
+          </svg>
+          <div className="absolute flex items-center justify-center flex-col">
+            <span className="text-2xl font-black text-transparent bg-clip-text bg-gradient-to-br from-white to-white/70 tracking-tighter">
+              {progress}<span className="text-sm font-bold text-white/50">%</span>
+            </span>
+          </div>
+        </div>
+        <div className="mt-2 text-[9px] uppercase tracking-widest text-indigo-300/80 font-bold flex items-center gap-1">
+          <Sparkles size={10} className="text-indigo-400" />
+          Score da Peça
+        </div>
+      </div>
+    </motion.div>
+  );
+}
+
 export default function LandingPage() {
   return (
     <div className="min-h-screen bg-[#030014] text-white flex flex-col selection:bg-indigo-500/30 overflow-x-hidden relative">
@@ -237,13 +401,13 @@ export default function LandingPage() {
         
         <div className="w-full max-w-6xl">
 
-          {/* Hero: texto + Themis. bottom-0 da Themis = topo dos cards */}
-          <div className="relative">
+          {/* Hero: texto + Dashboard Preview */}
+          <div className="grid lg:grid-cols-12 gap-8 items-center pt-4 pb-12 relative mb-6">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6 }}
-              className="w-full md:w-[54%] lg:w-[50%] text-center md:text-left relative z-[2] pt-4 pb-10"
+              className="col-span-12 lg:col-span-7 text-center lg:text-left relative z-[2]"
             >
               <h1 className="text-5xl md:text-[64px] lg:text-[72px] font-black tracking-tight mb-6 leading-[1.05] drop-shadow-2xl">
                 Inteligência que<br className="hidden md:block" /> transforma o{" "}
@@ -272,59 +436,8 @@ export default function LandingPage() {
               </motion.div>
             </motion.div>
 
-            <motion.div
-              initial={{ opacity: 0, scale: 0.95, x: 20 }}
-              animate={{ opacity: 1, scale: 1, x: 0 }}
-              transition={{ duration: 0.8, delay: 0.1 }}
-              className="hidden lg:flex absolute right-0 top-1/2 -translate-y-1/2 w-[480px] h-[400px] flex-col rounded-3xl bg-[#09051a]/60 border border-white/[0.08] p-6 backdrop-blur-2xl shadow-2xl shadow-indigo-500/10 z-[5] overflow-hidden"
-            >
-              {/* Decorative top bar */}
-              <div className="flex items-center justify-between pb-4 border-b border-white/[0.06] mb-5">
-                <div className="flex gap-2">
-                  <div className="w-2.5 h-2.5 rounded-full bg-red-500/50" />
-                  <div className="w-2.5 h-2.5 rounded-full bg-yellow-500/50" />
-                  <div className="w-2.5 h-2.5 rounded-full bg-green-500/50" />
-                </div>
-                <div className="px-3 py-1 rounded-full bg-indigo-500/10 border border-indigo-500/20 text-[10px] text-indigo-300 font-bold uppercase tracking-wider flex items-center gap-1.5">
-                  <span className="w-1.5 h-1.5 rounded-full bg-indigo-400 animate-pulse" />
-                  Geração de Peça Ativa
-                </div>
-              </div>
-
-              {/* Document Mock Content */}
-              <div className="space-y-4 flex-1">
-                <div className="text-[10px] text-white/40 font-mono">AO JUÍZO DA 1ª VARA FEDERAL DA SEÇÃO JUDICIÁRIA...</div>
-                <div className="space-y-2">
-                  <div className="h-2.5 bg-white/10 rounded-full w-full" />
-                  <div className="h-2.5 bg-white/10 rounded-full w-11/12" />
-                  <div className="h-2.5 bg-white/10 rounded-full w-full" />
-                </div>
-
-                {/* Highlighted text block representing AI extraction */}
-                <div className="p-3.5 rounded-2xl bg-indigo-600/10 border border-indigo-500/20 space-y-2 relative overflow-hidden">
-                  <div className="absolute top-0 right-0 w-24 h-24 bg-indigo-500/10 blur-xl pointer-events-none" />
-                  <div className="text-[11px] text-indigo-300 font-bold uppercase tracking-wide">Tese Jurisprudencial Relevante</div>
-                  <div className="h-2 bg-indigo-400/30 rounded-full w-5/6" />
-                  <div className="h-2 bg-indigo-400/20 rounded-full w-4/5" />
-                </div>
-
-                <div className="space-y-2">
-                  <div className="h-2.5 bg-white/10 rounded-full w-full" />
-                  <div className="h-2.5 bg-white/5 rounded-full w-3/4" />
-                </div>
-              </div>
-
-              {/* Floating stats card on top */}
-              <div className="absolute bottom-6 right-6 p-4 rounded-2xl bg-[#140b2b]/95 border border-purple-500/35 shadow-xl shadow-purple-500/10 flex items-center gap-4 animate-bounce [animation-duration:5s]">
-                <div className="w-10 h-10 rounded-xl bg-purple-600/20 border border-purple-500/30 flex items-center justify-center">
-                  <Sparkles className="text-purple-300" size={18} />
-                </div>
-                <div>
-                  <div className="text-[10px] text-purple-300 font-bold uppercase tracking-wider">Score de Assertividade</div>
-                  <div className="text-lg font-black text-white leading-none mt-1">98.4%</div>
-                </div>
-              </div>
-            </motion.div>
+            {/* Right side: Premium Dashboard preview */}
+            <AnimatedLegalDocument />
           </div>
 
           {/* 3 Cards — largura total, abaixo do texto */}

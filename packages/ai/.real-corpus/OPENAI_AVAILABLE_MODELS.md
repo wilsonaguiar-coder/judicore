@@ -1,0 +1,112 @@
+# OpenAI Available Models
+
+Total de modelos de texto detectados: 101
+
+| Model ID | Owner | Created |
+|---|---|---|
+| `chatgpt-image-latest` | system | 2025-12-16 |
+| `gpt-3.5-turbo` | openai | 2023-02-28 |
+| `gpt-3.5-turbo-0125` | system | 2024-01-23 |
+| `gpt-3.5-turbo-1106` | system | 2023-11-02 |
+| `gpt-3.5-turbo-16k` | openai-internal | 2023-05-10 |
+| `gpt-3.5-turbo-instruct` | system | 2023-08-24 |
+| `gpt-3.5-turbo-instruct-0914` | system | 2023-09-07 |
+| `gpt-4` | openai | 2023-06-27 |
+| `gpt-4-0613` | openai | 2023-06-12 |
+| `gpt-4-turbo` | system | 2024-04-05 |
+| `gpt-4-turbo-2024-04-09` | system | 2024-04-08 |
+| `gpt-4.1` | system | 2025-04-10 |
+| `gpt-4.1-2025-04-14` | system | 2025-04-10 |
+| `gpt-4.1-mini` | system | 2025-04-10 |
+| `gpt-4.1-mini-2025-04-14` | system | 2025-04-10 |
+| `gpt-4.1-nano` | system | 2025-04-10 |
+| `gpt-4.1-nano-2025-04-14` | system | 2025-04-10 |
+| `gpt-4o` | system | 2024-05-10 |
+| `gpt-4o-2024-05-13` | system | 2024-05-10 |
+| `gpt-4o-2024-08-06` | system | 2024-08-04 |
+| `gpt-4o-2024-11-20` | system | 2025-02-12 |
+| `gpt-4o-mini` | system | 2024-07-16 |
+| `gpt-4o-mini-2024-07-18` | system | 2024-07-16 |
+| `gpt-4o-mini-search-preview` | system | 2025-03-07 |
+| `gpt-4o-mini-search-preview-2025-03-11` | system | 2025-03-07 |
+| `gpt-4o-mini-transcribe` | system | 2025-03-15 |
+| `gpt-4o-mini-transcribe-2025-03-20` | system | 2025-12-13 |
+| `gpt-4o-mini-transcribe-2025-12-15` | system | 2025-12-13 |
+| `gpt-4o-mini-tts` | system | 2025-03-19 |
+| `gpt-4o-mini-tts-2025-03-20` | system | 2025-12-13 |
+| `gpt-4o-mini-tts-2025-12-15` | system | 2025-12-13 |
+| `gpt-4o-search-preview` | system | 2026-02-24 |
+| `gpt-4o-search-preview-2025-03-11` | system | 2026-02-24 |
+| `gpt-4o-transcribe` | system | 2025-03-15 |
+| `gpt-4o-transcribe-diarize` | system | 2025-06-24 |
+| `gpt-5` | system | 2025-08-05 |
+| `gpt-5-2025-08-07` | system | 2025-08-01 |
+| `gpt-5-chat-latest` | system | 2025-08-01 |
+| `gpt-5-codex` | system | 2025-09-10 |
+| `gpt-5-mini` | system | 2025-08-05 |
+| `gpt-5-mini-2025-08-07` | system | 2025-08-05 |
+| `gpt-5-nano` | system | 2025-08-05 |
+| `gpt-5-nano-2025-08-07` | system | 2025-08-05 |
+| `gpt-5-pro` | system | 2025-10-03 |
+| `gpt-5-pro-2025-10-06` | system | 2025-10-03 |
+| `gpt-5-search-api` | system | 2025-10-03 |
+| `gpt-5-search-api-2025-10-14` | system | 2025-10-09 |
+| `gpt-5.1` | system | 2025-11-10 |
+| `gpt-5.1-2025-11-13` | system | 2025-11-10 |
+| `gpt-5.1-chat-latest` | system | 2025-11-07 |
+| `gpt-5.1-codex` | system | 2025-11-12 |
+| `gpt-5.1-codex-max` | system | 2025-11-20 |
+| `gpt-5.1-codex-mini` | system | 2025-11-13 |
+| `gpt-5.2` | system | 2025-12-09 |
+| `gpt-5.2-2025-12-11` | system | 2025-12-09 |
+| `gpt-5.2-chat-latest` | system | 2025-12-10 |
+| `gpt-5.2-codex` | system | 2025-12-19 |
+| `gpt-5.2-pro` | system | 2025-12-10 |
+| `gpt-5.2-pro-2025-12-11` | system | 2025-12-10 |
+| `gpt-5.3-chat-latest` | system | 2026-02-27 |
+| `gpt-5.3-codex` | system | 2026-02-08 |
+| `gpt-5.4` | system | 2026-03-05 |
+| `gpt-5.4-2026-03-05` | system | 2026-03-04 |
+| `gpt-5.4-mini` | system | 2026-03-14 |
+| `gpt-5.4-mini-2026-03-17` | system | 2026-03-14 |
+| `gpt-5.4-nano` | system | 2026-03-14 |
+| `gpt-5.4-nano-2026-03-17` | system | 2026-03-14 |
+| `gpt-5.4-pro` | system | 2026-03-04 |
+| `gpt-5.4-pro-2026-03-05` | system | 2026-03-04 |
+| `gpt-5.5` | system | 2026-04-22 |
+| `gpt-5.5-2026-04-23` | system | 2026-04-22 |
+| `gpt-5.5-pro` | system | 2026-04-22 |
+| `gpt-5.5-pro-2026-04-23` | system | 2026-04-22 |
+| `gpt-audio` | system | 2025-08-28 |
+| `gpt-audio-1.5` | system | 2026-02-20 |
+| `gpt-audio-2025-08-28` | system | 2025-08-27 |
+| `gpt-audio-mini` | system | 2025-10-03 |
+| `gpt-audio-mini-2025-10-06` | system | 2025-10-03 |
+| `gpt-audio-mini-2025-12-15` | system | 2025-12-15 |
+| `gpt-image-1` | system | 2025-04-24 |
+| `gpt-image-1-mini` | system | 2025-09-26 |
+| `gpt-image-1.5` | system | 2025-11-25 |
+| `gpt-image-2` | system | 2026-04-17 |
+| `gpt-image-2-2026-04-21` | system | 2026-04-17 |
+| `gpt-realtime` | system | 2025-08-27 |
+| `gpt-realtime-1.5` | system | 2026-02-19 |
+| `gpt-realtime-2` | system | 2026-05-05 |
+| `gpt-realtime-2025-08-28` | system | 2025-08-27 |
+| `gpt-realtime-mini` | system | 2025-10-03 |
+| `gpt-realtime-mini-2025-10-06` | system | 2025-10-03 |
+| `gpt-realtime-mini-2025-12-15` | system | 2025-12-13 |
+| `gpt-realtime-translate` | system | 2026-05-05 |
+| `gpt-realtime-whisper` | system | 2026-05-05 |
+| `o1` | system | 2024-12-16 |
+| `o1-2024-12-17` | system | 2024-12-16 |
+| `o1-pro` | system | 2025-03-17 |
+| `o1-pro-2025-03-19` | system | 2025-03-17 |
+| `o3` | system | 2025-04-09 |
+| `o3-2025-04-16` | system | 2025-04-08 |
+| `o3-mini` | system | 2025-01-17 |
+| `o3-mini-2025-01-31` | system | 2025-01-27 |
+
+## Análise Inicial
+- **Modelos Mais Avançados (Flagships):** gpt-4o, gpt-4o-2024-05-13, gpt-4o-2024-08-06, gpt-4o-2024-11-20, gpt-4o-mini, gpt-4o-mini-2024-07-18, gpt-4o-mini-search-preview, gpt-4o-mini-search-preview-2025-03-11, gpt-4o-mini-transcribe, gpt-4o-mini-transcribe-2025-03-20, gpt-4o-mini-transcribe-2025-12-15, gpt-4o-mini-tts, gpt-4o-mini-tts-2025-03-20, gpt-4o-mini-tts-2025-12-15, gpt-4o-search-preview, gpt-4o-search-preview-2025-03-11, gpt-4o-transcribe, gpt-4o-transcribe-diarize, gpt-5, gpt-5-2025-08-07, gpt-5-chat-latest, gpt-5-codex, gpt-5-mini, gpt-5-mini-2025-08-07, gpt-5-nano, gpt-5-nano-2025-08-07, gpt-5-pro, gpt-5-pro-2025-10-06, gpt-5-search-api, gpt-5-search-api-2025-10-14, gpt-5.1, gpt-5.1-2025-11-13, gpt-5.1-chat-latest, gpt-5.1-codex, gpt-5.1-codex-max, gpt-5.1-codex-mini, gpt-5.2, gpt-5.2-2025-12-11, gpt-5.2-chat-latest, gpt-5.2-codex, gpt-5.2-pro, gpt-5.2-pro-2025-12-11, gpt-5.3-chat-latest, gpt-5.3-codex, gpt-5.4, gpt-5.4-2026-03-05, gpt-5.4-mini, gpt-5.4-mini-2026-03-17, gpt-5.4-nano, gpt-5.4-nano-2026-03-17, gpt-5.4-pro, gpt-5.4-pro-2026-03-05, gpt-5.5, gpt-5.5-2026-04-23, gpt-5.5-pro, gpt-5.5-pro-2026-04-23
+- **Modelos de Reasoning:** o1, o1-2024-12-17, o1-pro, o1-pro-2025-03-19, o3, o3-2025-04-16, o3-mini, o3-mini-2025-01-31
+- **Modelos Econômicos:** gpt-3.5-turbo, gpt-3.5-turbo-0125, gpt-3.5-turbo-1106, gpt-3.5-turbo-16k, gpt-3.5-turbo-instruct, gpt-3.5-turbo-instruct-0914, gpt-4.1-mini, gpt-4.1-mini-2025-04-14, gpt-4o-mini, gpt-4o-mini-2024-07-18, gpt-4o-mini-search-preview, gpt-4o-mini-search-preview-2025-03-11, gpt-4o-mini-transcribe, gpt-4o-mini-transcribe-2025-03-20, gpt-4o-mini-transcribe-2025-12-15, gpt-4o-mini-tts, gpt-4o-mini-tts-2025-03-20, gpt-4o-mini-tts-2025-12-15, gpt-5-mini, gpt-5-mini-2025-08-07, gpt-5.1-codex-mini, gpt-5.4-mini, gpt-5.4-mini-2026-03-17, gpt-audio-mini, gpt-audio-mini-2025-10-06, gpt-audio-mini-2025-12-15, gpt-image-1-mini, gpt-realtime-mini, gpt-realtime-mini-2025-10-06, gpt-realtime-mini-2025-12-15, o3-mini, o3-mini-2025-01-31

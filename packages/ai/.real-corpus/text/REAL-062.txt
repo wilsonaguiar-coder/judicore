@@ -1,0 +1,1050 @@
+PRISÃO IMEDIATA APÓS CONDENAÇÃO PERANTE O TRIBUNAL DO JÚRI: 
+INCONSTITUCIONALIDADES, INCONVENCIONALIDADES E 
+INCONGRUÊNCIAS 
+IMMEDIATE ARREST AFTER CONVICTION BEFORE THE COURT OF JURY: 
+INCONSTITUTIONALITIES, INCONVENTIONALITIES AND INCONGRUENCES 
+Gustavo Henrique Pinheiro Silva 1 
+ 
+ 
+RESUMO 
+O Código de Processo Penal foi recentemente alterad o pela Lei 13.964/19, lei esta que 
+teve origem, dentre outras propostas, no “Pacote Anticrime”. A referida alteração no Código de 
+Processo Penal trouxe múltiplos dispositivos de índ ole marcadamente punitivista. Dentre tais 
+alterações está a previsão de que, em se tratando do procedimento do Tribunal do Júri (destinado 
+ao julgamento dos crimes dolosos contra a vida), se  acaso o acusado vier a ser condenado a 
+uma pena igual ou superior a 15 anos de reclusão, então um dos efeitos da sentença condenatória 
+é a determinação da imediata prisão, estabelecendo- se, portanto, uma espécie de execução 
+antecipada da pena. A discussão acerca da execução antecipada da pena não é nova, 
+relembrando-se que o Supremo Tribunal Federal foi palco de recente discussão, ocasião em que 
+ficou definido ser inconstitucional a execução ante cipada da pena, isto ante a exigência do 
+trânsito em julgado da sentença condenatória, exigê ncia esta que corporifica o princípio da 
+presunção da inocência. Ocorre que, sob o argumento de que o Tribunal do Júri encarta situação 
+excepcional, vez que calcado no princípio da sobera nia dos veredictos, a discussão da prisão 
+antecipada voltou à tona (e, agora, positivada na l ei), sendo certo que tramita, perante o 
+Supremo Tribunal Federal, Recurso Extraordinário af etado em sede de Repercussão Geral, 
+expediente este que poderá dirimir a questão. Após uma breve introdução sobre o rito do júri, 
+e um recorte histórico da discussão travada em torn o da “prisão em segunda instância” (ADC 
+44, 45, e 54), o presente artigo irá analisar, de forma crítica, se a novidade legislativa encontra 
+amparo no ordenamento jurídico, analisando se a mes ma é constitucional. Ademais, será feita 
+a análise da questão sob o ponto de vista das Conve nções Internacionais de Direitos Humanos 
+do qual o Brasil é signatário (ênfase dada ao Pacto de San Jose da Costa Rica), isto de modo a 
+analisar se a novel legislação padece de inconvencionalidade. Para tanto, será feita pesquisa da 
+                                                           
+1 Graduado em Direito pela Universidade Federal do E stado do Rio de Janeiro. Defensor Público Estadual titular 
+da 15ª DPE Criminal de Campo Grande. Atualmente é C oordenador do Núcleo Institucional Criminal da 
+Defensoria Pública de Mato Grosso do Sul. 
+2 
+ 
+jurisprudência da Corte Interamericana de Direitos Humanos acerca dos temas que circundam 
+o debate. Ainda, será analisado se a reforma legal se mostra congruente com o processo penal 
+brasileiro, pondo foco em sua visão sistêmica. Por fim, será feito um cotejo de alguns julgados 
+das Cortes Superiores brasileira sobre a questão.  O artigo concluirá que a alteração legislativa 
+é inconstitucional, inconvencional e incongruente. 
+Palavras-chave : Tribunal do Júri. Prisão. Imediata. Artigo 492 do  Código de Processo Penal 
+brasileiro.  
+ 
+ABSTRACT 
+The Criminal Procedure Code was recently amended by  Law 13.964/19, a law that 
+originated, among other proposals, in the "Anti-Crime Package". This amendment to the Code 
+brought multiple punitive devices. Among such changes is the institution that, in the case of the 
+procedure of the Jury Court (intended for the trial of crimes related to voluntary treat to life), if 
+the accused happens to be sentenced to a sentence e qual to or greater than 15 years in prison, 
+then one of the effects of such sentence is the det ermination of immediate imprisonment, thus 
+establishing a kind of early execution of the sentence. The discussion about the early execution 
+of the sentence is not new, recalling that the Supr eme Court was the center of a recent debate, 
+when it was defined that the early execution of the  sentence was unconstitutional, particularly 
+because of the requirement that the condemnable sen tence is only enforceable after the end of 
+all applicable appeals, a requirement that embodies  the principle of the presumption of 
+innocence. It occurs that, on the grounds that the Jury Court represents an exceptional situation, 
+since based on the principle of sovereignty of verdicts, the discussion of early imprisonment is 
+now back (and now written in the law), being certai n that it is being processed, before the 
+Supreme Court, an Extraordinary Appeal labelled und er the “General Repercussion” system, 
+expedient that may resolve the issue. After a brief introduction on the jury rite, and a historical 
+clipping of the discussion held around "prison after second instance" (ADC 44, 45, and 54), this 
+article will critically analyze whether legislative  novelty is backed by the legal system, 
+analyzing whether it is constitutional. Furthermore, the analysis of the issue will be made from 
+the point of view of the International Conventions on Human Rights to which Brazil is a 
+signatory (emphasis given to the Pact of San Jose o f Costa Rica), in order to analyze whether 
+novel legislation are tainted by unconventionality.  To this end, a survey will be made of the 
+jurisprudence of the Inter-American Court of Human Rights on the issues surrounding the 
+debate. Furthermore, it will be analyzed whether th e legal reform is congruent with Brazilian 
+3 
+ 
+criminal proceedings, focusing on its systemic poin t of view. Finally, a comparison of some 
+judged cases of the Brazilian Superior Courts on th e issue will be made.  The article will 
+conclude that the legislative change is unconstitutional, unconventional and incompatible. 
+Keywords : Jury court. Arrest. Immediate. Article 492 of the B razilian Criminal Procedure 
+Code. 
+ 
+INTRODUÇÃO  
+A atual normativa estabelecida pelo artigo 492 do Código de Processo Penal disciplina 
+que dentre os efeitos imediatos da sentença condenatória proferida pelo Tribunal do Júri está a 
+determinação de que o acusado deverá ser preso imed iatamente no caso de condenação a uma 
+pena igual ou superior a 15 anos de reclusão, estab elecendo-se a execução provisória ( rectius, 
+imediata) da pena. O referido artigo legal estabele ceu, ainda, que a apelação interposta contra 
+decisão condenatória do Tribunal do Júri a uma pena  igual ou superior a 15 anos de reclusão 
+não terá, via de regra, efeito suspensivo. 
+A disciplina atual foi incluída no Código de Processo Penal pela Lei nº 13.964/19 (que 
+teve origem no “Pacote Anticrime”), estabelecendo-s e, portanto, uma hipótese de execução 
+imediata de sentença condenatória proferida por órg ão judicial de primeiro grau, condenação 
+esta contra a qual ainda cabe recurso de cognição a mpla. A legislação estabeleceu uma prisão 
+ex lege  que não se calca nos requisitos e pressupostos da prisão preventiva, mas decorre única 
+e exclusivamente no fato da condenação proferida pelo Tribunal do Júri, desde que em patamar 
+igual ou superior a 15 anos de reclusão. 
+A matéria será em breve decidida pelo Supremo Tribu nal Federal, sobretudo ante a 
+existência do Recurso Extraordinário RE 1235340/SC 1 afetado ao plenário da Suprema Corte 
+em sede de Repercussão Geral.  
+O presente artigo visa analisar eventuais incongruê ncias da novidade legislativa, e, 
+também, se a normativa estabelecida encontra guarid a no ordenamento jurídico brasileiro, em 
+especial à luz da Constituição da República. O arti go abordará, ainda, se a novel normativa 
+colide com as normativas das Convenções Internacionais de Direitos Humanos do qual o Brasil 
+é signatário, trazendo à colação alguns julgados da Corte Interamericana de Direitos Humanos 
+sobre temas análogos. Para tanto, o artigo fará uma pesquisa doutrinária e jurisprudencial sobre 
+o tema, visando, ao final, mediante análise crítica  da legislação em cotejo com o material 
+levantado, concluir se é cabível (ou não) a prisão imediata após condenação no Tribunal do 
+Júri.  
+4 
+ 
+1. Uma breve visão geral sobre o procedimento do Tribunal do Júri 
+A Constituição da República optou por estabelecer q ue o mérito do julgamento dos 
+crimes dolosos contra à vida é de competência do Tr ibunal do Júri. Tal previsão foi erigida 
+como um direito e garantia individual, estando pres ente no rol do artigo 5º, da Carta Magna, 
+mais especificamente no inciso XXXVIII, alínea “d”,  sendo que além da competência mínima 
+do Tribunal do Júri para julgar crimes dolosos contra a vida, também foi assegurado os direitos 
+à plenitude de defesa, o sigilo das votações e a soberania dos veredictos. 
+Os crimes contra a vida estão estabelecidos no Códi go Penal, sendo certo que o rol 
+inaugura a parte especial do Código Penal, e estão previstos entre os artigos 121 a 128. Se 
+praticados de forma dolosa, caberá ao Tribunal Popu lar a competência para julgar o mérito da 
+causa. Os crimes contra a vida são o homicídio (sim ples, qualificado e feminicídio); 
+Induzimento, instigação ou auxílio a suicídio ou a automutilação; infanticídio; e aborto.  
+Vale notar que a competência do Tribunal do Júri nã o foi reservada aos crimes mais 
+graves (assim considerando-se as penas abstratament e cominadas), bastando notar que 
+múltiplos tipos penais estabelecidos no Código Penal ou em legislações extravagantes possuem 
+penas maiores que os constantes no rol dos artigos 121 a 128 do Código Penal. Apenas para 
+exemplificar, temos o Latrocínio; Extorsão Mediante Sequestro em suas espécies qualificadas; 
+Estupro com Resultado Morte; Estupro de Vulnerável com Resultado Morte; etc. Assim, a 
+opção do legislador é em razão da matéria, ou seja,  em relação ao dolo do agente ser dirigido 
+ao bem jurídico vida. 
+O procedimento relativo aos processos da competência do tribunal do júri é regido pelo 
+Código de Processo Penal, isto entre os artigos 406  a 497. Nota-se que o procedimento é 
+dividido em duas fases, a primeira fase, denominada  pelo código de Acusação e Instrução 
+Preliminar, e a segunda fase, denominada de Instruç ão em Plenário. A doutrina denomina tais 
+fases, respectivamente: judicium accusationis  e a judicium causae . (OLIVEIRA, 2009, p. 637 2). 
+A primeira fase funciona como uma espécie de juízo de admissibilidade, ocasião em que 
+o juízo de direito irá averiguar se os fatos imputa dos devem ser submetidos ao julgamento 
+perante o Conselho de Sentença. Nesta fase, o juízo  poderá decidir pela absolvição sumária; 
+pela desclassificação para crime diverso de crime d oloso contra a vida; ou pela impronúncia. 
+Nestas hipóteses, o procedimento do júri se encerra na primeira fase.  
+Por outro lado, se o juízo verificar que existe las tro probatório mínimo acerca da 
+materialidade de crime contra a vida e indícios suficientes de autoria, e não ocorrendo quaisquer 
+5 
+ 
+das hipóteses anteriormente mencionadas, o juízo pr ofere uma decisão denominada de 
+pronúncia, que, uma vez preclusa, inaugura a segunda fase do procedimento do júri. 
+A segunda fase do rito especial do Tribunal do Júri inicia-se com recebimento dos autos 
+pelo Juiz Presidente do Tribunal do Júri, ocasião em que, dentre as múltiplas providências, estão 
+a intimação da acusação e da defesa, para que estas  apresentem o rol de testemunhas que irão 
+depor em plenário (artigo 422, do CPP), bem como a elaboração de relatório do feito e inclusão 
+em pauta. No dia da sessão, se presentes ao menos 1 5 jurados, será realizado o sorteio para a 
+formação do Conselho de Sentença, Conselho este composto por 7 jurados e perante quem será 
+realizada a instrução plenária. Encerrada a instruç ão, será concedida a palavra à acusação, e, 
+posteriormente, à defesa, para fazerem suas respectivas sustentações. 
+Encerrados os debates, o juiz presidente indagará a o Conselho de Sentença se está 
+habilitado ao julgamento, e, em caso positivo, dá-se início ao questionário e votação, sendo que 
+o veredicto é alcançado uma vez atingido o número de 4 votos. 
+Uma vez encerrada a votação, e se acaso o Conselho de Sentença entenda pela 
+condenação do acusado, o juiz presidente deverá pro ferir sentença em que fixará a pena-base; 
+considerará as circunstâncias agravantes ou atenuan tes alegadas nos debates; imporá os 
+aumentos ou diminuições da pena, em atenção às causas admitidas pelo júri. 
+Se, uma vez proferido o veredicto e realizada a dosimetria de pena, for verificado que a 
+condenação ensejou pena igual ou superior a 15 anos  de reclusão, então, consoante determina 
+o artigo 492, I, e, do CPP, o Juiz determinará a execução provisória das penas. Vale trazermos 
+à colação a literal redação do referido dispositivo: 
+Art. 492.  Em seguida, o presidente proferirá sentença que:             
+I – no caso de condenação:             
+a) fixará a pena-base;            
+b) considerará as circunstâncias agravantes ou atenuantes alegadas nos debates;             
+c) imporá os aumentos ou diminuições da pena, em at enção às causas admitidas pelo 
+júri;            
+d) observará as demais disposições do art. 387 deste Código;         
+e) mandará o acusado recolher-se ou recomendá-lo-á à prisão em que se encontra, se 
+presentes os requisitos da prisão preventiva, ou , no caso de condenação a uma pena 
+igual ou superior a 15 (quinze) anos de reclusão, d eterminará a execução 
+provisória das penas, com expedição do mandado de p risão, se for o caso, sem 
+prejuízo do conhecimento de recursos que vierem a s er interpostos . (grifos 
+nossos) 
+ 
+O presente artigo focará sua atenção ao trecho acima grifado, e que estabeleceu que no 
+caso de condenação a uma pena igual ou superior a 1 5 (quinze) anos de reclusão, o juiz 
+determinará a execução provisória das penas, com ex pedição do mandado de prisão, sem 
+prejuízo do conhecimento de recursos que vierem a ser interpostos.  
+6 
+ 
+Neste ponto, embora o Código mencione se tratar de “execução provisória das penas” 
+preferimos o termo “execução imediata  das penas”, uma vez que o provisório é reversível,  o 
+que é impossível em se tratando de execução de uma pena privativa de liberdade. (MENDES e 
+LUCCHESI/2020). 
+Vale atentar que espécie de prisão acima mencionada  não se confunde com a hipótese 
+de decretação (ou manutenção) de prisão preventiva, até mesmo porque a eventual necessidade 
+de prisão preventiva está estabelecida na primeira parte da alínea “e”, antes da partícula “ou” 
+(“mandará o acusado recolher-se ou recomendá-lo-á à  prisão em que se encontra, se presentes 
+os requisitos da prisão preventiva”), sendo certo, ainda, que nestas hipóteses sequer seria 
+necessário que a pena estabelecida seja igual ou su perior a 15 anos, podendo ocorrer em caso 
+de condenação à pena menor do que tal patamar. Em o utras palavras, estamos a falar de uma 
+espécie de prisão em que estão ausentes os requisit os da prisão preventiva, e que decorre do 
+mero fato  do acusado ter sido condenado, perante o Tribunal do Júri, a uma pena igual ou 
+superior a 15 anos de reclusão. 
+ 
+2. A alteração legislativa: O Pacote Anticrime e sua tônica punitivista 
+A alteração legislativa que ora nos debruçamos deco rre da Lei 13.964/2019 de 24 de 
+dezembro de 2019, com vacatio legis  de 30 dias, entrando em vigor em 23 de janeiro de 2020, 
+sendo certo que a referida Lei alterou múltiplos dispositivos legais do Código Penal, Código de 
+Processo Penal, Lei de Execução Penal, Lei de Crimes Hediondos, dentre outras.  
+Tal Lei 13.964/2019 teve como embriões (i) o Projeto de Lei 10.372/2018, que, por sua 
+vez, fora baseado no anteprojeto elaborado por uma comissão de juristas e então presidida pelo 
+Ministro Alexandre de Moraes; e (ii) o Projeto de Lei 882/2019, apresentando para a imprensa 
+como “Pacote Anticrime” elaborado pelo então Minist ro da Justiça Sergio Moro. Como ambos 
+os projetos tinham pontos de convergência, foi formado um Grupo de Trabalho na Câmara dos 
+Deputados para avaliar e uniformizar ambas as propo stas. (JUNQUEIRA, VANZOLINI, 
+FULLER & PARDAL, 2020, p. 9 3). 
+Não são raras as tentativas de solucionar os proble mas de segurança pública por meio 
+de políticas de recrudescimento do sistema penal e de execução penal, sendo certo que o 
+referido recrudescimento vem sistematicamente desac ompanhado de estudos empíricos que 
+demonstrem uma relação de causa e efeito entre a ma joração do espectro punitivista do 
+ordenamento jurídico e a melhora nos índices de cri minalidade. Não obstante, considerando 
+que tais medidas de recrudescimento penal têm forte  apelo midiático e encontram ressonância 
+7 
+ 
+no público leigo, então usualmente servem de mote p ara campanhas políticas de apelo 
+populista.  
+Com isso, o Estado busca suprir as deficiências na prestação de serviços públicos 
+básicos e a redução das desigualdades sociais (incumbências do Poder Executivo e Legislativo) 
+- e que são as causas  de grande parte da criminalidade - através de pseudo-soluções de (super) 
+encarceramento, depositando-se no Poder Judiciário tal incumbência, descurando que tal 
+atuação age apenas na consequência do problema, e não em sua gênese. Alias, apenas agrava a 
+situação carcerária, já reconhecidamente como um estado de coisas inconstitucional 4. 
+Neste sentido, vale trazermos o posicionamento de P línio Antônio Britto Gentil, 
+Fabrício Reis Costa e André Antiquera Pereira Lima,  que, em artigo 5 publicado em abril de 
+2020, assim se manifestaram: 
+O que se vê, no entanto, é que tal clamor punitivis ta se desnuda em um mero 
+simbolismo das medidas relacionadas à segurança pública.  
+O direito penal simbólico é intimamente relacionado  ao discurso populista, que, se 
+valendo do senso comum, das emoções decorrentes do medo do delito, buscam o 
+consentimento da população para a adoção de medidas  penais cada vez mais severas 
+e repressivas. A roupagem da eficiência que se pret ende imprimir a tais medidas 
+marcará seu caráter meramente simbólico: não aument am a proteção de bens 
+jurídicos, e sim, apenas apresentam mensagens imediatistas, ludibriando a população, 
+que, tranquilizada, não percebe a absoluta indifere nça delas com relação ao cerne do 
+problema da segurança pública: O que importa, para a função simbólica, é manter um 
+nível de tranquilidade na opinião pública, fundado na impressão de que o legislador 
+se encontra em sintonia com as preocupações que ema nam da sociedade. Criam-se, 
+assim, novos tipos penais, incrementam-se as penas,  restringem-se direitos sem que, 
+substancialmente, tais opções representem perspecti vas de mudança do quadro que 
+determinou a alteração (ou criação) legislativa. Pr oduz-se a ilusão de que soluções 
+foram encaminhadas. 
+ 
+Para esquadrinharmos as nuances ideológicas da nove l legislação, vale citarmos as 
+precisas palavras de Thiago Bunning Mendes e Guilherme Brenner Lucchesi 6: 
+ 
+Há um abismo entre o Pacote Anticrime – desidratado  em cerca de 30% ao perder na 
+integralidade onze de suas propostas e ver outras s ofrerem supressões parciais – e a 
+Lei Anticrime, aprovada pelo Congresso Nacional e (estranhamente) sancionada pelo 
+Presidente da República. A lei representa um contra ssenso e um poço de incógnitas, 
+muito bem definido por Salo de Carvalho ao reconhec er que estamos diante de ‘uma 
+lei sem identidade, pois, se no plano do direito pr ocessual penal inove com 
+importantes influxos garantistas, nas esferas do di reito penal e da execução penal 
+densifica substancialmente a estrutura inquisitória  do sistema punitivo. Se a Lei 
+Anticrime sintetiza a carência lógica (técnica) e a  promiscuidade ideológica da 
+política criminal brasileira contemporânea, em seu aspecto sancionador, abandona 
+qualquer pudor humanitário e assume a barbárie como  forma punitiva. Representa, 
+em síntese, o triste quadro de uma miserabilidade ética posta em forma política. 
+ 
+3. Relembrando algumas controvérsias acerca da Execução Imediata de Condenações não 
+Transitadas em Julgado: ADCs 43, 44 e 54 perante o STF 
+8 
+ 
+ 
+Por muito tempo, considerou-se possível a execução antecipada da pena, isto quando 
+cabível somente recurso sem efeito suspensivo, vis a vis , Recursos Extraordinário e Recurso 
+Especial. O raciocínio se calcava no fato de que, se o recurso interposto não suspendia o efeito 
+principal da condenação, então o cumprimento da pen a, por consequência, poderia ser 
+imediatamente executado. 
+Tal entendimento foi sendo gradualmente suplantado após o julgamento, pelo Plenário 
+do Supremo Tribunal Federal, do Habeas Corpus 84.07 8/MG 7, julgado em fevereiro de 2009, 
+e tendo como Ministro Relator Eros Grau, ocasião em que se decidiu que, verbis: 
+ 
+EMENTA: HABEAS CORPUS. INCONSTITUCIONALIDADE DA CHA MADA 
+"EXECUÇÃO ANTECIPADA DA PENA". ART. 5º, LVII, DA CO NSTITUIÇÃO 
+DO BRASIL. DIGNIDADE DA PESSOA HUMANA. ART. 1º, III , DA 
+CONSTITUIÇÃO DO BRASIL. 1. O art. 637 do CPP estabe lece que "[o] recurso 
+extraordinário não tem efeito suspensivo, e uma vez  arrazoados pelo recorrido os 
+autos do traslado, os originais baixarão à primeira  instância para a execução da 
+sentença". A Lei de Execução Penal condicionou a ex ecução da pena privativa de 
+liberdade ao trânsito em julgado da sentença conden atória. A Constituição do Brasil 
+de 1988 definiu, em seu art. 5º, inciso LVII, que " ninguém será considerado culpado 
+até o trânsito em julgado de sentença penal condena tória". 2. Daí que os preceitos 
+veiculados pela Lei n. 7.210/84, além de adequados à ordem constitucional vigente, 
+sobrepõem-se, temporal e materialmente, ao disposto no art. 637 do CPP. 3. A prisão 
+antes do trânsito em julgado da condenação somente pode ser decretada a título 
+cautelar. (omissis) 6. A antecipação da execução penal, ademais de incompatível com 
+o texto da Constituição, apenas poderia ser justifi cada em nome da conveniência dos 
+magistrados --- não do processo penal. A prestigiar -se o princípio constitucional, 
+dizem, os tribunais [leia-se STJ e STF] serão inund ados por recursos especiais e 
+extraordinários e subseqüentes agravos e embargos, além do que "ninguém mais será 
+preso". Eis o que poderia ser apontado como incitaç ão à "jurisprudência defensiva", 
+que, no extremo, reduz a amplitude ou mesmo amputa garantias constitucionais. A 
+comodidade, a melhor operacionalidade de funcioname nto do STF não pode ser 
+lograda a esse preço. (...) A Corte que vigorosamente prestigia o disposto no preceito 
+constitucional em nome da garantia da propriedade n ão a deve negar quando se trate 
+da garantia da liberdade, mesmo porque a propriedade tem mais a ver com as elites; a 
+ameaça às liberdades alcança de modo efetivo as cla sses subalternas. 8. Nas 
+democracias mesmo os criminosos são sujeitos de dir eitos. Não perdem essa 
+qualidade, para se transformarem em objetos processuais. São pessoas, inseridas entre 
+aquelas beneficiadas pela afirmação constitucional da sua dignidade (art. 1º, III, da 
+Constituição do Brasil). É inadmissível a sua exclu são social, sem que sejam 
+consideradas, em quaisquer circunstâncias, as singu laridades de cada infração penal, 
+o que somente se pode apurar plenamente quando transitada em julgado a condenação 
+de cada qual Ordem concedida. 
+ 
+Conforme nos alerta Tiago Bunning, “não se pode afirmar que esse (do HC 84.078/MG) 
+entendimento se tornou pacífico, levando em conside ração as constantes alterações de ânimo 
+da jurisprudência. No entanto, ao menos existia alg uma decisão robusta do Plenário que 
+fundamentava não ser possível a atrocidade de se ex ecutar antecipadamente a pena criminal” 
+(MENDES, 2019 8) 
+9 
+ 
+Ocorre que, em fevereiro de 2016, ao julgar o habea s corpus n.º 126.292 9, o Supremo 
+Tribunal Federal, por meio de seu Tribunal Pleno, e  modificando seu entendimento então 
+adotado, passou a admitir o início do cumprimento de pena antes do trânsito em julgado, desde 
+que esgotados os recursos perante as instâncias ord inárias. Com isso, em síntese, retornou o 
+entendimento de que caberia a famigerada “prisão em  segunda instância”.  
+Vale salientar que o entendimento decorrente do HC 126.292 se referia a qualquer 
+condenação criminal que fosse confirmada em segundo  grau, alcançando aquelas proferidas 
+pelo Tribunal Popular do Júri, mas desde que fossem submetidas ao crivo da segunda instância 
+(em caso de recurso). 
+Posteriormente, ainda no ano de 2016, o entendiment o do HC 126.292 foi reafirmado 
+por meio do que julgado no ARE 964.246 10 , que, em julgamento proferido em regime de 
+repercussão geral, reafirmou o entendimento de que seria cabível a “prisão em segunda 
+instância”.  
+De modo a enfrentar e reverter o entendimento acima  esposado, o Partido Ecológico 
+Nacional, o Conselho Federal da Ordem dos Advogados  do Brasil, e o Partido Comunista, 
+ingressaram no STF com as Ações Declaratórias de Co nstitucionalidade, autuadas, 
+respectivamente, como ADC 43 2, ADC 44 3 e ADC 54 4, sendo que, em brevíssima síntese, os 
+autores sustentavam a inconstitucionalidade da referida “prisão em segunda instância”.  
+As sustentações das ADCs giravam, sobretudo, em tor no do artigo 283 do Código de 
+Processo Penal, que, por sua vez, disciplina que “Ninguém poderá ser preso senão em flagrante 
+delito ou por ordem escrita e fundamentada da autor idade judiciária competente, em 
+decorrência de prisão cautelar ou em virtude de con denação criminal transitada em julgado”. 
+Com isso, ao se julgar pela constitucionalidade do referido artigo, então, a reboque, passa-se a 
+entender por inconstitucional a prisão antes do trânsito em julgado (exceto, por óbvio, se ocorrer 
+algumas das hipóteses de prisão cautelar). 
+As referidas ADCs receberam adesão, como interessados, de múltiplos atores do sistema 
+jurídico, como, por exemplo, Instituto Brasileiro D e Ciências Criminais – IBCCRIM, 
+Associação Brasileira Dos Advogados Criminalistas –  ABRACRIM, Conectas Direitos 
+Humanos, Defensoria Pública Da União, Defensorias d o Rio De Janeiro e de São Paulo, 
+Instituto de Defesa do Direito de Defesa, Instituto  Dos Advogados Brasileiros – IAB, dentre 
+outros. 
+                                                           
+2 Protocolado no STF em 19/05/2016. 
+3 Protocolado no STF em 20/05/2016. 
+4 Protocolado no STF em 18/04/2018.  
+10 
+ 
+O Supremo Tribunal Federal, por meio de seu plenári o, em julgamento finalizado em 
+novembro de 2019, assentou o entendimento (que já v igorava antes do já mencionado HC 
+126.292) de que não cabe prisão (que não seja prisão preventiva) enquanto não ocorrer o trânsito 
+em julgado da sentença penal condenatória. Eis a ementa das ADCs 11 : 
+PENA – EXECUÇÃO PROVISÓRIA – IMPOSSIBILIDADE – PRIN CÍPIO DA 
+NÃO CULPABILIDADE. Surge constitucional o artigo 28 3 do Código de Processo 
+Penal, a condicionar o início do cumprimento da pen a ao trânsito em julgado da 
+sentença penal condenatória, considerado o alcance da garantia versada no artigo 5º, 
+inciso LVII, da Constituição Federal, no que direci ona a apurar para, selada a culpa 
+em virtude de título precluso na via da recorribili dade, prender, em execução da 
+sanção, a qual não admite forma provisória. 
+(ADC 43, Relator(a): MARCO AURÉLIO, Tribunal Pleno,  julgado em 07/11/2019, 
+PROCESSO ELETRÔNICO DJe-270 DIVULG 11-11-2020 PUBLI C 12-11-2020) 
+ 
+Como visto, após idas e vindas da jurisprudência do Supremo Tribunal Federal, ao que 
+tudo indicava, parecia que a partir do julgado de n ovembro de 2019 nas ADCs 43, 44 e 54, 
+haveria alguma estabilização na questão afeta à (im )possibilidade de se executar uma pena de 
+forma antecipada.  
+Não obstante, e para os fins do presente artigo, va le notar que, quando do julgamento 
+das mencionadas ADC, o Ministro Dias Toffoli - entã o presidente do Supremo Tribunal 
+Federal, e proferindo o voto de desempate sobre a q uestão - malgrado tenha votado pela 
+impossibilidade de execução de pena de forma antecipada, em obiter dictum 12 , sustentou que a 
+única exceção seria em relação às decisões condenat órias proferidas pelo Tribunal do Júri, 
+ocasião em que seria possível a execução antecipada da pena. 
+Como visto, a semente do obiter dictum plantada pelo então Presidente do Supremo 
+Tribunal Federal acabou florescendo no Congresso Na cional, que, como exposto no tópico 
+anterior, acabou editando a Lei 13.964/2019 de 24 de dezembro de 2019 (pouco mais de 1 mês 
+depois do referido julgado) e que previa, em seu bo jo, a possibilidade de prisão após 
+condenação proferida pelo Tribunal do Júri (com a ressalva de que a condenação seja igual ou 
+superior a 15 anos).  
+ 
+4. Da Inconstitucionalidade da Prisão Imediata após Condenação no Júri 
+Como visto no tópico acima, em que pese as idas-e-vindas da jurisprudência do STF, e 
+não obstante o obter dictum  sobre a excepcionalidade da situação no júri, fato  é que foi 
+pacificado (ao menos por enquanto) que a garantia d a presunção de inocência insculpida no 
+artigo 5º, LVII (“ninguém será considerado culpado até o trânsito em julgado de sentença penal 
+condenatória”) impede que haja prisão antes do trân sito em julgado, exceto nas hipóteses de 
+11 
+ 
+prisão cautelar. Tal fato, por si só, já deveria se r suficiente para afastar a prisão imediata 
+decorrente da sentença condenatória proferida pelo Tribunal do Júri. 
+Ocorre que, os que defendem a possibilidade da referida prisão, assim o fazem valendo-
+se da “soberania dos veredictos” prevista no artigo  5º, XXXVIII, c, da Constituição da 
+República, e, por tal razão, seria uma exceção à re gra de “não-prisão antes do trânsito em 
+julgado”. 
+Entendemos que o referido raciocínio não é o mais correto. A uma, porque a garantia de 
+observância da soberania dos veredictos é uma garantia posta em favor do réu (e não do jurado). 
+Não por menos, diferentemente das constituições de 1934 e 1946 13  (que previam o Tribunal do 
+Júri no capítulo do Poder Judiciário), temos que as  garantias do júri foram incluídos no rol de 
+direitos e garantias individuais, o que demonstra q ue o titular do direito ali protegido não é a 
+pessoa do julgador mas sim a pessoa do julgado. 
+Neste sentido temos as lições de Tiago Bunning Mendes e Guilherme Brenner Lucchesi, 
+verbis: 
+O Tribunal do Júri representa uma garantia fundamental de ser julgado pelos próprios 
+pares, nas palavras de Julio B. Maier, um juízo de cidadãos para limitar o poder de 
+punir estatal, tanto é assim que sua previsão em no sso ordenamento está assegurada 
+no art. 5º, inciso XXXVIII, da Constituição Federal , ou seja, encontra-se no rol de 
+direitos e garantias fundamentais do acusado. 
+Segundo Geraldo Prado, ‘a soberania dos jurados que a Constituição alberga no inciso 
+XXXVII do art. 5º é um direito individual do imputado que se caracteriza por colocar 
+o titular em uma posição jurídica favorável em face  do exercício do poder punitivo.” 
+(p. 125/126). 
+ 
+Vale salientar que, ainda que se entendesse que o v etor hermenêutico da garantia da 
+soberania dos veredictos fosse em favor dos jurados (e não em favor do acusado), ainda assim 
+há que se lembrar que tal princípio não se reveste de caráter absoluto, merecendo, portanto, 
+conformação e ponderação com outros princípios coli dentes, no caso, a garantia de presunção 
+de inocência (e toda plêiade de direitos daí decorr entes), isto até o transito em julgado de 
+eventual sentença condenatória. 
+Neste sentido, vale citarmos Renato Brasileiro 14 , para quem: 
+“Por mais que se queira argumentar que a soberania dos veredictos funciona como 
+óbice para que um Tribunal formado por juízes togados possa modificar, no mérito, a 
+decisão proferida pelos jurados, daí não se pode concluir, em hipótese alguma, que as 
+decisões do júri sejam definitivas e irrecorríveis,  logo, exequíveis de imediato, sob 
+pena de se admitir que se trata de um poder absolut o, incontrastável, o que, à 
+evidência, é impensável em um Estado Democrático de  Direito. A soberania dos 
+veredictos prevista na Constituição Federal ostenta  valor meramente relativo (....). 
+Ora, como se pode justificar a execução provisória de uma prisão penal, decorrente 
+de decisão condenatória proferida por órgão especial do Poder Judiciário pertencente 
+à primeira instância, se esse decisum ainda está su jeito ao controle recursal pelo 
+12 
+ 
+próprio Poder Judiciário, a quem compete se pronunc iar sobre a regularidade dos 
+veredictos?” (p. 1540) 
+ 
+Neste ponto, saliente-se que a lei, a doutrina e o próprio Supremo Tribunal Federal 
+admitem relativização da “soberania dos veredictos”  quando se tratar de decisão 
+manifestamente contrária à prova dos autos ou for hipótese de cabimento de revisão criminal. 
+Esse entendimento é corroborado 5 pela Suprema Corte, vide, por exemplo, HC-AgR 
+142.621, DJE 29/09/2017; e HC-RO 119.089, DJE 07/10/2013. 
+Aliás, diferentemente da apelação (que, se provida,  enseja novo julgamento), em se 
+tratando de revisão criminal tem-se que o próprio m érito da causa pode ser resolvido por 
+pessoas diversas do Conselho de Sentença, vis a vis , pelo tribunal competente para o Juízo 
+rescisório.  
+Em outras palavras, uma eventual sentença condenatória proferida por um Conselho de 
+Sentença (ou seja, amparada pela soberania e pela c ompetência constitucionalmente 
+estabelecida para o juízo de mérito acerca de crime s dolosos contra a vida) pode ser 
+substituída/reformada pelo juízo rescindente, inclu sive gerando a absolvição do acusado, isto 
+em se tratando de revisão criminal.  
+Quanto ao confronto entre o juízo rescisório cabíve l quando do julgamento da revisão 
+criminal e o princípio da soberania dos vereditos, temos, por exemplo, as lições de Mirabete:   
+[...] como é uma garantia insculpida na Constituiçã o Federal que visa preservar a 
+liberdade individual, não haveria qualquer incompat ibilidade em se anular um 
+veredicto condenatório e proferir um outro em seu l ugar, absolutório ou redutor de 
+pena, através de uma revisão criminal, pelo próprio tribunal superior, pois, embora se 
+esteja aparentemente violando o princípio da soberania dos veredictos, na verdade, se 
+está indo ao encontro do espírito do Tribunal Popul ar, que é de privilegiar o direito à 
+liberdade. (CAMPOS, 2010) 15 . 
+ 
+Vale notar que o STF também já se manifestou neste sentido, inclusive afirmando que 
+a soberania dos veredictos “representa garantia fundamental do acusado”, ou seja, dando o vetor 
+hermenêutico “pro-julgado” e não “pro-julgador”, co nforme sustentamos no início desde 
+tópico. Na forma do que julgado pelo STF: 
+EMENTA: REVISÃO CRIMINAL. CONDENAÇÃO PENAL PELO JÚR I. ERRO 
+JUDICIÁRIO. INOPONIBILIDADE DA SOBERANIA DO VEREDIC TO DO 
+CONSELHO DE SENTENÇA À PRETENSÃO REVISIONAL. JULGAM ENTO 
+DESSA AÇÃO AUTÔNOMA DE IMPUGNAÇÃO PELO TRIBUNAL DE 
+SEGUNDO GRAU. CUMULAÇÃO DO “JUDICIUM RESCINDENS” CO M O 
+“JUDICIUM RESCISSORIUM”. POSSIBILIDADE. RECURSO DO MINISTÉRIO 
+                                                           
+5 Vale aqui observarmos que está em regime de Repercussão Geral a análise da possibilidade do órgão acusatório 
+apelar de decisão absolutória quando se tratar de a bsolvição pelo quesito genérico, conforme  ARE 1225 185, o 
+que não infirma o que aqui sustentado, mormente por que a discussão nesses casos é diversa, e versa sob re a 
+intangibilidade das razões de decidir dos jurados e  a possibilidade de absolvição por teses metajurídi cas  
+(http://portal.stf.jus.br/processos/detalhe.asp?incidente=5745131) 
+13 
+ 
+PÚBLICO A QUE SE NEGA SEGUIMENTO. - O Tribunal de segunda instância, ao 
+julgar a ação de revisão criminal, dispõe de compet ência plena para formular tanto o 
+juízo rescindente (“judicium rescindens”), que viab iliza a desconstituição da 
+autoridade da coisa julgada penal mediante invalida ção da condenação criminal, 
+quanto o juízo rescisório (“judicium rescissorium”) , que legitima o reexame do mérito 
+da causa e autoriza, até mesmo, quando for o caso, a prolação de provimento 
+absolutório, ainda que se trate de decisão emanada do júri, pois a soberania do 
+veredicto do Conselho de Sentença, que representa garantia fundamental do acusado, 
+não pode, ela própria, constituir paradoxal obstácu lo à restauração da liberdade 
+jurídica do condenado. Doutrina. Precedentes. (STF,  ARE 674.151; Rel. Min. Celso 
+de Mello. Julgado em 15/10/2013) 
+ 
+Assim, nos causa espanto uma prisão após condenação  em primeira instância, sendo 
+certo que contra a referida decisão ainda caberia r ecurso de apelação com possibilidade de 
+amplo revolvimento de provas e cotejo dos fatos, e que pode ocasionar a determinação de 
+realização do novo plenário de júri ou a reforma no patamar da pena fixada.  
+Se nem uma sentença condenatória confirmada em segu ndo grau tem o condão de 
+ensejar a prisão imediata do réu (conforme decidido nas ADCs 43,44, 54), então nos soa ilógico 
+admitir que uma sentença proferida em primeiro grau tenha tal efeito.  
+Ademais, vale lembrar que é inconstitucional a pris ão ex lege , conforme já decidiu o 
+STF, por exemplo, na ADIn 3112 16 , julgada em 02/05/2007. 
+Como visto, a soberania dos veredictos é garantia do réu (e não dos jurados), mas, ainda 
+que se entenda de forma diversa (e se entenda que é garantia do julgador), fato é que tal princípio 
+não é absoluto, e já encontra limitações na rotina processual (por exemplo, com a revisão 
+criminal), devendo, portanto, ser harmonizado com a  presunção de inocência, adotando-se a 
+técnica da Concordância Prática ou Harmonização, que, consoante ensina Konrad Hesse, “onde 
+surgirem colisões não se deve, à base de uma precip itada ‘ponderação de bens’ ou de uma 
+‘abstrata ponderação de valores’, realizar qualquer  deles à custa do sacrifício do outro.” 
+(HESSE, 1998. P. 48, apud , MENDES, 2008, p. 114) 16 . 
+ 
+5. Da Inconvencionalidade da Prisão Imediata após Condenação no Júri 
+Antes de tratarmos da Inconvencionalidade da prisão imediata após condenação no Júri, 
+vale lembrar que o Supremo Tribunal Federal brasile iro definiu que o Pacto de São José da 
+Costa Rica teria status  supralegal, ou seja, malgrado esteja hierarquicame nte abaixo da 
+Constituição da República, tal Pacto estaria em um estrato superior às demais normas 
+infraconstitucionais.  
+As decisões paradigmáticas  proferidas no Recurso E xtraordinário n.° 466.343 e no 
+Habeas Corpus n.° 87.58552, e, mais recentemente, n a ADPF n.° 347 (que reconheceu a 
+necessidade de colmatação da lacuna relativa às audiências de custódia, para fins de adequação 
+14 
+ 
+do ordenamento interno ao mesmo Pacto) demonstram q ue a evolução da jurisdição 
+constitucional no Brasil caminha para a sua abertur a ao direito internacional dos direitos 
+humanos. (CONCI & FARACO, 2020) 17  
+Não se pode descurar, ainda, que se por um lado a C onstituição da República conferiu 
+ao Supremo Tribunal Federal a missão de realizar o controle de constitucionalidade das leis, 
+por outro lado a Corte de San José foi instituída como a guardiã da interpretação e aplicação da 
+CADH, consoante previsto no artigo 62 da própria co nvenção, de forma que compete a ela 
+realizar o denominado controle de convencionalidade  no âmbito do sistema interamericano, 
+auxiliando no estabelecimento de um standard  interpretativo de direitos humanos. Por isso, 
+podemos falar da existência da teoria do duplo controle: para que um ato normativo interno seja 
+considerado válido, ele deve se compatibilizar tant o à Constituição (controle de 
+constitucionalidade) como aos tratados internaciona is de direitos humanos (controle de 
+convencionalidade), observando-se as interpretações  deduzidas, respectivamente, pelo STF e 
+pela Corte IDH (MARINO & CARVALHO, 2020) 18 . 
+Ademais, as decisões proferidas pela Corte IDH têm força vinculante para todos os 
+poderes e órgãos estatais contra o qual foram profe ridas, e servem de vetor hermenêutico para 
+os demais estados.  
+Com efeito, consoante propugna a Procuradoria Geral da República 6, o reconhecimento 
+da autoridade da Corte Interamericana de Direitos H umanos por parte do Estado brasileiro 
+cumpre decisão constituinte inscrita no artigo 7o do ADCT, segundo o que o Brasil propugnará 
+pela formação de um tribunal internacional dos dire itos humanos, restando clara a decisão  
+constitucional originária de inserir o Brasil na ju risdição das cortes internacionais de direitos 
+humanos, o que constitui vetor interpretativo de conciliação do Direito e da jurisdição internos 
+com o panorama normativo internacional a que o país  se submeta, em processo integrativo 
+também previsto nos §§ 2º e 4º do artigo 5o da Constituição.  
+Para Piovesan “O sistema interamericano tem revelad o, sobretudo, uma dupla vocação: 
+impedir retrocessos e fomentar avanços no regime de  proteção dos direitos humanos, sob a 
+inspiração de uma ordem centrada no valor da absolu ta prevalência da dignidade humana” 
+(PIOVESAN, 2008. P. 272) 19  
+Então, partindo-se das premissas acima aventadas, quais sejam: (i) as normas de direitos 
+humanos previstos em convenções internacionais de d ireitos humanos das quais o Brasil seja 
+                                                           
+6 Em que pese a referência ora trazida se trate de p arecer da PGR emitida no bojo da ADPF 320 atualment e em 
+trâmite no STF, vale notar que os fundamento ali la nçados se aplicam, também, mutatis mutandis , ao tema aqui 
+apresentado. 
+15 
+ 
+signatário tem força vinculante ao Brasil; (ii) as referidas normas tem, inclusive, índole 
+supralegal, afastando as demais normas infraconstit ucionais que lhes sejam colidentes; (iii) a 
+Corte Interamericana de Direitos Humanos é o melhor  palco para estabelecer o norte 
+hermenêutico das normas insculpidas da CADH; então passamos a analisar as normas presentes 
+na CADH e que tenham reflexos na prisão imediata ap ós condenação no júri, cotejando tais 
+normas com a intepretação dada pela Corte acerca da s mesmas, isto de modo a verificar se a 
+norma prevista no artigo 492, I, e do Código de Processo Penal passaria pelo filtro do controle 
+de convencionalidade. 
+O artigo 7, item 3 do Pacto de São José da Costa Rica 20  estabeleceu que ninguém pode 
+ser submetido a detenção ou encarceramento arbitrár ios, sendo certo que o artigo 8º do Pacto, 
+previu, ainda, dentre outras garantias, o direito à  presunção de inocência e o direito ao duplo 
+grau de jurisdição. Na forma do artigo 8, item 2, c aput e alínea h: “Toda pessoa acusada de 
+delito tem direito a que se presuma sua inocência enquanto  não se comprove legalmente 
+sua culpa . Durante o processo, toda pessoa tem direito, em p lena igualdade, às seguintes 
+garantias mínimas: (...) h) direito de recorrer da sentença  para juiz ou tribunal superior.” 
+(grifos nossos). 
+Por sua vez, temos que o artigo 9º, item 3, do Pacto Internacional sobre Direitos Civis 
+e Políticos 21 , estabeleceu a excepcionalidade da prisão preventi va. Na forma do referido 
+dispositivo: “(...) A prisão preventiva de pessoas que aguardam julgame nto não deverá 
+constituir a regra geral , mas a soltura poderá estar condicionada a garantias que assegurem o 
+comparecimento da pessoa em questão à audiência, a todos os atos do processo e, se necessário 
+for, para a execução da sentença.” (grifos nossos) 
+Com base nas referidas normas, analisemos a densida de normativa que a Corte 
+Interamericana vem dando a tais dispositivos. 
+Sob o viés da excepcionalidade da prisão cautelar e  da presunção de inocência, temos 
+que conforme decidiu a Corte IDH, no Caso Suárez Rosero Vs. Equador 22 , a prisão preventiva 
+é uma medida cautelar, não punitiva, não podendo se rvir de antecipação de pena, até mesmo 
+porque a pessoa deve ser considerada inocente até que sua culpa seja demonstrada.  
+No Caso López Álvarez Vs. Honduras 23 , a Corte foi ainda mais didática, 
+estabelecendo que a prisão preventiva deve observar  não só o princípio da legalidade, mas 
+também da proporcionalidade, necessidade e presunçã o de inocência, e que a regra deve ser a 
+liberdade enquanto se decide acerca da responsabili dade penal, até mesmo porque é incabível 
+a antecipação de pena.  
+16 
+ 
+Entendimento similar, e denotando que a concretude da presunção da inocência somente 
+pode ser atingida quando, ao se impor medidas caute lares restritivas de liberdade, assim seja 
+feito dentro dos estritos limites da necessidade e proporcionalidade, temos o julgado proferido 
+pela Corte no Caso Palamara Iribarne Vs. Chile 24 . 
+No Caso Acosta Calderón Vs. Equador 25 , mais uma vez a Corte repisa que a prisão 
+preventiva - como medida cautelar mais grave que possa ser aplicada a um acusado - não pode 
+ser revestida de caráter punitivo ou antecipatório de pena.  
+De teor quase similar ao Caso Acosta Calderón Vs. Equador, temos também o decidido 
+no Caso  Tibi Vs. Equador 26 : 
+Na mesma linha do que apontado nos julgados, acima,  temos, ainda o Caso Servellón 
+Garcia y otros vs. Honduras 27 ; Caso Yvon Neptune vs. Haiti 28 ; e, ainda, Caso Norín 
+Catrimán y otros (dirigentes, membros e ativista do povo indígena mapuche) vs. Chile 29 ;  
+Já sob o viés do direito ao duplo grau de jurisdiçã o, temos que o Caso Herrera Ulloa 
+vs. República da Costa Rica  apresenta-se como um importante leading case  na jurisprudência 
+interamericana eis que reconhece o status de direit o humano ao direito ao duplo de jurisdição 
+penal previsto na Convenção Americana com amplo efe ito devolutivo, colocando de maneira 
+inafastável o direito a um amplo recurso penal na A mérica Latina, trazendo à esfera da tutela 
+internacional a proteção de garantias processuais p enais, enquanto direitos humanos. 
+(SOUZA 30 , 2014).  
+Consoante decidira a Corte 31 , o direito ao recurso pressupõe que o caso possa s er 
+revisado por um tribunal superior de forma ampla, e  que, até que tal ocorra, a sentença não 
+adquire a qualidade de coisa julgada. 
+No Caso Barreto Leiva vs. Venezuela 32 , a Corte define que o direito ao recurso, e a 
+dupla apreciação judicial da causa, garantem a cred ibilidade ao ato jurisdicional, ao mesmo 
+tempo em que garantem os direitos do condenado, sal ientando que a Corte ainda colmata tal 
+raciocínio com a conclusão de que a regra deve ser a liberdade do processado enquanto se 
+resolve sobre sua responsabilidade criminal.  
+Encontramos entendimento similar no Caso Liakat Ali Alibux vs. Suriname33 , ocasião 
+em que a Corte reiterou seu entendimento acerca do direito ao duplo grau de jurisdição, e que 
+tal extensão abarca o direito a recurso de cognição ampla, antes da sentença adquirir a qualidade 
+de coisa julgada. 
+Mais um julgado em que encontramos a decisão da Corte entendendo que o duplo grau 
+é direito do acusado podemos ver no Caso Mohamed vs. Argentina 34 .  
+17 
+ 
+É bem verdade que o Supremo Tribunal Federal vem se mostrando recalcitrante em dar 
+contornos de garantia constitucional ao duplo grau de jurisdição (vide o que decidido pelo pleno 
+do STF na ADPF 167 35 ). Não obstante, o próprio STF reconhece a força no rmativa da Corte 
+IDH e sua capacidade de afastar a legislação ordiná ria que lhe seja desconforme, como, por 
+exemplo, decidido no HC 88.420-236 , destacando-se: “(...)Ainda que não se empreste dignidade 
+constitucional ao duplo grau de jurisdição, trata-s e de garantia prevista na Convenção 
+Interamericana de Direitos Humanos, (...) (e) tem o condão de modificar a legislação ordinária 
+que lhe é anterior.”  
+Em sentido similar decidiu o STF ao sepultar o arti go 594 do CPP (que exigia como 
+pressuposto recursal que o réu se recolhesse à pris ão). Para tanto, colacionamos a ementa do 
+julgado e excertos do voto do Ministro Relator Joaquim Barbosa: 
+EMENTA: RECURSO ORDINÁRIO EM HABEAS CORPUS. ART. 59 4 DO 
+CÓDIGO DE PROCESSO PENAL. CONHECIMENTO DA APELAÇÃO E 
+RECOLHIMENTO DO RÉU CONDENADO À PRISÃO. VIOLAÇÃO AO S 
+PRINCÍPIOS DA IGUALDADE E DA AMPLA DEFESA. RECURSO PROVIDO. 
+1. O recolhimento do condenado à prisão não pode se r exigido como requisito para 
+o conhecimento do recurso de apelação, sob pena de violação aos direitos de ampla 
+defesa e à igualdade entre as partes no processo. 
+2. Não recepção do art. 594 do Código de Processo Penal da Constituição de 1988. 
+3. Recurso ordinário conhecido e provido. 
+Trechos do voto do relator:  (...) à luz dos princípios constitucionais da não—
+culpabilidade, da ampla defesa e do duplo grau de j urisdição, deve prevalecer o 
+inverso, ou seja: a regra é o acusado ter o direito  de recorrer em liberdade, podendo 
+independentemente disto , o juiz decretar sua prisã o , caso estejam presentes os 
+pressupostos e requisitos do art. 312 do Código de Processo Penal. O conhecimento 
+do recurso, contudo, não pode estar vinculado ao recolhimento do réu à prisão. (...)a 
+prisão no curso do processo e admitida quando prese ntes o fumus boni iuris e o 
+periculum libertatis. Assim, a prisão do apelante deve ser vista como medida cautelar 
+, e não como requisito para o conhecimento da apelação. (...) negar trânsito à apelação 
+do condenado em primeira instância, pelo simples fa to de ter ele permanecido revel 
+durante a instrução penal, constitui violação ao pr incípio constitucional da ampla 
+defesa e à regra do duplo grau de jurisdição, previ stos também em pactos 
+internacionais de que o Brasil é signatário e que s ão posteriores ao nosso Código de 
+Processo Penal(...) o direito ao duplo grau de juri sdição, previsto no Decreto 
+678/1992, que incorporou o Pacto de São José da Costa Rica, tem, no mínimo, status 
+de lei ordinária, de forma que deve prevalecer a re gra da apelação em liberdade, em 
+detrimento da leitura tradicional do art . 594 do C ódigo de Processo Penal.” (RHC 
+83-810/RJ 37 . STF. Tribunal Pleno. Relator MIN. JOAQUIM BARBOSA . Julgado 
+em 05/03/2009) 
+ 
+Ao abordarmos o direito ao duplo grau de jurisdição , não olvidamos que o CPP 
+estabeleceu, no artigo 492, §3º, que o juiz preside nte poderá deixar de autorizar a execução 
+provisória das penas “se houver questão substancial  cuja resolução pelo tribunal ao qual 
+competir o julgamento possa plausivelmente levar à revisão da condenação”. Não obstante, 
+conforme nos alerta Carlos Alberto Garcete, em Homi cídio: Aspectos Penais, Processuais 
+Penais, Tribunal do Júri e Feminicídio: 
+18 
+ 
+A norma em referência é difícil compreensão porque,  no momento da prolação do 
+veredicto em plenário, a Defesa não interpôs o recu rso de apelação criminal, e se o 
+fez, sequer ofereceu suas razões. Logo, como o juiz  presidente poderá avaliar o 
+conteúdo de virtual apelação e aplicar efeito suspensivo ao recurso? 
+Ademais, o juiz presidente não tem competência para  avaliar se a segunda instância 
+poderá plausivelmente levar à revisão de condenação  referente a questão 
+substancial.” 38       
+ 
+Com espeque nos raciocínios acima trazidos, considerando as normas internacionais de 
+direitos humanos colacionadas, considerando e tendo  como referência a mais autorizada 
+interpretação feita pela Corte Interamericana de Direitos Humanos, e considerando que a prisão 
+imediata após condenação no Júri decorre de um veredicto proferido em 1ª instância, veredicto 
+contra o qual ainda cabe recurso de cognição ampla e possibilidade de pleno revolvimento de 
+fatos e provas, considerando que o mero fato de sur gir uma condenação (provisória) à pena 
+igual ou superior a 15 anos não faz nascer os requi sitos e pressupostos da prisão preventiva, 
+então podemos concluir que o artigo 492, I, e do Código de Processo Penal não encontra amparo 
+nas convenções internacionais de direitos humanos, e, portanto, padece de vício de 
+inconvencionalidade. 
+ 
+6. Das Incongruências Legislativas no Plano da Legislação Ordinária 
+A nova normativa imposta no artigo 492, I, e do Código de Processo Penal padece não 
+somente de inconstitucionalidade e inconvencionalidade, conforme acima exposto, mas padece, 
+ainda, de incongruências com as próprias normativas do Código de Processo Penal, assim como 
+apresenta descompasso com o ordenamento jurídico, aqui entendido como um sistema. 
+Verifica-se que a norma processual penal estabelece u uma nova espécie de prisão 
+antecipada (carecedora dos requisitos de cautelaridade e decorrente de decisão proferida em 1ª 
+instância) isto pelo mero fato de ser uma pena igua l ou superior a 15 anos, decorrente de uma 
+condenação proferida pelo Tribunal do Júri (ou seja , condenação decorrente de crime doloso 
+contra a vida ou conexo). 
+Ocorre que não há tal mandamento legal em delitos d e igual gravidade ou ainda mais 
+graves (leia-se: preceito secundário com penas igua is ou maiores às penas do homicídio 
+qualificado), como, por exemplo, na hipótese de estupro com resultado morte (artigo 213, §2º, 
+do Código Penal, que estabelece pena mínima de 12 a  30 anos); latrocínio (artigo 157, §3º, do 
+Código Penal, que estabelece penas de 20 anos a 30 anos); extorsão mediante sequestro com 
+resultado morte (art. 159, §3º, do Código Penal, qu e estabelece penas de 24 a 30 anos). Nota-
+se, portanto, que a norma ora debatida carece de is onomia ou coerência sistêmica. 
+(QUEIROZ/2020 39 ). 
+19 
+ 
+No mesmo sentido acima, temos as lições de Mendes &  Lucchesi, e que nos trazem 
+também outro ponto para o debate, qual seja, o “per igoso risco de que o magistrado ‘jogue’ 
+com a dosimetria da pena, motivado pela intenção de  executar ou não a condenação de forma 
+imediata, o que é inadmissível e viola o princípio da culpabilidade, entre outros.”. Os autores, 
+citando as lições de Guilherme Madeira Dezem e Luci ano Anderson de Souza, lançam a 
+seguinte (e pertinente) reflexão acerca de outra in congruência da norma: “Só existe soberania 
+dos veredictos defensável para crimes com pena maio r ou igual a 15 anos? Para penas abaixo 
+desse montante não há soberania dos veredictos? Não  há sentido nessa distinção feita pelo 
+legislador quanto à soberania dos veredictos ter ma ior incidência nos casos envolvendo 
+determinado montante de pena.” 6 
+Ademais, o dispositivo em comento parece descurar do que estatuído pelo artigo 283 do 
+Código de Processo Penal, que dispõe que as prisões somente devem ocorrer (i) em decorrência 
+de prisão em flagrante; (ii) em decorrência de prisão cautelar; ou (iii) em razão de condenação 
+criminal transitada em julgado. Consoante o dispositivo: “Ninguém poderá ser preso senão em 
+flagrante delito ou por ordem escrita e fundamentad a da autoridade judiciária competente, em 
+decorrência de prisão cautelar ou em virtude de condenação criminal transitada em julgado”.   
+A falta de lógica se agrava ainda mais quando adici onamos à equação o que 
+expressamente disciplinado pelo diploma processual penal, que, em seu artigo 313, §2º, 
+textualmente impede a prisão preventiva com vistas ao cumprimento antecipado de pena. 
+Conforme dispõe o artigo: “Não será admitida a decr etação da prisão preventiva com a 
+finalidade de antecipação de cumprimento de pena ou  como decorrência imediata de 
+investigação criminal ou da apresentação ou recebimento de denúncia.” 
+Acerca da incoerência ora apontada, se faz importan te colacionarmos os ensinamentos 
+de Garcete, para quem:  
+Curiosamente, a mesma Lei n. 13.964/2019, naquilo q ue deveria buscar a 
+harmonização sistêmica, manteve a redação do art. 2 83, segundo o qual ninguém 
+poderá ser preso senão em flagrante delito ou por o rdem escrita e fundamentada da 
+autoridade judiciária competente, em decorrência de prisão cautelar ou em virtude de 
+condenação criminal transitada em julgado. Em adiçã o, o §2º do art. 310 estatui que 
+não será admitida a decretação de prisão preventiva  com a finalidade de antecipação 
+de pena.  
+(...) 
+Por consectário, em nosso ordenamento jurídico, afo ra as prisões cautelares, não há 
+embasamento jurídico para a prisão-pena por ausênci a de título executivo, pois nulla 
+executio sine titulo .
+40  
+ 
+7. Da jurisprudência dos Tribunais Superiores acerc a da Prisão Imediata após 
+Condenação no Júri 
+20 
+ 
+Como já exposto ao longo do presente artigo, a questão ora discutida será decidida pelo 
+plenário do Supremo Tribunal Federal em sede de Repercussão Geral (RE 1235340/SC 41 ). Não 
+obstante, vale colacionarmos alguns julgados import antes proferidos pelas Cortes Superiores 
+(Superior Tribunal de Justiça e Supremo Tribunal Federal). 
+O primeiro “julgado” que merece atenção é o “profer ido” pela 1ª Turma do STF no HC 
+118.770 que vem sendo usado 7 como o principal precedente para calcar o entendimento de que 
+é cabível a prisão imediata no Tribunal do Júri. Para tanto, colacionamos a “ementa”  
+Ementa: Direito Constitucional e Penal. Habeas Corp us. Duplo Homicídio, ambos 
+qualificados. Condenação pelo Tribunal do Júri. Sob erania dos veredictos. Início do 
+cumprimento da pena. Possibilidade. 1. A Constituiç ão Federal prevê a competência 
+do Tribunal do Júri para o julgamento de crimes dol osos contra a vida (art. 5º, inciso 
+XXXVIII, d). Prevê, ademais, a soberania dos veredictos (art. 5º, inciso XXXVIII, c), 
+a significar que os tribunais não podem substituir a decisão proferida pelo júri popular. 
+2. Diante disso, não viola o princípio da presunção  de inocência ou da não 
+culpabilidade a execução da condenação pelo Tribunal do Júri, independentemente do 
+julgamento da apelação ou de qualquer outro recurso . Essa decisão está em 
+consonância com a lógica do precedente firmado em r epercussão geral no ARE 
+964.246-RG, Rel. Min. Teori Zavascki, já que, també m no caso de decisão do Júri, o 
+Tribunal não poderá reapreciar os fatos e provas, na medida em que a responsabilidade 
+penal do réu já foi assentada soberanamente pelo Jú ri. 3. Caso haja fortes indícios de 
+nulidade ou de condenação manifestamente contrária à prova dos autos, hipóteses 
+incomuns, o Tribunal poderá suspender a execução da  decisão até o julgamento do 
+recurso. 4. Habeas corpus não conhecido, ante a ina dequação da via eleita. Não 
+concessão da ordem de ofício. Tese de julgamento: “ A prisão de réu condenado por 
+decisão do Tribunal do Júri, ainda que sujeita a re curso, não viola o princípio 
+constitucional da presunção de inocência ou não-cul pabilidade.” (Relator Ministro 
+Marco Aurélio. Redator para o acórdão Ministro Luis  Roberto Barroso. STF; HC 
+118770; Primeira Turma; Julg. 07/03/2017; DJE 24/04/2017; Pág. 42) 
+ 
+As aspas utilizadas nas palavras “julgado”, “profer ido” e “ementa” têm razão de ser. 
+Isto porque, analisando-se o que efetivamente decid ido naquele feito, não é possível chegar à 
+conclusão de que a Turma tenha efetivamente decidido que seria cabível a prisão imediata ora 
+debatida. 
+Para tanto, e nos apoiando na didática decisão do M inistro do Superior Tribunal de 
+Justiça Reynaldo da Fonseca, do Superior Tribunal d e Justiça, ao atentamente analisar aquele 
+precedente, vale notar que: 
+(omissis) Na mesma oportunidade, o juiz-presidente acolheu o pedido ministerial 
+formulado com base no acórdão da Primeira Turma do Supremo Tribunal Federal, 
+proferido no julgamento do HC 118.770/SP, e deferiu  a imediata execução provisória da 
+pena. Acontece que a conclusão majoritária do referido julgado foi no sentido de não 
+                                                           
+7 Vale notar, por exemplo, que no HC 153290, a prime ira Turma citou textualmente que o paradigma era o 
+mencionado HC 118.770: “Ementa: HABEAS CORPUS. HOMI CÍDIO QUALIFICADO (ART. 121, § 2º, 
+INCISOS I e IV, DO CÓDIGO PENAL). PRISÃO. AUSÊNCIA DE ILEGALIDADE. 1. Esta Primeira Turma já 
+decidiu que “A prisão do réu condenado por decisão do Tribunal do Júri, ainda que sujeita a recurso, n ão viola o 
+princípio constitucional da presunção de inocência ou não culpabilidade” (HC 118.770-SP, Red. p/ acórd ão Min. 
+ROBERTO BARROSO, j. 7/3/2017). 2. Habeas Corpus den egado.”. Disponível em 
+https://jurisprudencia.stf.jus.br/pages/search?base=acordaos&sinonimo=true&plural=true&page=1&pageSize=1 
+0&queryString=118770&sort=_score&sortBy=desc) 
+21 
+ 
+admitir a impetração , sem comprometimento com a respeitável tese esboçada na ementa 
+do digno Redator para o acórdão. Não há notícia, aliás, de qualquer precedente da 
+Segunda Turma ou do Pleno do STF que proclame a exe cução provisória da pena 
+antes do exame da sentença condenatória pelo Tribunal de apelação, como entendeu 
+o acórdão impugnado. (grifos nossos) (RHC 92.108/RS, Rel. Ministro REYNA LDO 
+SOARES DA FONSECA, QUINTA TURMA, julgado em 06/03/2018, DJe 14/03/2018) 
+ 
+Em outras palavras, naquele julgado (HC 118.770) te mos que, em 
+síntese 42 : 
+Ministro Marco Aurélio : “(omissis) Defiro a ordem, confirmando a medida 
+acauteladora implementada, para assegurar ao pacien te o direito de aguardar, em 
+liberdade, o trânsito em julgado da decisão proferi da no processo nº 0004626- 
+52.2008.8.26.0238, do Juízo da Primeira Vara Judicial de Ibiúna/SP” 
+Ministro Luis Roberto Barroso : “(omissis) Sim, eu até penso que, em certos casos , 
+poder-se-ia determinar o julgamento da apelação. Mas creio que, enquanto não desfeita a 
+condenação pelo Júri, prevalece a decisão soberano do Júri. É o que diz a Constituição. 
+Deste modo, o Tribunal sequer pode ele próprio desf azer ou refazer aquela decisão. 
+Portanto, eu não estou conhecendo” 
+Ministra Rosa Weber : “(omissis) E eu sempre tenho entendido que o praz o, o excesso 
+de prazo na formação da culpa, é fundamento válido exclusivamente no primeiro grau de 
+jurisdição, antes de uma sentença. Mas depois de uma sentença condenatória, pelo atraso 
+no tribunal, eu não tenho entendido assim.” 
+Ministro Luiz Fux : “Não conheço, porque é substitutivo de recurso or dinário, 
+observando a nossa jurisprudência.” 
+ 
+Posto isto, tem-se que a ementa daquele julgado enc ontra-se, ao que tudo indica, em 
+descompasso com o que efetivamente decidido, sendo certo que naquela ementa foi lançada a 
+posição do Ministro Luís Roberto Barroso, sem que, contudo, os demais Ministros tivessem 
+acompanhado tal posicionamento. Em verdade – como m uito bem lançado pelo Ministro 
+Reynaldo da Fonseca – tem-se que aquele julgado ens ejou tão somente decisão no sentido de 
+não admitir a impetração do Habeas. 
+Como visto, o precedente do HC 118.770 não se propõ e aos fins a que vem sendo 
+utilizado, ou seja, calcar o argumento de que o STF vem autorizando a prisão antecipada. 
+O Superior Tribunal de Justiça, por outro lado, vem  demonstrando que sua 
+jurisprudência, tanto da Quinta Turma, quanto da Sexta Turma, vem se posicionando de forma 
+contrária à prisão imediata no Tribunal do Júri. Para tanto, veja-se, dentre outros julgados 8: 
+ 
+HABEAS CORPUS. HOMICÍDIO DUPLAMENTE QUALIFICADO 
+CONDENAÇÃO PELO TRIBUNAL DO JÚRI. PACIENTE QUE RESP ONDEU 
+SOLTO UMA PARTE DA AÇÃO PENAL. PRISÃO PREVENTIVA NÃ O 
+FUNDAMENTADA. (...). CONSTRANGIMENTO ILEGAL CARACTE RIZADO. 
+WRIT NÃO CONHECIDO. ORDEM CONCEDIDA DE OFÍCIO. 1. ( ...). 2. Na 
+hipótese, o Decreto prisional encontra-se fundament ado em decorrência exclusiva da 
+condenação do paciente pelo Conselho de Sentença, não tendo a Magistrada declinado 
+                                                           
+8 Vale citar, ainda, STJ; HC 510.047; Quinta Turma; Rel. Min. Reynaldo Soares da Fonseca; Julg. 06/06/2 019; 
+DJE 27/06/2019; e STJ; AgRg-RHC 108.496; Proc. 2019/0047315-9; SC; Sexta Turma; Rel. Min. Nefi Cordeiro; 
+Julg. 16/05/2019; DJE 24/05/2019 
+22 
+ 
+qualquer motivação concreta para necessidade da prisão, afirmado, apenas, que o réu 
+permaneceu preso durante grande parte do processo. (...) 4. Ressalte-se que esta 
+Corte de Justiça já se pronunciou no sentido de que "a soberania dos veredictos 
+não é absoluta e convive em harmonia com o sistema recursal desenhado pela Lei 
+Adjetiva Penal. O fato de a Corte revisora, no julg amento de apelação contra 
+decisão do Tribunal do Júri, não estar legitimada a efetuar o juízo rescisório, não 
+provoca a execução imediata da sentença condenatóri a, pois permanece 
+incólume a sua competência para efetuar o juízo rescindente e determinar, se for 
+o caso, um novo julgamento, com reexame de fatos e provas"  (RHC 92.108/RS, 
+QUINTA TURMA, Rel. Ministro REYNALDO Soares DA Fonseca, DJe 14/3/2018). 
+5. Assim, deve prevalecer o entendimento predominante na Quinta e Sexta 
+Turmas desta Corte, que segue a diretriz jurisprudencial de que não se admite a 
+execução automática da condenação pelo Tribunal do Júri, antes do 
+encerramento da cognição ordinária, sob pena de afr onta ao princípio 
+constitucional da presunção de inocência.  6. Habeas corpus não conhecido. Ordem 
+concedida de ofício para assegurar ao paciente o di reito de aguardar, em liberdade, o 
+julgamento dos recursos sujeitos a julgamento pelo Tribunal revisor, mediante a 
+fixação de medidas cautelares a serem estabelecidas  pelo Juízo de primeiro grau, se 
+necessárias, salvo se por outro motivo não estiver preso, e sem prejuízo da decretação 
+de nova prisão, desde que concretamente fundamentad a. (STJ; HC 501.788; Proc. 
+2019/0092084-4; SP; Quinta Turma ; Rel. Min. Ribeiro Dantas; Julg. 17/09/2019; 
+DJE 23/09/2019) 
+ 
+AGRAVO REGIMENTAL NO RECURSO EM HABEAS CORPUS. TRIB UNAL 
+DO JÚRI. HOMICÍDIO QUALIFICADO. EXECUÇÃO PROVISÓRIA  DA PENA. 
+CONDENAÇÃO AINDA NÃO TRANSITADA EM JULGADO OU 
+CONFIRMADA POR COLEGIADO DE SEGUNDO GRAU. EXPEDIÇÃO  DE 
+MANDADO DE PRISÃO OBSTADA. AGRAVO REGIMENTAL IMPROVIDO. 1. 
+É pacífica a jurisprudência desta Corte  no sentido de que a negativa do direito de 
+recorrer em liberdade e, consequentemente, a determinação da imediata execução 
+provisória da pena, não pode fundar-se na mera cond enação pelo Tribunal do 
+Júri.  Precedentes. 2. Agravo regimental improvido. (STJ; AgRg-RHC 114.284; Proc. 
+2019/0172889-1; PE; Sexta Turma ; Rel. Min. Nefi Cordeiro; Julg. 26/11/2019; DJE 
+03/12/2019) 
+ 
+Encontramos, ainda, precedentes do Supremo Tribunal  Federal, conforme decidiu a 
+Segunda Turma do STF no HC 174.759 
+43 ; tendo como Ministro Relator Celso de Mello; e 
+publicado em outubro de 2020. Ainda, o que decidido monocraticamente pelo Ministro Gilmar 
+Mendes HC 176.229 44 , julgado em 26/09/2019. 
+Resta, então, aguardarmos o que o Supremo Tribunal Federal decidirá sobre a questão 
+em sede de Repercussão Geral. 
+ 
+8. Conclusão 
+Aury Lopes Junior, com o brilhantismo que lhe é pec uliar, assim bem resume o estado 
+de coisas a que chegamos: “(...)é preocupante – sob  o ponto de vista das conquistas 
+democráticas obtidas – que a crença nas instituiçõe s jurídicas dependa da prisão de pessoas. 
+Quando os poderes públicos precisam lançar mão da prisão para legitimar-se, a doença é grave, 
+e anuncia um grave retrocesso para o estado policialesco e autoritário, incompatível com o nível 
+de civilidade alcançado” 45 .  
+23 
+ 
+A sociedade brasileira, com justa razão, clama por melhorias na segurança pública. Na 
+esteira desta exigência, o legislador brasileiro ro tineiramente se usa do expediente de adotar a 
+tônica punitivista, isto por acreditar (sem qualquer base empírica) que a prisão é a solução para 
+todos os males. Por outro lado, recentemente foi sepultada a antecipação da pena decorrente de 
+acórdão condenatório recorrível (a famigerada “pris ão em segunda instância”), por entendê-la, 
+corretamente, por inconstitucional. Assim, não obstante tal posicionamento (e quiçá por causa 
+dele), houve a alteração legislativa inserida no Có digo de Processo Penal de modo a permitir 
+tal prisão antecipada, isto quando se tratar de con denação proferida pelo Tribunal do Júri, e 
+desde que igual ou superior a 15 anos de reclusão. 
+A alteração legislativa, todavia, se mostra em desc ompasso com a Constituição da 
+República, quer porque a soberania dos veredictos é direito do réu (e não deve ser interpretado 
+em seu desfavor), quer porque possui valor relativo , e deve ser harmonizado com outros 
+princípios (em especial o da presunção de inocência). 
+Ademais, a novel legislação padece de inconvencionalidade (e, por isso, é afastada por 
+norma de status  superior, vis a vis , norma supralegal), sendo certo que a Corte Intera mericana 
+de Direitos Humanos possui vasta jurisprudência no sentido de que não cabe prisão para fins 
+de antecipação de pena, e, ainda, que o duplo grau de jurisdição deve ser observado e aplicado 
+com instrumentos eficazes aos fins a que se propõem. 
+Nota-se, ainda, que a legislação encarta incongruên cias dentro do próprio Código de 
+Processo Penal, colidindo frontalmente com alguns dos dispositivos da norma processual. 
+A jurisprudência não é uníssona, embora o Superior Tribunal de Justiça venha se 
+posicionando, por meio de ambas suas turmas criminais, no sentido de vedar a prisão antecipada 
+no júri. No Supremo Tribunal Federal a matéria é mais controvertida, mas, ao que tudo indica, 
+será em breve pacificada (para um, ou outro lado) ante o julgamento em Repercussão Geral. 
+Não vemos como correto, todavia, antecipar a prisão  de alguém contra quem não há o 
+trânsito em julgado, e, mais ainda, quando tal cidadão tem em seu favor o manejo de recurso de 
+cognição ampla. Trata-se, portanto, de açodamento em restringir a liberdade alheia, como se o 
+cárcere fosse o bálsamo milagroso para as iniquidades nacionais. 
+ 
+ 
+ 
+ 
+24 
+ 
+ 
+REFERÊNCIAS BIBLIOGRÁFICAS 
+1 Supremo Tribunal Federal. [Acesso 26 nov 2020]. Di sponível em: 
+http://portal.stf.jus.br/processos/detalhe.asp?incidente=5776893.  
+2 OLIVEIRA, Eugenio Pacelli. Curso de Processo Penal. 12ª Ed. Rio de Janeiro. Lumen Juris. 
+3 JUNQUEIRA, Gustavo et. al. Lei Anticrime Comentada: artigo por artigo. 1ª ed. São Paulo: Saraiva, 
+2020 
+4 Supremo Tribunal Federal. [Acesso 23 nov 2020]. Di sponível em: 
+https://jurisprudencia.stf.jus.br/pages/search/sjur339101/false 
+5 Justificando. [Acesso 20 nov 2020]. Disponível em:  https://www.justificando.com/2020/04/24/os-
+limites-da-legalidade-no-julgamento-sobre-a-obrigacao-de-prisao-apos-condenacao-do-juri/ 
+6 MENDES, Tiago Bunning. LUCCHESI, Guilherme Brenner . Lei Anticrime – a (re)forma pena e a 
+aproximação de um sistema acusatório? 1ª ed. São Paulo: Tirant lo Blanch, 2020. 
+7https://jurisprudencia.stf.jus.br/pages/search?base=acordaos&pesquisa_inteiro_teor=false&sinonimo= 
+true&plural=true&radicais=false&buscaExata=true&page=1&pageSize=10&queryString=84.078&sor 
+t=_score&sortBy=desc 
+8 MENDES, Tiago Bunning. Direito ao Recurso no proce sso penal: o duplo grau de jurisdição como 
+garantia exclusiva do imputado. Rio de Janeiro: Lumen Juris, 2019. 
+9 Supremo Tribunal Federal. [Acesso 18 nov 2020]. Di sponível em: 
+https://jurisprudencia.stf.jus.br/pages/search?base=acordaos&pesquisa_inteiro_teor=false&sinonimo=t 
+rue&plural=true&radicais=false&buscaExata=true&page=1&pageSize=10&queryString=126.292&so 
+rt=_score&sortBy=desc 
+10  Supremo Tribunal Federal. [Acesso 26 nov 2020]. Di sponível em: 
+https://jurisprudencia.stf.jus.br/pages/search/repercussao-geral8782/false 
+11  Supremo Tribunal Federal. [Acesso 26 nov 2020]. Di sponível em: 
+https://jurisprudencia.stf.jus.br/pages/search/sjur436271/false 
+12  Supremo Tribunal Federal. [Acesso 26 nov 2020]. Di sponível em: 
+http://www.stf.jus.br/portal/cms/verNoticiaDetalhe.asp?idConteudo=429359 
+13  MENDES, Gilmar Ferreira. Curso de Direito Constitu cional. Gilmar Ferreira Mendes, Inocêncio 
+Martires Coelho, Paulo Gustavo Gonet Branco. – 3. E d ver e atual. – São Paulo: Saraiva, 2008. P. 580-
+581. 
+14  LIMA, Renato Brasileiro. Manual de Processo Penal. 8ª ed. Salvador: Juspodium, 2020. 
+15  CAMPOS, Walfredo Cunha. Tribunal do Júri: Teoria e Prática. 1ª edição. São Paulo: Atlas, 2010, ps. 
+292 
+16 Supremo Tribunal Federal. [Acesso 26 nov 2020]. Dis ponível em: 
+https://jurisprudencia.stf.jus.br/pages/search?base=acordaos&sinonimo=true&plural=true&page=1&p 
+ageSize=10&queryString=prisao%20ex%20lege&sort=_score&sortBy=desc 
+17  CONCI, Luiz Guilherme Arcaro. FARACO, Marina. O Bl oco De Constitucionalidade 
+Convencionalizado Como Paradigma Contemporâneo Da J urisdição Constitucional Brasileira. 
+JURISDIÇÃO CONSTITUCIONAL EM PERSPECTIVA: ESTUDOS E M COMEMORAÇÃO AOS 
+20 ANOS DA LEI 9.868/1999. coordenadores Clémerson Merlin Cleve, Paulo Ricardo Schier. Bruno 
+Meneses Lorenzetto. São Paulo: Thomson Reuters Brasil, 2020. 
+18  MARINO, Tiago Fuchs. CARVALHO, Luciani Coimbra de.  40 ANOS DA LEI DA ANISTIA 
+BRASILEIRA: ANÁLISE DA ADPF 153 E DOS  CASOS “GUERR ILHA DO ARAGUAIA” E 
+VLADIMIR HERZOG, SOB A  PERSPECTIVA DO TRANSCONSTIT UCIONALISMO E DA 
+TEORIA DO DUPLO  CONTROLE DE DIREITOS HUMANOS. Revi sta Direito & Paz | São Paulo, 
+SP - Lorena | Ano XIII | n. 42 | p. 309-327 | 1º Semestre, 2020 
+19  PIOVESAN, Flávia. Direitos Humanos e o direito con stitucional internacional. 9ª ed – São Paulo: 
+Saraiva, 2008. 
+20  Brasil. Presidência da República [Acesso 26 nov 20 20]. Disponível em: 
+http://www.planalto.gov.br/ccivil_03/decreto/d0678.htm 
+21  http://www.planalto.gov.br/ccivil_03/decreto/1990-1994/d0592.htm 
+                                                 
+25 
+ 
+                                                                                                                                                         
+22 Conselho Nacional de Justiça. [Acesso 26 nov 2020].  Disponível em: https://www.cnj.jus.br/wp-
+content/uploads/2016/04/36b15a58a41a220027b36a1b165182f6.pdf 
+23  Corte Interamericana de Direitos Humanos. [Acesso 26 nov 2020]. Disponível em: 
+https://www.corteidh.or.cr/docs/casos/articulos/seriec_141_esp.pdf 
+24  Corte Interamericana de Direitos Humanos. [Acesso 26 nov 2020]. Disponível 
+em:https://www.corteidh.or.cr/docs/casos/articulos/Seriec_135_esp.pdf 
+25  Corte Interamericana de Direitos Humanos. [Acesso 26 nov 2020]. Disponível 
+em:https://www.corteidh.or.cr/docs/casos/articulos/seriec_129_esp1.pdf 
+26  Corte Interamericana de Direitos Humanos. [Acesso 26 nov 2020]. Disponível 
+em:https://www.corteidh.or.cr/docs/casos/articulos/seriec_114_esp.pdf 
+27  Corte Interamericana de Direitos Humanos. [Acesso 26 nov 2020]. Disponível em: 
+https://www.corteidh.or.cr/docs/casos/articulos/seriec_152_esp.pdf  
+28  Corte Interamericana de Direitos Humanos. [Acesso 26 nov 2020]. Disponível 
+em:https://www.corteidh.or.cr/docs/casos/articulos/seriec_180_esp1.pdf 
+29 Conselho Nacional de Justiça. [Acesso 26 nov 2020].  Disponível em: https://www.cnj.jus.br/wp-
+content/uploads/2016/04/142788b09442cde14d1b005c1920ccc0.pdf 
+30  SOUZA, Rafael Barreto. DIREITO AO DUPLO GRAU DE JURISDIÇÃO NA AMÉRICA LATINA: 
+CASO HERRERA ULLHOA VS. COSTA RICA DA CORTE INTERAM ERICANA DE DIREITOS 
+HUMANOS. http://publicadireito.com.br/publicacao/ufpb/livro.php?gt=195 
+31  Corte Interamericana de Direitos Humanos. [Acesso 26 nov 2020]. Disponível em: 
+https://www.corteidh.or.cr/docs/casos/articulos/seriec_107_esp.pdf 
+32 Conselho Nacional de Justiça. [Acesso 26 nov 2020].  Disponível em: https://www.cnj.jus.br/wp-
+content/uploads/2016/04/5523cf3ae7f45bc966b18b150e1378d8.pdf 
+33 Conselho Nacional de Justiça. [Acesso 26 nov 2020].  Disponível em: https://www.cnj.jus.br/wp-
+content/uploads/2016/04/76dc0db310925e305df1def0e12c9ee7.pdf 
+34  Corte Interamericana de Direitos Humanos. [Acesso 26 nov 2020]. Disponível em: 
+https://www.corteidh.or.cr/docs/casos/articulos/seriec_255_esp.pdf 
+35  Supremo Tribunal Federal. [Acesso 26 nov 2020]. Di sponível em: 
+http://portal.stf.jus.br/processos/detalhe.asp?incidente=2669847 
+36 Supremo Tribunal Federal. [Acesso 26 nov 2020]. Dis ponível em: 
+http://stf.jus.br/portal/diarioJustica/verDiarioProcesso.asp?numDj=109&dataPublicacaoDj=08/06/200 
+7&incidente=2374345&codCapitulo=5&numMateria=29&codMateria=2 
+37  Supremo Tribunal Federal. [Acesso 26 nov 2020]. Di sponível em: 
+http://redir.stf.jus.br/paginadorpub/paginador.jsp?docTP=AC&docID=604577 
+38  GARCETE, Carlos Alberto, Homicídio: Aspectos Penais , Processuais Penais, Tribunal do Júri e 
+Feminicídio, 1ª ed. São Paulo: Thomson Reuters Brasil, 2020.  
+39  Paulo Queiroz. A nova Prisão Preventiva. [Acesso 2 6 nov 2020]. Disponível em: 
+https://www.pauloqueiroz.net/a-nova-prisao-preventiva-lei-n-13-964-2019/ 
+40  Idem, Ibidem. 
+41  Supremo Tribunal Federal. [Acesso 26 nov 2020]. Di sponível em: 
+http://portal.stf.jus.br/processos/detalhe.asp?incidente=5776893 
+42  Supremo Tribunal Federal. [Acesso 26 nov 2020]. Di sponível em: Inteiro Teor disponível em 
+http://portal.stf.jus.br/processos/downloadPeca.asp?id=311647767&ext=.pdf 
+43  Supremo Tribunal Federal. [Acesso 26 nov 2020]. Di sponível em: 
+https://jurisprudencia.stf.jus.br/pages/search?base=acordaos&pesquisa_inteiro_teor=false&sinonimo=t 
+rue&plural=true&radicais=false&buscaExata=true&page=1&pageSize=10&queryString=174.759&so 
+rt=_score&sortBy=desc 
+44 Supremo Tribunal Federal. [Acesso 26 nov 2020]. Dis ponível em: 
+https://jurisprudencia.stf.jus.br/pages/search?base=decisoes&pesquisa_inteiro_teor=false&sinonimo=t 
+rue&plural=true&radicais=false&buscaExata=true&page=1&pageSize=10&queryString=176229&sor 
+t=_score&sortBy=desc 
+45  LOPES JUNIOR, Aury. Direito Processual Penal. 17ª ed. São Paulo: Saraiva, 2020 

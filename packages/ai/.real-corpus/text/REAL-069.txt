@@ -1,0 +1,575 @@
+Retroatividade do acordo de não persecução penal na jurisprudência dos Tribunais 
+Superiores: breves comentários 
+ 
+Messod Azulay Neto1 
+ 
+ 
+Sumário: 1. Palavras iniciais: para além dos 15 anos de Superior Tribunal de Justiça do 
+Ministro Raul Araújo; 2. A regra constitucional da retroatividade da norma penal mais 
+benéfica (art. 5º, inciso XL, Constituição); 3. Natureza do acordo de não persecução 
+penal; 4. Retroatividade do acordo de não persecução penal na jurisprudência dos 
+Tribunais Superiores; 5. Considerações finais; Referências bibliográficas. 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+1. Palavras iniciais: para além dos 15 anos de Superior Tribunal de Justiça do 
+Ministro Raul Araújo 
+Antes de entrar propriamente no tema proposto para este breve ensaio, gostaria de 
+agradecer o convite para participar desta obra coletiva e registrar algumas palavras em 
+homenagem aos quinze anos de Superior Tribunal de Justiça do colega Ministro Raul 
+Araújo. 
+O Ministro Raul Araújo tem uma trajetória interessantíssima. Formado em Direito 
+pela Universidade Federal do Ceará, exerceu todas as funções essenciais do Poder 
+Judiciário. Foi advogado, promotor de justiça no Ministério Público do Estado do Ceará, 
+procurador-geral do estado do Ceará, desembargador do Tribunal de Justiça do mesmo 
+estado pelo quinto constitucional destinado à advocacia e, enfim, Ministro do Superior 
+Tribunal de Justiça. 
+Um caminho raro que, sem dúvida, contribui para uma visão global e uma atuação 
+humanizada. 
+ 
+1 Ministro do Superior Tribunal de Justiça, STJ. Coordenador Científico da Fundação Getúlio Vargas Justiça 
+FGV Justiça. 
+Vale ainda destacar sua marcante passagem pelo Tribunal Superior Eleitoral 2, 
+onde demonstrou seu compromisso com o processo democrático em momentos 
+desafiadores o para país. 
+No Superior Tribunal de Justiça, conhecido pela coerência, polidez e cordialidade, 
+o Ministro Raul Araújo, atualmente, é membro da Quarta Turma, da Segunda Seção3 e da 
+Corte Especial4. 
+É, portanto, um grande prazer poder contribuir com essa obra coletiva. 
+Este pequeno ensaio se propõe a analisar o caminho da jurisprudência até o 
+entendimento atual pela possibilidade de aplicação retroativa do instituto do acordo de 
+não persecução penal aos acusados que já estavam sendo processados por crime antes da 
+edição da Lei nº 13.964 de 2019 (Pacote Anticrime). Para isso, revisam- se, brevemente, 
+alguns aspectos do princípio da retroatividade da norma penal mais benéfica, da natureza 
+do instituto de natureza consensual e da jurisprudência dos Tribunais Superiores sobre a 
+matéria, especialmente o acórdão proferido pelo Plenário do Supremo Tribunal Federal, 
+nos autos do Habeas Corpus 185.913, julgado em 18 de setembro de 2024, de relatoria 
+do Ministro Gilmar Mendes. 
+ 
+ 
+2. A regra constitucional da retroatividade da norma penal mais benéfica (art. 5º, 
+inciso XL, Constituição) 
+A regra geral no conflito intertemporal de normas penais é a da irretroatividade 
+em razão da legalidade estrita, da anterioridade, dos direitos individuais e da segurança 
+jurídica em um Estado Democrático de Direito 5, como “condição preliminar de ordem e 
+firmeza nas relações sociais e segurança dos direitos individuais”6. 
+ 
+2 No Tribunal Superior Eleitoral, o Ministro Raul Araújo tomou posse como Ministr o substituto em 
+1º.9.2020; como Ministro efetivo em 6.9.2022 e como Ministro Corregedor em 21.11.2023. 
+3 A Segunda Seção é composta pelas Primeira e Segunda Turmas de competência de dir eito público 
+(impostos, previdência, servidores públicos, indenização do Estado, improbidade (Brasil. Superior Tribunal 
+de Justiça. Regimento interno [do] Superior Tribunal de Justiça. Brasília: STJ, 2 024. Disponível em: 
+https://www.stj.jus.br/publicacaoinstitucional/index.php/Regimento/article/view/3115/3839. Acesso em : 
+27 ago. 2025). 
+4 A Corte Especial do Superior Tribunal de Justiça é composta pelos quinze Ministros mais antigos e pelo 
+Presidente do Tribunal e não tem sua competência sujeita à especialização (Brasil. Superior Tribunal de 
+Justiça. Regimento interno [do] Superior Tribunal de Justiça. Brasília: STJ, 2024.  Disponível em: 
+https://www.stj.jus.br/publicacaoinstitucional/index.php/Regimento/article/view/3115/3839. Acesso em : 
+27 ago. 2025). 
+5 Bitencourt, Cezar Roberto. Tratado de Direito Penal : Parte Geral (arts. 1º a 120). 29 ed. São Paulo: 
+SaraivaJur, 2023, p. 186-187. 
+6 PRADO, Luiz Regis. Curso de direito penal brasileiro: parte geral. 22 ed. Londrina: Editora Thoth, 2024, 
+p. 78. 
+O inciso XL do art. 5º da Constituição, no entanto, prevê a regra da retroatividade 
+da norma penal mais benéfica ou, na mesma direção em sentido contrário, da 
+irretroatividade da norma penal mais gravosa, nos seguintes termos: “(a) lei penal não 
+retroagirá, salvo para beneficiar o réu” 7. O postulado é complementado pelo parágrafo 
+único do art. 2º do Código Penal, ao dispor que “(a) lei posterior, que de qualquer modo 
+favorecer o agente, aplica-se aos fatos anteriores, ainda que decididos por sentença 
+condenatória transitada em julgado”8. 
+Esse é, pois, o tratamento legislativo constitucional da (ir)retroatividade das 
+normas penais de conteúdo material9, isto é, prescrições que afetam diretamente a esfera 
+jurídica dos acusados, alterando o regramento a que se submetem em qualquer fase da 
+persecução criminal. 
+Por outro lado, as normas de natureza processual possuem regramento diferente. 
+O art. 2º do Código de Processo Penal estabelece sua aplicabilidade imediata, nos 
+seguintes termos: “(a) lei processual penal aplicar- se-á desde logo, sem prejuízo da 
+validade dos atos realizados sob a vigência da lei anterior”10. 
+ 
+[...] A lei processual não se submete ao princípio da extra-atividade da lei penal 
+mais benéfica (ultratividade e retroatividade). É pacífico o entendimento 
+doutrinário-jurisprudencial de que, em matéria processual, vige o princípio  
+tempus regit actum  a que se relaciona aos atos do processo, ao contrário do 
+princípio tempus comissi delicti , que está relacionado ao fato delitivo. Isso 
+implica afirmar que a nova lei processual aplica-se de imediato, sem efeito 
+retroativo, respeitando-se, portanto, a validade processual anterior. 
+Entende-se, no âmbito do direito intertemporal, como lei processual aquela que 
+disciplina o processo e o procedimento, sem relação direta com o direito de 
+punir do Estado. É bom frisar que o princípio tempus regit actum  aplica-se, 
+sem exceção, tão somente às normas que regem a realização dos atos 
+processuais, isto é, as que se destinam a regular a formalização processual e a 
+organização judiciária, lato sensu . Em qualquer caso em que uma lei dita 
+processual, posterior à prática do crime, determine a diminuição de garantias 
+ou de direitos fundamentais ou implique qualquer forma de restrição da 
+ 
+7 Brasil. [Constituição (1988)]. Constituição da República Federativa do Brasil de 19 88. Brasília, DF: 
+Presidência da República, [2023].  
+Disponível em: http://www.planalto.gov.br/ccivil_03/Constituicao/Constituiçao.htm. Acesso em: 16 set. 
+2025. 
+8 Brasil. [Código Penal - Decreto-Lei nº 2.848, de 07 de dezembro de 19 40]. Código Penal. Brasília, DF: 
+Presidência da República.  
+Disponível em: https://www.planalto.gov.br/ccivil_03/decreto-lei/del2848compilado.htm. Aces so em: 19 
+de set. 2025. 
+9 O princípio da irretroatividade da lei penal se aplica às normas penais de conteúdo material (Bitencourt, 
+Cezar Roberto. Tratado de Direito Penal: Parte Geral (arts. 1º a 120). 29 ed. São Paulo: SaraivaJur, 2023, 
+p. 187) 
+10 Brasil. [Código de Processo Penal – Decreto-Lei nº 3.689, de 3 de outubro de 1941]. Código de Processo 
+Penal. Brasília, DF: Presidência da República.  
+Disponível em: https://www.planalto.gov.br/ccivil_03/decreto-lei/del3689.htm. Acesso em: 18 de set. 2025. 
+liberdade, não terá vigência o princípio tempus regit actum , aplicando-se, 
+nessas hipóteses, a legislação vigente na época do crime. [...]. 11 
+ 
+ 
+Existe, por fim, a hipótese das normas de natureza mista, híbridas, ou processuais 
+com efeitos (ou conteúdos) materiais. São aquelas que disciplinam tanto regras de direito 
+material, como de direito processual penal. Assim, dado que afetam diretamente a esfera 
+jurídica do indivíduo submetido à jurisdição criminal devem, por determinação 
+constitucional, observar a regra da irretroatividade (da lei penal mais gravosa) ou da 
+retroatividade da lei penal mais benéfica12.  
+Mais detalhadamente, Cezar Roberto Bittencourt explica que:  
+ 
+Em outros termos, toda lei penal, seja de natureza processual, seja de natureza 
+material, que, de alguma forma, amplie as garantias de liberdade do indivíduo, 
+reduza as proibições e, por extensão, as consequências negativas do crime, seja 
+ampliando o campo da licitude penal, seja abolindo tipos penais, seja refletindo 
+nas excludentes de criminalidade ou mesmo nas dirimentes de culpabilidade 
+de, é considerada lei mais benigna, digna de receber, quando for o caso , os 
+atributos da retroatividade e da própria ultra-atividade penal. Por outro lado,  
+toda lei penal (material ou processual) que, de alguma forma, represente um 
+gravame aos direitos de liberdade, que agrave as consequências penais diretas 
+do crime, criminalize condutas, restrinja a liberdade, provisoriamente ou não, 
+reduza os meios de defesa, simplifique os procedimentos penais, ou limite a 
+produção de provas, caracteriza lei penal mais grave e, consequentemente, não 
+pode retroagir.13 
+ 
+ 
+Com o intuito de examinar a incidência da regra da retroatividade mais favorável 
+ao acusado, interessa, portanto, a definição da natureza da norma que prescreve o instituto 
+do acordo de não persecução penal (art. 28-A do Código de Processo Penal). Se 
+puramente processual ou processual com repercussões de caráter material na esfera de 
+direitos individuais daqueles expostos à aplicação do instrumento. 
+ 
+ 
+3. Natureza do acordo de não persecução penal 
+O acordo de não persecução penal, previsto no art. 28-A do Código de Processo 
+Penal, pode ser conceituado como  
+ 
+[...] um mecanismo de simplificação procedimental, que se realiza por meio de 
+um negócio jurídico entre acusação e defesa, em que o imputado abre mão do  
+ 
+11 Bitencourt, Cezar Roberto. Tratado de Direito Penal: Parte Geral (arts. 1º a 120). 29  ed. São Paulo: 
+SaraivaJur, 2023, p. 206. 
+12 Bitencourt, Cezar Roberto. Tratado de Direito Penal: Parte Geral (arts. 1º a 120). 29 ed. São Paulo: 
+SaraivaJur, 2023, p. 206. 
+13 Bitencourt, Cezar Roberto. Tratado de Direito Penal: Parte Geral (arts. 1º a 120). 29  ed. São Paulo: 
+SaraivaJur, 2023, p. 207. 
+exercício de direitos fundamentais (como processo, à prova, ao contr aditório, 
+ao silêncio etc.), conformando-se com a pretensão acusatória ao se submeter 
+voluntariamente às condições (sanções) pactuadas e confessar, em troca de 
+benefícios (como sanção menos gravosa, além de evitar o início do process o 
+ou uma sentença condenatória definitiva e seus efeitos, como maus 
+antecedentes)14. 
+ 
+ 
+Muito embora seja discutível a concretude da utilização mais benéfica do 
+instituto15 – dado que implica necessariamente renúncia ao exercício de garantias 
+processuais fundamentais –, é certo que o acordo de não persecução penal produz efeitos 
+imediatos na esfera material dos sujeitos submetidos a esse tipo de consensualidade. D e 
+sua conceituação decorrem alterações na sanção aplicada – nos equivalentes penais 
+aplicados (benefícios) –, assim como se evita o início de um processo criminal ou mesmo 
+a prolação de uma sentença condenatória com todos os efeitos penais e extrapenais 
+correlatos. 
+Parece adequado, então, classificar a previsão normativa do acordo de não 
+persecução penal como instituto derivado de norma de natureza híbrida, com repercussões 
+materiais, e, portanto, sujeito à retroatividade da lei penal mais benéfica, prevista no 
+inciso XL do art. 5º da Constituição. 
+ 
+ 
+4. Retroatividade do acordo de não persecução penal na jurisprudência dos 
+Tribunais Superiores 
+Após divergências entre as Turmas do Supremo, a matéria foi afetada ao Plenário. 
+No julgamento do Habeas Corpus 185.913, de relatoria do Ministro Gilmar Mendes, o 
+Pleno do Supremo Tribunal Federal decidiu, por maioria16, pela aplicabilidade do instituto 
+do acordo de não persecução penal a processos iniciados antes de sua edição pela Lei nº 
+13.964, de 2019. 
+O caso concreto trata va de uma pessoa condenada a uma pena de um ano, onze 
+meses e dez dias por tráfico de drogas e, como dito, a maioria do Plenário do Supremo 
+concedeu ordem de habeas corpus para suspender os efeitos da condenação e determinar 
+ 
+14 Vasconcellos, Vinicius Gomes de. Acordo de Não Persecução Penal. 2 ed. São Paulo: Thomson Reuters 
+Brasil, 2024. P. 49. 
+15 Sobre as críticas à lógica negocial, dentre outros autores , remete-se a: Vasconcellos, Vinicius Gomes de. 
+Barganha e Justiça Criminal Negocial : análise das tendências de expansão dos espaços de consenso no 
+processo penal brasileiro. 2 ed. Belo Horizonte, São Paulo: D’Plácido, 2021. 232 p. 
+16 Ficaram vencidos (votos divergentes): Ministro Alexandre de Moraes, Ministra Cármen L úcia, Ministro 
+Flávio Dino e Ministro Luiz Fux. 
+ao Ministério Público que avaliasse o cabimento do acordo de não persecução penal, nos 
+termos do art. 28-A do Código de Processo Penal. 
+O acórdão contou com a seguinte ementa: 
+ 
+Ementa: Direito Penal e Processual Penal. Habeas corpus. ANPP - Acordo de 
+Não Persecução Penal (art. 28-A do CPP, inserido pela Lei 13964/2019). 
+Aplicação da lei no tempo e natureza da norma. Norma processual de conteúdo 
+material. Natureza Híbrida. Retroatividade e possibilidade de aplicação aos 
+casos penais em curso quando da entrada em vigor da Lei 13964/2019  
+(23.1.2020). Concessão da ordem.  
+I. Caso em exame  
+1. Habeas corpus impetrado em face de acórdão da quinta turma do Sup erior 
+Tribunal de Justiça em que se discute a possibilidade de aplicação retroativa 
+do art. 28-A do Código de Processo Penal (CPP) a fatos ocorridos antes da sua 
+entrada em vigência.  
+II. Questão em discussão  
+2. A questão em discussão consiste em saber se o Acordo de Não-Persecução 
+Penal (ANPP) previsto no art. 28-A do CPP, introduzido pela Lei 13.964/2019 
+(Pacote Anticrime), pode ser aplicado a fatos anteriores à sua entrada em 
+vigência (23.1.2020) III. Razões de decidir  
+3. O ANPP, introduzido pelo Pacote Anticrime, é negócio jurídico processual 
+que depende de manifestação positiva do legitimado ativo (Ministério 
+Público), vinculada aos requisitos previstos no art. 28-A do CPP, de modo que 
+a recusa deve ser motivada e fundamentada, autorizando o controle pelo órgão 
+jurisdicional quanto às razões adotadas.  
+4. O art. 28-A do CPP, que prevê a possibilidade de celebração do ANPP, é 
+norma de natureza híbrida (material-processual), diante da consequente 
+extinção da punibilidade, razão pela qual deve ser reconhecida a sua incidência 
+imediata em todos os casos sem trânsito em julgado da sentença condenatória.  
+5. O acusado/investigado não tem o direito subjetivo ao ANPP, mas sim o 
+direito subjetivo ao eventual oferecimento ou a devida motivação e 
+fundamentação quanto à negativa. A recusa ao Acordo de Não Persecução 
+Penal deve ser motivada concretamente, com a indicação tangível dos 
+requisitos objetivos e subjetivos ausentes (ônus argumentativo do legitimado 
+ativo da ação penal), especialmente as circunstâncias que tornam insuficientes 
+à reprovação e prevenção do crime.  
+6. É indevida a exigência de prévia confissão durante a Etapa de Investigação 
+Criminal. Dado o caráter negocial do ANPP, a confissão é “circunstancial” , 
+relacionada à manifestação da autonomia privada para fins negociais, em que 
+os cenários, os custos e benefícios são analisados, vedado, no caso de 
+revogação do acordo, o reaproveitamento da “confissão circunstancial” ( ad 
+hoc) como prova desfavorável durante a Etapa do Procedimento Judicial.  
+7. O Órgão Judicial exerce controle quanto ao objeto e termos do acordo, 
+mediante a verificação do preenchimento dos pressupostos de existência, dos 
+requisitos de validade e das condições da eficácia, podendo decotar ou negar, 
+de modo motivado e fundamentado, a respectiva homologação (CPP, art. 28 -
+A, §§ 7º, 8º e 14)  
+8. Nas hipóteses de aplicabilidade do ANPP (CPP, art. 28-A) a casos já em 
+andamento no momento da entrada em vigor da Lei 13.964/2019, a viabilidade 
+do oferecimento do acordo deverá ser avaliada pelo órgão ministerial oficiante 
+na instância e no estágio em que estiver o processo. Se eventualmente 
+celebrado o ANPP, será competente para acompanhar o seu fiel cumprimento 
+o juízo da execução penal e, em caso de descumprimento, devem ser 
+aproveitados todos os atos processuais anteriormente praticados, retomando-
+se o curso processual no estágio em que o feito se encontrava no momento  da 
+propositura do ANPP.  
+IV . Dispositivo e tese  
+9. Concedida a ordem de habeas corpus para determinar a suspensão do 
+processo e de eventual execução da pena até a manifestação motivada do órgão 
+acusatório sobre a viabilidade de proposta do ANPP, conforme os requisito s 
+previstos na legislação, passível de controle na forma do § 14 do art. 28-A do 
+CPP.  
+Teses de julgamento: “1. Compete ao membro do Ministério Público oficiante, 
+motivadamente e no exercício do seu poder-dever, avaliar o preenchimento dos 
+requisitos para negociação e celebração do ANPP, sem prejuízo do regular 
+exercício dos controles jurisdicional e interno; 2. É cabível a celebração de 
+Acordo de Não Persecução Penal em casos de processos em andamento quando 
+da entrada em vigência da Lei nº 13.964, de 2019, mesmo se ausente confissão 
+do réu até aquele momento, desde que o pedido tenha sido feito antes do 
+trânsito em julgado; 3. Nos processos penais em andamento na data da 
+proclamação do resultado deste julgamento, nos quais, em tese, seja cabível a 
+negociação de ANPP, se este ainda não foi oferecido ou não houve motivação 
+para o seu não oferecimento, o Ministério Público, agindo de ofício, a pedid o 
+da defesa ou mediante provocação do magistrado da causa, deverá, na primeira 
+oportunidade em que falar nos autos, após a publicação da ata deste 
+julgamento, manifestar-se motivadamente acerca do cabimento ou não do 
+acordo; 4. Nas investigações ou ações penais iniciadas a partir da proclamação 
+do resultado deste julgamento, a proposição de ANPP pelo Ministério Público, 
+ou a motivação para o seu não oferecimento, devem ser apresentadas antes do 
+recebimento da denúncia, ressalvada a possibilidade de propositura, pelo órgão 
+ministerial, no curso da ação penal, se for o caso.” _________  
+Dispositivos relevantes citados: CF/1988, arts. 5º, XL e LVII; 98, I; Código  
+Penal, art. 2º, caput e parágrafo único; Código de Processo Penal, art. 28- A, 
+caput, incisos I a V e §§ 1º a 14. Jurisprudência relevante citada: HC 
+75.343/SP; HC 127.483/PR; Inq 4.420 AgR/DF; Pet 7.065-AgRg/DF; ADI 
+1.719/DF; Inq 1.055 QO/AM; HC 74.305/SP; HC 191.464 AgR/SC.17 
+ 
+ 
+A interpretação foi construída a partir da perspectiva de interesse constitucional 
+sobre os limites e a eficácia do disposto no inciso XL do art. 5º da Constituição da 
+República, que estabelece, como visto anteriormente, a regra da retroatividade da norma 
+penal mais benéfica, isto é, a partir do potencial de aplicação desse princípio 
+constitucional a normas de natureza mista ou processuais com efeitos (ou conteúdos) 
+materiais18. 
+O precedente delimitou as questões-problemas a serem resolvidas pela Suprema 
+Corte, nos seguintes termos: 
+ 
+a) O ANPP pode ser oferecido em processos já em curso quando do surgimento 
+da Lei 13.964/2019? Qual é a natureza da norma inserida no art. 28-A do CPP? 
+É possível a sua aplicação retroativa em benefício ao imputado? 
+ 
+17 Brasil. Supremo Tribunal Federal. Plenário. HC 185.913, rel. min. Gilmar Mend es, j. 18.9.2024. 
+Disponível em: https://redir.stf.jus.br/paginadorpub/paginador.jsp?docTP=TP&docID=782290785. Acesso 
+em: 15 set. 2025. 
+18 Brasil. Supremo Tribunal Federal. Plenário. HC 185.913, rel. min. Gilmar Mend es, j. 18.9.2024. 
+Disponível em: https://redir.stf.jus.br/paginadorpub/paginador.jsp?docTP=TP&docID=782290785. Acesso 
+em: 15 set. 2025. 
+b) É potencialmente cabível o oferecimento do ANPP mesmo em casos nos 
+quais o imputado não tenha confessado anteriormente, durante a investigação 
+ou o processo?19 
+ 
+ 
+Até então, havia divergências entre os mais diversos tribunais do país.  
+Como o próprio julgado aponta, no âmbito do Superior Tribunal de Justiça, 
+embora, inicialmente, a Sexta Turma tivesse aceitado a aplicação do acordo de não 
+persecução penal para processos em curso até o trânsito em julgado e a Quinta Turma 
+somente admitisse até o oferecimento da denúncia, posteriormente, ambas as Turmas da 
+Corte consolidaram entendimento no sentido de que o acordo de não persecução penal 
+seria possível, apenas, até o oferecimento da denúncia e desde que houvesse confissão 
+formal do acusado. 
+Para ilustrar esse caminho da jurisprudência do Superior Tribunal de Justiça, o 
+acórdão do Habeas Corpus 185.913 cita um julgado de relatoria do Ministro Felix Fischer, 
+da Quinta Turma, pela impossibilidade de aplicação do acordo no curso processual; o 
+entendimento inicial da Sexta Turma por meio de um julgado de relatoria do Ministro 
+Nefi Cordeiro; e, por fim, o precedente da Sexta Turma que se alinhou ao entendimento 
+da Quinta Turma para não admitir a incidência do negócio jurídico penal no curso do 
+processo20: 
+ 
+[...] ACORDO DE NÃO PERSECUÇÃO PENAL. APLICAÇÃO DO ART. 
+28-A DO CPP. INOV AÇÃO RECURSAL. IMPOSSIBILIDADE. 
+IRRESIGNAÇÃO DA PARTE COM DECISÃO EMBARGADA. 
+INVIABILIDADE. EMBARGOS PARCIALMENTE ACOLHIDOS PARA 
+SANAR OMISSÃO, SEM EFEITOS INFRINGENTES.  
+[...]  
+V - Ainda, da simples leitura do art. 28-A do CPP, se verifica a ausência do s 
+requisitos para a sua aplicação, porquanto o embargante, em momento algum , 
+confessou formal e circunstancialmente a prática de infração penal, 
+pressuposto básico para a possibilidade de oferecimento de acordo de não 
+persecução penal, [...] na fase de investigação criminal ou até o recebimento 
+da denúncia e não, como no presente, em que há condenação confirmado por  
+Tribunal de segundo grau. Precedentes.21 
+ 
+ 
+ 
+19 Brasil. Supremo Tribunal Federal. Plenário. HC 185.913, rel. min. Gilmar Mend es, j. 18.9.2024. 
+Disponível em: https://redir.stf.jus.br/paginadorpub/paginador.jsp?docTP=TP&docID=782290785. Acesso 
+em: 15 set. 2025. 
+20 Julgados citados no voto de relatoria do Ministro Gilmar Mendes (BRASIL. Sup remo Tribunal Federal. 
+Plenário. HC 185.913, rel. min. Gilmar Mendes, j. 18.9.2024.  
+Disponível em: https://redir.stf.jus.br/paginadorpub/paginador.jsp?docTP=TP&docID=782290785. Acesso 
+em: 15 set. 2025). 
+21 Brasil. Superior Tribunal de Justiça. Quinta Turma. AREsp 1.681.153, r el. min. Felix Fischer, j. 
+14.9.2020. Disponível em:  
+https://scon.stj.jus.br/SCON/GetInteiroTeorDoAcordao?num_registro=202000672468&dt_publicacao=14
+/09/2020. Acesso em: 25 set. 2025. 
+AGRA VO REGIMENTAL NO HABEAS CORPUS. FRAUDE À 
+LICITAÇÃO. FALSIDADE IDEOLÓGICA. ACORDO DE NÃO 
+PERSECUÇÃO PENAL. PACOTE ANTICRIME. ART. 28-A DO CÓDIGO 
+DE PROCESSO PENAL. NORMA PENAL DE NATURA MISTA. 
+RETROATIVIDADE A FA VOR DO RÉU. NECESSIDADE DE 
+INTIMAÇÃO DO MINISTÉRIO PÚBLICO. DECISÃO 
+RECONSIDERADA. AGRA VO REGIMENTAL PROVIDO. 1. É 
+reconsiderada a decisão inicial porque o cumprimento integral do acordo de 
+não persecução penal gera a extinção da punibilidade (art. 28-A, § 13, do CPP), 
+de modo que como norma de natureza jurídica mista e mais benéfica ao réu, 
+deve retroagir em seu benefício em processos não transitados em julgado  (art. 
+5º, XL, da CF). 2. Agravo regimental provido, determinando a baixa dos autos 
+ao juízo de origem para que suspenda a ação penal e intime o Ministério 
+Público acerca de eventual interesse na propositura de acordo de não 
+persecução penal, nos termos do art. 28-A do CPP (introduzido pelo Pacote  
+Anticrime - Lei n. 13.964/2019).22 
+ 
+ 
+[...] ACORDO DE NÃO PERSECUÇÃO PENAL. ART. 28-A DO CPP, 
+INTRODUZIDO PELA LEI N. 13.964/2019. NORMA HÍBRIDA: 
+CONTEÚDO DE DIREITO PENAL E PROCESSUAL PENAL. 
+RETROATIVIDADE. POSSIBILIDADE ATÉ O RECEBIMENTO DA 
+DENÚNCIA. [...] 
+1. O art. 28-A do Código de Processo Penal, introduzido pela Lei n. 
+13.964/2019, que passou a vigorar a partir de 24/01/2020, traz norma de 
+natureza híbrida, isto é, possui conteúdo de Direito Penal e Processual Penal.  
+2. Infere-se da norma despenalizadora que o propósito do acordo d e não 
+persecução penal é o de poupar o agente do delito e o aparelho estatal do 
+desgaste inerente à instauração do processo-crime, abrindo a possibilidade de 
+o membro do Ministério Público, caso atendidos os requisitos legais, oferecer 
+condições para o então investigado (e não acusado) não ser processado, d esde 
+que necessário e suficiente para reprovação e prevenção do crime. Ou seja: o 
+benefício a ser eventualmente ofertado ao agente sobre o qual há, em tese, justa 
+causa para o oferecimento de denúncia se aplica ainda na fase pré-processual,  
+com o claro objetivo de mitigar o princípio da obrigatoriedade da ação penal.  
+3. Se, por um lado, a lei nova mais benéfica deve retroagir para alcançar 
+aqueles crimes cometidos antes da sua entrada em vigor - princípio da 
+retroatividade da lex mitior, por outro lado, há de se considerar o momento 
+processual adequado para perquirir sua incidência - princípio tempus regit 
+actum, sob pena de se desvirtuar o instituto despenalizador. 
+4. Ao conjugar esses dois princípios, tem-se que é possível a aplicação 
+retroativa do acordo de não persecução penal, desde que não recebida a 
+denúncia. A partir daí, iniciada a persecução penal em juízo, não há falar em 
+retroceder na marcha processual. [...]23 
+ 
+ 
+No Supremo Tribunal Federal, conforme mencionado anteriormente, até o 
+julgamento do Habeas Corpus afetado ao Tribunal Pleno, também havia divergência entre 
+as Turmas. 
+ 
+22 Brasil. Superior Tribunal de Justiça. Sexta Turma. HC 575.395, rel. min. Nefi Cordeiro, j. 14.9.2020. 
+Disponível em: 
+https://scon.stj.jus.br/SCON/GetInteiroTeorDoAcordao?num_registro=202000931310&dt_publicacao=14
+/09/2020. Acesso em: 25 set. 2025. 
+23 Brasil. Superior Tribunal de Justiça. Sexta Turma. HC 628.647 rel. min. Nef i Cordeiro, relatora para o 
+acórdão min. Laurita Vaz, j. 9.3.2021. Disponível em:  
+https://scon.stj.jus.br/SCON/GetInteiroTeorDoAcordao?num_registro=202003060514&dt_publicacao=07
+/06/2021. Acesso em: 25 set. 2025. 
+A Primeira Turma tinha posição no sentido de que a aplicabilidade do acordo de 
+não persecução penal seria possível, apenas, até o recebimento da denúncia, isto é, o 
+instituto se esgotaria na fase pré-processual, porque a consequência de sua não 
+homologação, recusa ou descumprimento seria a inauguração da fase processual: 
+ 
+Direito penal e processual penal. Agravo regimental em habeas corpus. Acordo 
+de não persecução penal (art. 28-A do CPP). Retroatividade até o recebimento 
+da denúncia. 1. A Lei nº 13.964/2019, no ponto em que institui o acordo de não 
+persecução penal (ANPP), é considerada lei penal de natureza híbrida, 
+admitindo conformação entre a retroatividade penal benéfica e o tempus regit 
+actum. 2. O ANPP se esgota na etapa pré-processual, sobretudo porque a 
+consequência da sua recusa, sua não homologação ou seu descumprimento é 
+inaugurar a fase de oferecimento e de recebimento da denúncia. 3. O 
+recebimento da denúncia encerra a etapa pré-processual, devendo ser 
+considerados válidos os atos praticados em conformidade com a lei então 
+vigente. Dessa forma, a retroatividade penal benéfica incide para permitir que 
+o ANPP seja viabilizado a fatos anteriores à Lei nº 13.964/2019, desde que não 
+recebida a denúncia. 4. Na hipótese concreta, ao tempo da entrada em vigor da 
+Lei nº 13.964/2019, havia sentença penal condenatória e sua confirmação e m 
+sede recursal, o que inviabiliza restaurar fase da persecução penal já encerrada 
+para admitir-se o ANPP. 5. Agravo regimental a que se nega provimento com 
+a fixação da seguinte tese: “o acordo de não persecução penal (ANPP) aplica-
+se a fatos ocorridos antes da Lei nº 13.964/2019, desde que não recebid a a 
+denúncia”.24 
+ 
+ 
+A Segunda Turma, por outro lado, firmou entendimento no sentido de que o 
+acordo de não persecução penal seria possível até o trânsito em julgado, mas com a 
+obrigação da parte requerer a avaliação da consensualidade na primeira oportunidade 
+processual após a vigência do instituto: 
+ 
+Agravo regimental no habeas corpus. 2. A Segunda Turma tem entendiment o 
+no sentido de que o ANPP é possível a processos ainda em curso até o trânsito 
+em julgado, isto é, com sentença que ainda não transitou em julgado. 3.  O 
+acusado somente tem direito desde que tenha formulado o pedido de análise 
+do ANPP na primeira oportunidade de intervenção nos autos após a data de 
+vigência do art. 28-A do CPC, sob pena de estabilização da controvérsia por 
+meio dos efeitos preclusivos do comportamento omisso, em observância da 
+boa-fé objetiva e do princípio da cooperação processual. [...]. 25 
+ 
+ 
+Por fim, com o julgamento do Habeas Corpus 185.913, de relatoria do Ministro 
+Gilmar Mendes, o Pleno do Supremo Tribunal Federal encerrou a controvérsia e, por 
+maioria, fixou as seguintes teses de julgamento: 
+ 
+24 Brasil. Supremo Tribunal Federal. Primeira Turma. HC 191.464, rel. min. Roberto Barroso, j. 11.11.2020. 
+Disponível em: https://redir.stf.jus.br/paginadorpub/paginador.jsp?docTP=TP&docID=754484857. Acesso 
+em: 25 set. 2025. 
+25 Brasil. Supremo Tribunal Federal. Segunda Turma. HC 231.789, rel. min. Gilmar Mendes, j. 23.10.2023. 
+Disponível em: https://redir.stf.jus.br/paginadorpub/paginador.jsp?docTP=TP&docID=771966019. 
+Acesso em: 25 set. 2025. 
+ 
+1. Compete ao membro do Ministério Público oficiante, motivadamente e no 
+exercício do seu poder-dever, avaliar o preenchimento dos requisitos para 
+negociação e celebração do ANPP, sem prejuízo do regular exercício dos 
+controles jurisdicional e interno; 
+ 
+2. É cabível a celebração de Acordo de Não Persecução Penal em casos de 
+processos em andamento quando da entrada em vigência da Lei nº 13.964,  de 
+2019, mesmo se ausente confissão do réu até aquele momento, desde que o  
+pedido tenha sido feito antes do trânsito em julgado; 
+3. Nos processos penais em andamento na data da proclamação do resultado 
+deste julgamento, nos quais, em tese, seja cabível a negociação de ANPP, se 
+este ainda não foi oferecido ou não houve motivação para o seu não 
+oferecimento, o Ministério Público, agindo de ofício, a pedido da defesa ou 
+mediante provocação do magistrado da causa, deverá, na primeira 
+oportunidade em que falar nos autos, após a publicação da ata deste 
+julgamento, manifestar-se motivadamente acerca do cabimento ou não do 
+acordo; 
+ 
+4. Nas investigações ou ações penais iniciadas a partir da proclamação do 
+resultado deste julgamento, a proposição de ANPP pelo Ministério Público, ou 
+a motivação para o seu não oferecimento, devem ser apresentadas antes do 
+recebimento da denúncia, ressalvada a possibilidade de propositura, pelo órgão 
+ministerial, no curso da ação penal, se for o caso.26 
+ 
+ 
+5. Considerações finais 
+Muito longe de esgotar a temática, este pequeno ensaio buscou, apenas, desenhar 
+o caminho da jurisprudência até o entendimento atual sobre a viabilidade de aplicação 
+retroativa do acordo de não persecução penal em processos em curso. Deixo aqui essa 
+contribuição para uma nova agenda de pesquisa que surge com esse instituto de 
+consensualidade no processo penal. 
+Agradeço, enfim, mais uma vez, pela oportunidade de participar dessa edição em 
+homenagem aos 15 anos do Ministro Raul Araújo no Superior Tribunal de Justiça. 
+  
+ 
+26 Brasil. Supremo Tribunal Federal. Plenário. HC 185.913, rel. min. Gilmar Mend es, j. 18.9.2024. 
+Disponível em: https://redir.stf.jus.br/paginadorpub/paginador.jsp?docTP=TP&docID=782290785. Acesso 
+em: 15 set. 2025. 
+Referências 
+BRASIL. [Constituição (1988)]. Constituição da República Federativa do Brasil de 
+1988. Brasília, DF: Presidência da República, [2023]. Disponível em: 
+http://www.planalto.gov.br/ccivil_03/Constituicao/Constituiçao.htm. Acesso em: 16 set. 
+2025. 
+ 
+BRASIL. [Código de Processo Penal – Decreto-Lei nº 3.689, de 3 de outubro de 1941]. 
+Código de Processo Penal. Brasília, DF: Presidência da República. Disponível em: 
+https://www.planalto.gov.br/ccivil_03/decreto-lei/del3689.htm. Acesso em: 18 de set. 
+2025. 
+ 
+BRASIL. [Código Penal - Decreto-Lei nº 2.848, de 07 de dezembro de 1940]. Código 
+Penal. Brasília, DF: Presidência da República. Disponível em: 
+https://www.planalto.gov.br/ccivil_03/decreto-lei/del2848compilado.htm. Acesso em: 
+19 de set. 2025. 
+ 
+BRASIL. Supremo Tribunal Federal. Plenário. HC 185.913, rel. min. Gilmar Mendes, j. 
+18.9.2024. Disponível em: 
+https://redir.stf.jus.br/paginadorpub/paginador.jsp?docTP=TP&docID=782290785. 
+Acesso em: 15 set. 2025. 
+ 
+BRASIL. Supremo Tribunal Federal. Primeira Turma. HC 191.464, rel. min. Roberto 
+Barroso, j. 11.11.2020. Disponível em: 
+https://redir.stf.jus.br/paginadorpub/paginador.jsp?docTP=TP&docID=754484857. 
+Acesso em: 25 set. 2025. 
+ 
+BRASIL. Supremo Tribunal Federal. Segunda Turma. HC 231.789, rel. min. Gilmar 
+Mendes, j. 23.10.2023. Disponível em: 
+https://redir.stf.jus.br/paginadorpub/paginador.jsp?docTP=TP&docID=771966019. 
+Acesso em: 25 set. 2025. 
+ 
+BRASIL. Superior Tribunal de Justiça. Regimento interno [do] Superior Tribunal de 
+Justiça. Brasília: STJ, 2024. Disponível em: 
+https://www.stj.jus.br/publicacaoinstitucional/index.php/Regimento/article/view/3115/3
+839. Acesso em: 27 ago. 2025. 
+ 
+BRASIL. Superior Tribunal de Justiça. Quinta Turma. AREsp 1.681.153, rel. min. Felix 
+Fischer, j. 14.9.2020. Disponível em: 
+https://scon.stj.jus.br/SCON/GetInteiroTeorDoAcordao?num_registro=202000672468&
+dt_publicacao=14/09/2020. Acesso em: 25 set. 2025. 
+ 
+BRASIL. Superior Tribunal de Justiça. Sexta Turma. HC 575.395, rel. min. Nefi 
+Cordeiro, j. 14.9.2020. Disponível em: 
+https://scon.stj.jus.br/SCON/GetInteiroTeorDoAcordao?num_registro=202000931310&
+dt_publicacao=14/09/2020. Acesso em: 25 set. 2025. 
+ 
+BRASIL. Superior Tribunal de Justiça. Sexta Turma. HC 628.647 rel. min. Nefi 
+Cordeiro, relatora para o acórdão min. Laurita Vaz, j. 9.3.2021. Disponível em: 
+https://scon.stj.jus.br/SCON/GetInteiroTeorDoAcordao?num_registro=202003060514&
+dt_publicacao=07/06/2021. Acesso em: 25 set. 2025. 
+ 
+BITENCOURT, Cezar Roberto. Tratado de Direito Penal: Parte Geral (arts. 1º a 120). 29 
+ed. São Paulo: SaraivaJur, 2023. 1.096 p. 
+ 
+PRADO, Luiz Regis. Curso de direito penal brasileiro : parte geral. 22 ed. Londrina: 
+Editora Thoth, 2024. 523 p. 
+ 
+V ASCONCELLOS, Vinicius Gomes de. Acordo de Não Persecução Penal. 2 ed. São 
+Paulo: Thomson Reuters Brasil, 2024. 318 p. 
+ 
+V ASCONCELLOS, Vinicius Gomes de. Barganha e Justiça Criminal Negocial: análise 
+das tendências de expansão dos espaços de consenso no processo penal brasileiro. 2 ed. 
+Belo Horizonte, São Paulo: D’Plácido, 2021. 232 p. 

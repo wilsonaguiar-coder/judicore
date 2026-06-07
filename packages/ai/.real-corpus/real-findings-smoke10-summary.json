@@ -1,0 +1,16 @@
+{
+  "deepseek": {
+    "processed": 10,
+    "failed": 0,
+    "totalFindings": 21,
+    "totalCost": 0.015909775,
+    "totalLatency": 140000.2148999999
+  },
+  "gemini": {
+    "processed": 10,
+    "failed": 0,
+    "totalFindings": 30,
+    "totalCost": 0.010574924999999999,
+    "totalLatency": 426102.41279999993
+  }
+}

@@ -1,0 +1,102 @@
+[
+  {
+    "id": "REAL-001",
+    "filename": "SENTENCA-PRESCRICAO.pdf",
+    "gpt": {
+      "findings": [],
+      "latencyMs": 42153.668699999995,
+      "costUsd": 0.007642500000000001,
+      "summary": "Peça sólida — nenhuma oportunidade de fortalecimento identificada."
+    }
+  },
+  {
+    "id": "REAL-002",
+    "filename": "sentenca-Leo-Lins-discriminacao-show-stand-up.pdf",
+    "gpt": {
+      "findings": [],
+      "latencyMs": 45214.8395,
+      "costUsd": 0.065385,
+      "summary": "Peça sólida — nenhuma oportunidade de fortalecimento identificada."
+    }
+  },
+  {
+    "id": "REAL-003",
+    "filename": "sentenca-vara-civel-especializada.pdf",
+    "gpt": {
+      "findings": [],
+      "latencyMs": 41465.1345,
+      "costUsd": 0.011917500000000001,
+      "summary": "Peça sólida — nenhuma oportunidade de fortalecimento identificada."
+    }
+  },
+  {
+    "id": "REAL-004",
+    "filename": "sentenca-juiz-advogado.pdf",
+    "gpt": {
+      "findings": [],
+      "latencyMs": 47756.931899999996,
+      "costUsd": 0.045777500000000006,
+      "summary": "Peça sólida — nenhuma oportunidade de fortalecimento identificada."
+    }
+  },
+  {
+    "id": "REAL-005",
+    "filename": "Sent_JoaoCandido.pdf",
+    "gpt": {
+      "findings": [],
+      "latencyMs": 46198.9118,
+      "costUsd": 0.06578,
+      "summary": "Peça sólida — nenhuma oportunidade de fortalecimento identificada."
+    }
+  },
+  {
+    "id": "REAL-006",
+    "filename": "clique-aqui-ler-sentenca-condenatoria1.pdf",
+    "gpt": {
+      "findings": [],
+      "latencyMs": 41791.75130000003,
+      "costUsd": 0.1,
+      "summary": "Peça sólida — nenhuma oportunidade de fortalecimento identificada."
+    }
+  },
+  {
+    "id": "REAL-007",
+    "filename": "uniao-indenizar-sargento-desenhou.pdf",
+    "gpt": {
+      "findings": [],
+      "latencyMs": 43240.05290000001,
+      "costUsd": 0.04020375,
+      "summary": "Peça sólida — nenhuma oportunidade de fortalecimento identificada."
+    }
+  },
+  {
+    "id": "REAL-008",
+    "filename": "condenacao-eduardo-cunha-13-vara.pdf",
+    "gpt": {
+      "findings": [],
+      "latencyMs": 48440.37909999996,
+      "costUsd": 0.1,
+      "summary": "Peça sólida — nenhuma oportunidade de fortalecimento identificada."
+    }
+  },
+  {
+    "id": "REAL-009",
+    "filename": "palavra-mariana-ferrer-nao-basta.pdf",
+    "gpt": {
+      "findings": [],
+      "latencyMs": 44017.40629999997,
+      "costUsd": 0.08803250000000001,
+      "summary": "Peça sólida — nenhuma oportunidade de fortalecimento identificada."
+    }
+  },
+  {
+    "id": "REAL-010",
+    "filename": "acordos-delacao-lava-jato-sao.pdf",
+    "gpt": {
+      "findings": [],
+      "latencyMs": 43425.697400000005,
+      "costUsd": 0.09025625000000001,
+      "summary": "Peça sólida — nenhuma oportunidade de fortalecimento identificada."
+    }
+  }
+]
