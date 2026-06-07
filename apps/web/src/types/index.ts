@@ -38,6 +38,10 @@ export interface User {
   role: UserRole;
   defaultArea?: LegalArea;
   accessExpiresAt?: string | null;
+  monthlyPieceLimit?: number;
+  piecesUsedCurrentCycle?: number;
+  currentCycleStart?: string | null;
+  currentCycleEnd?: string | null;
 }
 
 export interface Case {
