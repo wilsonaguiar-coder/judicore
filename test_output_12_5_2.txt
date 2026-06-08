@@ -1,0 +1,105 @@
+Already up to date.
+Prisma schema loaded from prisma/schema.prisma
+Datasource "db": PostgreSQL database "judicore", schema "public" at "localhost:5432"
+
+8 migrations found in prisma/migrations
+
+Applying migration `20260608000000_add_piece_generation_snapshot`
+
+The following migration(s) have been applied:
+
+migrations/
+  └─ 20260608000000_add_piece_generation_snapshot/
+    └─ migration.sql
+      
+All migrations have been successfully applied.
+Prisma schema loaded from prisma/schema.prisma
+
+✔ Generated Prisma Client (v5.22.0) to ./../../node_modules/.pnpm/@prisma+client@5.22.0_prisma@5.22.0/node_modules/@prisma/client in 182ms
+
+Start by importing your Prisma Client (See: https://pris.ly/d/importing-client)
+
+Tip: Easily identify and fix slow SQL queries in your app. Optimize helps you enhance your visibility: https://pris.ly/--optimize
+
+
+ERRORS:
+From https://github.com/wilsonaguiar-coder/judicore
+ * branch            main       -> FETCH_HEAD
+npm warn ERESOLVE overriding peer dependency
+npm warn While resolving: typescript@5.9.3
+npm warn Found: peer eslint@"^8.57.0 || ^9.0.0 || ^10.0.0" from @typescript-eslint/rule-tester@8.60.1
+npm warn node_modules/.pnpm/typescript@5.9.3/node_modules/typescript/node_modules/@typescript-eslint/rule-tester
+npm warn   dev @typescript-eslint/rule-tester@"^8.24.1" from typescript@5.9.3
+npm warn   node_modules/.pnpm/typescript@5.9.3/node_modules/typescript
+npm warn
+npm warn Could not resolve dependency:
+npm warn peer eslint@"^8.57.0 || ^9.0.0 || ^10.0.0" from @typescript-eslint/rule-tester@8.60.1
+npm warn node_modules/.pnpm/typescript@5.9.3/node_modules/typescript/node_modules/@typescript-eslint/rule-tester
+npm warn   dev @typescript-eslint/rule-tester@"^8.24.1" from typescript@5.9.3
+npm warn   node_modules/.pnpm/typescript@5.9.3/node_modules/typescript
+npm warn ERESOLVE overriding peer dependency
+npm warn While resolving: typescript@5.9.3
+npm warn Found: peer eslint@"^8.57.0 || ^9.0.0 || ^10.0.0" from @typescript-eslint/type-utils@8.60.1
+npm warn node_modules/.pnpm/typescript@5.9.3/node_modules/typescript/node_modules/@typescript-eslint/type-utils
+npm warn   dev @typescript-eslint/type-utils@"^8.24.1" from typescript@5.9.3
+npm warn   node_modules/.pnpm/typescript@5.9.3/node_modules/typescript
+npm warn
+npm warn Could not resolve dependency:
+npm warn peer eslint@"^8.57.0 || ^9.0.0 || ^10.0.0" from @typescript-eslint/type-utils@8.60.1
+npm warn node_modules/.pnpm/typescript@5.9.3/node_modules/typescript/node_modules/@typescript-eslint/type-utils
+npm warn   dev @typescript-eslint/type-utils@"^8.24.1" from typescript@5.9.3
+npm warn   node_modules/.pnpm/typescript@5.9.3/node_modules/typescript
+npm warn ERESOLVE overriding peer dependency
+npm warn While resolving: typescript@5.9.3
+npm warn Found: peer eslint@"^8.57.0 || ^9.0.0 || ^10.0.0" from @typescript-eslint/utils@8.60.1
+npm warn node_modules/.pnpm/typescript@5.9.3/node_modules/typescript/node_modules/@typescript-eslint/utils
+npm warn   dev @typescript-eslint/utils@"^8.24.1" from typescript@5.9.3
+npm warn   node_modules/.pnpm/typescript@5.9.3/node_modules/typescript
+npm warn   2 more (@typescript-eslint/rule-tester, @typescript-eslint/type-utils)
+npm warn
+npm warn Could not resolve dependency:
+npm warn peer eslint@"^8.57.0 || ^9.0.0 || ^10.0.0" from @typescript-eslint/utils@8.60.1
+npm warn node_modules/.pnpm/typescript@5.9.3/node_modules/typescript/node_modules/@typescript-eslint/utils
+npm warn   dev @typescript-eslint/utils@"^8.24.1" from typescript@5.9.3
+npm warn   node_modules/.pnpm/typescript@5.9.3/node_modules/typescript
+npm warn   2 more (@typescript-eslint/rule-tester, @typescript-eslint/type-utils)
+npm warn reify invalid or damaged lockfile detected
+npm warn reify please re-try this operation once it completes
+npm warn reify so that the damage can be corrected, or perform
+npm warn reify a fresh install with no lockfile if the problem persists.
+npm warn deprecated inflight@1.0.6: This module is not supported, and leaks memory. Do not use it. Check out lru-cache if you want a good and tested way to coalesce async requests by a key value, which is much more comprehensive and powerful.
+npm warn deprecated glob@8.1.0: Old versions of glob are not supported, and contain widely publicized security vulnerabilities, which have been fixed in the current version. Please update. Support for old versions may be purchased (at exorbitant rates) by contacting i@izs.me
+npm warn deprecated glob@10.5.0: Old versions of glob are not supported, and contain widely publicized security vulnerabilities, which have been fixed in the current version. Please update. Support for old versions may be purchased (at exorbitant rates) by contacting i@izs.me
+npm error code 1
+npm error path /opt/judicore/node_modules/.pnpm/typescript@5.9.3/node_modules/esbuild
+npm error command failed
+npm error command sh -c node install.js
+npm error /opt/judicore/node_modules/.pnpm/typescript@5.9.3/node_modules/esbuild/install.js:136
+npm error     throw new Error(`Expected ${JSON.stringify(versionFromPackageJSON)} but got ${JSON.stringify(stdout)}`);
+npm error           ^
+npm error
+npm error Error: Expected "0.25.12" but got "0.27.7"
+npm error     at validateBinaryVersion (/opt/judicore/node_modules/.pnpm/typescript@5.9.3/node_modules/esbuild/install.js:136:11)
+npm error     at /opt/judicore/node_modules/.pnpm/typescript@5.9.3/node_modules/esbuild/install.js:287:5
+npm error
+npm error Node.js v20.20.2
+npm error A complete log of this run can be found in: /root/.npm/_logs/2026-06-08T01_49_22_357Z-debug-0.log
+node:internal/modules/esm/resolve:322
+  return new ERR_PACKAGE_PATH_NOT_EXPORTED(
+         ^
+
+Error [ERR_PACKAGE_PATH_NOT_EXPORTED]: No "exports" main defined in /opt/judicore/packages/ai/node_modules/@judicore/db/package.json
+    at exportsNotFound (node:internal/modules/esm/resolve:322:10)
+    at packageExportsResolve (node:internal/modules/esm/resolve:613:13)
+    at resolveExports (node:internal/modules/cjs/loader:638:36)
+    at Module._findPath (node:internal/modules/cjs/loader:711:31)
+    at Module._resolveFilename (node:internal/modules/cjs/loader:1193:27)
+    at nextResolveSimple (/root/.npm/_npx/fd45a72a545557e9/node_modules/tsx/dist/register-BOkp8V6j.cjs:10:1017)
+    at /root/.npm/_npx/fd45a72a545557e9/node_modules/tsx/dist/register-BOkp8V6j.cjs:9:4388
+    at /root/.npm/_npx/fd45a72a545557e9/node_modules/tsx/dist/register-BOkp8V6j.cjs:9:3818
+    at resolveTsPaths (/root/.npm/_npx/fd45a72a545557e9/node_modules/tsx/dist/register-BOkp8V6j.cjs:10:770)
+    at /root/.npm/_npx/fd45a72a545557e9/node_modules/tsx/dist/register-BOkp8V6j.cjs:10:1155 {
+  code: 'ERR_PACKAGE_PATH_NOT_EXPORTED'
+}
+
+Node.js v20.20.2

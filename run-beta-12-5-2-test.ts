@@ -1,6 +1,6 @@
 import "dotenv/config";
-import { GenerationPipeline, GenerationInput } from "./packages/ai/src/generation-pipeline/generation.pipeline.js";
-import { prisma } from "./packages/db/src/index.js";
+import { GenerationPipeline, GenerationInput } from "@judicore/ai";
+import { prisma } from "@judicore/db";
 
 async function main() {
   console.log("Iniciando Teste da Fase 12.5.2 - Paridade de Pensão EC 41/2003");
