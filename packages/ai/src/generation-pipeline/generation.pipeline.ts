@@ -1,3 +1,4 @@
+import { execSync } from "child_process";
 import { prisma, QuotaService } from "@judicore/db";
 import { PieceBriefService } from "./piece-brief.service.js";
 import { LegalResearchService } from "../legal-research/legal-research.service.js";
@@ -6,6 +7,11 @@ import { DocumentExtractor } from "../document-processing/extractor.js";
 import { ContextReducer } from "../document-processing/reducer.js";
 import { QualificationExtractor } from "../document-processing/qualification-extractor.js";
 import { LegalMatrixBuilderService } from "./legal-matrix-builder.service.js";
+import { buildPremiumDocumentPrompt } from "../prompts.js";
+
+function getCommitHash(): string {
+  try { return execSync("git rev-parse HEAD", { encoding: "utf8" }).trim(); } catch { return "unknown"; }
+}
 
 export interface GenerationInput {
   userId: string;
@@ -100,6 +106,26 @@ export class GenerationPipeline {
       });
 
       // 6.5. Salvar Snapshot de Observabilidade
+      const legalMatrixFormattedForSnap = LegalMatrixBuilderService.formatToMarkdown(legalMatrix);
+      const systemPromptFull = buildPremiumDocumentPrompt(
+        pieceType as any,
+        [],
+        legalMatrixFormattedForSnap,
+        JSON.stringify(brief),
+        userOrientation,
+        qualData
+      );
+      const userPromptFull = "Redija a peça final completa agora. ATENÇÃO MÁXIMA: É ESTRITAMENTE PROIBIDO escrever 'vem à presença', 'vem perante', 'Diante do exposto, requer', 'Ante o exposto, requer' ou 'Termos em que, Pede deferimento'. Vá direto ao ponto, use redação institucional e direta.";
+      const gptPayloadFull = {
+        model: "gpt-4o",
+        messages: [
+          { role: "system", content: systemPromptFull },
+          { role: "user", content: userPromptFull }
+        ],
+        temperature: 0.2,
+        max_tokens: 4096
+      };
+
       await prisma.pieceGenerationSnapshot.create({
         data: {
           generationId: generation.id,
@@ -116,10 +142,14 @@ export class GenerationPipeline {
           },
           legalMatrixJson: legalMatrix as any,
           promptSnapshotJson: {
-            hash: "v12.5.2",
+            hash: "v13.5.3",
             versao: "1.0",
             tamanho: writerRes.inputTokens,
-            resumoInicial: writerRes.promptSnapshot
+            resumoInicial: writerRes.promptSnapshot,
+            systemPromptFull,
+            userPromptFull,
+            gptPayloadFull,
+            commitHash: getCommitHash()
           }
         }
       });

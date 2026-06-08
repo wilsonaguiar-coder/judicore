@@ -2,7 +2,6 @@ import { prisma } from "@judicore/db";
 import * as fs from "fs";
 
 async function main() {
-  // Buscar a geração que contenha o texto do Francisco Wilson
   const gen = await prisma.pieceGeneration.findFirst({
     where: {
       generatedText: {
@@ -23,7 +22,7 @@ async function main() {
   }
 
   const snap = gen.snapshot;
-  
+
   const qualJson = snap?.qualificationJson || {};
   const briefJson = snap?.pieceBriefJson || {};
   const researchJson = snap?.researchSummaryJson || {};
@@ -34,21 +33,37 @@ async function main() {
   fs.writeFileSync("piecebrief_raw.json", JSON.stringify(briefJson, null, 2));
   fs.writeFileSync("legalresearch_raw.json", JSON.stringify(researchJson, null, 2));
   fs.writeFileSync("legalmatrix_raw.json", JSON.stringify(matrixJson, null, 2));
-  fs.writeFileSync("writer_system_prompt.txt", promptJson.systemPrompt || "N/A");
-  fs.writeFileSync("writer_user_prompt.txt", promptJson.userPrompt || "N/A");
-  fs.writeFileSync("writer_final_payload.txt", JSON.stringify(promptJson.gptPayload || {}, null, 2));
+  fs.writeFileSync("writer_system_prompt.txt", promptJson.systemPromptFull || promptJson.resumoInicial || "N/A");
+  fs.writeFileSync("writer_user_prompt.txt", promptJson.userPromptFull || "N/A");
+  fs.writeFileSync("writer_final_payload.json", JSON.stringify(promptJson.gptPayloadFull || {}, null, 2));
   fs.writeFileSync("writer_response_raw.txt", gen.generatedText || "N/A");
+
+  const metadata = {
+    requestId: gen.id,
+    timestamp: gen.createdAt.toISOString(),
+    providerPieceBrief: "Gemini 1.5 Pro",
+    providerWriter: "GPT-4o",
+    inputTokensGemini: gen.inputTokensGemini,
+    outputTokensGemini: gen.outputTokensGemini,
+    inputTokensGpt: gen.inputTokensGpt,
+    outputTokensGpt: gen.outputTokensGpt,
+    commitHash: promptJson.commitHash || "N/A",
+    promptHash: promptJson.hash || "N/A"
+  };
+  fs.writeFileSync("metadata_execution.json", JSON.stringify(metadata, null, 2));
 
   console.log("2. Informações da Execução:");
   console.log(`* requestId: ${gen.id}`);
   console.log(`* timestamp: ${gen.createdAt.toISOString()}`);
-  console.log(`* provider PieceBrief: Gemini 1.5 Pro (inferido)`);
-  console.log(`* provider Writer: GPT-4o (inferido)`);
+  console.log(`* commitHash: ${promptJson.commitHash || "N/A (execução anterior ao v13.5.3)"}`);
+  console.log(`* promptHash: ${promptJson.hash || "N/A"}`);
+  console.log(`* provider PieceBrief: Gemini 1.5 Pro`);
+  console.log(`* provider Writer: GPT-4o`);
 
   const s1 = JSON.stringify(qualJson);
   const s2 = JSON.stringify(briefJson);
-  const s3 = promptJson.systemPrompt || "";
-  const s4 = JSON.stringify(promptJson.gptPayload || {});
+  const s3 = promptJson.systemPromptFull || promptJson.resumoInicial || "";
+  const s4 = JSON.stringify(promptJson.gptPayloadFull || {});
   const s5 = gen.generatedText || "";
 
   const check = (str: string, term: string) => str.includes(term) ? "SIM" : "NÃO";
@@ -58,7 +73,7 @@ async function main() {
   console.log(`[${check(s1, name) === 'SIM' ? 'x' : ' '}] qualification_extractor_output.json - ${check(s1, name)}`);
   console.log(`[${check(s2, name) === 'SIM' ? 'x' : ' '}] piecebrief_raw.json - ${check(s2, name)}`);
   console.log(`[${check(s3, name) === 'SIM' ? 'x' : ' '}] writer_system_prompt.txt - ${check(s3, name)}`);
-  console.log(`[${check(s4, name) === 'SIM' ? 'x' : ' '}] writer_final_payload.txt - ${check(s4, name)}`);
+  console.log(`[${check(s4, name) === 'SIM' ? 'x' : ' '}] writer_final_payload.json - ${check(s4, name)}`);
   console.log(`[${check(s5, name) === 'SIM' ? 'x' : ' '}] writer_response_raw.txt - ${check(s5, name)}`);
 
   const cpf = "810.848.973-34";
@@ -66,13 +81,8 @@ async function main() {
   console.log(`[${check(s1, cpf) === 'SIM' ? 'x' : ' '}] qualification_extractor_output.json - ${check(s1, cpf)}`);
   console.log(`[${check(s2, cpf) === 'SIM' ? 'x' : ' '}] piecebrief_raw.json - ${check(s2, cpf)}`);
   console.log(`[${check(s3, cpf) === 'SIM' ? 'x' : ' '}] writer_system_prompt.txt - ${check(s3, cpf)}`);
-  console.log(`[${check(s4, cpf) === 'SIM' ? 'x' : ' '}] writer_final_payload.txt - ${check(s4, cpf)}`);
+  console.log(`[${check(s4, cpf) === 'SIM' ? 'x' : ' '}] writer_final_payload.json - ${check(s4, cpf)}`);
   console.log(`[${check(s5, cpf) === 'SIM' ? 'x' : ' '}] writer_response_raw.txt - ${check(s5, cpf)}`);
-
-  console.log("\n6. Identificação dos artefatos anteriores:");
-  console.log("* qual requestId eles pertencem: Nova execução gerada localmente via script ('dump-artifacts.ts') gerando novos IDs sintéticos.");
-  console.log("* qual caso foi utilizado: Script local usando variáveis de mock (Maria Aparecida da Silva).");
-  console.log("* por que foram exportados: O assistente recriou uma execução sintética do pipeline via script em vez de consultar a tabela PieceGeneration e PieceGenerationSnapshot no banco de dados.");
 }
 
 main()
