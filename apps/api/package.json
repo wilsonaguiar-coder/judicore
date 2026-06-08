@@ -8,7 +8,9 @@
     "build": "tsc",
     "start": "node dist/server.js",
     "typecheck": "tsc --noEmit",
-    "index": "tsx src/scripts/index-jurisprudencia.ts"
+    "index": "tsx src/scripts/index-jurisprudencia.ts",
+    "sync-leis": "tsx ../../ingest_local.ts && python ../../upload_and_load.py",
+    "test-writer": "tsx --env-file=../../packages/ai/.env src/scripts/test-writer.ts"
   },
   "dependencies": {
     "@fastify/cors": "^9.0.0",

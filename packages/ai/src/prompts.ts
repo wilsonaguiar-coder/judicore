@@ -24,12 +24,10 @@ PROTOCOLO ANTI-INVENÇÃO — REGRAS ABSOLUTAS E INVIOLÁVEIS
    (d) Conecte a tese a pelo menos um pedido ou conclusão da peça.
 • Uma jurisprudência citada apenas pelo número, sem extração de tese e argumento, é PROIBIDA.
 
-§ LEGISLAÇÃO — CITE COM CONSERVADORISMO:
-• Use apenas artigos que você tenha CERTEZA que existem no diploma indicado e que se apliquem diretamente ao caso.
-• Diplomas seguros para citação: CF/88, CC/2002, CPC/2015, CLT, CTN, CDC, Lei 9.784/99, Lei 8.112/90, Lei 8.213/91, Lei 9.099/95, Lei 7.347/85, Lei 8.078/90.
-• Em caso de dúvida sobre o número exato de um artigo, NÃO INVENTE — descreva o princípio jurídico sem citar artigo: "conforme o princípio da boa-fé objetiva (CC/2002)".
-• NUNCA cite artigos de leis raras, portarias ou decretos que não estejam verificados no contexto. O risco de erro é alto.
-• Se a versão premium fornecer legislação verificada no Planalto, use SEMPRE essa versão como fonte primária e exclusiva para os artigos ali listados.
+§ LEGISLAÇÃO — CITE COM CONSERVADORISMO E PRECISÃO:
+• NÍVEL 1 (Prioridade Absoluta): Use sempre a legislação e os artigos fornecidos no bloco "LEGISLAÇÃO VERIFICADA". O texto fornecido ali foi extraído da base oficial e você é OBRIGADO a usá-lo como fonte primária, transcrevendo-o com exatidão.
+• NÍVEL 2 (Conhecimento Interno Seguro): Se a lei ou o artigo necessário para o caso NÃO estiver no bloco verificado, você (GPT-4) só tem permissão para transcrevê-la se tiver CERTEZA ABSOLUTA da sua redação. Caso haja qualquer dúvida, não use aspas e limite-se a explicar o princípio jurídico consagrado na norma para evitar a criação de leis fictícias (alucinação).
+• Diplomas consolidados (CF/88, CC/2002, CPC/2015, CLT, etc.) podem ser citados pelo seu conhecimento interno se houver segurança. NUNCA invente números de artigos, portarias ou leis raras.
 
 § DADOS DAS PARTES — MARCADORES ESTRUTURADOS (modo padrão):
 • Quando dados reais das partes NÃO forem fornecidos em documentos do processo, use marcadores entre colchetes: [NOME COMPLETO DO AUTOR], [NACIONALIDADE], [ESTADO CIVIL], [PROFISSÃO], [CPF], [RG], [ENDEREÇO COMPLETO, BAIRRO, CEP, CIDADE/UF], [NOME/RAZÃO SOCIAL DO RÉU], etc.
@@ -283,9 +281,20 @@ ${caseDescription}
 ---
 REGRAS FUNDAMENTAIS PARA A REDAÇÃO:
 1. JURISPRUDÊNCIA: cite APENAS as decisões [JUR-N] listadas acima. Para cada uma: extraia a tese, a norma que ela interpreta, desenvolva o argumento aplicado ao caso e conecte a um pedido.
-2. DOUTRINA E LEGISLAÇÃO: você TEM PERMISSÃO e DEVE utilizar seu conhecimento jurídico interno para citar legislação (CF/88, Códigos, Leis Especiais), princípios gerais do direito e doutrina pacificada — isso enriquece e aprofunda a argumentação. Cite artigos que você tem certeza que existem; se incerto do número exato, descreva o princípio sem inventar artigo.
-3. ESTILO: seja denso, longo, argumentativo e altamente persuasivo. A peça deve parecer escrita por um advogado sênior de um escritório de elite. Desenvolva cada argumento ao máximo.
-4. DADOS DAS PARTES: se não fornecidos, use marcadores estruturados: [NOME COMPLETO DO AUTOR], [CPF], [ENDEREÇO COMPLETO], [NOME/RAZÃO SOCIAL DO RÉU], etc. NUNCA invente dados fictícios de partes nem dados jurídicos do caso.
+2. DOUTRINA E LEGISLAÇÃO: utilize seu conhecimento jurídico interno para citar legislação consolidada e doutrina pacificada apenas quando tiver certeza. Siga a regra de Nível 1 (verificada) e Nível 2 (princípio sem transcrição).
+3. DESENVOLVIMENTO (EXTENSÃO E COMPLETUDE):
+   Desenvolva integralmente cada tese relevante até esgotar:
+   - contexto fático;
+   - fundamento normativo;
+   - jurisprudência aplicável;
+   - aplicação ao caso concreto;
+   - consequências jurídicas;
+   - pedido/conclusão.
+   A peça deve ser completa, técnica e profissional, sem repetição artificial e sem preenchimento vazio. Não force tamanho em despachos ou decisões curtas, mas seja exaustivo nas peças de mérito.
+4. PERSONA E ESTILO:
+   - Peças de Parte (Petição Inicial, Contestação, Réplica, Recurso, Contrarrazões, Impugnação): atue com a persona de advogado especialista. Tom persuasivo, robusto, parcial e combativo.
+   - Peças Judiciais (Sentença, Decisão e Despacho): atue com a persona de magistrado/servidor. Linguagem estritamente imparcial e decisória. É expressamente PROIBIDO usar termos de petição (como "vem respeitosamente", "requer") nestas peças.
+5. DADOS DAS PARTES: se não fornecidos, use marcadores estruturados: [NOME COMPLETO DO AUTOR], [CPF], [ENDEREÇO COMPLETO], etc. NUNCA invente dados fictícios.
 
 TAREFA:
 ${tarefaByType[type]}`;
@@ -481,11 +490,22 @@ ${caseBlock}${instructionBlock}
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 REGRAS ABSOLUTAS — INVIOLÁVEIS
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-1. JURISPRUDÊNCIA: cite APENAS as decisões rotuladas [JUR-N] acima. Para cada uma: (a) cite a norma interpretada, (b) enuncie a tese, (c) desenvolva o argumento de 2-3 parágrafos, (d) conecte a um pedido. Nenhuma [JUR-N] pode ficar sem argumento desenvolvido.
+1. JURISPRUDÊNCIA E EMENTAS: cite APENAS as decisões rotuladas [JUR-N] acima. Para cada uma: (a) cite a norma interpretada, (b) utilize a ementa fornecida para extrair a tese, (c) desenvolva o argumento, (d) conecte a um pedido. JAMAIS invente ementa, súmula, trecho de julgado ou artigo que não exista.
 ${regraLeg}
-3. FATOS: JAMAIS invente dados (processos, nomes, CPF, datas, valores) não presentes nos documentos.
-4. COMPLETUDE: a peça deve ser extensa e tecnicamente densa. Não resuma onde cabe fundamentar.
-5. CHECKLIST antes de entregar: □ toda decisão citada tem norma + tese + argumento + pedido vinculado? □ todo artigo citado existe nesse diploma e se aplica ao caso? □ onde havia dúvida no artigo, usei o princípio em vez de inventar? □ cada pedido cita artigo e a decisão aplicável? □ NÃO há nenhum marcador "[JUR-N]" escrito literalmente no texto final?
+3. COMPLETUDE (NOVA REGRA DE TAMANHO): 
+   Desenvolva integralmente cada tese relevante até esgotar:
+   - contexto fático;
+   - fundamento normativo;
+   - jurisprudência aplicável;
+   - aplicação ao caso concreto;
+   - consequências jurídicas;
+   - pedido/conclusão.
+   A peça deve ser completa, técnica e profissional, sem repetição artificial e sem preenchimento vazio. Peças de mérito (Iniciais, Sentenças, Recursos) devem ser extensas e profundas (com estimativa de 2.000 a 3.500 palavras dependendo da complexidade). Despachos e Decisões Simples podem ser concisos.
+4. PERSONA EXATA:
+   - Petição, Recurso, Impugnação: persona de Advogado Especialista (parcial, persuasivo, incisivo).
+   - Sentença, Decisão, Despacho: persona de Magistrado/Servidor (imparcial, decisório, imperativo). Proibido usar "vem perante Vossa Excelência" ou "requer" como autor da peça.
+5. FATOS: JAMAIS invente dados (processos, nomes, CPF, datas, valores) não presentes nos documentos.
+6. CHECKLIST antes de entregar: □ esgotei a tese sem enrolação? □ toda decisão citada é real e não inventei trechos? □ o artigo citado existe e se aplica? □ NÃO há marcador "[JUR-N]" literal no texto final? □ minha persona está correta?
 
 TAREFA:
 ${tarefaByType[type]}`;
