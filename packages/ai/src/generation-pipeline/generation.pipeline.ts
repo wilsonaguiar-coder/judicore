@@ -4,6 +4,7 @@ import { LegalResearchService } from "../legal-research/legal-research.service.j
 import { WriterService } from "./writer.service.js";
 import { DocumentExtractor } from "../document-processing/extractor.js";
 import { ContextReducer } from "../document-processing/reducer.js";
+import { QualificationExtractor } from "../document-processing/qualification-extractor.js";
 
 export interface GenerationInput {
   userId: string;
@@ -16,6 +17,14 @@ export class GenerationPipeline {
   static async execute(input: GenerationInput): Promise<{ draft: string, generationId: string }> {
     const { userId, pieceType, userOrientation, files } = input;
     const startMs = Date.now();
+
+    if (files.length > 5) {
+      throw new Error("Limite excedido: máximo de 5 arquivos por requisição.");
+    }
+    const totalSize = files.reduce((acc, f) => acc + f.buffer.length, 0);
+    if (totalSize > 15 * 1024 * 1024) {
+      throw new Error("Limite excedido: tamanho máximo total de arquivos é 15MB.");
+    }
 
     // 1. Inicia o registro no banco
     const generation = await prisma.pieceGeneration.create({
@@ -35,9 +44,19 @@ export class GenerationPipeline {
 
       for (const file of files) {
         const rawText = await extractor.extractText(file.buffer, file.mimeType);
-        const reducedText = reducer.process(rawText, file.category);
+        const reducedText = reducer.process(rawText, file.category, 80000); // 80k max por arquivo
         combinedText += `\n[Documento: ${file.category}]\n${reducedText}\n`;
       }
+
+      if (combinedText.length > 150000) {
+        combinedText = combinedText.substring(0, 150000) + "\n...[TRUNCADO PELO SISTEMA]";
+      }
+
+      // Extração de Qualificação
+      const qualData = QualificationExtractor.extract(combinedText);
+      const qualBlock = QualificationExtractor.formatToPrompt(qualData);
+      
+      combinedText = qualBlock + "\n\n" + combinedText;
 
       // Os arquivos originais (buffers) saem de escopo após este bloco (garantia LGPD).
 

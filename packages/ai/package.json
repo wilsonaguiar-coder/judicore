@@ -30,9 +30,12 @@
   "dependencies": {
     "@judicore/db": "workspace:*",
     "@judicore/search": "workspace:*",
+    "adm-zip": "^0.5.17",
+    "mammoth": "^1.12.0",
     "openai": "^6.39.1"
   },
   "devDependencies": {
+    "@types/adm-zip": "^0.5.8",
     "@types/node": "^20.0.0",
     "@types/pdf-parse": "^1.1.5",
     "dotenv": "^16.4.0",
