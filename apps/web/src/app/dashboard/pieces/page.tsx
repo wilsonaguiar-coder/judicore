@@ -38,8 +38,8 @@ export default function PiecesPage() {
 
   const cards = user?.role === "SERVIDOR" ? servidorCards : comumCards;
 
-  // Mocking quotas for MVP view
-  const quotaUsed = user?.piecesUsedCurrentCycle ?? 23;
+  // Fallback to 0 / 50 if data is not available
+  const quotaUsed = user?.piecesUsedCurrentCycle ?? 0;
   const quotaTotal = user?.monthlyPieceLimit ?? 50;
   const daysToRenew = 12;
 

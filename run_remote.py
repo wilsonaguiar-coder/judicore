@@ -16,7 +16,7 @@ try:
     
     commands = [
         "cd /opt/judicore && git pull",
-        "cd /opt/judicore/packages/ai && npx tsx scripts/run-beta-12-5-0.ts"
+        "cd /opt/judicore/packages/ai && set -a && source /opt/judicore/apps/api/.env && set +a && npx tsx scripts/run-beta-12-5-0.ts"
     ]
     
     for cmd in commands:
