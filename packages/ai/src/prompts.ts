@@ -812,6 +812,7 @@ PROCESSO DO TRABALHO:
 REGRAS ABSOLUTAS — INVIOLÁVEIS
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 1. JURISPRUDÊNCIA E EMENTAS: cite APENAS as decisões rotuladas [JUR-N] acima. Para cada uma: (a) cite a norma interpretada, (b) utilize a ementa fornecida para extrair a tese, (c) desenvolva o argumento, (d) conecte a um pedido. JAMAIS invente ementa, súmula, trecho de julgado ou artigo que não exista.
+   ⚠ PROIBIDO ABSOLUTO: escrever "[JUR-1]", "[JUR-2]" ou qualquer "[JUR-N]" no texto final da peça — são marcadores internos de referência. No corpo da peça, cite sempre pelos dados reais: tribunal + número do processo (ex: "STF, RE 603.580/MG"). Apenas no modelo de análise interna os rótulos [JUR-N] existem.
 ${regraLeg}
 3. COMPLETUDE:
    Desenvolva integralmente cada tese relevante até esgotar: contexto fático → fundamento normativo → jurisprudência aplicável → aplicação ao caso concreto → consequências jurídicas → pedido/conclusão.
