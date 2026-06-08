@@ -33,7 +33,7 @@ async function main() {
     teses: [
       {
         tese: brief.tesesIdentificadas![0],
-        queries: { lanceDB: "query", lexMLOldQuery: "q", lexMLQueries: [] },
+        queries: { lanceDB: "query", lexMLQueries: [] },
         jurisprudencia: [
           { titulo: "Súmula 340 STJ", tribunal: "STJ", fonte: "LanceDB", score: 0.9, ementa: "A lei aplicável à concessão de pensão previdenciária por morte é aquela vigente na data do óbito do segurado.", conteudo: "A lei aplicável à concessão de pensão previdenciária por morte é aquela vigente na data do óbito do segurado." },
           { titulo: "RE 123", tribunal: "STF", fonte: "LexML", score: 0.8, ementa: "Tempus regit actum na pensão por morte.", conteudo: "Tempus regit actum na pensão por morte." }
@@ -43,7 +43,7 @@ async function main() {
       },
       {
         tese: brief.tesesIdentificadas![1],
-        queries: { lanceDB: "query", lexMLOldQuery: "q", lexMLQueries: [] },
+        queries: { lanceDB: "query", lexMLQueries: [] },
         jurisprudencia: [],
         legislacao: [
           { titulo: "Art. 40 da CF/88 (Redação da EC 41/03)", tribunal: "", fonte: "LegisDB", score: 0.9, conteudo: "Aos servidores titulares de cargos efetivos da União..." }
@@ -52,7 +52,7 @@ async function main() {
       },
       {
         tese: brief.tesesIdentificadas![2],
-        queries: { lanceDB: "query", lexMLOldQuery: "q", lexMLQueries: [] },
+        queries: { lanceDB: "query", lexMLQueries: [] },
         jurisprudencia: [
           { titulo: "RE 603.580", tribunal: "STF", fonte: "LanceDB + LexML", score: 0.95, ementa: "RECURSO EXTRAORDINÁRIO. PREVIDENCIÁRIO. PENSÃO POR MORTE. PARIDADE. REGRAS DE TRANSIÇÃO. EC 41 E 47. TEMA 396.", conteudo: "RECURSO EXTRAORDINÁRIO. PREVIDENCIÁRIO. PENSÃO POR MORTE. PARIDADE. REGRAS DE TRANSIÇÃO. EC 41 E 47. TEMA 396." }
         ],

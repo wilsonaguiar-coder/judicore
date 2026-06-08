@@ -108,7 +108,7 @@ async function main() {
       console.log(`\n  Tese: ${String(tp.tese).slice(0, 80)}...`);
       if (tp.queries?.lexMLQueries) {
         for (const q of tp.queries.lexMLQueries) {
-          console.log(`    LexML [${q.returnedCount} resultados] ${q.cql}`);
+          console.log(`    LexML [${q.returnedCount} resultados] keyword="${q.keyword}"`);
         }
       }
     }
