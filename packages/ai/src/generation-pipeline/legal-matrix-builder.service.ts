@@ -105,12 +105,16 @@ export class LegalMatrixBuilderService {
       let localDevices = [];
       let queryUsed = {};
 
-      if (exactMatches.length > 0) {
-         queryUsed = { OR: exactMatches };
-         localDevices = await prisma.legisDevice.findMany({ where: queryUsed, take: 5 });
-      } else if (searchKeywords.length > 0) {
-         queryUsed = { OR: searchKeywords.map(k => ({ texto: { contains: k, mode: 'insensitive' } })) };
-         localDevices = await prisma.legisDevice.findMany({ where: queryUsed, take: 3 });
+      try {
+          if (exactMatches.length > 0) {
+             queryUsed = { OR: exactMatches };
+             localDevices = await prisma.legisDevice.findMany({ where: queryUsed, take: 5 });
+          } else if (searchKeywords.length > 0) {
+             queryUsed = { OR: searchKeywords.map(k => ({ texto: { contains: k, mode: 'insensitive' } })) };
+             localDevices = await prisma.legisDevice.findMany({ where: queryUsed, take: 3 });
+          }
+      } catch (err) {
+          console.warn("Falha ao buscar no LegisDB:", err);
       }
       observability.resultadosRetornados.legisDB += localDevices.length;
 
