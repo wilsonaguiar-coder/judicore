@@ -5,7 +5,8 @@ async function main() {
   const gen = await prisma.pieceGeneration.findFirst({
     where: {
       generatedText: {
-        contains: "FRANCISCO WILSON DE BRITO AGUIAR"
+        contains: "Francisco Wilson de Brito Aguiar",
+        mode: "insensitive"
       }
     },
     include: {
