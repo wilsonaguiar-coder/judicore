@@ -7,7 +7,7 @@ const prisma = new PrismaClient();
 
 
 async function main() {
-  const brief: PieceBrief = {
+  const brief: any = {
     tipoPeca: "Petição Inicial",
     fatosRelevantes: [
       "O autor é viúvo e pensionista de uma ex-servidora pública federal.",
@@ -24,7 +24,7 @@ async function main() {
       "direito adquirido", "Tema 396", "RE 603.580", "EC 47/2005"
     ],
     pedidosIdentificados: ["Concessão da paridade"],
-    _metadata: { inputTokens: 100, outputTokens: 100 }
+    // _metadata: { inputTokens: 100, outputTokens: 100 }
   };
 
   const isTrabalhista = false;

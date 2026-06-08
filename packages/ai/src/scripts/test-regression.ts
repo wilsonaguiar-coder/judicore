@@ -6,7 +6,7 @@ import * as fs from "fs";
 import * as path from "path";
 
 async function main() {
-  const brief: PieceBrief = {
+  const brief: any = {
     tipoPeca: "Petição Inicial",
     fatosRelevantes: [
       "O autor é viúvo e pensionista de uma ex-servidora pública federal.",
@@ -23,7 +23,7 @@ async function main() {
       "direito adquirido", "Tema 396", "RE 603.580", "EC 47/2005"
     ],
     pedidosIdentificados: ["Concessão da paridade e pagamento dos atrasados"],
-    _metadata: { inputTokens: 100, outputTokens: 100 }
+    // _metadata: { inputTokens: 100, outputTokens: 100 }
   };
 
   const userOrientation = "peticionar pela procedência de pedido de paridade de pensão de ex-servidora federal, falecida após a ec 41/2003.";
@@ -37,7 +37,7 @@ async function main() {
         tese: brief.tesesIdentificadas![0],
         queries: { lanceDB: "query", lexMLOldQuery: "q", lexMLQueries: [] },
         jurisprudencia: [
-          { titulo: "Súmula 340 STJ", tribunal: "STJ", fonte: "LanceDB", score: 0.9, ementa: "A lei aplicável à concessão de pensão previdenciária por morte é aquela vigente na data do óbito do segurado." }
+          { titulo: "Súmula 340 STJ", tribunal: "STJ", fonte: "LanceDB", score: 0.9, ementa: "A lei aplicável à concessão de pensão previdenciária por morte é aquela vigente na data do óbito do segurado.", conteudo: "A lei aplicável à concessão de pensão previdenciária por morte é aquela vigente na data do óbito do segurado." }
         ],
         legislacao: [],
         descartes: []
@@ -55,7 +55,7 @@ async function main() {
         tese: brief.tesesIdentificadas![2],
         queries: { lanceDB: "query", lexMLOldQuery: "q", lexMLQueries: [] },
         jurisprudencia: [
-          { titulo: "RE 603.580 / Tema 396", tribunal: "STF", fonte: "LanceDB", score: 0.95, ementa: "RECURSO EXTRAORDINÁRIO. PREVIDENCIÁRIO. PENSÃO POR MORTE. PARIDADE. REGRAS DE TRANSIÇÃO. EC 41 E 47. TEMA 396." }
+          { titulo: "RE 603.580 / Tema 396", tribunal: "STF", fonte: "LanceDB", score: 0.95, ementa: "RECURSO EXTRAORDINÁRIO. PREVIDENCIÁRIO. PENSÃO POR MORTE. PARIDADE. REGRAS DE TRANSIÇÃO. EC 41 E 47. TEMA 396.", conteudo: "RECURSO EXTRAORDINÁRIO. PREVIDENCIÁRIO. PENSÃO POR MORTE. PARIDADE. REGRAS DE TRANSIÇÃO. EC 41 E 47. TEMA 396." }
         ],
         legislacao: [
            { titulo: "Art. 3º da EC 47/2005", tribunal: "", fonte: "LexML", score: 0.85, conteudo: "Ressalvado o direito de opção à aposentadoria pelas normas estabelecidas..." }

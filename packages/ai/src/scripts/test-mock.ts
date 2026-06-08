@@ -9,15 +9,15 @@ import * as searchObj from "@judicore/search";
 };
 
 (searchObj as any).searchLanceDB = async () => [
-    { titulo: "RE 870717", tribunal: "STF", ementa: "Pensão por morte. Aplicação da lei vigente na data do óbito do instituidor." },
-    { titulo: "RE 1376169", tribunal: "STF", ementa: "RECURSO EXTRAORDINÁRIO. PARIDADE. TEMA RG Nº 396." }
+    { titulo: "RE 870717", tribunal: "STF", ementa: "Pensão por morte. Aplicação da lei vigente na data do óbito do instituidor.", conteudo: "Pensão por morte. Aplicação da lei vigente na data do óbito do instituidor." },
+    { titulo: "RE 1376169", tribunal: "STF", ementa: "RECURSO EXTRAORDINÁRIO. PARIDADE. TEMA RG Nº 396.", conteudo: "RECURSO EXTRAORDINÁRIO. PARIDADE. TEMA RG Nº 396." }
 ];
 
 import { LegalResearchService } from "../legal-research/legal-research.service.js";
 import { LegalMatrixBuilderService } from "../generation-pipeline/legal-matrix-builder.service.js";
 
 async function main() {
-  const brief: PieceBrief = {
+  const brief: any = {
     tipoPeca: "Petição Inicial",
     fatosRelevantes: ["O óbito ocorreu após a vigência da EC 41/2003."],
     tesesIdentificadas: [
@@ -30,7 +30,7 @@ async function main() {
       "direito adquirido", "Tema 396", "RE 603.580", "EC 47/2005"
     ],
     pedidosIdentificados: ["Concessão da paridade"],
-    _metadata: { inputTokens: 100, outputTokens: 100 }
+    // _metadata: { inputTokens: 100, outputTokens: 100 }
   };
 
   const isTrabalhista = false;
