@@ -1,0 +1,13 @@
+ input_tokens | data_json 
+--------------+-----------
+(0 rows)
+
+ tese_count | data_json 
+------------+-----------
+(0 rows)
+
+ input_tokens_gemini | output_tokens_gemini | input_tokens_gpt | output_tokens_gpt 
+---------------------+----------------------+------------------+-------------------
+                3982 |                 1591 |            55959 |               952
+(1 row)
+

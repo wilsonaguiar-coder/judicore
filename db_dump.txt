@@ -1,0 +1,6 @@
+
+ERRORS:
+bash: line 3: psql: command not found
+bash: line 4: psql: command not found
+bash: line 5: psql: command not found
+bash: line 6: psql: command not found

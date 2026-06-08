@@ -11,7 +11,7 @@ try:
     client.connect(hostname=host, username=user, password=password)
     sftp = client.open_sftp()
     
-    remote_path = "/etc/nginx/sites-available/judicore"
+    remote_path = "/etc/nginx/sites-enabled/judicore"
     local_path = "judicore_nginx.conf"
     
     # Download

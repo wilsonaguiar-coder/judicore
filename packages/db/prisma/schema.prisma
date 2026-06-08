@@ -413,8 +413,24 @@ model PieceGeneration {
   evaluatedAt        DateTime?             @map("evaluated_at")
 
   evaluation         PieceEvaluation?
+  snapshot           PieceGenerationSnapshot?
 
   @@map("piece_generations")
+}
+
+model PieceGenerationSnapshot {
+  id                  String   @id @default(cuid())
+  generationId        String   @unique @map("generation_id")
+  pieceBriefJson      Json     @map("piece_brief_json")
+  qualificationJson   Json     @map("qualification_json")
+  researchSummaryJson Json     @map("research_summary_json")
+  legalMatrixJson     Json     @map("legal_matrix_json")
+  promptSnapshotJson  Json     @map("prompt_snapshot_json")
+  createdAt           DateTime @default(now()) @map("created_at")
+
+  generation PieceGeneration @relation(fields: [generationId], references: [id], onDelete: Cascade)
+
+  @@map("piece_generation_snapshots")
 }
 
 model PieceEvaluation {
@@ -431,3 +447,4 @@ model PieceEvaluation {
 
   @@map("piece_evaluations")
 }
+

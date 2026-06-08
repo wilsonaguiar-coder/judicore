@@ -5,6 +5,7 @@ import { WriterService } from "./writer.service.js";
 import { DocumentExtractor } from "../document-processing/extractor.js";
 import { ContextReducer } from "../document-processing/reducer.js";
 import { QualificationExtractor } from "../document-processing/qualification-extractor.js";
+import { LegalMatrixBuilderService } from "./legal-matrix-builder.service.js";
 
 export interface GenerationInput {
   userId: string;
@@ -70,9 +71,12 @@ export class GenerationPipeline {
       const research = await LegalResearchService.executeResearch(brief.palavrasChave, userOrientation, isTrabalhista);
       const researchResultsCount = research.jurisprudenciaLocal.length + research.jurisprudenciaLexML.length + research.legislacaoLexML.length;
 
+      // 4.5. Legal Matrix Builder (Determinístico - Fase 12.5.2)
+      const legalMatrix = LegalMatrixBuilderService.buildMatrix(brief, research);
+
       // 5. Redação Final (Writer GPT-5.5)
       const t1 = Date.now();
-      const writerRes = await WriterService.generatePiece(pieceType, userOrientation, brief, research);
+      const writerRes = await WriterService.generatePiece(pieceType, userOrientation, brief, research, qualData, legalMatrix);
       const timeGptMs = Date.now() - t1;
 
       // 6. Atualizar BD com Sucesso
@@ -95,6 +99,31 @@ export class GenerationPipeline {
         }
       });
 
+      // 6.5. Salvar Snapshot de Observabilidade
+      await prisma.pieceGenerationSnapshot.create({
+        data: {
+          generationId: generation.id,
+          pieceBriefJson: brief as any,
+          qualificationJson: qualData as any,
+          researchSummaryJson: {
+            stfStjTotal: research.jurisprudenciaLocal.length,
+            lexmlJuriTotal: research.jurisprudenciaLexML.length,
+            lexmlLegisTotal: research.legislacaoLexML.length,
+            fontesSelecionadas: [
+              ...legalMatrix.teses.flatMap(t => t.jurisprudenciaAplicavel.map(j => j.fonte)),
+              ...legalMatrix.teses.flatMap(t => t.fundamentosLegais.map(l => l.fonte))
+            ]
+          },
+          legalMatrixJson: legalMatrix as any,
+          promptSnapshotJson: {
+            hash: "v12.5.2",
+            versao: "1.0",
+            tamanho: writerRes.inputTokens,
+            resumoInicial: writerRes.promptSnapshot
+          }
+        }
+      });
+
       // 7. Consumir Cota
       await QuotaService.consumePieceQuota(userId, generation.id);
 
@@ -114,3 +143,4 @@ export class GenerationPipeline {
     }
   }
 }
+
