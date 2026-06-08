@@ -2,6 +2,8 @@ import { NextResponse } from "next/server";
 import { GenerationPipeline } from "@judicore/ai";
 import { prisma } from "@judicore/db";
 
+export const dynamic = "force-dynamic";
+
 const USER_ID = "cmosstzkf00007w17jjo10cwo";
 
 const CASOS = [
