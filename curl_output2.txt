@@ -1,14 +1,18 @@
-HEAD is now at 5298d42  feat: legal matrix builder
-Updating 5298d42..65cd191
+HEAD is now at 65cd191  test: api route
+Updating 65cd191..a7001ff
 Fast-forward
- apps/web/src/app/api/test-beta/route.ts |  40 +++++++++++++
- run-beta-12-5-2-test.ts                 |   4 +-
- run_remote_test_12_5_2.py               |  42 +++++++++++++
- test_output_12_5_2.txt                  | 103 ++++++++++++++++++++++++++++++++
- 4 files changed, 187 insertions(+), 2 deletions(-)
- create mode 100644 apps/web/src/app/api/test-beta/route.ts
- create mode 100644 run_remote_test_12_5_2.py
- create mode 100644 test_output_12_5_2.txt
+ apps/web/src/app/api/test-beta/route.ts |   2 +-
+ curl_output.txt                         | 123 +++++++++++++++++++++++++++++++
+ curl_output2.txt                        | 124 ++++++++++++++++++++++++++++++++
+ get_user.py                             |  13 ++++
+ run_curl_test.py                        |  42 +++++++++++
+ run_curl_test_fix.py                    |  46 ++++++++++++
+ 6 files changed, 349 insertions(+), 1 deletion(-)
+ create mode 100644 curl_output.txt
+ create mode 100644 curl_output2.txt
+ create mode 100644 get_user.py
+ create mode 100644 run_curl_test.py
+ create mode 100644 run_curl_test_fix.py
 Prisma schema loaded from prisma/schema.prisma
 Datasource "db": PostgreSQL database "judicore", schema "public" at "localhost:5432"
 
@@ -18,7 +22,7 @@ Datasource "db": PostgreSQL database "judicore", schema "public" at "localhost:5
 No pending migrations to apply.
 Prisma schema loaded from prisma/schema.prisma
 
-✔ Generated Prisma Client (v5.22.0) to ./../../node_modules/.pnpm/@prisma+client@5.22.0_prisma@5.22.0/node_modules/@prisma/client in 171ms
+✔ Generated Prisma Client (v5.22.0) to ./../../node_modules/.pnpm/@prisma+client@5.22.0_prisma@5.22.0/node_modules/@prisma/client in 183ms
 
 Start by importing your Prisma Client (See: https://pris.ly/d/importing-client)
 
@@ -63,7 +67,7 @@ Route (app)                                                 Size     First Load 
 ├ ○ /api/review-studio/calibration                          0 B                0 B
 ├ ƒ /api/review-studio/feedback                             0 B                0 B
 ├ ƒ /api/review-studio/ingest                               0 B                0 B
-├ ƒ /api/test-beta                                          0 B                0 B
+├ ○ /api/test-beta                                          0 B                0 B
 ├ ○ /api/test-pdf                                           0 B                0 B
 ├ ○ /dashboard                                              18.3 kB         114 kB
 ├ ○ /dashboard/admin                                        5.66 kB         104 kB
@@ -110,15 +114,13 @@ Use --update-env to update environment variables
 ┌────┬────────────────────┬─────────────┬─────────┬─────────┬──────────┬────────┬──────┬───────────┬──────────┬──────────┬──────────┬──────────┐
 │ id │ name               │ namespace   │ version │ mode    │ pid      │ uptime │ ↺    │ status    │ cpu      │ mem      │ user     │ watching │
 ├────┼────────────────────┼─────────────┼─────────┼─────────┼──────────┼────────┼──────┼───────────┼──────────┼──────────┼──────────┼──────────┤
-│ 4  │ judicore-api       │ default     │ N/A     │ fork    │ 1606078  │ 24m    │ 199  │ online    │ 0%       │ 61.8mb   │ root     │ disabled │
-│ 3  │ judicore-search    │ default     │ N/A     │ fork    │ 1606175  │ 24m    │ 411  │ online    │ 0%       │ 2.7gb    │ root     │ disabled │
-│ 1  │ judicore-web       │ default     │ N/A     │ fork    │ 1616255  │ 0s     │ 258  │ online    │ 0%       │ 3.3mb    │ root     │ disabled │
+│ 4  │ judicore-api       │ default     │ N/A     │ fork    │ 1606078  │ 27m    │ 199  │ online    │ 0%       │ 61.8mb   │ root     │ disabled │
+│ 3  │ judicore-search    │ default     │ N/A     │ fork    │ 1606175  │ 27m    │ 411  │ online    │ 0%       │ 3.4gb    │ root     │ disabled │
+│ 1  │ judicore-web       │ default     │ N/A     │ fork    │ 1617835  │ 0s     │ 259  │ online    │ 0%       │ 1.9mb    │ root     │ disabled │
 └────┴────────────────────┴─────────────┴─────────┴─────────┴──────────┴────────┴──────┴───────────┴──────────┴──────────┴──────────┴──────────┘
-{"success":false,"error":"Usuário não encontrado"}
+{"success":true,"draft":"EXCELENTÍSSIMO SENHOR DOUTOR JUIZ FEDERAL DA ___ VARA FEDERAL DA SEÇÃO JUDICIÁRIA DO DISTRITO FEDERAL\n\nJOÃO DA SILVA, brasileiro, casado, portador do CPF nº 123.456.789-00, residente e domiciliado na Rua das Flores, 123, Brasília, DF, CEP 70000-000, por seu advogado que esta subscreve, instrumento de mandato anexo, vem, respeitosamente, à presença de Vossa Excelência, propor\n\n**AÇÃO ORDINÁRIA DE REVISÃO DE PENSÃO POR MORTE**\n\nem face da UNIÃO FEDERAL, pessoa jurídica de direito público interno, a ser citada por meio de sua Advocacia-Geral da União, pelos motivos de fato e de direito a seguir expostos:\n\n### I. DOS FATOS\n\nO autor é viúvo de Maria da Silva, ex-servidora pública federal, falecida em 2005, após a Emenda Constitucional nº 41/2003. A servidora já havia preenchido todos os requisitos para aposentadoria com paridade antes da referida emenda, conforme será demonstrado ao longo do processo. Após o falecimento de sua esposa, o autor passou a receber pensão por morte, contudo, a administração pública negou o direito à paridade dos reajustes salariais, não estendendo ao autor os aumentos concedidos aos servidores da ativa.\n\n### II. DO DIREITO\n\n#### A. Tese Principal: Direito Adquirido à Paridade\n\nA Constituição Federal, em seu art. 40, § 7º, com redação dada pela EC 41/2003, prevê que o benefício de pensão por morte deverá ser equivalente ao valor da totalidade dos proventos do servidor falecido até o limite estabelecido para os benefícios do regime geral de previdência social. No entanto, o Supremo Tribunal Federal, no RE 603.580 (Tema 396 de Repercussão Geral), consolidou o entendimento de que os pensionistas de servidores que já haviam preenchido os requisitos para aposentadoria com paridade antes da EC 41/2003 possuem direito adquirido à paridade.\n\n#### B. Aplicação ao Caso Concreto\n\nNo presente caso, Maria da Silva já havia preenchido todos os requisitos para aposentadoria com paridade antes da promulgação da EC 41/2003. Portanto, o autor possui direito adquirido à paridade de sua pensão com os reajustes concedidos aos servidores da ativa, conforme o cargo que a instituidora ocupava.\n\n### III. DOS PEDIDOS\n\nDiante do exposto, requer-se:\n\na) A concessão da gratuidade de justiça, conforme declaração de hipossuficiência anexa;\nb) A citação da União Federal para, querendo, contestar a presente ação;\nc) A declaração do direito do autor à paridade de sua pensão por morte com a remuneração dos servidores da ativa ocupantes do mesmo cargo que a instituidora;\nd) A condenação da ré a revisar o valor da pensão, aplicando todos os reajustes concedidos aos servidores da ativa desde a data do óbito;\ne) A condenação da ré ao pagamento das diferenças retroativas, respeitada a prescrição quinquenal, acrescidas de juros e correção monetária;\nf) A condenação da ré ao pagamento de custas processuais e honorários advocatícios.\n\n### IV. DAS PROVAS\n\nPretende-se provar o alegado por todos os meios de prova em direito admitidos, especialmente documental, testemunhal e pericial.\n\nNestes termos, pede deferimento.\n\nBrasília, [data].\n\n[assinatura do advogado]\n[nome do advogado]\nOAB/DF [número da OAB]","generationId":"cmq4k97l200004dgim2t4j3lo","snapshot":null,"gen":{"id":"cmq4k97l200004dgim2t4j3lo","userId":"cmosstzkf00007w17jjo10cwo","pieceType":"Petição Inicial","userOrientation":"peticionar pela procedência de pedido de paridade de pensão de ex-servidora federal, falecida após a ec 41/2003. O autor é João da Silva, marido da falecida Maria da Silva. CPF 123.456.789-00, residente na Rua das Flores, 123, Brasília, DF, CEP 70000-000.","status":"COMPLETED","inputTokensGemini":568,"outputTokensGemini":1755,"inputTokensGpt":2434,"outputTokensGpt":947,"processingTimeMs":36002,"timeGeminiMs":11,"timeLanceDbMs":5510,"timeLexMlMs":1521,"timeGptMs":28934,"researchResultsCount":0,"errorMessage":null,"generatedText":"EXCELENTÍSSIMO SENHOR DOUTOR JUIZ FEDERAL DA ___ VARA FEDERAL DA SEÇÃO JUDICIÁRIA DO DISTRITO FEDERAL\n\nJOÃO DA SILVA, brasileiro, casado, portador do CPF nº 123.456.789-00, residente e domiciliado na Rua das Flores, 123, Brasília, DF, CEP 70000-000, por seu advogado que esta subscreve, instrumento de mandato anexo, vem, respeitosamente, à presença de Vossa Excelência, propor\n\n**AÇÃO ORDINÁRIA DE REVISÃO DE PENSÃO POR MORTE**\n\nem face da UNIÃO FEDERAL, pessoa jurídica de direito público interno, a ser citada por meio de sua Advocacia-Geral da União, pelos motivos de fato e de direito a seguir expostos:\n\n### I. DOS FATOS\n\nO autor é viúvo de Maria da Silva, ex-servidora pública federal, falecida em 2005, após a Emenda Constitucional nº 41/2003. A servidora já havia preenchido todos os requisitos para aposentadoria com paridade antes da referida emenda, conforme será demonstrado ao longo do processo. Após o falecimento de sua esposa, o autor passou a receber pensão por morte, contudo, a administração pública negou o direito à paridade dos reajustes salariais, não estendendo ao autor os aumentos concedidos aos servidores da ativa.\n\n### II. DO DIREITO\n\n#### A. Tese Principal: Direito Adquirido à Paridade\n\nA Constituição Federal, em seu art. 40, § 7º, com redação dada pela EC 41/2003, prevê que o benefício de pensão por morte deverá ser equivalente ao valor da totalidade dos proventos do servidor falecido até o limite estabelecido para os benefícios do regime geral de previdência social. No entanto, o Supremo Tribunal Federal, no RE 603.580 (Tema 396 de Repercussão Geral), consolidou o entendimento de que os pensionistas de servidores que já haviam preenchido os requisitos para aposentadoria com paridade antes da EC 41/2003 possuem direito adquirido à paridade.\n\n#### B. Aplicação ao Caso Concreto\n\nNo presente caso, Maria da Silva já havia preenchido todos os requisitos para aposentadoria com paridade antes da promulgação da EC 41/2003. Portanto, o autor possui direito adquirido à paridade de sua pensão com os reajustes concedidos aos servidores da ativa, conforme o cargo que a instituidora ocupava.\n\n### III. DOS PEDIDOS\n\nDiante do exposto, requer-se:\n\na) A concessão da gratuidade de justiça, conforme declaração de hipossuficiência anexa;\nb) A citação da União Federal para, querendo, contestar a presente ação;\nc) A declaração do direito do autor à paridade de sua pensão por morte com a remuneração dos servidores da ativa ocupantes do mesmo cargo que a instituidora;\nd) A condenação da ré a revisar o valor da pensão, aplicando todos os reajustes concedidos aos servidores da ativa desde a data do óbito;\ne) A condenação da ré ao pagamento das diferenças retroativas, respeitada a prescrição quinquenal, acrescidas de juros e correção monetária;\nf) A condenação da ré ao pagamento de custas processuais e honorários advocatícios.\n\n### IV. DAS PROVAS\n\nPretende-se provar o alegado por todos os meios de prova em direito admitidos, especialmente documental, testemunhal e pericial.\n\nNestes termos, pede deferimento.\n\nBrasília, [data].\n\n[assinatura do advogado]\n[nome do advogado]\nOAB/DF [número da OAB]","createdAt":"2026-06-08T01:57:17.606Z","completedAt":"2026-06-08T01:57:53.588Z","viewedAt":null,"evaluatedAt":null}}
 ERRORS:
 From https://github.com/wilsonaguiar-coder/judicore
  * branch            main       -> FETCH_HEAD
- ⚠ Sending SIGTERM signal to Next.js build worker due to timeout of 60 seconds. Subsequent errors may be a result of the worker exiting.
- ⨯ Next.js build worker exited with code: null and signal: SIGTERM
- ⚠ Restarted static page generation for /api/test-beta because it took more than 60 seconds
- ⚠ See more info here https://nextjs.org/docs/messages/static-page-generation-timeout
+   65cd191..a7001ff  main       -> origin/main
+[LanceDB Search Error] Headers Timeout Error
