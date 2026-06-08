@@ -33,7 +33,7 @@ export class WriterService {
     );
 
     const response = await client.chat.completions.create({
-      model: "gpt-4-turbo", // Simulação do GPT-5.5 no MVP
+      model: "gpt-4o", // Modelo mais moderno e inteligente da OpenAI atual
       messages: [
         { role: "system", content: systemPrompt },
         { role: "user", content: "Redija a peça final completa agora, seguindo estritamente a Legal Matrix e a Estrutura Argumentativa Obrigatória." }
