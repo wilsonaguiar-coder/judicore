@@ -448,3 +448,17 @@ model PieceEvaluation {
   @@map("piece_evaluations")
 }
 
+model LegisDevice {
+  id           String   @id @default(cuid())
+  normaNome    String   @map("norma_nome")
+  dispositivo  String
+  texto        String   @db.Text
+  urnLexml     String?  @map("urn_lexml")
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
+
+  @@unique([normaNome, dispositivo])
+  @@index([normaNome])
+  @@map("legis_devices")
+}
+
