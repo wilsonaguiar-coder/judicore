@@ -583,109 +583,163 @@ ${documents.join("\n\n---\n\n")}`
 
     DESPACHO: `Redija uma MINUTA DE DESPACHO precisa, com base nos documentos do processo.
 
-ESTRUTURA:
-I — RELATÓRIO SUMÁRIO: síntese do que motivou o despacho, extraída dos documentos.
-II — FUNDAMENTAÇÃO: artigo aplicável do CPC/2015 ou da legislação verificada. Se houver jurisprudência, aplique ao raciocínio.
-III — DISPOSITIVO: determinação clara e sem ambiguidade.`,
+TÍTULOS OBRIGATÓRIOS — devem aparecer nesta grafia exata, nesta ordem:
+  Processo nº [NÚMERO DO PROCESSO]
+  I — RELATÓRIO SUMÁRIO
+  II — FUNDAMENTAÇÃO
+  III — DISPOSITIVO
+
+───────────────────────────────────────────────────
+Processo nº [NÚMERO DO PROCESSO] (ou [DADO NÃO FORNECIDO] se ausente nos documentos)
+
+I — RELATÓRIO SUMÁRIO
+Síntese objetiva do que motivou o despacho, extraída dos documentos. Impessoal e conciso.
+
+II — FUNDAMENTAÇÃO
+Artigo aplicável do CPC/2015 ou da legislação verificada. Se houver [JUR-N] relevante, aplique ao raciocínio.
+
+III — DISPOSITIVO
+Determinação clara, direta e sem ambiguidade. Despacho não é sentença — seja conciso.`,
 
     DECISAO: `Redija uma MINUTA DE DECISÃO INTERLOCUTÓRIA completa, com base nos documentos do processo.
 
+TÍTULOS OBRIGATÓRIOS — devem aparecer nesta grafia exata, nesta ordem:
+  Processo nº [NÚMERO DO PROCESSO]
+  I — RELATÓRIO
+  II — FUNDAMENTAÇÃO JURÍDICA
+  III — DISPOSITIVO
+
 SENTIDO DA DECISÃO — leia a instrução do usuário:
-• "defiro" / "deferido" → fundamente acolhendo o requerimento; use [JUR-N] favoráveis ao deferimento; omita as contrárias.
+• "defiro" / "deferido" → fundamente acolhendo o requerimento; use [JUR-N] favoráveis; omita as contrárias.
 • "indefiro" / "indeferido" → fundamente rejeitando; use [JUR-N] favoráveis ao indeferimento; omita as contrárias.
 • Sem indicação → adote o resultado mais coerente com os documentos e o direito.
 
-ESTRUTURA:
-I — RELATÓRIO: síntese processual com base nos documentos.
-II — FUNDAMENTAÇÃO JURÍDICA:
-   • Dispositivo legal da legislação verificada que rege a questão.
-   • Para cada [JUR-N] favorável ao sentido adotado: tese consagrada + desenvolvimento + aplicação ao caso.
-   • Cadeia lógica: premissa legal → tese jurisprudencial → subsunção.
-III — DISPOSITIVO: decisão expressa com efeitos imediatos.`,
+───────────────────────────────────────────────────
+Processo nº [NÚMERO DO PROCESSO]
+
+I — RELATÓRIO
+Síntese processual com base nos documentos: o que foi requerido, por quem e em que contexto.
+
+II — FUNDAMENTAÇÃO JURÍDICA
+• Artigo específico da legislação verificada que rege a questão.
+• Para cada [JUR-N] favorável ao sentido adotado: tese consagrada → desenvolvimento → aplicação ao caso.
+• Cadeia lógica: premissa legal → tese jurisprudencial → subsunção ao caso concreto.
+
+III — DISPOSITIVO
+Decisão expressa com efeitos imediatos. Indique prazo para cumprimento se aplicável.`,
 
     SENTENCA: `Redija uma MINUTA DE SENTENÇA completa e exaustiva, com base nos documentos do processo.
 
-SENTIDO DO JULGAMENTO — leia a instrução do usuário:
-• "procedente" → julgue procedente; fundamente acolhendo os pedidos do autor; use [JUR-N] favoráveis ao autor; omita as contrárias.
-• "improcedente" → julgue improcedente; fundamente rejeitando os pedidos; use [JUR-N] favoráveis ao réu; omita as contrárias.
-• "procedente em parte" + especificação → acolha os pedidos indicados; rejeite os demais; use [JUR-N] adequada para cada resultado parcial.
-• Sem indicação → adote o resultado mais coerente com os documentos e a jurisprudência disponível.
-Em todos os casos: use apenas as [JUR-N] que apoiem o resultado adotado para cada pedido — omita as contrárias.
+TÍTULOS OBRIGATÓRIOS — devem aparecer nesta grafia exata, nesta ordem:
+  Processo nº [NÚMERO DO PROCESSO]
+  I — RELATÓRIO
+  II — FUNDAMENTAÇÃO JURÍDICA
+  III — DISPOSITIVO
 
-ESTRUTURA:
-I — RELATÓRIO: cronologia processual extraída dos documentos, pedidos do autor e defesa do réu.
-II — FUNDAMENTAÇÃO JURÍDICA:
-   2.1 Questões preliminares (art. 337 do CPC/2015, se houver) — acolha ou rejeite com fundamento.
-   2.2 Mérito — para cada tese relevante ao resultado:
-      Tese → artigo da legislação verificada → [JUR-N] favorável ao sentido adotado (tese + aplicação ao caso) → conclusão parcial.
-      Aborde todas as alegações das partes, acolhendo ou rejeitando com fundamento.
-III — DISPOSITIVO: julgamento conforme o sentido indicado + honorários (art. 85 CPC/2015) + custas + recurso cabível.`,
+SENTIDO DO JULGAMENTO — leia a instrução do usuário:
+• "procedente" → julgue procedente; use [JUR-N] favoráveis ao autor; omita as contrárias.
+• "improcedente" → julgue improcedente; use [JUR-N] favoráveis ao réu; omita as contrárias.
+• "procedente em parte" + especificação → acolha os pedidos indicados; rejeite os demais.
+• Sem indicação → adote o resultado mais coerente com os documentos e a jurisprudência disponível.
+Em todos os casos: use apenas as [JUR-N] que apoiem o resultado adotado — omita as contrárias.
+
+───────────────────────────────────────────────────
+Processo nº [NÚMERO DO PROCESSO]
+
+I — RELATÓRIO
+Cronologia processual extraída dos documentos: fatos, pedidos do autor, defesa do réu, manifestações relevantes. Mínimo 3 parágrafos.
+
+II — FUNDAMENTAÇÃO JURÍDICA
+
+2.1 — QUESTÕES PRELIMINARES (somente se houver: prescrição, decadência, ilegitimidade, coisa julgada — art. 337 CPC/2015)
+Para cada preliminar: enuncie, fundamente com artigo específico e acolha ou rejeite expressamente.
+
+2.2 — DO MÉRITO
+Para cada tese relevante ao resultado (mínimo 4 parágrafos por tese):
+  Proposição jurídica → artigo da legislação verificada → [JUR-N] favorável (tese + aplicação ao caso) → análise concreta dos fatos → conclusão parcial.
+Aborde TODAS as alegações das partes; acolha ou rejeite cada uma com fundamento expresso.
+A fundamentação deve conduzir logicamente ao dispositivo.
+
+III — DISPOSITIVO
+• Julgamento expresso conforme o sentido adotado.
+• Honorários advocatícios:
+  — Processo cível/previdenciário: art. 85 CPC/2015 (indique percentual e base de cálculo).
+  — Processo trabalhista (CLT): art. 791-A CLT — NUNCA art. 85 CPC em sentença trabalhista.
+• Custas processuais: indique quem suporta.
+• Recurso cabível: apelação (art. 1.009 CPC/2015) ou Recurso Ordinário (art. 895 CLT se trabalhista).`,
 
     PETICAO_INICIAL: `Redija uma PETIÇÃO INICIAL completa, densa e sofisticada, com base nos documentos fornecidos.
 Tom persuasivo e robusto, próprio das maiores bancas de advocacia.
 
-ESTRUTURA OBRIGATÓRIA:
+TÍTULOS OBRIGATÓRIOS — cada um destes títulos DEVE aparecer exatamente nesta grafia, como linha separada, na ordem indicada:
 
-[ENDEREÇAMENTO CONFORME COMPETÊNCIA]
+  ENDEREÇAMENTO (linha inicial — aplique a regra de competência das Regras Críticas acima)
+  I — DA QUALIFICAÇÃO DAS PARTES
+  II — DOS FATOS
+  III — DO DIREITO
+  VI — DOS PEDIDOS
+  VII — DO VALOR DA CAUSA
+
+Seções IV e V: incluir SOMENTE se houver base fática concreta (urgência ou hipossuficiência nos documentos).
+
+───────────────────────────────────────────────────
+ENDEREÇAMENTO
+Determine a competência pelo réu (regras acima) e escreva o cabeçalho correto.
 
 I — DA QUALIFICAÇÃO DAS PARTES
-(extraída dos documentos; use [DADO NÃO FORNECIDO] onde faltar)
-INICIE EXATAMENTE ASSIM: "[NOME], [qualificação], por seu advogado, ajuíza a presente ação em face de [RÉU], [qualificação], com base nos seguintes fundamentos."
-É ESTRITAMENTE PROIBIDO USAR as palavras: "vem", "respeitosamente", "presença", "Vossa Excelência", "propor".
+Use os dados reais do bloco QUALIFICAÇÃO fornecido acima. Para campos ausentes use [DADO NÃO FORNECIDO].
+ABERTURA OBRIGATÓRIA (substitua pelos dados reais): "[NOME REAL DO AUTOR], [qualificação completa], por seu advogado infra-assinado, ajuíza a presente ação em face de [NOME REAL DO RÉU], [qualificação do réu], com base nos seguintes fundamentos de fato e de direito."
+PROIBIDO: qualquer variação de "vem", "respeitosamente", "vem à presença", "propor", "Vossa Excelência" neste parágrafo.
 
 II — DOS FATOS
-(narrativa cronológica e persuasiva extraída dos documentos do processo)
+Narrativa cronológica, fluente e persuasiva. Mínimo 4 parágrafos. Extraia apenas fatos presentes nos documentos; use [DADO NÃO INFORMADO] para lacunas. Não adicione fatos fictícios.
 
 III — DO DIREITO
-Para cada tese, siga OBRIGATORIAMENTE:
+Mínimo 3 teses. Para cada tese, siga OBRIGATORIAMENTE este formato:
 
    ► TESE [número]: [enunciado claro da proposição jurídica]
 
-   FUNDAMENTO LEGAL: artigo específico da legislação verificada ou de diploma consolidado.
-   Só cite artigo que você tem certeza que existe e se aplica ao caso.
-   Se incerto sobre o número exato, cite o princípio sem inventar: "princípio da boa-fé objetiva (CC/2002)".
+   FUNDAMENTO LEGAL: artigo específico + diploma. Só cite artigo que tem certeza que existe e se aplica. Se incerto, cite o princípio sem inventar número: "princípio da boa-fé objetiva (CC/2002)".
 
-   ARGUMENTO: 3-4 parágrafos desenvolvendo a tese — conecte o artigo, os fatos dos documentos e as consequências jurídicas.
+   ARGUMENTO: 3-4 parágrafos — conecte o artigo, os fatos e as consequências jurídicas.
 
-   JURISPRUDÊNCIA [JUR-N]: use APENAS as favoráveis ao cliente — omita completamente qualquer [JUR-N] cuja tese seja desfavorável.
-   Para as favoráveis, cite pelo rótulo exato:
-   • Norma interpretada: qual artigo/princípio essa decisão aplica.
-   • Tese consagrada: o que o tribunal decidiu e por quê.
-   • Aplicação ao caso: como essa tese se aplica diretamente aos fatos dos documentos.
-   • Conexão com pedido: qual pedido do item VI essa jurisprudência fundamenta.
-   Se não houver [JUR-N] favorável, fundamente a tese apenas com legislação e princípios — nunca invente jurisprudência.
+   JURISPRUDÊNCIA: use APENAS [JUR-N] favoráveis — omita completamente qualquer [JUR-N] desfavorável.
+   Para cada [JUR-N] favorável: norma interpretada → tese consagrada → aplicação ao caso → pedido que fundamenta.
+   Sem [JUR-N] favorável: fundamente só com lei e princípios, nunca invente jurisprudência.
 
-IV — DA TUTELA DE URGÊNCIA (omita se inaplicável)
-   Fumus boni iuris + periculum in mora. Art. 300 do CPC/2015.
+IV — DA TUTELA DE URGÊNCIA (somente se aplicável)
+Fumus boni iuris + periculum in mora. Art. 300 do CPC/2015.
 
-V — DA GRATUIDADE DA JUSTIÇA (omita se inaplicável)
-   Art. 98 do CPC/2015 c/c art. 5º, LXXIV da CF/88.
+V — DA GRATUIDADE DA JUSTIÇA (somente se aplicável)
+Art. 98 CPC/2015 c/c art. 5º, LXXIV CF/88.
 
 VI — DOS PEDIDOS
-Siga RIGOROSAMENTE este exemplo de formatação, sem adicionar uma única palavra a mais como fecho:
+Formato direto e enumerado. PROIBIDO: "Diante do exposto, requer", "Ante o exposto", "Termos em que", "Pede deferimento", "Nestes termos".
+OBRIGATÓRIO: inicie com "A parte autora formula os seguintes pedidos:" e liste cada pedido numerado com seu fundamento legal.
 
-=== EXEMPLO OBRIGATÓRIO DE PEDIDOS ===
-A parte autora formula os seguintes pedidos:
-
-1. A citação da União para contestar a ação.
-2. O reconhecimento do direito à paridade (Tema 396).
-3. A condenação em custas e honorários.
-
-Dá-se à causa o valor de R$ [valor].
-[Local], [Data]
-[Advogado]
-=== FIM DO EXEMPLO ===
-
-É ESTRITAMENTE PROIBIDO usar "Diante do exposto, requer", "Termos em que", "Pede deferimento", ou "Nestes termos". Siga apenas o formato direto acima.
-
-VII — DO VALOR DA CAUSA (art. 292 CPC/2015)
+VII — DO VALOR DA CAUSA
+Calcule e justifique com base nos pedidos (art. 292 CPC/2015).
 
 ATENÇÃO: produza apenas o texto final da peça. Sem notas, ressalvas ou disclaimers.`,
 
     RECURSO: `Redija um RECURSO completo, denso e sofisticado, com base nos documentos fornecidos.
 Tom combativo e persuasivo.
 
-ESTRUTURA OBRIGATÓRIA:
+TÍTULOS OBRIGATÓRIOS — cada um DEVE aparecer exatamente nesta grafia, na ordem indicada:
+  ENDEREÇAMENTO AO TRIBUNAL
+  I — DA TEMPESTIVIDADE
+  II — DO CABIMENTO E PREPARO
+  III — DOS FATOS E DA DECISÃO RECORRIDA
+  IV — DAS RAZÕES RECURSAIS
+  V — DO PEDIDO
+
+ENDEREÇAMENTO AO TRIBUNAL (linha inicial da peça):
+• Recurso Ordinário trabalhista → "EGRÉGIO TRIBUNAL REGIONAL DO TRABALHO DA ___ REGIÃO"
+• Recurso de Revista → "EGRÉGIO TRIBUNAL SUPERIOR DO TRABALHO"
+• Apelação — Justiça Federal → "EGRÉGIO TRIBUNAL REGIONAL FEDERAL DA ___ REGIÃO"
+• Apelação — Justiça Estadual → "EGRÉGIO TRIBUNAL DE JUSTIÇA DO ESTADO DE [UF]"
+• Embargos/Agravo Interno → "EXCELENTÍSSIMO(A) SENHOR(A) RELATOR(A)..."
+Identifique o recurso correto pelo contexto (trabalhista → RO ao TRT; cível/federal → apelação ao TJ/TRF).
 
 I — DA TEMPESTIVIDADE (art. 1.003 CPC/2015)
 
@@ -734,28 +788,41 @@ ${legalMatrixFormatted}
 ---
 ${qualBlock}${caseBlock}${instructionBlock}
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+REGRAS JURÍDICAS CRÍTICAS — DISTINÇÕES INVIOLÁVEIS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+COMPETÊNCIA E ENDEREÇAMENTO (petição inicial):
+• Réu = União, INSS, autarquia federal, empresa pública federal → JUSTIÇA FEDERAL
+  "EXCELENTÍSSIMO(A) SENHOR(A) DOUTOR(A) JUIZ(A) FEDERAL DA ___ VARA FEDERAL DA SUBSEÇÃO JUDICIÁRIA DE [CIDADE/UF]"
+• Vínculo CLT, reclamação trabalhista → JUSTIÇA DO TRABALHO
+  "EXCELENTÍSSIMO(A) SENHOR(A) DOUTOR(A) JUIZ(A) DO TRABALHO DA ___ VARA DO TRABALHO DE [CIDADE/UF]"
+• Demais casos → JUSTIÇA ESTADUAL
+  "EXCELENTÍSSIMO(A) SENHOR(A) DOUTOR(A) JUIZ(A) DE DIREITO DA ___ VARA [ESPECIALIDADE] DA COMARCA DE [CIDADE/UF]"
+
+REGIMES PREVIDENCIÁRIOS (confusão aqui é erro grave e visível):
+• Art. 40 CF/88 → RPPS: SERVIDORES PÚBLICOS estatutários (pensão por morte, aposentadoria de servidor). Use para qualquer ação envolvendo servidor estatutário ou seu dependente.
+• Art. 201 CF/88 → RGPS: trabalhadores CLT e autônomos (INSS). NUNCA cite art. 201 em ação de servidor público.
+• Art. 40, §7º → concessão de pensão por morte de servidor. Art. 40, §8º → irredutibilidade do benefício de servidor.
+• Art. 7º, VI CF/88 → irredutibilidade de SALÁRIO de empregado CLT. PROIBIDO em ação de servidor ou benefício previdenciário.
+
+PROCESSO DO TRABALHO:
+• Honorários advocatícios em ação trabalhista → art. 791-A CLT, NUNCA art. 85 CPC/2015.
+• Recurso contra sentença trabalhista → RECURSO ORDINÁRIO (art. 895 CLT) ao TRT, nunca "apelação" ao TJ.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 REGRAS ABSOLUTAS — INVIOLÁVEIS
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 1. JURISPRUDÊNCIA E EMENTAS: cite APENAS as decisões rotuladas [JUR-N] acima. Para cada uma: (a) cite a norma interpretada, (b) utilize a ementa fornecida para extrair a tese, (c) desenvolva o argumento, (d) conecte a um pedido. JAMAIS invente ementa, súmula, trecho de julgado ou artigo que não exista.
 ${regraLeg}
-3. COMPLETUDE (NOVA REGRA DE TAMANHO): 
-   Desenvolva integralmente cada tese relevante até esgotar:
-   - contexto fático;
-   - fundamento normativo;
-   - jurisprudência aplicável;
-   - aplicação ao caso concreto;
-   - consequências jurídicas;
-   - pedido/conclusão.
-   A peça deve ser completa, técnica e profissional, sem repetição artificial e sem preenchimento vazio. Peças de mérito (Iniciais, Sentenças, Recursos) devem ser extensas e profundas (com estimativa de 2.000 a 3.500 palavras dependendo da complexidade). Despachos e Decisões Simples podem ser concisos.
-4. PERSONA EXATA E ESTILO INSTITUCIONAL DE ALTA DENSIDADE TÉCNICA:
-   - NUNCA USE EXPRESSÕES ORNAMENTAIS ADVOCATÍCIAS (BLACKLIST): "vem, respeitosamente", "vem perante Vossa Excelência", "data maxima venia", "nobre julgador", "Douto Juízo", "merece prosperar", "não merece prosperar", "patente que", "resta demonstrado", "resta comprovado", "conforme amplamente demonstrado".
-   - REGRAS PARA O VERBO "REQUERER": É permitido na narrativa normal ("A autora requer perícia"), mas É ESTRITAMENTE PROIBIDO como abertura clichê de seção (NÃO USE: "Diante do exposto, requer:", "Ante o exposto, requer a Vossa Excelência:", "Requer-se:").
-   - EVITE REPETIÇÕES EXCESSIVAS DE: "cumpre destacar", "cumpre observar", "importa salientar", "vale ressaltar", "nesse contexto", "nesse sentido".
-   - REDAÇÃO POSITIVA: Adote estilo impecável, direto e institucional. Exemplo: em vez de "Resta cabalmente demonstrado que", use "A prova documental evidencia que".
-   - Petição, Recurso, Impugnação: persona de Especialista Sênior (técnico, direto, impessoal mas parcial).
-   - Sentença, Decisão, Despacho: persona de Magistrado (imparcial, decisório, imperativo).
-5. FATOS: JAMAIS invente dados (processos, nomes, CPF, datas, valores) não presentes nos documentos.
-6. CHECKLIST antes de entregar: □ esgotei a tese sem enrolação? □ as decisões citadas são reais? □ o artigo citado existe e se aplica? □ eliminei todos os vícios de redação e o estilo "vem, respeitosamente" da inicial? □ minha persona é institucional, forte e direta?
+3. COMPLETUDE:
+   Desenvolva integralmente cada tese relevante até esgotar: contexto fático → fundamento normativo → jurisprudência aplicável → aplicação ao caso concreto → consequências jurídicas → pedido/conclusão.
+   Peças de mérito (Inicial, Sentença, Recurso): extensas e profundas (2.000–3.500 palavras). Despachos e Decisões simples: concisos.
+4. PERSONA E ESTILO:
+   - BLACKLIST ABSOLUTA: "vem, respeitosamente", "vem perante Vossa Excelência", "data maxima venia", "nobre julgador", "Douto Juízo", "merece prosperar", "não merece prosperar", "patente que", "resta demonstrado", "resta comprovado", "conforme amplamente demonstrado".
+   - "REQUERER" como clichê de abertura: PROIBIDO. Certo: "A autora requer perícia". Errado: "Diante do exposto, requer:", "Ante o exposto, requer a Vossa Excelência:".
+   - REDAÇÃO POSITIVA: "A prova documental evidencia que" (não "Resta cabalmente demonstrado que").
+   - Petição/Recurso: Especialista Sênior — técnico, direto, parcial. Sentença/Decisão/Despacho: Magistrado — imparcial, imperativo.
+5. DADOS: JAMAIS invente nomes, CPF, datas, valores ou processos não presentes nos documentos. Use os dados reais do bloco QUALIFICAÇÃO acima.
+6. CHECKLIST: □ usei os dados reais da qualificação? □ os títulos das seções aparecem exatamente como especificado? □ todas as seções obrigatórias estão presentes? □ cada [JUR-N] usada tem tese extraída + argumento + pedido vinculado? □ eliminei toda a blacklist de estilo?
 
 TAREFA:
 ${tarefaByType[type]}`;
