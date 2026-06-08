@@ -2,7 +2,7 @@
 
 import { useState, useRef } from "react";
 import { useRouter } from "next/navigation";
-import { ArrowLeft, UploadCloud, X, File as FileIcon, FileText, Info, AlertCircle } from "lucide-react";
+import { ArrowLeft, UploadCloud, X, File as FileIcon, FileText, Info, AlertCircle, Copy, Download, Check } from "lucide-react";
 import { useAuthStore } from "@/store/auth";
 import { PieceEvaluationForm } from "./piece-evaluation-form";
 
@@ -38,6 +38,25 @@ export function PieceCreationForm({ title, description, auxiliaryText }: PieceCr
   const [orientation, setOrientation] = useState("");
   const [showToast, setShowToast] = useState(false);
   const [showBlockToast, setShowBlockToast] = useState(false);
+  const [copied, setCopied] = useState(false);
+
+  const handleCopy = () => {
+    if (!generatedDraft) return;
+    navigator.clipboard.writeText(generatedDraft);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
+
+  const handleDownload = () => {
+    if (!generatedDraft) return;
+    const blob = new Blob([generatedDraft], { type: "text/plain;charset=utf-8" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `${title.replace(/\s+/g, "_").toLowerCase()}_rascunho.txt`;
+    a.click();
+    URL.revokeObjectURL(url);
+  };
 
   const quotaUsed = user?.piecesUsedCurrentCycle ?? 23;
   const quotaTotal = user?.monthlyPieceLimit ?? 50;
@@ -132,18 +151,42 @@ export function PieceCreationForm({ title, description, auxiliaryText }: PieceCr
 
   if (generatedDraft) {
     return (
-      <div className="flex flex-col flex-1 h-full max-w-4xl mx-auto w-full pb-20 relative animate-in fade-in zoom-in-95 duration-300">
-        <div className="flex items-center mb-6">
-          <button onClick={() => setGeneratedDraft(null)} className="flex items-center text-slate-400 hover:text-white transition-colors mr-4">
-            <ArrowLeft className="w-5 h-5 mr-1" />
-            Voltar
-          </button>
-          <h2 className="text-2xl font-bold text-white flex-1">{title} (Rascunho)</h2>
+      <div className="flex flex-col flex-1 h-full max-w-6xl mx-auto w-full pb-20 relative animate-in fade-in zoom-in-95 duration-300">
+        <div className="flex items-center mb-6 justify-between">
+          <div className="flex items-center">
+            <button onClick={() => setGeneratedDraft(null)} className="flex items-center text-slate-400 hover:text-white transition-colors mr-4">
+              <ArrowLeft className="w-5 h-5 mr-1" />
+              Voltar
+            </button>
+            <h2 className="text-2xl font-bold text-white">{title} (Rascunho)</h2>
+          </div>
+          <div className="flex items-center gap-3">
+            <button 
+              onClick={handleCopy}
+              className="flex items-center px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded-lg text-sm font-medium transition-colors"
+            >
+              {copied ? <Check className="w-4 h-4 mr-2 text-green-400" /> : <Copy className="w-4 h-4 mr-2" />}
+              {copied ? "Copiado!" : "Copiar"}
+            </button>
+            <button 
+              onClick={handleDownload}
+              className="flex items-center px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg text-sm font-medium transition-colors"
+            >
+              <Download className="w-4 h-4 mr-2" />
+              Baixar (.txt)
+            </button>
+          </div>
         </div>
-        <div className="bg-slate-900/50 backdrop-blur-xl border border-slate-800 rounded-2xl p-8 overflow-y-auto max-h-[60vh] mb-4">
-          <pre className="text-slate-300 whitespace-pre-wrap font-sans text-sm leading-relaxed">{generatedDraft}</pre>
+
+        <div className="flex flex-col xl:flex-row gap-6 items-start w-full">
+          <div className="flex-1 w-full bg-slate-900/50 backdrop-blur-xl border border-slate-800 rounded-2xl p-6 overflow-y-auto max-h-[75vh] shadow-xl">
+            <pre className="text-slate-300 whitespace-pre-wrap font-sans text-base leading-relaxed">{generatedDraft}</pre>
+          </div>
+          
+          <div className="w-full xl:w-[400px] shrink-0 xl:-mt-6">
+            {generationId && <PieceEvaluationForm generationId={generationId} />}
+          </div>
         </div>
-        {generationId && <PieceEvaluationForm generationId={generationId} />}
       </div>
     );
   }
