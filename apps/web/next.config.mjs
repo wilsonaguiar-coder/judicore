@@ -1,5 +1,6 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  serverExternalPackages: ['pdf-parse', 'mammoth', 'adm-zip'],
   async rewrites() {
     return {
       // fallback: only applied when no App Router/Pages route matches the path.
