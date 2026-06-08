@@ -188,14 +188,28 @@ export class LegalResearchService {
           }
       }
 
-      // Q3 - Normativa Exata
-      let ecNumber = null;
-      const ecMatch = lower.match(/(?:ec|emenda constitucional)(?:\s*n[ºo]?\s*)?(\d+)/);
-      if (ecMatch) {
-          ecNumber = ecMatch[1];
-          queries.push({ type: "Legis", cql: `palavras="EC ${ecNumber}"` });
-          queries.push({ type: "Juri", cql: `palavras="EC ${ecNumber}"` });
+      // Q3 - Normativa Exata (captura TODAS as ECs com matchAll — EC 41, EC 41/2003, Emenda Constitucional nº 41, etc.)
+      const ecRegex = /(?:\bec\b|emenda constitucional)\s*(?:n[.o]?\s*)?(\d+)(?:\/(\d{4}))?/gi;
+      const ecMatches = Array.from(lower.matchAll(ecRegex));
+      const seenEcs = new Set<string>();
+      let ecNumber: string | null = null;
+
+      for (const ecMatch of ecMatches) {
+          const num = ecMatch[1];
+          const year = ecMatch[2] || null;
+          if (seenEcs.has(num)) continue;
+          seenEcs.add(num);
+
+          if (!ecNumber) ecNumber = num; // primeiro EC detectado para uso no Q1
+
+          queries.push({ type: "Legis", cql: `palavras="EC ${num}"` });
+          queries.push({ type: "Juri",  cql: `palavras="EC ${num}"` });
+          if (year) {
+              queries.push({ type: "Legis", cql: `palavras="EC ${num}/${year}"` });
+              queries.push({ type: "Juri",  cql: `palavras="EC ${num}/${year}"` });
+          }
       }
+
 
       // Q1 - Conceitual
       const teseKeywords = (brief.palavrasChave || []).filter(kw => lower.includes(kw.toLowerCase()));
