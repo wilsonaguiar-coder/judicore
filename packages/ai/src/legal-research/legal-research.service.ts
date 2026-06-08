@@ -6,6 +6,12 @@ export interface LegalResearchPack {
   legislacaoLexML: any[];
   timeLanceDbMs: number;
   timeLexMlMs: number;
+  observability?: {
+    queryLexML_Jurisprudencia: string;
+    queryLexML_Legislacao: string;
+    queryLanceDB: string;
+    queryTST?: string;
+  };
 }
 
 export class LegalResearchService {
@@ -68,7 +74,13 @@ export class LegalResearchService {
       jurisprudenciaLexML,
       legislacaoLexML,
       timeLanceDbMs,
-      timeLexMlMs
+      timeLexMlMs,
+      observability: {
+        queryLexML_Jurisprudencia: cqlJuri,
+        queryLexML_Legislacao: cqlLegis,
+        queryLanceDB: queryBase,
+        ...(isTrabalhista ? { queryTST: queryBase } : {})
+      }
     };
   }
 
