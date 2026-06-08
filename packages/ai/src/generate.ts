@@ -231,7 +231,14 @@ export async function* generatePremiumDocumentStream(
       {
         role: "user",
         content: buildPremiumDocumentPrompt(
-          type, documents, jurisprudencias, legislation, caseDescription, instruction
+          type, 
+          documents, 
+          "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\nLEGISLAÇÃO VERIFICADA\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n" +
+          Object.entries(legislation).map(([lei, texto]) => `=== ${lei} ===\n${texto}`).join("\n\n") + 
+          "\n\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\nJURISPRUDÊNCIA SELECIONADA\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n" +
+          jurisprudencias.map((j, i) => `[JUR-${i+1}] ${j.tribunal} - ${j.numero}\nEmenta: ${j.ementa}`).join("\n\n"),
+          caseDescription, 
+          instruction
         ),
       },
     ],
