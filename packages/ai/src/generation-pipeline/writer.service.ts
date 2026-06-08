@@ -23,11 +23,11 @@ export class WriterService {
     const client = getOpenAIClient();
 
     // LegalMatrix já contém a legislação do LegisDB e a Jurisprudência com Ementas (após Fase 13)
+    const legalMatrixFormatted = LegalMatrixBuilderService.formatToMarkdown(legalMatrix);
     const systemPrompt = buildPremiumDocumentPrompt(
       pieceType as any,
       [], // Documentos reais em texto (não usados no MVP atual diretamente aqui)
-      legalMatrix.jurisprudenciaSelecionada,
-      legalMatrix.legislacaoSelecionada.reduce((acc, curr) => ({ ...acc, [curr.titulo]: curr.textoLiteral || curr.conteudo }), {}),
+      legalMatrixFormatted,
       JSON.stringify(brief),
       userOrientation
     );

@@ -303,8 +303,7 @@ ${tarefaByType[type]}`;
 export function buildPremiumDocumentPrompt(
   type: "DESPACHO" | "DECISAO" | "SENTENCA" | "PETICAO_INICIAL" | "RECURSO",
   documents: string[],
-  jurisprudencias: Jurisprudencia[],
-  legislation: Record<string, string>,
+  legalMatrixFormatted: string,
   caseDescription?: string,
   instruction?: string,
 ): string {
@@ -317,16 +316,7 @@ INSTRUÇÃO: estes são os documentos reais do caso. Extraia deles os fatos, dad
 ${documents.join("\n\n---\n\n")}`
     : "";
 
-  const legBlock = Object.keys(legislation).length > 0
-    ? `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-LEGISLAÇÃO VERIFICADA NA FONTE OFICIAL (Planalto)
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-INSTRUÇÃO: USE SEMPRE esta versão como fonte primária para citar os artigos abaixo. O texto está conferido. Para leis não presentes neste bloco, você pode citar artigos de diplomas consolidados (CC, CPC, CF, CLT etc.) desde que tenham relação direta com o caso — jamais invente números de artigos.
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-${Object.entries(legislation).map(([lei, texto]) => `\n=== ${lei} ===\n${texto}`).join("\n\n")}`
-    : "";
 
-  const jurBlock = buildRagContext(jurisprudencias);
 
   const instructionBlock = instruction?.trim()
     ? `\n━━━ ORIENTAÇÃO ESPECÍFICA DO USUÁRIO ━━━\n${instruction.trim()}\nSiga esta orientação com prioridade.\n`
@@ -339,8 +329,8 @@ ${Object.entries(legislation).map(([lei, texto]) => `\n=== ${lei} ===\n${texto}`
   const isPostulatorio = type === "PETICAO_INICIAL" || type === "RECURSO";
 
   const regraLeg = isPostulatorio
-    ? `2. LEGISLAÇÃO: use PRIORITARIAMENTE os artigos do bloco "LEGISLAÇÃO VERIFICADA" acima. Para dispositivos não presentes nesse bloco, cite apenas artigos de diplomas consolidados (CC/2002, CPC/2015, CF/88, CLT, CDC, Lei 8.213/91, Lei 8.112/90, etc.) dos quais você tenha CERTEZA que o artigo existe e se aplica ao caso. Se houver dúvida sobre o número exato de um artigo, descreva o princípio jurídico sem inventar número. NUNCA cite portaria, decreto ou lei especial que não esteja no bloco verificado.`
-    : `2. LEGISLAÇÃO: cite APENAS artigos presentes no bloco "LEGISLAÇÃO VERIFICADA" acima ou de diplomas processuais (CPC/2015) diretamente aplicáveis ao ato. Para qualquer outro diploma, descreva o princípio sem citar artigo. Não invente número de artigo.`;
+    ? `2. LEGISLAÇÃO: use PRIORITARIAMENTE os artigos fornecidos na MATRIZ JURÍDICA abaixo. Para dispositivos não presentes na matriz, cite apenas artigos de diplomas consolidados (CC/2002, CPC/2015, CF/88, CLT, CDC, Lei 8.213/91, Lei 8.112/90, etc.) dos quais você tenha CERTEZA que o artigo existe e se aplica ao caso. Se houver dúvida sobre o número exato de um artigo, descreva o princípio jurídico sem inventar número. NUNCA cite portaria, decreto ou lei especial que não esteja na matriz.`
+    : `2. LEGISLAÇÃO: cite APENAS artigos presentes na MATRIZ JURÍDICA abaixo ou de diplomas processuais (CPC/2015) diretamente aplicáveis ao ato. Para qualquer outro diploma, descreva o princípio sem citar artigo. Não invente número de artigo.`;
 
   const tarefaByType: Record<string, string> = {
 
@@ -479,11 +469,7 @@ ATENÇÃO: produza apenas o texto da peça. Sem notas, ressalvas ou disclaimers.
 
 ---
 
-${jurBlock}
-
----
-
-${legBlock}
+${legalMatrixFormatted}
 
 ---
 ${caseBlock}${instructionBlock}

@@ -359,6 +359,26 @@ TST
             );
           })()}
 
+          {/* ── LEIS E SÚMULAS (PASSIVO LEGISLATIVO) ── */}
+          <section className="rounded-lg border border-primary/20 bg-primary/5 p-5 space-y-3">
+            <div className="flex items-center gap-2">
+              <Database size={14} className="text-primary" />
+              <h2 className="text-sm font-semibold text-primary">Passivo Legislativo (Leis e Súmulas)</h2>
+            </div>
+            <p className="text-xs text-muted-foreground leading-relaxed">
+              O firewall do Governo Federal bloqueia as extrações originadas deste servidor (VPS). Para garantir que a base de Leis e Súmulas fique sempre atualizada com as últimas revogações, você deve rodar a sincronização a partir do seu próprio computador. O robô local fará a leitura limpa e enviará o pacote atualizado para o banco em produção automaticamente.
+            </p>
+            <div className="rounded bg-background border px-3 py-2.5 flex items-center justify-between">
+              <div>
+                <p className="text-[10px] font-semibold text-muted-foreground mb-1">COMANDO LOCAL (RODE NO SEU TERMINAL NA PASTA DO PROJETO)</p>
+                <code className="text-xs font-mono text-primary font-bold">npm run sync-leis</code>
+              </div>
+              <p className="text-[10px] text-muted-foreground text-right max-w-xs">
+                O script fará o download de todas as normas, limpará dispositivos revogados no servidor e atualizará a base sem necessidade de ações manuais no VPS.
+              </p>
+            </div>
+          </section>
+
           {/* ── LANCEDB ── */}
           <section className="rounded-lg border p-5 space-y-4">
             <div className="flex items-center justify-between">

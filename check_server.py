@@ -1,38 +1,24 @@
 import paramiko
 import sys
-sys.stdout.reconfigure(encoding='utf-8')
 
-host = "2.24.75.193"
-user = "root"
-password = "Ugaz#@2026ok"
+sys.stdout.reconfigure(encoding='utf-8')
 
 client = paramiko.SSHClient()
 client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+client.connect(hostname='2.24.75.193', username='root', password='Ugaz#@2026ok')
 
-try:
-    client.connect(hostname=host, username=user, password=password)
-    
-    commands = [
-        "pm2 list",
-        "pm2 logs --lines 30 --nostream",
-        "systemctl status nginx --no-pager | tail -20",
-        "curl -s -o /dev/null -w '%{http_code}' http://localhost:3000",
-    ]
-    
-    for cmd in commands:
-        print(f"\n{'='*60}")
-        print(f"CMD: {cmd}")
-        print('='*60)
-        stdin, stdout, stderr = client.exec_command(cmd)
-        exit_status = stdout.channel.recv_exit_status()
-        out = stdout.read().decode('utf-8', errors='ignore')
-        err = stderr.read().decode('utf-8', errors='ignore')
-        if out:
-            print(out)
-        if err:
-            print(f"STDERR: {err}")
+print("=== PM2 STATUS ===")
+stdin, stdout, stderr = client.exec_command("pm2 list")
+print(stdout.read().decode('utf-8', errors='ignore'))
 
-except Exception as e:
-    print(f"Erro: {str(e)}")
-finally:
-    client.close()
+print("\n=== PM2 LOGS: WEB ===")
+stdin, stdout, stderr = client.exec_command("pm2 logs judicore-web --lines 30 --nostream")
+print(stdout.read().decode('utf-8', errors='ignore'))
+print(stderr.read().decode('utf-8', errors='ignore'))
+
+print("\n=== PM2 LOGS: API ===")
+stdin, stdout, stderr = client.exec_command("pm2 logs judicore-api --lines 30 --nostream")
+print(stdout.read().decode('utf-8', errors='ignore'))
+print(stderr.read().decode('utf-8', errors='ignore'))
+
+client.close()

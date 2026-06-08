@@ -148,6 +148,56 @@ export class LegalMatrixBuilderService {
     return { teses, legislacaoSelecionada: enrichedLegislacao, jurisprudenciaSelecionada: enrichedJurisprudencia };
   }
   
+  static formatToMarkdown(matrix: LegalMatrix): string {
+    let md = "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n";
+    md += "MATRIZ JURÍDICA E ARGUMENTATIVA (SÍNTESE DAS FONTES)\n";
+    md += "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n";
+    
+    matrix.teses.forEach((tese, i) => {
+        md += `### TESE ${i + 1}: ${tese.tese}\n\n`;
+        
+        md += `#### DISPOSITIVOS LEGAIS APLICÁVEIS (LegisDB / Oficial)\n`;
+        const oficiais = tese.fundamentosLegais.filter(l => l.fonte.includes("LegisDB"));
+        if (oficiais.length > 0) {
+            oficiais.forEach(l => {
+                md += `- **${l.titulo}**: ${l.textoLiteral}\n`;
+            });
+        } else {
+            md += `- (Nenhum dispositivo localizado no LegisDB para esta tese)\n`;
+        }
+        
+        md += `\n#### FUNDAMENTOS COMPLEMENTARES (LexML / Legislação Correlata)\n`;
+        const complementares = tese.fundamentosLegais.filter(l => !l.fonte.includes("LegisDB"));
+        if (complementares.length > 0) {
+            complementares.forEach(l => {
+                md += `- **${l.titulo}**\n`;
+            });
+        } else {
+            md += `- (Nenhuma legislação complementar identificada no LexML)\n`;
+        }
+        
+        md += `\n#### JURISPRUDÊNCIA APLICÁVEL & EMENTAS RELEVANTES\n`;
+        if (tese.jurisprudenciaAplicavel.length > 0) {
+            tese.jurisprudenciaAplicavel.forEach((j, k) => {
+                md += `[JUR-${i+1}.${k+1}] **${j.tribunal} - ${j.numero}**\n`;
+                md += `*Ementa:* ${j.ementa}\n`;
+                md += `*Motivo da Seleção:* ${j.motivoSelecao}\n\n`;
+            });
+        } else {
+            md += `- (Nenhuma jurisprudência específica localizada para esta tese)\n\n`;
+        }
+        
+        md += `#### APLICAÇÃO AO CASO CONCRETO (Instrução Estratégica)\n`;
+        md += `${tese.aplicacaoConcreta}\n\n`;
+        
+        md += `#### PEDIDO RELACIONADO\n`;
+        md += `${tese.pedidoRelacionado}\n\n`;
+        md += `---\n\n`;
+    });
+    
+    return md;
+  }
+  
   static buildFilteredResearch(research: LegalResearchPack) {
     return {
       legislacaoSelecionada: research.legislacaoLexML.slice(0, 3),

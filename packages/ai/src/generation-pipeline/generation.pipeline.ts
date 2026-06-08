@@ -72,7 +72,7 @@ export class GenerationPipeline {
       const researchResultsCount = research.jurisprudenciaLocal.length + research.jurisprudenciaLexML.length + research.legislacaoLexML.length;
 
       // 4.5. Legal Matrix Builder (Determinístico - Fase 12.5.2)
-      const legalMatrix = LegalMatrixBuilderService.buildMatrix(brief, research);
+      const legalMatrix = await LegalMatrixBuilderService.buildMatrix(brief, research);
 
       // 5. Redação Final (Writer GPT-5.5)
       const t1 = Date.now();
