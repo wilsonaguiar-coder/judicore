@@ -279,6 +279,16 @@ describe("Writer Regression Scenarios (FASE 10.1.3)", () => {
       },
       expectedResult: "FATAL",
     },
+    {
+      id: "F4",
+      group: "FICTITIOUS_FACTS",
+      description: "RPPS - Invenção de data de óbito e órgão público fictício nos testes",
+      input: {
+        draft: "A ex-servidora faleceu em 12/05/2005, vinculada ao Ministério da Fazenda Fictício.",
+        classification: { tipo_peca: "PETICAO_INICIAL" },
+      },
+      expectedResult: "FATAL",
+    },
 
     // ==================================================
     // GRUPO G — RECURSOS

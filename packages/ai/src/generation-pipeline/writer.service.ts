@@ -26,6 +26,9 @@ REGRAS OBRIGATÓRIAS (PENA DE FALHA GRAVE):
 3. Se o pacote não contiver fundamentação suficiente, informe a limitação sem inventar.
 4. Estruture a peça adequadamente conforme as normas processuais.
 5. A Determinação do Usuário possui prioridade absoluta na estratégia e redação.
+6. UTILIZE as informações extraídas dos documentos (nome, CPF, RG, endereço) quando disponíveis no Piece Brief.
+7. JAMAIS crie fatos ausentes dos documentos (não invente datas, não invente órgãos públicos, não invente situações funcionais).
+8. Se uma informação essencial (ex: CPF, endereço) não estiver disponível no Piece Brief, deixe um placeholder em branco (ex: [CPF]) em vez de inventar um dado fictício, mas SE a informação ESTIVER no Piece Brief, DEVE ser utilizada na peça e não substituída por placeholder.
 
 TIPO DA PEÇA: ${pieceType}
 DETERMINAÇÃO DO USUÁRIO: ${userOrientation}

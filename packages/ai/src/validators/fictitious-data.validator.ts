@@ -27,6 +27,9 @@ const FICTITIOUS_PATTERNS: Array<{ pattern: RegExp; label: string }> = [
   { pattern: /\b0001234-56\./,                    label: "número de processo fictício '0001234-56'" },
   // Banco de exemplo do demo
   { pattern: /\bBanco\s+Exemplo\b/i,              label: "banco fictício 'Banco Exemplo S/A'" },
+  // Alucinações recorrentes do GPT para RPPS (datas e órgãos que ele inventa quando falta dado)
+  { pattern: /\b12\/05\/2005\b/i,                 label: "data de óbito fictícia '12/05/2005'" },
+  { pattern: /\bMinistério\s+da\s+Fazenda\s+Fictício\b/i, label: "órgão fictício 'Ministério da Fazenda Fictício'" },
 ];
 
 /**
