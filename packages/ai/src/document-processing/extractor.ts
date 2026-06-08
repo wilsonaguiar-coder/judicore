@@ -3,9 +3,6 @@
 
 import * as mammoth from "mammoth";
 import AdmZip from "adm-zip";
-import { createRequire } from "module";
-
-const nativeRequire = createRequire(import.meta.url);
 
 export interface IDocumentExtractor {
   extractText(buffer: Buffer, mimeType: string): Promise<string>;
@@ -35,9 +32,12 @@ export class DocumentExtractor implements IDocumentExtractor {
 
   private async extractFromPdf(buffer: Buffer): Promise<string> {
     try {
-      // O uso de 'nativeRequire' esconde a dependência do AST Parser do Webpack
-      // Isso evita que o pdf.js interno seja minificado e quebre com 'i is not a function'
-      const pdfParse = nativeRequire("pdf-parse");
+      // Cria um import dinâmico invisível para o Webpack usando new Function
+      // Isso força o uso do loader ESM nativo do Node.js
+      const dynamicImport = new Function('modulePath', 'return import(modulePath)');
+      const pdfParseModule = await dynamicImport('pdf-parse');
+      const pdfParse = pdfParseModule.default || pdfParseModule;
+      
       const data = await pdfParse(buffer);
       const text = data.text || "";
       const usefulText = text.replace(/\s+/g, " ").trim();
