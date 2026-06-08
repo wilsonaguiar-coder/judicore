@@ -32,14 +32,14 @@ export class DocumentExtractor implements IDocumentExtractor {
 
   private async extractFromPdf(buffer: Buffer): Promise<string> {
     try {
-      // Cria um import dinâmico invisível para o Webpack usando new Function
-      // Isso força o uso do loader ESM nativo do Node.js
-      const dynamicImport = new Function('modulePath', 'return import(modulePath)');
-      const pdfParseModule = await dynamicImport('pdf-parse');
-      const pdfParse = pdfParseModule.default || pdfParseModule;
-      
-      const data = await pdfParse(buffer);
+      // O módulo pdf-parse v2.4.5 expõe a classe PDFParse, diferente da v1.1.1.
+      // O Next.js agrupa perfeitamente módulos modernos, então um import comum funciona.
+      const { PDFParse } = await import("pdf-parse");
+      const parser = new PDFParse({ data: buffer });
+      const data = await parser.getText();
       const text = data.text || "";
+      await parser.destroy();
+      
       const usefulText = text.replace(/\s+/g, " ").trim();
       if (usefulText.length < 100) {
         throw new Error("Não foi possível extrair texto deste PDF. O arquivo parece ser escaneado ou contém apenas imagem. O OCR será suportado em etapa futura.");

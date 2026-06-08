@@ -4,7 +4,19 @@ import AdmZip from "adm-zip";
 import * as mammoth from "mammoth";
 
 // Mocks
-jest.mock("pdf-parse");
+const mockGetText = jest.fn();
+const mockDestroy = jest.fn();
+
+jest.mock("pdf-parse", () => {
+  return {
+    PDFParse: jest.fn().mockImplementation(() => {
+      return {
+        getText: mockGetText,
+        destroy: mockDestroy
+      };
+    })
+  };
+});
 jest.mock("adm-zip");
 jest.mock("mammoth", () => ({
   extractRawText: jest.fn()
@@ -19,17 +31,19 @@ describe("DocumentExtractor", () => {
   });
 
   it("deve extrair texto de PDF pesquisável", async () => {
-    (pdfParse as jest.Mock).mockResolvedValue({ text: "Texto longo o suficiente para passar do limite de cem caracteres que é exigido pelo fallback do sistema para pdf não escaneado." });
+    mockGetText.mockResolvedValue({ text: "Texto longo o suficiente para passar do limite de cem caracteres que é exigido pelo fallback do sistema para pdf não escaneado." });
     
     const text = await extractor.extractText(Buffer.from("fake-pdf"), "application/pdf");
     expect(text).toContain("Texto longo");
+    expect(mockDestroy).toHaveBeenCalled();
   });
 
   it("deve lançar erro amigável para PDF escaneado (pouco texto)", async () => {
-    (pdfParse as jest.Mock).mockResolvedValue({ text: "Pouco texto" });
+    mockGetText.mockResolvedValue({ text: "Pouco texto" });
     
     await expect(extractor.extractText(Buffer.from("fake-pdf"), "application/pdf"))
       .rejects.toThrow("O arquivo parece ser escaneado ou contém apenas imagem");
+    expect(mockDestroy).toHaveBeenCalled();
   });
 
   it("deve lançar erro claro para imagens (OCR futuro)", async () => {
