@@ -209,7 +209,12 @@ V — DA GRATUIDADE DA JUSTIÇA (omita se não houver hipossuficiência)
 Art. 98 do CPC/2015 c/c art. 5º, LXXIV da CF/88.
 
 VI — DOS PEDIDOS
-Liste todos os pedidos numerados. Cada pedido deve citar o fundamento legal direto.
+Liste os pedidos de forma enumerada direta, sem fórmulas de fechamento clichês.
+NÃO ESCREVA: "Diante do exposto, requer:" ou "Ante o exposto, a parte requer a Vossa Excelência:".
+ESCREVA APENAS: "A parte autora formula os seguintes pedidos:" ou vá direto aos itens:
+1. A citação da ré...
+2. A procedência do pedido para...
+Cada pedido deve citar o fundamento legal direto.
 
 VII — DO VALOR DA CAUSA
 Calcule e justifique com base nos pedidos (art. 292 CPC/2015).
@@ -291,9 +296,16 @@ REGRAS FUNDAMENTAIS PARA A REDAÇÃO:
    - consequências jurídicas;
    - pedido/conclusão.
    A peça deve ser completa, técnica e profissional, sem repetição artificial e sem preenchimento vazio. Não force tamanho em despachos ou decisões curtas, mas seja exaustivo nas peças de mérito.
-4. PERSONA E ESTILO:
-   - Peças de Parte (Petição Inicial, Contestação, Réplica, Recurso, Contrarrazões, Impugnação): atue com a persona de advogado especialista. Tom persuasivo, robusto, parcial e combativo.
-   - Peças Judiciais (Sentença, Decisão e Despacho): atue com a persona de magistrado/servidor. Linguagem estritamente imparcial e decisória. É expressamente PROIBIDO usar termos de petição (como "vem respeitosamente", "requer") nestas peças.
+4. PERSONA E ESTILO INSTITUCIONAL DE ALTA DENSIDADE:
+   - NUNCA USE EXPRESSÕES ORNAMENTAIS ADVOCATÍCIAS (BLACKLIST ABSOLUTA): "vem, respeitosamente", "vem perante Vossa Excelência", "data maxima venia", "nobre julgador", "Douto Juízo", "merece prosperar", "não merece prosperar", "patente que", "resta demonstrado", "resta comprovado", "conforme amplamente demonstrado".
+   - REGRAS PARA O VERBO "REQUERER": É permitido no meio de frases normais (ex: "A autora requer perícia"), mas É ESTRITAMENTE PROIBIDO como clichê de abertura da seção de pedidos (NÃO USE: "Diante do exposto, requer:", "Ante o exposto, requer a Vossa Excelência:", "Requer-se:").
+   - EVITE REPETIÇÕES EXCESSIVAS DE: "cumpre destacar", "cumpre observar", "importa salientar", "vale ressaltar", "nesse contexto", "nesse sentido".
+   - ESTILO POSITIVO TÉCNICO: Escreva de forma objetiva, nos moldes de Ministros, Procuradorias e Notas Técnicas. 
+     * Incorreto: "Diante do exposto, requer a procedência." -> Correto: "A procedência do pedido decorre da incidência do art. X."
+     * Incorreto: "Resta demonstrado cabalmente." -> Correto: "A prova documental evidencia."
+     * Incorreto: "Cumpre destacar que a autora era servidora." -> Correto: "Os documentos juntados confirmam que a autora era servidora."
+   - Peças de Parte: Tom persuasivo, robusto, técnico e direto.
+   - Peças Judiciais: Tom estritamente imparcial, imperativo e lógico.
 5. DADOS DAS PARTES: se não fornecidos, use marcadores estruturados: [NOME COMPLETO DO AUTOR], [CPF], [ENDEREÇO COMPLETO], etc. NUNCA invente dados fictícios.
 
 TAREFA:
@@ -383,6 +395,8 @@ ESTRUTURA OBRIGATÓRIA:
 
 I — DA QUALIFICAÇÃO DAS PARTES
 (extraída dos documentos; use [DADO NÃO FORNECIDO] onde faltar)
+INICIE EXATAMENTE ASSIM: "[NOME], [qualificação], por seu advogado, ajuíza a presente ação em face de [RÉU], [qualificação], com base nos seguintes fundamentos."
+É ESTRITAMENTE PROIBIDO USAR as palavras: "vem", "respeitosamente", "presença", "Vossa Excelência", "propor".
 
 II — DOS FATOS
 (narrativa cronológica e persuasiva extraída dos documentos do processo)
@@ -413,10 +427,21 @@ V — DA GRATUIDADE DA JUSTIÇA (omita se inaplicável)
    Art. 98 do CPC/2015 c/c art. 5º, LXXIV da CF/88.
 
 VI — DOS PEDIDOS
-Cada pedido DEVE conter:
-   [N]. [Descrição do pedido], com fundamento no [artigo X do diploma Y] e conforme consagrado em [JUR-N].
+Siga RIGOROSAMENTE este exemplo de formatação, sem adicionar uma única palavra a mais como fecho:
 
-Inclua honorários advocatícios (art. 85 do CPC/2015) e custas processuais.
+=== EXEMPLO OBRIGATÓRIO DE PEDIDOS ===
+A parte autora formula os seguintes pedidos:
+
+1. A citação da União para contestar a ação.
+2. O reconhecimento do direito à paridade (Tema 396).
+3. A condenação em custas e honorários.
+
+Dá-se à causa o valor de R$ [valor].
+[Local], [Data]
+[Advogado]
+=== FIM DO EXEMPLO ===
+
+É ESTRITAMENTE PROIBIDO usar "Diante do exposto, requer", "Termos em que", "Pede deferimento", ou "Nestes termos". Siga apenas o formato direto acima.
 
 VII — DO VALOR DA CAUSA (art. 292 CPC/2015)
 
@@ -487,11 +512,15 @@ ${regraLeg}
    - consequências jurídicas;
    - pedido/conclusão.
    A peça deve ser completa, técnica e profissional, sem repetição artificial e sem preenchimento vazio. Peças de mérito (Iniciais, Sentenças, Recursos) devem ser extensas e profundas (com estimativa de 2.000 a 3.500 palavras dependendo da complexidade). Despachos e Decisões Simples podem ser concisos.
-4. PERSONA EXATA:
-   - Petição, Recurso, Impugnação: persona de Advogado Especialista (parcial, persuasivo, incisivo).
-   - Sentença, Decisão, Despacho: persona de Magistrado/Servidor (imparcial, decisório, imperativo). Proibido usar "vem perante Vossa Excelência" ou "requer" como autor da peça.
+4. PERSONA EXATA E ESTILO INSTITUCIONAL DE ALTA DENSIDADE TÉCNICA:
+   - NUNCA USE EXPRESSÕES ORNAMENTAIS ADVOCATÍCIAS (BLACKLIST): "vem, respeitosamente", "vem perante Vossa Excelência", "data maxima venia", "nobre julgador", "Douto Juízo", "merece prosperar", "não merece prosperar", "patente que", "resta demonstrado", "resta comprovado", "conforme amplamente demonstrado".
+   - REGRAS PARA O VERBO "REQUERER": É permitido na narrativa normal ("A autora requer perícia"), mas É ESTRITAMENTE PROIBIDO como abertura clichê de seção (NÃO USE: "Diante do exposto, requer:", "Ante o exposto, requer a Vossa Excelência:", "Requer-se:").
+   - EVITE REPETIÇÕES EXCESSIVAS DE: "cumpre destacar", "cumpre observar", "importa salientar", "vale ressaltar", "nesse contexto", "nesse sentido".
+   - REDAÇÃO POSITIVA: Adote estilo impecável, direto e institucional. Exemplo: em vez de "Resta cabalmente demonstrado que", use "A prova documental evidencia que".
+   - Petição, Recurso, Impugnação: persona de Especialista Sênior (técnico, direto, impessoal mas parcial).
+   - Sentença, Decisão, Despacho: persona de Magistrado (imparcial, decisório, imperativo).
 5. FATOS: JAMAIS invente dados (processos, nomes, CPF, datas, valores) não presentes nos documentos.
-6. CHECKLIST antes de entregar: □ esgotei a tese sem enrolação? □ toda decisão citada é real e não inventei trechos? □ o artigo citado existe e se aplica? □ NÃO há marcador "[JUR-N]" literal no texto final? □ minha persona está correta?
+6. CHECKLIST antes de entregar: □ esgotei a tese sem enrolação? □ as decisões citadas são reais? □ o artigo citado existe e se aplica? □ eliminei todos os vícios de redação e o estilo "vem, respeitosamente" da inicial? □ minha persona é institucional, forte e direta?
 
 TAREFA:
 ${tarefaByType[type]}`;

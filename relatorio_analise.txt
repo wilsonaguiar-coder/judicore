@@ -1,0 +1,20 @@
+PieceBrief Chars: 5738
+Brief Teses:
+- A pensão por morte rege-se pela lei vigente na data do óbito do instituidor (tempus regit actum).
+- A EC 41/2003 extinguiu a regra geral de paridade e integralidade para as aposentadorias e pensões do serviço público.
+- Tese de exceção (direito adquirido): O direito à pensão com paridade é assegurado se o servidor instituidor, embora falecido após a EC 41/2003, já houvesse preenchido todos os requisitos para se aposentar com direito à paridade antes de seu falecimento. Aplicação do entendimento firmado pelo STF no Tema 396 de Repercussão Geral (RE 603.580).
+Brief Paridade? True
+Brief Direito Adq? True
+Brief Tema 396? True
+
+Research: LegisDB=15, LexML=0, LanceDB=9
+
+Matrix Teses Count: 3
+Matrix Fundamentos: 15
+Matrix Ementas: 9
+Matrix Size: 89241 chars
+Matrix Direito Adq? True
+Matrix Paridade? True
+
+GPT Input Tokens: 18001
+GPT Output Tokens: 1064

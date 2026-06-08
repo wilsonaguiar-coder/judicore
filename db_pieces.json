@@ -1,0 +1,94 @@
+{
+  "pieces": [
+    {
+      "id": "cmq4kkibc0000vifat3n8bhwc",
+      "pieceType": "Petição Inicial",
+      "userOrientation": "Redigir petição inicial previdenciária pleiteando aposentadoria especial por exposição habitual a ruído acima de 85dB durante 25 anos. O autor trabalhou como operador de máquinas em metalúrgica. Possu",
+      "inputTokensGpt": "47029",
+      "outputTokensGpt": "926",
+      "processingTimeMs": "44216",
+      "draft": "EXCELENTÍSSIMO SENHOR DOUTOR JUIZ FEDERAL DA ___ VARA DO JUÍZO FEDERAL DA SEÇÃO JUDICIÁRIA DE SÃO PAULO – SP"
+    },
+    {
+      "id": "cmq4k97l200004dgim2t4j3lo",
+      "pieceType": "Petição Inicial",
+      "userOrientation": "peticionar pela procedência de pedido de paridade de pensão de ex-servidora federal, falecida após a ec 41/2003. O autor é João da Silva, marido da falecida Maria da Silva. CPF 123.456.789-00, residen",
+      "inputTokensGpt": "2434",
+      "outputTokensGpt": "947",
+      "processingTimeMs": "36002",
+      "draft": "EXCELENTÍSSIMO SENHOR DOUTOR JUIZ FEDERAL DA ___ VARA FEDERAL DA SEÇÃO JUDICIÁRIA DO DISTRITO FEDERAL"
+    },
+    {
+      "id": "cmq4iyjgy0000n14f4cha94mz",
+      "pieceType": "Petição Inicial",
+      "userOrientation": "peticionar pela procedência de pedido de paridade de pensão de ex-servidora federal, falecida após a ec 41/2003. segue documentos pessoais e comprovante de endereço do autor, marido da falecida, para ",
+      "inputTokensGpt": "55959",
+      "outputTokensGpt": "952",
+      "processingTimeMs": "86485",
+      "draft": "EXCELENTÍSSIMO SENHOR DOUTOR JUIZ FEDERAL DA ___ VARA FEDERAL DA SEÇÃO JUDICIÁRIA DE [INSERIR LOCALIDADE]"
+    },
+    {
+      "id": "cmq4i8cit000012pvgvassnds",
+      "pieceType": "Petição Inicial",
+      "userOrientation": "Direito Previdenciário",
+      "inputTokensGpt": "51478",
+      "outputTokensGpt": "886",
+      "processingTimeMs": "84337",
+      "draft": "EXCELENTÍSSIMO SENHOR DOUTOR JUIZ FEDERAL DA VARA PREVIDENCIÁRIA DA SEÇÃO JUDICIÁRIA DE [INSERIR LOCALIDADE]"
+    },
+    {
+      "id": "cmq4hx9us0000pg7e1lle2zm1",
+      "pieceType": "Petição Inicial",
+      "userOrientation": "peticionar pela procedência de pedido de paridade de pensão de ex-servidora federal falecida após a EC 41/2003. Utilizar documentos para qualificação.",
+      "inputTokensGpt": "61309",
+      "outputTokensGpt": "839",
+      "processingTimeMs": "88557",
+      "draft": "EXCELENTÍSSIMO SENHOR DOUTOR JUIZ FEDERAL DA ___ VARA FEDERAL DA SEÇÃO JUDICIÁRIA DE SÃO PAULO – SP"
+    },
+    {
+      "id": "cmq4gv0cc00001182v1lluu4p",
+      "pieceType": "Petição Inicial",
+      "userOrientation": "peticionar pela procedência de pedido de paridade de pensão de ex-servidora federal, falecida após a ec 41/2003. segue documentos pessoais e comprovante de endereço do autor, marido da falecida, para ",
+      "inputTokensGpt": "58028",
+      "outputTokensGpt": "919",
+      "processingTimeMs": "84606",
+      "draft": "EXCELENTÍSSIMO SENHOR DOUTOR JUIZ FEDERAL DA ___ VARA FEDERAL DA SEÇÃO JUDICIÁRIA DE [INSERIR LOCALIDADE]"
+    },
+    {
+      "id": "cmq4ffmt6000f14f1tqf14eyo",
+      "pieceType": "Despacho",
+      "userOrientation": "Fundamentar a decisão com base nos julgados recentes do STJ.",
+      "inputTokensGpt": "27397",
+      "outputTokensGpt": "634",
+      "processingTimeMs": "60100",
+      "draft": "**DESPACHO**"
+    },
+    {
+      "id": "cmq4fel7m000c14f19smufcpb",
+      "pieceType": "Decisão",
+      "userOrientation": "Fundamentar a decisão com base nos julgados recentes do STJ.",
+      "inputTokensGpt": "41393",
+      "outputTokensGpt": "653",
+      "processingTimeMs": "48694",
+      "draft": "**DECISÃO**"
+    },
+    {
+      "id": "cmq4fdhpc000914f1227l3y4o",
+      "pieceType": "Sentença",
+      "userOrientation": "Fundamentar a decisão com base nos julgados recentes do STJ.",
+      "inputTokensGpt": "34650",
+      "outputTokensGpt": "719",
+      "processingTimeMs": "51191",
+      "draft": "**PODER JUDICIÁRIO**"
+    },
+    {
+      "id": "cmq4fc505000614f1zr5tbu84",
+      "pieceType": "Contestação",
+      "userOrientation": "Direito Previdenciário",
+      "inputTokensGpt": "60533",
+      "outputTokensGpt": "768",
+      "processingTimeMs": "63100",
+      "draft": "**EXCELENTÍSSIMO SENHOR DOUTOR JUIZ FEDERAL DA VARA PREVIDENCIÁRIA DA SEÇÃO JUDICIÁRIA DE [INSERIR LOCALIDADE]**"
+    }
+  ]
+}
