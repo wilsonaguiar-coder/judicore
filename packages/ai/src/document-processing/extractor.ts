@@ -33,7 +33,7 @@ export class DocumentExtractor implements IDocumentExtractor {
   private async extractFromPdf(buffer: Buffer): Promise<string> {
     try {
       const pdfParseModule = await import("pdf-parse");
-      const pdfParse = pdfParseModule.default || pdfParseModule;
+      const pdfParse = (pdfParseModule as any).default || pdfParseModule;
       const data = await (pdfParse as any)(buffer);
       const text = data.text || "";
       const usefulText = text.replace(/\s+/g, " ").trim();
