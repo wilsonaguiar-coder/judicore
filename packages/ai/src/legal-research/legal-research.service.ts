@@ -1,5 +1,6 @@
 import { searchJurisprudencia, searchLanceDB } from "@judicore/search";
 import type { PieceBrief } from "../generation-pipeline/piece-brief.service.js";
+import { LexmlQueryExtractorService } from "./lexml-query-extractor.service.js";
 
 export interface RankedResult {
   titulo: string;
@@ -45,27 +46,29 @@ export class LegalResearchService {
       ? brief.tesesIdentificadas
       : [brief.estrategiaSugerida || "Tese Principal"];
 
+    // AI-powered query extraction: Gemini 2.0 Flash-Lite reads each tese
+    // and generates optimized keyword strings for LexML jurisprudência + legislação
+    const aiQuerySets = await LexmlQueryExtractorService.extractQueriesForAll(
+      tesesBase,
+      brief.tipoPeca,
+      brief.palavrasChave
+    );
+
+    // LanceDB query: brief keywords as-is (semantic search benefits from full context)
+    const lanceDbQueryString = (brief.palavrasChave || []).slice(0, 8).join(" ");
+
     const researchPacks: TeseResearchPack[] = [];
 
-    for (const teseText of tesesBase) {
-      // LanceDB query string
-      const cleanWords = teseText.split(" ").map(w => w.replace(/[.,()]/g, ""));
-      const allowList = ["tema", "re", "are", "stf", "stj", "ec", "lei", "art"];
-      const siglaMatches = cleanWords.filter(w => allowList.includes(w.toLowerCase()) || !isNaN(parseInt(w)));
-      const normalWords = cleanWords.filter(w => w.length > 5 && !siglaMatches.includes(w));
-      const keywords = [...siglaMatches, ...normalWords].slice(0, 12);
-      const coreKeywords = Array.from(new Set([...keywords, ...(brief.palavrasChave || []).slice(0, 3)])).slice(0, 15);
-      const lanceDbQueryString = coreKeywords.join(" ");
+    for (let i = 0; i < tesesBase.length; i++) {
+      const teseText = tesesBase[i];
+      const querySet = aiQuerySets[i] ?? { juri: [], legis: [] };
 
-      // LexML keyword queries (HTML search — SRU endpoint was removed)
-      const lexmlQueriesList = this.buildLexmlQueriesForTese(teseText, brief);
       const lexMLQueriesLogged: { keyword: string; returnedCount: number; url: string }[] = [];
-
       let rawJuri: any[] = [];
       let rawLegis: any[] = [];
       const descartes: RankedResult[] = [];
 
-      // 1. LanceDB
+      // 1. LanceDB — semantic search over STF/STJ vectors
       try {
         const t0 = Date.now();
         const lanceResults = await searchLanceDB(lanceDbQueryString, ["STF", "STJ"], 10);
@@ -75,24 +78,33 @@ export class LegalResearchService {
         console.warn("[LegalResearchService] LanceDB fallback:", err.message);
       }
 
-      // 2. LexML — HTML keyword search (/busca/search?keyword=...&f1-tipoDocumento=...)
-      for (const lq of lexmlQueriesList) {
+      // 2. LexML — jurisprudência keyword queries (AI-generated)
+      for (const keyword of querySet.juri) {
         let currentUrl = "";
         try {
           const t1 = Date.now();
-          const { results, url } = await this.fetchLexmlSearch(lq.keyword, lq.type);
+          const { results, url } = await this.fetchLexmlSearch(keyword, "Juri");
           timeLexMlMs += Date.now() - t1;
           currentUrl = url;
+          lexMLQueriesLogged.push({ keyword, returnedCount: results.length, url });
+          rawJuri = rawJuri.concat(results.map(r => ({ ...r, origin: "LexML" })));
+        } catch {
+          lexMLQueriesLogged.push({ keyword, returnedCount: 0, url: currentUrl || "Erro de Conexão" });
+        }
+      }
 
-          lexMLQueriesLogged.push({ keyword: lq.keyword, returnedCount: results.length, url });
-
-          if (lq.type === "Juri") {
-            rawJuri = rawJuri.concat(results.map(r => ({ ...r, origin: "LexML" })));
-          } else {
-            rawLegis = rawLegis.concat(results.map(r => ({ ...r, origin: "LexML" })));
-          }
-        } catch (err) {
-          lexMLQueriesLogged.push({ keyword: lq.keyword, returnedCount: 0, url: currentUrl || "Erro de Conexão" });
+      // 3. LexML — legislação keyword queries (AI-generated)
+      for (const keyword of querySet.legis) {
+        let currentUrl = "";
+        try {
+          const t1 = Date.now();
+          const { results, url } = await this.fetchLexmlSearch(keyword, "Legis");
+          timeLexMlMs += Date.now() - t1;
+          currentUrl = url;
+          lexMLQueriesLogged.push({ keyword, returnedCount: results.length, url });
+          rawLegis = rawLegis.concat(results.map(r => ({ ...r, origin: "LexML" })));
+        } catch {
+          lexMLQueriesLogged.push({ keyword, returnedCount: 0, url: currentUrl || "Erro de Conexão" });
         }
       }
 
@@ -111,7 +123,10 @@ export class LegalResearchService {
 
       const rankedJuri: RankedResult[] = [];
       for (const item of dedupMapJuri.values()) {
-        const scored = this.rankResults(item, teseText, domain, brief.tipoPeca, userOrientation, item.origin, item.tribunal);
+        const scored = this.rankResults(
+          item, teseText, domain, brief.tipoPeca, userOrientation,
+          item.origin, item.tribunal, brief.palavrasChave
+        );
         if (scored.score > 0.3) {
           rankedJuri.push(scored);
         } else {
@@ -128,7 +143,10 @@ export class LegalResearchService {
 
       const rankedLegis: RankedResult[] = [];
       for (const item of dedupMapLegis.values()) {
-        const scored = this.rankResults(item, teseText, domain, brief.tipoPeca, userOrientation, item.origin);
+        const scored = this.rankResults(
+          item, teseText, domain, brief.tipoPeca, userOrientation,
+          item.origin, undefined, brief.palavrasChave
+        );
         if (scored.score > 0.2) {
           rankedLegis.push(scored);
         } else {
@@ -149,72 +167,6 @@ export class LegalResearchService {
     }
 
     return { teses: researchPacks, timeLanceDbMs, timeLexMlMs };
-  }
-
-  // Builds keyword strings for /busca/search — simpler and more effective than SRU CQL
-  private static buildLexmlQueriesForTese(
-    teseText: string,
-    brief: PieceBrief
-  ): { type: "Juri" | "Legis"; keyword: string }[] {
-    const queries: { type: "Juri" | "Legis"; keyword: string }[] = [];
-    const lower = teseText.toLowerCase();
-
-    // Collect EC references
-    const ecRegex = /(?:\bec\b|emenda constitucional)\s*(?:n[.o]?\s*)?(\d+)(?:\/(\d{4}))?/gi;
-    const ecMatches = Array.from(lower.matchAll(ecRegex));
-    const seenEcs = new Set<string>();
-    const ecTerms: string[] = [];
-    for (const m of ecMatches) {
-      const num = m[1];
-      const year = m[2];
-      if (seenEcs.has(num)) continue;
-      seenEcs.add(num);
-      ecTerms.push(year ? `EC ${num}/${year}` : `EC ${num}`);
-    }
-
-    // Collect Tema reference
-    const temaMatch = lower.match(/tema\s*(\d+)/);
-
-    // Collect RE/ARE/REsp numbers
-    const reMatch = lower.match(/\b(re|are|resp)\s*(\d+)/i);
-
-    // Get relevant palavrasChave (those that appear in the tese text)
-    const relevantKw = (brief.palavrasChave || [])
-      .filter(kw => lower.includes(kw.toLowerCase()))
-      .filter(kw => kw.length > 5 && !kw.toLowerCase().startsWith("tema") && !kw.toLowerCase().startsWith("re "))
-      .slice(0, 3);
-
-    // Q1 — main conceptual query: brief keywords + first EC term
-    const mainParts = [...relevantKw.slice(0, 2), ...ecTerms.slice(0, 1)].filter(Boolean);
-    if (mainParts.length > 0) {
-      queries.push({ type: "Juri", keyword: mainParts.join(" ") });
-    } else {
-      // Fallback: extract meaningful words from tese
-      const stopwords = new Set(["direito", "pedido", "benefício", "servidor", "instituidor",
-        "falecido", "geral", "regra", "exceção", "entendimento", "firmado", "aplicação"]);
-      const fallbackWords = lower.replace(/[.,():/]/g, " ").split(/\s+/)
-        .filter(w => w.length > 6 && !stopwords.has(w));
-      const fallback = Array.from(new Set(fallbackWords)).slice(0, 3).join(" ");
-      if (fallback) queries.push({ type: "Juri", keyword: fallback });
-    }
-
-    // Q2 — Tema-specific query
-    if (temaMatch) {
-      const temaKw = relevantKw[0] ? `Tema ${temaMatch[1]} ${relevantKw[0]}` : `Tema ${temaMatch[1]}`;
-      queries.push({ type: "Juri", keyword: temaKw });
-    }
-
-    // Q3 — RE/ARE/REsp-specific query
-    if (reMatch) {
-      queries.push({ type: "Juri", keyword: `${reMatch[1].toUpperCase()} ${reMatch[2]}` });
-    }
-
-    // Q4 — EC-focused jurisprudência (if EC not already in Q1)
-    if (ecTerms.length > 0 && relevantKw.length > 1) {
-      queries.push({ type: "Juri", keyword: `${ecTerms[0]} ${relevantKw[1]}` });
-    }
-
-    return queries;
   }
 
   // Fetches /busca/search and parses HTML results (replaces defunct SRU endpoint)
@@ -244,7 +196,6 @@ export class LegalResearchService {
   private static parseLexmlSearchHtml(html: string): any[] {
     const results: any[] = [];
 
-    // Each result is inside a div with class="docHit"
     const blocks = html.split(/(?=<div[^>]+class="docHit")/gi).filter(b => b.includes('class="docHit"'));
 
     for (const block of blocks) {
@@ -258,7 +209,6 @@ export class LegalResearchService {
       const titulo = this.cleanHtml(tituloRaw);
       const tribunal = this.parseTribunal(autoridade);
 
-      // Extract decision number from title (e.g. "ARE 1300613 AgR-segundo / CE")
       const numeroMatch = titulo.match(/^([A-Z]+\s+[\d.-]+)/);
       const numero = numeroMatch ? numeroMatch[1].trim() : titulo.slice(0, 40);
 
@@ -278,7 +228,6 @@ export class LegalResearchService {
     return results;
   }
 
-  // Extracts a field value from a docHit HTML block by its label name
   private static extractLexmlField(block: string, fieldName: string): string {
     const regex = new RegExp(
       `${fieldName}\\s*(?:\\s|&nbsp;)*<\\/b><\\/td><td[^>]*>([\\s\\S]*?)<\\/td>`,
@@ -288,7 +237,6 @@ export class LegalResearchService {
     return m ? m[1].trim() : "";
   }
 
-  // Maps full tribunal name to abbreviation for scoring
   private static parseTribunal(autoridade: string): string {
     const lower = autoridade.toLowerCase();
     if (lower.includes("supremo tribunal federal")) return "STF";
@@ -298,7 +246,6 @@ export class LegalResearchService {
     return autoridade.split(".")[0].trim() || "Outro";
   }
 
-  // Strips HTML tags and decodes common entities
   private static cleanHtml(html: string): string {
     return html
       .replace(/<span[^>]*>/gi, "")
@@ -324,34 +271,58 @@ export class LegalResearchService {
     pieceType: string,
     userOrientation: string,
     source: string,
-    tribunal?: string
+    tribunal?: string,
+    briefKeywords?: string[]
   ): RankedResult {
     let score = 1.0;
-    let reason = "Aderência inicial";
+    let reason = "Base";
 
-    const textContext = ((item.titulo || "") + " " + (item.ementa || "") + " " + (item.conteudo || "")).toLowerCase();
-    const teseKeywords = teseText.toLowerCase().split(" ").filter(w => w.length > 4);
+    const textContext = (
+      (item.titulo || "") + " " +
+      (item.ementa || "") + " " +
+      (item.conteudo || "")
+    ).toLowerCase();
 
-    let hits = 0;
-    for (const w of teseKeywords) {
-      if (textContext.includes(w)) hits++;
+    const teseWords = teseText.toLowerCase().split(" ").filter(w => w.length > 4);
+    let teseHits = 0;
+    for (const w of teseWords) {
+      if (textContext.includes(w)) teseHits++;
     }
-    if (hits > 0) {
-      score += hits * 0.1;
-      reason += ` | Match tese (+${(hits * 0.1).toFixed(1)})`;
+    if (teseHits > 0) {
+      score += teseHits * 0.1;
+      reason += ` | Tese ${teseHits}(+${(teseHits * 0.1).toFixed(1)})`;
+    }
+
+    // Brief-anchored relevance: counts how many of the case's specific keywords
+    // appear in this decision's ementa/content.
+    // Zero matches → likely off-topic regardless of court prestige → penalize heavily.
+    // 2+ matches → strong contextual signal → reward.
+    if (briefKeywords && briefKeywords.length >= 3) {
+      let briefHits = 0;
+      for (const kw of briefKeywords) {
+        if (textContext.includes(kw.toLowerCase())) briefHits++;
+      }
+      if (briefHits >= 2) {
+        const bonus = parseFloat((briefHits * 0.25).toFixed(2));
+        score += bonus;
+        reason += ` | BriefMatch ${briefHits}(+${bonus})`;
+      } else if (briefHits === 0) {
+        score *= 0.1;
+        reason += ` | Off-topic(0/${briefKeywords.length})`;
+      }
     }
 
     if (tribunal && (tribunal.includes("STF") || tribunal.includes("STJ"))) {
       score += 0.3;
-      reason += " | STF/STJ (+0.3)";
+      reason += " | STF/STJ(+0.3)";
     }
 
     if (item.ementa && item.ementa.length > 150) {
       score += 0.2;
-      reason += " | Ementa rica (+0.2)";
+      reason += " | Ementa(+0.2)";
     } else if (!item.ementa && !source.includes("LexML")) {
       score -= 0.5;
-      reason += " | Sem ementa (-0.5)";
+      reason += " | SemEmenta(-0.5)";
     }
 
     if (
@@ -360,19 +331,7 @@ export class LegalResearchService {
       textContext.match(/tema \d+/)
     ) {
       score += 0.4;
-      reason += " | Repercussão/Repetitivo (+0.4)";
-    }
-
-    const contaminations = ["militar", "policial", "ferroviário", "invalidez", "penal", "criminal"];
-    for (const cont of contaminations) {
-      if (
-        textContext.includes(cont) &&
-        !userOrientation.toLowerCase().includes(cont) &&
-        !teseText.toLowerCase().includes(cont)
-      ) {
-        score -= 0.8;
-        reason += ` | Subtema Incompatível (${cont}) (-0.8)`;
-      }
+      reason += " | RepGeral(+0.4)";
     }
 
     return {
