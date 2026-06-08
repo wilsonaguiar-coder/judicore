@@ -312,6 +312,193 @@ TAREFA:
 ${tarefaByType[type]}`;
 }
 
+// ─── Normalização de Qualificação ────────────────────────────────────────────
+
+const QUAL_MISSING = "[DADO NÃO FORNECIDO]";
+
+interface NormalizedParty {
+  nome: string;
+  cpf: string;
+  rg: string;
+  orgaoExpedidor: string;
+  estadoCivil: string;
+  profissao: string;
+  endereco: string;
+  numero: string;
+  complemento: string;
+  bairro: string;
+  cidade: string;
+  uf: string;
+  cep: string;
+  qualificacao?: string;
+}
+
+interface NormalizedQualification {
+  poloAtivo: NormalizedParty[];
+  poloPassivo: NormalizedParty[];
+}
+
+function pickField(
+  extractorField: { value: string | null; confidence: string } | undefined,
+  briefFallback?: string | null
+): string {
+  if (extractorField?.confidence === 'encontrado' && extractorField.value) return extractorField.value;
+  if (briefFallback) return String(briefFallback);
+  if (extractorField?.confidence === 'baixa confiança' && extractorField.value) return extractorField.value;
+  return QUAL_MISSING;
+}
+
+function extractFromQualString(qual: string | undefined, field: 'estadoCivil' | 'profissao'): string | null {
+  if (!qual) return null;
+  if (field === 'estadoCivil') {
+    const m = qual.match(/\b(casad[oa]|solteir[oa]|viúv[oa]|divorciado?[a]?|separad[oa]|uni[aã]o\s+est[aá]vel)\b/i);
+    return m ? m[0] : null;
+  }
+  const skip = /^(brasileir[ao]|portu[gê]s[ea]?|casad[oa]|solteir[oa]|viúv[oa]|divorciado?[a]?|separad[oa])$/i;
+  const parts = qual.split(/[,.]/).map(s => s.trim()).filter(Boolean);
+  for (let i = parts.length - 1; i >= 0; i--) {
+    if (!skip.test(parts[i]) && parts[i].length > 2) return parts[i];
+  }
+  return null;
+}
+
+function resolveBriefAutora(partes: any): any {
+  if (!partes || typeof partes !== 'object') return null;
+  if (Array.isArray(partes)) return partes[0] ?? null;
+  return partes.autora ?? partes.autor ?? partes.requerente ?? null;
+}
+
+function resolveBriefReu(partes: any): any {
+  if (!partes || typeof partes !== 'object') return null;
+  if (Array.isArray(partes)) return partes[1] ?? null;
+  return partes.reu ?? partes.requerido ?? null;
+}
+
+function buildReuParty(reu: any): NormalizedParty {
+  return {
+    nome: reu.nome ?? QUAL_MISSING,
+    cpf: QUAL_MISSING, rg: QUAL_MISSING, orgaoExpedidor: QUAL_MISSING,
+    estadoCivil: QUAL_MISSING, profissao: QUAL_MISSING,
+    endereco: QUAL_MISSING, numero: QUAL_MISSING, complemento: QUAL_MISSING,
+    bairro: QUAL_MISSING, cidade: QUAL_MISSING, uf: QUAL_MISSING, cep: QUAL_MISSING,
+    qualificacao: reu.qualificacao,
+  };
+}
+
+function normalizeStructuredParty(p: any): NormalizedParty {
+  return {
+    nome:           p.nome           ?? QUAL_MISSING,
+    cpf:            p.cpf            ?? QUAL_MISSING,
+    rg:             p.rg             ?? QUAL_MISSING,
+    orgaoExpedidor: p.orgaoExpedidor ?? QUAL_MISSING,
+    estadoCivil:    p.estadoCivil    ?? QUAL_MISSING,
+    profissao:      p.profissao      ?? QUAL_MISSING,
+    endereco:       p.endereco       ?? QUAL_MISSING,
+    numero:         p.numero         ?? QUAL_MISSING,
+    complemento:    p.complemento    ?? QUAL_MISSING,
+    bairro:         p.bairro         ?? QUAL_MISSING,
+    cidade:         p.cidade         ?? QUAL_MISSING,
+    uf:             p.uf             ?? QUAL_MISSING,
+    cep:            p.cep            ?? QUAL_MISSING,
+    qualificacao:   p.qualificacao,
+  };
+}
+
+export function normalizeQualificationForPrompt(
+  qualificationData: any,
+  brief?: any
+): NormalizedQualification {
+  const result: NormalizedQualification = { poloAtivo: [], poloPassivo: [] };
+
+  const briefAutora = resolveBriefAutora(brief?.partesIdentificadas);
+  const briefReu    = resolveBriefReu(brief?.partesIdentificadas);
+
+  // Caso 1: estrutura flat do QualificationExtractor ({nome.confidence, cpf.confidence, ...})
+  const isFlat =
+    qualificationData != null &&
+    typeof qualificationData === 'object' &&
+    !Array.isArray(qualificationData) &&
+    (qualificationData.cpf?.confidence !== undefined ||
+     qualificationData.nome?.confidence !== undefined ||
+     qualificationData.rg?.confidence !== undefined);
+
+  if (isFlat) {
+    const ex = qualificationData;
+    result.poloAtivo.push({
+      nome:           pickField(ex.nome,           briefAutora?.nome),
+      cpf:            pickField(ex.cpf,            briefAutora?.cpf),
+      rg:             pickField(ex.rg,             briefAutora?.rg),
+      orgaoExpedidor: pickField(ex.orgaoExpedidor, null),
+      estadoCivil:    pickField(ex.estadoCivil,    extractFromQualString(briefAutora?.qualificacao, 'estadoCivil')),
+      profissao:      pickField(ex.profissao,      extractFromQualString(briefAutora?.qualificacao, 'profissao')),
+      endereco:       pickField(ex.endereco,       briefAutora?.endereco),
+      numero:         pickField(ex.numero,         null),
+      complemento:    pickField(ex.complemento,    null),
+      bairro:         pickField(ex.bairro,         null),
+      cidade:         pickField(ex.cidade,         null),
+      uf:             pickField(ex.uf,             null),
+      cep:            pickField(ex.cep,            null),
+    });
+    if (briefReu) result.poloPassivo.push(buildReuParty(briefReu));
+    return result;
+  }
+
+  // Caso 2: estrutura {poloAtivo[], poloPassivo[]}
+  if (Array.isArray(qualificationData?.poloAtivo)) {
+    for (const p of qualificationData.poloAtivo) result.poloAtivo.push(normalizeStructuredParty(p));
+    for (const p of (qualificationData.poloPassivo ?? [])) result.poloPassivo.push(normalizeStructuredParty(p));
+    return result;
+  }
+
+  // Caso 3: legado {autor/autora: {...}, reu: {...}}
+  if (qualificationData?.autor || qualificationData?.autora || qualificationData?.requerente) {
+    const autor = qualificationData.autor ?? qualificationData.autora ?? qualificationData.requerente;
+    const reu   = qualificationData.reu ?? qualificationData.requerido;
+    result.poloAtivo.push({
+      nome:           autor.nome       ?? QUAL_MISSING,
+      cpf:            autor.cpf        ?? QUAL_MISSING,
+      rg:             autor.rg         ?? QUAL_MISSING,
+      orgaoExpedidor: QUAL_MISSING,
+      estadoCivil:    QUAL_MISSING,
+      profissao:      QUAL_MISSING,
+      endereco:       autor.endereco   ?? QUAL_MISSING,
+      numero:         QUAL_MISSING,
+      complemento:    QUAL_MISSING,
+      bairro:         QUAL_MISSING,
+      cidade:         QUAL_MISSING,
+      uf:             QUAL_MISSING,
+      cep:            QUAL_MISSING,
+      qualificacao:   autor.qualificacao,
+    });
+    if (reu) result.poloPassivo.push(buildReuParty(reu));
+    return result;
+  }
+
+  // Fallback: apenas PieceBrief
+  if (briefAutora) {
+    result.poloAtivo.push({
+      nome:           briefAutora.nome     ?? QUAL_MISSING,
+      cpf:            briefAutora.cpf      ?? QUAL_MISSING,
+      rg:             briefAutora.rg       ?? QUAL_MISSING,
+      orgaoExpedidor: QUAL_MISSING,
+      estadoCivil:    extractFromQualString(briefAutora.qualificacao, 'estadoCivil') ?? QUAL_MISSING,
+      profissao:      extractFromQualString(briefAutora.qualificacao, 'profissao')   ?? QUAL_MISSING,
+      endereco:       briefAutora.endereco ?? QUAL_MISSING,
+      numero:         QUAL_MISSING,
+      complemento:    QUAL_MISSING,
+      bairro:         QUAL_MISSING,
+      cidade:         QUAL_MISSING,
+      uf:             QUAL_MISSING,
+      cep:            QUAL_MISSING,
+    });
+  }
+  if (briefReu) result.poloPassivo.push(buildReuParty(briefReu));
+
+  return result;
+}
+
+// ─── Fim da normalização ──────────────────────────────────────────────────────
+
 export function buildPremiumDocumentPrompt(
   type: "DESPACHO" | "DECISAO" | "SENTENCA" | "PETICAO_INICIAL" | "RECURSO",
   documents: string[],
@@ -341,38 +528,48 @@ ${documents.join("\n\n---\n\n")}`
 
   let qualBlock = "";
   if (qualificationData) {
+    let brief: any = null;
+    if (caseDescription) {
+      try { brief = JSON.parse(caseDescription); } catch { /* não é JSON — ignora */ }
+    }
+
+    const normalized = normalizeQualificationForPrompt(qualificationData, brief);
+
     qualBlock = `\n━━━ DADOS OBRIGATÓRIOS DAS PARTES (QUALIFICAÇÃO REAL) ━━━\n` +
-                `Substitua os marcadores da peça por estes dados exatos extraídos dos documentos. JAMAIS invente dados.\n`;
-    const pa = qualificationData.poloAtivo || [];
-    const pp = qualificationData.poloPassivo || [];
-    
-    if (pa.length > 0) {
+                `Substitua os marcadores da peça por estes dados exatos. JAMAIS invente dados.\n`;
+
+    const fmtParty = (p: NormalizedParty): string => {
+      let s = `- Nome: ${p.nome}\n`;
+      s += `  CPF: ${p.cpf}\n`;
+      s += `  RG: ${p.rg}\n`;
+      if (p.orgaoExpedidor !== QUAL_MISSING) s += `  Órgão Expedidor: ${p.orgaoExpedidor}\n`;
+      if (p.estadoCivil    !== QUAL_MISSING) s += `  Estado Civil: ${p.estadoCivil}\n`;
+      if (p.profissao      !== QUAL_MISSING) s += `  Profissão: ${p.profissao}\n`;
+      let addr = p.endereco;
+      if (p.numero      !== QUAL_MISSING) addr += `, ${p.numero}`;
+      if (p.complemento !== QUAL_MISSING) addr += `, ${p.complemento}`;
+      s += `  Endereço: ${addr}\n`;
+      if (p.bairro !== QUAL_MISSING) s += `  Bairro: ${p.bairro}\n`;
+      if (p.cidade !== QUAL_MISSING) s += `  Cidade: ${p.cidade}\n`;
+      if (p.uf     !== QUAL_MISSING) s += `  UF: ${p.uf}\n`;
+      if (p.cep    !== QUAL_MISSING) s += `  CEP: ${p.cep}\n`;
+      if (p.qualificacao)            s += `  Qualificação: ${p.qualificacao}\n`;
+      return s;
+    };
+
+    if (normalized.poloAtivo.length > 0) {
       qualBlock += `\n[AUTORES / REQUERENTES]\n`;
-      pa.forEach((p: any) => {
-        qualBlock += `- Nome: ${p.nome}\n`;
-        if (p.qualificacao) qualBlock += `  Qualificação: ${p.qualificacao}\n`;
-        if (p.endereco) qualBlock += `  Endereço: ${p.endereco}\n`;
-        if (p.documentos) {
-          p.documentos.forEach((d: any) => {
-            qualBlock += `  ${d.tipo}: ${d.numero}\n`;
-          });
-        }
-      });
+      normalized.poloAtivo.forEach(p => { qualBlock += fmtParty(p); });
     }
-    
-    if (pp.length > 0) {
+
+    if (normalized.poloPassivo.length > 0) {
       qualBlock += `\n[RÉUS / REQUERIDOS]\n`;
-      pp.forEach((p: any) => {
+      normalized.poloPassivo.forEach(p => {
         qualBlock += `- Nome: ${p.nome}\n`;
         if (p.qualificacao) qualBlock += `  Qualificação: ${p.qualificacao}\n`;
-        if (p.endereco) qualBlock += `  Endereço: ${p.endereco}\n`;
-        if (p.documentos) {
-          p.documentos.forEach((d: any) => {
-            qualBlock += `  ${d.tipo}: ${d.numero}\n`;
-          });
-        }
       });
     }
+
     qualBlock += "\n";
   }
 
