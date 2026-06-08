@@ -30,8 +30,7 @@ async function main() {
   const isTrabalhista = false;
   const userOrientation = "peticionar pela procedência de pedido de paridade de pensão de ex-servidora federal, falecida após a ec 41/2003.";
 
-  console.log("Executando Legal Research...");
-  const research = await LegalResearchService.executeResearch(brief.palavrasChave, userOrientation, isTrabalhista);
+  const research = await LegalResearchService.executeResearch(brief, userOrientation, isTrabalhista, "CIVIL");
 
   console.log("Construindo Legal Matrix...");
   const matrix = await LegalMatrixBuilderService.buildMatrix(brief, research);

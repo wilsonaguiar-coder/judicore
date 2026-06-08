@@ -68,8 +68,8 @@ export class GenerationPipeline {
 
       // 4. Pesquisa Jurídica (ES/LanceDB + LexML)
       const isTrabalhista = userOrientation.toLowerCase().includes("trabalho") || pieceType.toLowerCase().includes("trabalho");
-      const research = await LegalResearchService.executeResearch(brief.palavrasChave, userOrientation, isTrabalhista);
-      const researchResultsCount = research.jurisprudenciaLocal.length + research.jurisprudenciaLexML.length + research.legislacaoLexML.length;
+      const research = await LegalResearchService.executeResearch(brief, userOrientation, isTrabalhista, "CIVIL");
+      const researchResultsCount = research.teses.reduce((acc, t) => acc + t.jurisprudencia.length + t.legislacao.length, 0);
 
       // 4.5. Legal Matrix Builder (Determinístico - Fase 12.5.2)
       const legalMatrix = await LegalMatrixBuilderService.buildMatrix(brief, research);
@@ -106,12 +106,12 @@ export class GenerationPipeline {
           pieceBriefJson: brief as any,
           qualificationJson: qualData as any,
           researchSummaryJson: {
-            stfStjTotal: research.jurisprudenciaLocal.length,
-            lexmlJuriTotal: research.jurisprudenciaLexML.length,
-            lexmlLegisTotal: research.legislacaoLexML.length,
+            stfStjTotal: research.teses.reduce((acc, t) => acc + t.jurisprudencia.filter(j => j.fonte.includes("LanceDB")).length, 0),
+            lexmlJuriTotal: research.teses.reduce((acc, t) => acc + t.jurisprudencia.filter(j => j.fonte.includes("LexML")).length, 0),
+            lexmlLegisTotal: research.teses.reduce((acc, t) => acc + t.legislacao.length, 0),
             fontesSelecionadas: [
-              ...legalMatrix.teses.flatMap(t => t.jurisprudenciaAplicavel.map(j => j.fonte)),
-              ...legalMatrix.teses.flatMap(t => t.fundamentosLegais.map(l => l.fonte))
+              ...legalMatrix.teses.flatMap(t => t.jurisprudenciaAplicavel),
+              ...legalMatrix.teses.flatMap(t => t.fundamentosLegais)
             ]
           },
           legalMatrixJson: legalMatrix as any,

@@ -1,5 +1,5 @@
 import type { PieceBrief } from "./piece-brief.service.js";
-import type { LegalResearchPack } from "../legal-research/legal-research.service.js";
+import type { LegalResearchPack, TeseResearchPack } from "../legal-research/legal-research.service.js";
 import { PrismaClient } from "@judicore/db";
 
 const prisma = new PrismaClient();
@@ -7,8 +7,8 @@ const prisma = new PrismaClient();
 export interface LegalMatrixTese {
   tese: string;
   fatosRelevantes: string[];
-  fundamentosLegais: string[]; // Agora guarda apenas as chaves [DISP-X]
-  jurisprudenciaAplicavel: string[]; // Agora guarda apenas as chaves [JUR-X]
+  fundamentosLegais: string[]; 
+  jurisprudenciaAplicavel: string[]; 
   aplicacaoConcreta: string;
   pedidoRelacionado: string;
 }
@@ -21,85 +21,73 @@ export interface LegalMatrix {
 }
 
 export class LegalMatrixBuilderService {
-  /**
-   * Constrói de forma determinística a Matriz de Argumentação, 
-   * buscando os textos literais no LegisDB local.
-   */
   static async buildMatrix(brief: PieceBrief, research: LegalResearchPack): Promise<LegalMatrix> {
     const teses: LegalMatrixTese[] = [];
-    
-    const topLegislacao = research.legislacaoLexML.slice(0, 3);
-    const topJurisprudencia = [
-      ...research.jurisprudenciaLocal.slice(0, 3),
-      ...research.jurisprudenciaLexML.slice(0, 2)
-    ];
-
-    const tesesBase = brief.tesesIdentificadas.length > 0 
-      ? brief.tesesIdentificadas 
-      : [brief.estrategiaSugerida || "Tese Jurídica Principal"];
 
     const globalLegislacao = new Map<string, any>();
     const globalJurisprudencia = new Map<string, any>();
     
-    // Objeto de observabilidade que a nova versão exigiu
     const observability = {
-      queryLexML_Jurisprudencia: research.observability?.queryLexML_Jurisprudencia || "N/A",
-      queryLexML_Legislacao: research.observability?.queryLexML_Legislacao || "N/A",
-      queryLanceDB: research.observability?.queryLanceDB || "N/A",
-      queryTST: research.observability?.queryTST || "N/A",
-      queriesLegisDbPorTese: [] as any[],
-      resultadosRetornados: {
-        legisDB: [] as string[],
-        lexML: [] as string[],
-        lanceDB: [] as string[]
-      },
-      resultadosAproveitados: {
-        legisDB: [] as string[],
-        lexML: [] as string[],
-        lanceDB: [] as string[]
-      },
-      resultadosDescartados: [] as string[]
+      pesquisaPorTese: [] as any[],
+      resultadosRetornados: { legisDB: 0, lexML: 0, lanceDB: 0 },
+      resultadosAproveitados: { legisDB: 0, lexML: 0, lanceDB: 0 },
+      resultadosDescartados: [] as any[]
     };
 
-    // Populando resultados retornados na origem
-    observability.resultadosRetornados.lexML = topLegislacao.map(l => l.titulo);
-    observability.resultadosRetornados.lanceDB = topJurisprudencia.map(j => j.numero || j.titulo);
-
-    // Mapeamento corrigido para preservar EMENTAS INTEGRALMENTE (Bloco 6)
-    // Sem truncamento substring(0,300)
-    const enrichedJurisprudencia = topJurisprudencia.map((j, idx) => {
-      const id = `[JUR-${idx + 1}]`;
-      const doc = {
-        id,
-        titulo: j.titulo || `Decisão do ${j.tribunal || "Tribunal"}`, 
-        fonte: j.fonte || j.url || "Indisponível",
-        tribunal: j.tribunal || "Indisponível",
-        numero: j.numero || "Indisponível",
-        ementa: j.ementa || j.conteudo || j.conteudoIntegral || "Ementa indisponível",
-        motivoSelecao: "Identificado como relevante para as teses do PieceBrief e orientação do usuário."
-      };
-      globalJurisprudencia.set(id, doc);
-      observability.resultadosAproveitados.lanceDB.push(doc.numero);
-      return doc;
-    });
-
     let dispCounter = 1;
+    let jurCounter = 1;
 
-    for (let i = 0; i < tesesBase.length; i++) {
-      const teseText = tesesBase[i];
+    for (let i = 0; i < research.teses.length; i++) {
+      const researchTese = research.teses[i];
+      const teseText = researchTese.tese;
       const refsTeseLegis: string[] = [];
-      const refsTeseJuri: string[] = []; // Se tivéssemos classificação por tese, colocaríamos aqui.
+      const refsTeseJuri: string[] = []; 
       
-      // Associamos todas as JUR por padrão ou fazemos match simples
-      enrichedJurisprudencia.forEach(j => refsTeseJuri.push(j.id));
+      const combinedContext = (teseText + " " + brief.fatosRelevantes.join(" ") + " " + (brief.palavrasChave||[]).join(" ")).toLowerCase();
+      
+      // ===== JURISPRUDÊNCIA (LanceDB + LexML) =====
+      // Limites: 3 por padrão, até 5 se for Tema/STF/Repercussão
+      let juriAproveitadosTese = 0;
+      let juriLimit = 3;
+      
+      // Verifica se a tese pede exceção
+      if (combinedContext.includes("tema") || combinedContext.includes("repercussão geral") || combinedContext.includes("repetitivo") || teseText.toLowerCase().includes("stf")) {
+          juriLimit = 5;
+      }
 
-      // 1. Busca Direcionada no LegisDB por tese (Bloco 1 e 5)
-      // Extrair padrões específicos: EC, Lei, Art.
+      for (const j of researchTese.jurisprudencia) {
+          if (juriAproveitadosTese >= juriLimit) break;
+          
+          let existingId = null;
+          // Busca no global
+          for (const [key, val] of globalJurisprudencia.entries()) {
+              if (val.numero === j.numero || val.titulo === j.titulo) { existingId = key; break; }
+          }
+
+          if (!existingId) {
+             existingId = `[JUR-${jurCounter++}]`;
+             globalJurisprudencia.set(existingId, {
+               id: existingId,
+               titulo: j.titulo, 
+               fonte: j.fonte,
+               tribunal: j.tribunal || "Tribunal Superior",
+               numero: j.numero || "Indisponível",
+               ementa: j.ementa || j.conteudo || "Ementa indisponível"
+             });
+             observability.resultadosAproveitados[j.fonte === "LexML" ? "lexML" : "lanceDB"]++;
+          }
+          if (!refsTeseJuri.includes(existingId)) refsTeseJuri.push(existingId);
+          juriAproveitadosTese++;
+      }
+
+      // Descarta o excedente
+      for (let k = juriLimit; k < researchTese.jurisprudencia.length; k++) {
+         observability.resultadosDescartados.push({ item: researchTese.jurisprudencia[k].titulo, score: researchTese.jurisprudencia[k].score, reason: "Descartado pelo limite por tese (máx " + juriLimit + ")" });
+      }
+
+      // ===== LEGISDB (Local) =====
       const searchKeywords = teseText.split(" ").filter(w => w.length > 4);
       const exactMatches = [];
-      
-      // Busca específica de Emendas (ex: EC 41/2003, Tema 396) no teseText e brief
-      const combinedContext = (teseText + " " + brief.fatosRelevantes.join(" ") + " " + (brief.palavrasChave||[]).join(" ")).toLowerCase();
       
       if (combinedContext.includes("ec 41") || combinedContext.includes("emenda constitucional 41") || combinedContext.includes("emenda constitucional nº 41")) {
          exactMatches.push({ normaNome: { contains: "Emenda Constitucional nº 41" } });
@@ -121,27 +109,24 @@ export class LegalMatrixBuilderService {
          queryUsed = { OR: exactMatches };
          localDevices = await prisma.legisDevice.findMany({ where: queryUsed, take: 5 });
       } else if (searchKeywords.length > 0) {
-         // Fallback para keywords, mas vamos limitar
          queryUsed = { OR: searchKeywords.map(k => ({ texto: { contains: k, mode: 'insensitive' } })) };
          localDevices = await prisma.legisDevice.findMany({ where: queryUsed, take: 3 });
       }
+      observability.resultadosRetornados.legisDB += localDevices.length;
 
-      observability.queriesLegisDbPorTese.push({ tese: teseText, query: queryUsed, returnedCount: localDevices.length });
-
+      let legisAproveitadas = 0;
       for (const d of localDevices) {
+         if (legisAproveitadas >= 3) break;
          const tituloDevice = `Art. ${d.dispositivo} da ${d.normaNome}`;
-         observability.resultadosRetornados.legisDB.push(tituloDevice);
          
-         // Regra de descarte: Art. 5 inteiro (Bloco 3)
          if (d.dispositivo === "5º" && d.normaNome.includes("Constituição") && !combinedContext.includes("art. 5")) {
-             // Limita a apenas o caput ou descarta se for mto genérico
+             observability.resultadosDescartados.push({ item: tituloDevice, score: 0, reason: "Truncado por ser CF genérica" });
              const caput = d.texto.split("\\n")[0];
              d.texto = caput + " ... [Restante do Art. 5 omitido por diretriz de deduplicação]";
-             observability.resultadosDescartados.push(tituloDevice + " (truncado por ser CF genérica)");
          }
          if (["1º", "3º", "4º", "6º"].includes(d.dispositivo) && d.normaNome.includes("Constituição") && !combinedContext.includes("art. " + d.dispositivo)) {
-             observability.resultadosDescartados.push(tituloDevice + " (descartado por ser CF genérica não solicitada)");
-             continue; // Pula a inserção (Bloco 1)
+             observability.resultadosDescartados.push({ item: tituloDevice, score: 0, reason: "Descartado por ser CF genérica não solicitada" });
+             continue; 
          }
 
          let existingId = null;
@@ -157,13 +142,15 @@ export class LegalMatrixBuilderService {
                fonte: "LegisDB Local",
                textoLiteral: d.texto
              });
-             observability.resultadosAproveitados.legisDB.push(tituloDevice);
+             observability.resultadosAproveitados.legisDB++;
          }
          if (!refsTeseLegis.includes(existingId)) refsTeseLegis.push(existingId);
+         legisAproveitadas++;
       }
 
-      // Fallback LexML para tese
-      for (const l of topLegislacao) {
+      // ===== LEGISLAÇÃO LEXML =====
+      for (const l of researchTese.legislacao) {
+         if (legisAproveitadas >= 3) break;
          let existingId = null;
          for (const [key, val] of globalLegislacao.entries()) {
              if (val.titulo === l.titulo) { existingId = key; break; }
@@ -174,12 +161,22 @@ export class LegalMatrixBuilderService {
                id: existingId,
                titulo: l.titulo, 
                fonte: l.fonte, 
-               textoLiteral: "Fallback Seguro: O texto literal desta lei não está no LegisDB. Argumente com base nos princípios e cite a norma." 
+               textoLiteral: l.conteudo
              });
-             observability.resultadosAproveitados.lexML.push(l.titulo);
+             observability.resultadosAproveitados.lexML++;
          }
          if (!refsTeseLegis.includes(existingId)) refsTeseLegis.push(existingId);
+         legisAproveitadas++;
       }
+
+      observability.pesquisaPorTese.push({
+         tese: teseText,
+         queries: researchTese.queries,
+         queryLegisDB: queryUsed,
+         resultadosLanceDB: researchTese.jurisprudencia.filter(r => r.fonte.includes("LanceDB")).length,
+         resultadosLexML: researchTese.jurisprudencia.filter(r => r.fonte.includes("LexML")).length + researchTese.legislacao.length,
+         descartes: researchTese.descartes
+      });
 
       teses.push({
         tese: teseText,
@@ -235,15 +232,5 @@ export class LegalMatrixBuilderService {
     });
     
     return md;
-  }
-  
-  static buildFilteredResearch(research: LegalResearchPack) {
-    return {
-      legislacaoSelecionada: research.legislacaoLexML.slice(0, 3),
-      jurisprudenciaSelecionada: [
-        ...research.jurisprudenciaLocal.slice(0, 3),
-        ...research.jurisprudenciaLexML.slice(0, 2)
-      ]
-    };
   }
 }
