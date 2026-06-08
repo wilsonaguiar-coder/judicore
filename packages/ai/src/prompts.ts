@@ -318,6 +318,7 @@ export function buildPremiumDocumentPrompt(
   legalMatrixFormatted: string,
   caseDescription?: string,
   instruction?: string,
+  qualificationData?: any
 ): string {
   const docsBlock = documents.length > 0
     ? `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -337,6 +338,43 @@ ${documents.join("\n\n---\n\n")}`
   const caseBlock = caseDescription?.trim()
     ? `\n━━━ CONTEXTO ADICIONAL DO CASO ━━━\n${caseDescription.trim()}\n`
     : "";
+
+  let qualBlock = "";
+  if (qualificationData) {
+    qualBlock = `\n━━━ DADOS OBRIGATÓRIOS DAS PARTES (QUALIFICAÇÃO REAL) ━━━\n` +
+                `Substitua os marcadores da peça por estes dados exatos extraídos dos documentos. JAMAIS invente dados.\n`;
+    const pa = qualificationData.poloAtivo || [];
+    const pp = qualificationData.poloPassivo || [];
+    
+    if (pa.length > 0) {
+      qualBlock += `\n[AUTORES / REQUERENTES]\n`;
+      pa.forEach((p: any) => {
+        qualBlock += `- Nome: ${p.nome}\n`;
+        if (p.qualificacao) qualBlock += `  Qualificação: ${p.qualificacao}\n`;
+        if (p.endereco) qualBlock += `  Endereço: ${p.endereco}\n`;
+        if (p.documentos) {
+          p.documentos.forEach((d: any) => {
+            qualBlock += `  ${d.tipo}: ${d.numero}\n`;
+          });
+        }
+      });
+    }
+    
+    if (pp.length > 0) {
+      qualBlock += `\n[RÉUS / REQUERIDOS]\n`;
+      pp.forEach((p: any) => {
+        qualBlock += `- Nome: ${p.nome}\n`;
+        if (p.qualificacao) qualBlock += `  Qualificação: ${p.qualificacao}\n`;
+        if (p.endereco) qualBlock += `  Endereço: ${p.endereco}\n`;
+        if (p.documentos) {
+          p.documentos.forEach((d: any) => {
+            qualBlock += `  ${d.tipo}: ${d.numero}\n`;
+          });
+        }
+      });
+    }
+    qualBlock += "\n";
+  }
 
   const isPostulatorio = type === "PETICAO_INICIAL" || type === "RECURSO";
 
@@ -497,7 +535,7 @@ ATENÇÃO: produza apenas o texto da peça. Sem notas, ressalvas ou disclaimers.
 ${legalMatrixFormatted}
 
 ---
-${caseBlock}${instructionBlock}
+${qualBlock}${caseBlock}${instructionBlock}
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 REGRAS ABSOLUTAS — INVIOLÁVEIS
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━

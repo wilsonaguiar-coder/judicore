@@ -31,7 +31,8 @@ export class WriterService {
       [], // Documentos reais em texto (não usados no MVP atual diretamente aqui)
       legalMatrixFormatted,
       JSON.stringify(brief),
-      userOrientation
+      userOrientation,
+      qualificationData
     );
 
     let messages: any[] = [
