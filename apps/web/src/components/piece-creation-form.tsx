@@ -1,8 +1,8 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { ArrowLeft, UploadCloud, X, File as FileIcon, FileText, Info, AlertCircle, Copy, Download, Check } from "lucide-react";
+import { ArrowLeft, UploadCloud, X, File as FileIcon, FileText, Info, AlertCircle, Copy, Download, Check, CheckCircle2, Loader2 } from "lucide-react";
 import { useAuthStore } from "@/store/auth";
 import { PieceEvaluationForm } from "./piece-evaluation-form";
 
@@ -10,6 +10,107 @@ interface PieceCreationFormProps {
   title: string;
   description: string;
   auxiliaryText: string;
+}
+
+const GENERATION_STEPS = [
+  { id: 1, text: "Enviando e processando arquivos", duration: 15 },
+  { id: 2, text: "Extraindo inteligência e qualificação", duration: 30 },
+  { id: 3, text: "Pesquisando teses e jurisprudência", duration: 55 },
+  { id: 4, text: "Redigindo fundamentação jurídica", duration: 85 },
+  { id: 5, text: "Revisando e formatando rascunho final", duration: 99 },
+];
+
+function GenerationProgressModal({ isOpen }: { isOpen: boolean }) {
+  const [progress, setProgress] = useState(0);
+  const [currentStep, setCurrentStep] = useState(1);
+
+  useEffect(() => {
+    if (!isOpen) {
+      setProgress(0);
+      setCurrentStep(1);
+      return;
+    }
+
+    const startTime = Date.now();
+    const durationMs = 35000; // Expected generation time ~35s
+    
+    const interval = setInterval(() => {
+      const elapsed = Date.now() - startTime;
+      // Calcula progresso base usando curva (rápido no começo, devagar no final)
+      const rawProgress = (elapsed / durationMs) * 100;
+      let newProgress = Math.min(Math.floor(rawProgress + Math.random() * 5), 99);
+      
+      setProgress(newProgress);
+
+      // Encontra o passo atual baseado no progresso
+      const step = GENERATION_STEPS.slice().reverse().find(s => newProgress >= s.duration)?.id || 1;
+      // Sempre no mínimo 1 e no máximo 5, mas se passar o duration do próximo, avança
+      const nextStepIndex = GENERATION_STEPS.findIndex(s => newProgress < s.duration);
+      const activeStep = nextStepIndex === -1 ? 5 : nextStepIndex + 1;
+      
+      setCurrentStep(activeStep);
+    }, 800);
+
+    return () => clearInterval(interval);
+  }, [isOpen]);
+
+  if (!isOpen) return null;
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/80 backdrop-blur-sm animate-in fade-in duration-300">
+      <div className="bg-white rounded-2xl shadow-2xl p-8 max-w-md w-full mx-4 relative overflow-hidden">
+        {/* Progress bar top strip */}
+        <div className="absolute top-0 left-0 h-1.5 bg-slate-100 w-full">
+          <div 
+            className="h-full bg-violet-600 transition-all duration-1000 ease-out"
+            style={{ width: progress + "%" }}
+          />
+        </div>
+
+        <div className="text-center mb-8 mt-2">
+          <div className="w-16 h-16 bg-violet-100 text-violet-600 rounded-full flex items-center justify-center mx-auto mb-4 animate-pulse">
+            <Loader2 className="w-8 h-8 animate-spin" />
+          </div>
+          <h3 className="text-xl font-bold text-slate-800">Gerando Peça Jurídica</h3>
+          <p className="text-slate-500 text-sm mt-2">A inteligência artificial está trabalhando no seu caso. Isso pode levar alguns segundos.</p>
+        </div>
+
+        <div className="space-y-4 relative">
+          {/* Vertical line connector */}
+          <div className="absolute left-[11px] top-2 bottom-2 w-0.5 bg-slate-100" />
+          
+          {GENERATION_STEPS.map((step, index) => {
+            const isCompleted = currentStep > step.id;
+            const isActive = currentStep === step.id;
+            const isPending = currentStep < step.id;
+
+            return (
+              <div key={step.id} className={`flex items-start gap-3 relative ${isPending ? 'opacity-40' : 'opacity-100'} transition-opacity duration-500`}>
+                <div className="relative z-10 bg-white pt-1">
+                  {isCompleted ? (
+                    <CheckCircle2 className="w-6 h-6 text-green-500" />
+                  ) : isActive ? (
+                    <div className="w-6 h-6 rounded-full border-2 border-violet-600 flex items-center justify-center">
+                      <div className="w-2.5 h-2.5 bg-violet-600 rounded-full animate-pulse" />
+                    </div>
+                  ) : (
+                    <div className="w-6 h-6 rounded-full border-2 border-slate-300 bg-white" />
+                  )}
+                </div>
+                <div className={`pt-1 ${isActive ? 'text-violet-700 font-medium' : 'text-slate-600'}`}>
+                  {step.text}
+                </div>
+              </div>
+            );
+          })}
+        </div>
+        
+        <div className="mt-8 text-center flex items-center justify-center gap-2 text-sm font-medium text-slate-500">
+          <span className="text-violet-600">{progress}%</span> concluído
+        </div>
+      </div>
+    </div>
+  );
 }
 
 interface AttachedFile {
@@ -193,6 +294,8 @@ export function PieceCreationForm({ title, description, auxiliaryText }: PieceCr
 
   return (
     <div className="flex flex-col flex-1 h-full max-w-4xl mx-auto w-full pb-20 relative">
+      <GenerationProgressModal isOpen={isGenerating} />
+      
       {/* Toast de Geração */}
       {showToast && (
         <div className="fixed bottom-6 right-6 bg-slate-900 text-white px-4 py-3 rounded-lg shadow-lg flex items-center gap-3 animate-in slide-in-from-bottom-5 z-50">
