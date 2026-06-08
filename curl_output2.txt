@@ -1,0 +1,124 @@
+HEAD is now at 5298d42  feat: legal matrix builder
+Updating 5298d42..65cd191
+Fast-forward
+ apps/web/src/app/api/test-beta/route.ts |  40 +++++++++++++
+ run-beta-12-5-2-test.ts                 |   4 +-
+ run_remote_test_12_5_2.py               |  42 +++++++++++++
+ test_output_12_5_2.txt                  | 103 ++++++++++++++++++++++++++++++++
+ 4 files changed, 187 insertions(+), 2 deletions(-)
+ create mode 100644 apps/web/src/app/api/test-beta/route.ts
+ create mode 100644 run_remote_test_12_5_2.py
+ create mode 100644 test_output_12_5_2.txt
+Prisma schema loaded from prisma/schema.prisma
+Datasource "db": PostgreSQL database "judicore", schema "public" at "localhost:5432"
+
+8 migrations found in prisma/migrations
+
+
+No pending migrations to apply.
+Prisma schema loaded from prisma/schema.prisma
+
+✔ Generated Prisma Client (v5.22.0) to ./../../node_modules/.pnpm/@prisma+client@5.22.0_prisma@5.22.0/node_modules/@prisma/client in 171ms
+
+Start by importing your Prisma Client (See: https://pris.ly/d/importing-client)
+
+Tip: Want real-time updates to your database without manual polling? Discover how with Pulse: https://pris.ly/tip-0-pulse
+
+
+> @judicore/web@0.0.1 build
+> next build
+
+  ▲ Next.js 14.2.35
+  - Environments: .env.production
+
+   Creating an optimized production build ...
+ ✓ Compiled successfully
+   Linting and checking validity of types ...
+   Collecting page data ...
+   Generating static pages (0/39) ...
+   Generating static pages (9/39) 
+   Generating static pages (19/39) 
+   Generating static pages (29/39) 
+ ✓ Generating static pages (39/39)
+   Finalizing page optimization ...
+   Collecting build traces ...
+
+Route (app)                                                 Size     First Load JS
+┌ ○ /                                                       6.09 kB         143 kB
+├ ○ /_not-found                                             874 B          88.1 kB
+├ ƒ /api/piece-evaluation/[id]                              0 B                0 B
+├ ƒ /api/piece-evaluation/[id]/view                         0 B                0 B
+├ ƒ /api/piece-generation                                   0 B                0 B
+├ ƒ /api/review-studio/[id]/ai-review                       0 B                0 B
+├ ƒ /api/review-studio/[id]/audit                           0 B                0 B
+├ ƒ /api/review-studio/[id]/decision                        0 B                0 B
+├ ƒ /api/review-studio/[id]/re-audit                        0 B                0 B
+├ ƒ /api/review-studio/[id]/rewrite                         0 B                0 B
+├ ƒ /api/review-studio/[id]/suggestion                      0 B                0 B
+├ ƒ /api/review-studio/[id]/versions                        0 B                0 B
+├ ƒ /api/review-studio/[id]/versions/[versionId]            0 B                0 B
+├ ƒ /api/review-studio/[id]/versions/[versionId]/recommend  0 B                0 B
+├ ƒ /api/review-studio/[id]/versions/compare                0 B                0 B
+├ ○ /api/review-studio/analytics                            0 B                0 B
+├ ○ /api/review-studio/calibration                          0 B                0 B
+├ ƒ /api/review-studio/feedback                             0 B                0 B
+├ ƒ /api/review-studio/ingest                               0 B                0 B
+├ ƒ /api/test-beta                                          0 B                0 B
+├ ○ /api/test-pdf                                           0 B                0 B
+├ ○ /dashboard                                              18.3 kB         114 kB
+├ ○ /dashboard/admin                                        5.66 kB         104 kB
+├ ○ /dashboard/admin/testes                                 5.63 kB         104 kB
+├ ○ /dashboard/admin/uso                                    4.87 kB         100 kB
+├ ○ /dashboard/admin/usuarios                               5.66 kB         101 kB
+├ ƒ /dashboard/case/[id]                                    8.76 kB         109 kB
+├ ○ /dashboard/judiaudit                                    10.5 kB         106 kB
+├ ○ /dashboard/judiaudit/nova                               5.37 kB         101 kB
+├ ○ /dashboard/pieces                                       4.2 kB         99.7 kB
+├ ○ /dashboard/pieces/appeal                                643 B           104 kB
+├ ○ /dashboard/pieces/contestation                          649 B           104 kB
+├ ○ /dashboard/pieces/counterarguments                      665 B           104 kB
+├ ○ /dashboard/pieces/decision                              654 B           104 kB
+├ ○ /dashboard/pieces/embargos                              648 B           104 kB
+├ ○ /dashboard/pieces/initial-petition                      709 B           104 kB
+├ ○ /dashboard/pieces/objection                             640 B           104 kB
+├ ○ /dashboard/pieces/order                                 647 B           104 kB
+├ ○ /dashboard/pieces/reply                                 642 B           104 kB
+├ ○ /dashboard/pieces/sentence                              647 B           104 kB
+├ ○ /dashboard/pje                                          2.69 kB        98.2 kB
+├ ○ /dashboard/search                                       2.32 kB         102 kB
+├ ○ /dashboard/settings                                     2.69 kB        98.2 kB
+├ ○ /dashboard/social-security-calculations                 2.68 kB        98.2 kB
+├ ○ /icon.png                                               0 B                0 B
+├ ○ /login                                                  2.48 kB         142 kB
+├ ○ /privacidade                                            3.51 kB         140 kB
+├ ƒ /review-studio/[id]                                     11.3 kB        98.6 kB
+├ ○ /review-studio/analytics                                2.72 kB          90 kB
+├ ○ /sobre                                                  4.08 kB         141 kB
+└ ○ /termos                                                 4.14 kB         141 kB
++ First Load JS shared by all                               87.3 kB
+  ├ chunks/0a8b1846-c014068565047805.js                     53.6 kB
+  ├ chunks/3526-dfd0447293c8764b.js                         31.7 kB
+  └ other shared chunks (total)                             1.9 kB
+
+
+○  (Static)   prerendered as static content
+ƒ  (Dynamic)  server-rendered on demand
+
+Use --update-env to update environment variables
+[PM2] Applying action restartProcessId on app [judicore-web](ids: [ 1 ])
+[PM2] [judicore-web](1) ✓
+┌────┬────────────────────┬─────────────┬─────────┬─────────┬──────────┬────────┬──────┬───────────┬──────────┬──────────┬──────────┬──────────┐
+│ id │ name               │ namespace   │ version │ mode    │ pid      │ uptime │ ↺    │ status    │ cpu      │ mem      │ user     │ watching │
+├────┼────────────────────┼─────────────┼─────────┼─────────┼──────────┼────────┼──────┼───────────┼──────────┼──────────┼──────────┼──────────┤
+│ 4  │ judicore-api       │ default     │ N/A     │ fork    │ 1606078  │ 24m    │ 199  │ online    │ 0%       │ 61.8mb   │ root     │ disabled │
+│ 3  │ judicore-search    │ default     │ N/A     │ fork    │ 1606175  │ 24m    │ 411  │ online    │ 0%       │ 2.7gb    │ root     │ disabled │
+│ 1  │ judicore-web       │ default     │ N/A     │ fork    │ 1616255  │ 0s     │ 258  │ online    │ 0%       │ 3.3mb    │ root     │ disabled │
+└────┴────────────────────┴─────────────┴─────────┴─────────┴──────────┴────────┴──────┴───────────┴──────────┴──────────┴──────────┴──────────┘
+{"success":false,"error":"Usuário não encontrado"}
+ERRORS:
+From https://github.com/wilsonaguiar-coder/judicore
+ * branch            main       -> FETCH_HEAD
+ ⚠ Sending SIGTERM signal to Next.js build worker due to timeout of 60 seconds. Subsequent errors may be a result of the worker exiting.
+ ⨯ Next.js build worker exited with code: null and signal: SIGTERM
+ ⚠ Restarted static page generation for /api/test-beta because it took more than 60 seconds
+ ⚠ See more info here https://nextjs.org/docs/messages/static-page-generation-timeout

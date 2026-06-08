@@ -5,7 +5,7 @@ import { prisma } from "@judicore/db";
 export async function GET() {
   try {
     const input = {
-      userId: "user_teste_123",
+    userId: "cmosstzkf00007w17jjo10cwo",
       pieceType: "Petição Inicial",
       userOrientation: "peticionar pela procedência de pedido de paridade de pensão de ex-servidora federal, falecida após a ec 41/2003. O autor é João da Silva, marido da falecida Maria da Silva. CPF 123.456.789-00, residente na Rua das Flores, 123, Brasília, DF, CEP 70000-000.",
       files: [

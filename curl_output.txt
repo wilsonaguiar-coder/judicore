@@ -1,0 +1,123 @@
+Updating 5298d42..65cd191
+Prisma schema loaded from prisma/schema.prisma
+Datasource "db": PostgreSQL database
+
+Prisma schema loaded from prisma/schema.prisma
+
+✔ Generated Prisma Client (v5.22.0) to ./../../node_modules/.pnpm/@prisma+client@5.22.0_prisma@5.22.0/node_modules/@prisma/client in 169ms
+
+Start by importing your Prisma Client (See: https://pris.ly/d/importing-client)
+
+Tip: Curious about the SQL queries Prisma ORM generates? Optimize helps you enhance your visibility: https://pris.ly/tip-2-optimize
+
+
+> @judicore/web@0.0.1 build
+> next build
+
+  ▲ Next.js 14.2.35
+  - Environments: .env.production
+
+   Creating an optimized production build ...
+ ✓ Compiled successfully
+   Linting and checking validity of types ...
+   Collecting page data ...
+   Generating static pages (0/38) ...
+   Generating static pages (9/38) 
+   Generating static pages (18/38) 
+   Generating static pages (28/38) 
+ ✓ Generating static pages (38/38)
+   Finalizing page optimization ...
+   Collecting build traces ...
+
+Route (app)                                                 Size     First Load JS
+┌ ○ /                                                       6.09 kB         143 kB
+├ ○ /_not-found                                             874 B          88.1 kB
+├ ƒ /api/piece-evaluation/[id]                              0 B                0 B
+├ ƒ /api/piece-evaluation/[id]/view                         0 B                0 B
+├ ƒ /api/piece-generation                                   0 B                0 B
+├ ƒ /api/review-studio/[id]/ai-review                       0 B                0 B
+├ ƒ /api/review-studio/[id]/audit                           0 B                0 B
+├ ƒ /api/review-studio/[id]/decision                        0 B                0 B
+├ ƒ /api/review-studio/[id]/re-audit                        0 B                0 B
+├ ƒ /api/review-studio/[id]/rewrite                         0 B                0 B
+├ ƒ /api/review-studio/[id]/suggestion                      0 B                0 B
+├ ƒ /api/review-studio/[id]/versions                        0 B                0 B
+├ ƒ /api/review-studio/[id]/versions/[versionId]            0 B                0 B
+├ ƒ /api/review-studio/[id]/versions/[versionId]/recommend  0 B                0 B
+├ ƒ /api/review-studio/[id]/versions/compare                0 B                0 B
+├ ○ /api/review-studio/analytics                            0 B                0 B
+├ ○ /api/review-studio/calibration                          0 B                0 B
+├ ƒ /api/review-studio/feedback                             0 B                0 B
+├ ƒ /api/review-studio/ingest                               0 B                0 B
+├ ○ /api/test-pdf                                           0 B                0 B
+├ ○ /dashboard                                              18.3 kB         114 kB
+├ ○ /dashboard/admin                                        5.66 kB         104 kB
+├ ○ /dashboard/admin/testes                                 5.63 kB         104 kB
+├ ○ /dashboard/admin/uso                                    4.87 kB         100 kB
+├ ○ /dashboard/admin/usuarios                               5.66 kB         101 kB
+├ ƒ /dashboard/case/[id]                                    8.76 kB         109 kB
+├ ○ /dashboard/judiaudit                                    10.5 kB         106 kB
+├ ○ /dashboard/judiaudit/nova                               5.37 kB         101 kB
+├ ○ /dashboard/pieces                                       4.2 kB         99.7 kB
+├ ○ /dashboard/pieces/appeal                                643 B           104 kB
+├ ○ /dashboard/pieces/contestation                          649 B           104 kB
+├ ○ /dashboard/pieces/counterarguments                      665 B           104 kB
+├ ○ /dashboard/pieces/decision                              654 B           104 kB
+├ ○ /dashboard/pieces/embargos                              648 B           104 kB
+├ ○ /dashboard/pieces/initial-petition                      709 B           104 kB
+├ ○ /dashboard/pieces/objection                             640 B           104 kB
+├ ○ /dashboard/pieces/order                                 647 B           104 kB
+├ ○ /dashboard/pieces/reply                                 642 B           104 kB
+├ ○ /dashboard/pieces/sentence                              647 B           104 kB
+├ ○ /dashboard/pje                                          2.69 kB        98.2 kB
+├ ○ /dashboard/search                                       2.32 kB         102 kB
+├ ○ /dashboard/settings                                     2.69 kB        98.2 kB
+├ ○ /dashboard/social-security-calculations                 2.68 kB        98.2 kB
+├ ○ /icon.png                                               0 B                0 B
+├ ○ /login                                                  2.48 kB         142 kB
+├ ○ /privacidade                                            3.51 kB         140 kB
+├ ƒ /review-studio/[id]                                     11.3 kB        98.6 kB
+├ ○ /review-studio/analytics                                2.72 kB          90 kB
+├ ○ /sobre                                                  4.08 kB         141 kB
+└ ○ /termos                                                 4.14 kB         141 kB
++ First Load JS shared by all                               87.3 kB
+  ├ chunks/0a8b1846-c014068565047805.js                     53.6 kB
+  ├ chunks/3526-dfd0447293c8764b.js                         31.7 kB
+  └ other shared chunks (total)                             1.9 kB
+
+
+○  (Static)   prerendered as static content
+ƒ  (Dynamic)  server-rendered on demand
+
+Use --update-env to update environment variables
+[PM2] Applying action restartProcessId on app [judicore-web](ids: [ 1 ])
+[PM2] [judicore-web](1) ✓
+┌────┬────────────────────┬─────────────┬─────────┬─────────┬──────────┬────────┬──────┬───────────┬──────────┬──────────┬──────────┬──────────┐
+│ id │ name               │ namespace   │ version │ mode    │ pid      │ uptime │ ↺    │ status    │ cpu      │ mem      │ user     │ watching │
+├────┼────────────────────┼─────────────┼─────────┼─────────┼──────────┼────────┼──────┼───────────┼──────────┼──────────┼──────────┼──────────┤
+│ 4  │ judicore-api       │ default     │ N/A     │ fork    │ 1606078  │ 21m    │ 199  │ online    │ 0%       │ 61.8mb   │ root     │ disabled │
+│ 3  │ judicore-search    │ default     │ N/A     │ fork    │ 1606175  │ 21m    │ 411  │ online    │ 0%       │ 1.7gb    │ root     │ disabled │
+│ 1  │ judicore-web       │ default     │ N/A     │ fork    │ 1614900  │ 0s     │ 257  │ online    │ 0%       │ 5.7mb    │ root     │ disabled │
+└────┴────────────────────┴─────────────┴─────────┴─────────┴──────────┴────────┴──────┴───────────┴──────────┴──────────┴──────────┴──────────┘
+
+ERRORS:
+From https://github.com/wilsonaguiar-coder/judicore
+ * branch            main       -> FETCH_HEAD
+   2afeb2f..65cd191  main       -> origin/main
+error: Your local changes to the following files would be overwritten by merge:
+	run-beta-12-5-2-test.ts
+Please commit your changes or stash them before you merge.
+Aborting
+Error: Prisma schema validation - (get-config wasm)
+Error code: P1012
+error: Environment variable not found: DATABASE_URL.
+  -->  prisma/schema.prisma:7
+   | 
+ 6 |   provider = "postgresql"
+ 7 |   url      = env("DATABASE_URL")
+   | 
+
+Validation Error Count: 1
+[Context: getConfig]
+
+Prisma CLI Version : 5.22.0
