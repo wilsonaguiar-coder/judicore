@@ -53,10 +53,25 @@ export class QualificationExtractor {
       cep:            notFound(),
     };
 
-    // CPF
-    const cpfMatch = text.match(/\b\d{3}\.?\d{3}\.?\d{3}-?\d{2}\b/);
-    if (cpfMatch) {
-      data.cpf = found(cpfMatch[0]);
+    // CPF — prioridade 1: prefixo explícito "CPF:" (comum em OCR de CNH/RG)
+    // Normaliza os dígitos e reformata para XXX.XXX.XXX-XX
+    const cpfPrefixado = text.match(
+      /(?:CPF|C\.P\.F\.)\s*[:\s.]{0,3}(\d{3}[.\s-]?\d{3}[.\s-]?\d{3}[.\s-]?\d{2})/i
+    );
+    if (cpfPrefixado) {
+      const digits = cpfPrefixado[1].replace(/\D/g, "");
+      if (digits.length === 11) {
+        data.cpf = found(`${digits.slice(0,3)}.${digits.slice(3,6)}.${digits.slice(6,9)}-${digits.slice(9)}`);
+      }
+    }
+
+    // CPF — prioridade 2: formato estrito XXX.XXX.XXX-XX com separadores obrigatórios
+    // (evita capturar RENACH de 11 dígitos sem formatação presente na URL do QR Code da CNH)
+    if (!data.cpf.value) {
+      const cpfFormatado = text.match(/\b(\d{3}\.\d{3}\.\d{3}-\d{2})\b/);
+      if (cpfFormatado) {
+        data.cpf = found(cpfFormatado[1]);
+      }
     }
 
     // RG com órgão expedidor opcional ("RG 12.345.678-9 SSP/SP")
