@@ -84,7 +84,7 @@ export class LegalResearchService {
            let currentUrl = "";
            try {
                const fullCql = `${lq.cql} AND (${lq.type === "Juri" ? 'tipoDocumento="Acórdão"' : 'tipoDocumento="Lei" OR tipoDocumento="Decreto" OR tipoDocumento="Constituição"'})`;
-               const limit = 5; // Menos resultados por query curta
+               const limit = 10; // Aumentado para capturar mais decisões por query
                const t1 = Date.now();
                
                const params = new URLSearchParams({
@@ -103,7 +103,7 @@ export class LegalResearchService {
                lexMLQueriesLogged.push({ cql: lq.cql, returnedCount: results.length, url: currentUrl });
 
                if (lq.type === "Juri") {
-                   rawJuri = rawJuri.concat(results.map(r => ({ ...r, origin: "LexML", tribunal: "LexML" })));
+                   rawJuri = rawJuri.concat(results.map(r => ({ ...r, origin: "LexML", tribunal: r.publisher || "LexML" })));
                } else {
                    rawLegis = rawLegis.concat(results.map(r => ({ ...r, origin: "LexML" })));
                }
@@ -172,23 +172,23 @@ export class LegalResearchService {
       const queries: { type: "Juri"|"Legis", cql: string }[] = [];
       const lower = teseText.toLowerCase();
 
-      // Q2 - Jurisprudência Exata (Normalização de Tema e RE)
+      // Q2 - Jurisprudência por Tema e RE (all = todos os termos, não necessariamente adjacentes)
       const temaMatch = lower.match(/tema\s*(\d+)/);
       if (temaMatch) {
-          queries.push({ type: "Juri", cql: `palavras="Tema ${temaMatch[1]}"` });
+          queries.push({ type: "Juri", cql: `palavras all "Tema ${temaMatch[1]}"` });
       }
 
       const reMatch = lower.match(/re\s*(\d+)[.-]?(\d+)?/);
       if (reMatch) {
           const rawNum = reMatch[0].replace(/[^0-9]/g, ""); // Ex: 603580
-          queries.push({ type: "Juri", cql: `palavras="RE ${rawNum}"` });
+          queries.push({ type: "Juri", cql: `palavras all "RE ${rawNum}"` });
           if (rawNum.length > 3) {
               const formatted = `RE ${rawNum.slice(0,3)}.${rawNum.slice(3)}`;
-              queries.push({ type: "Juri", cql: `palavras="${formatted}"` });
+              queries.push({ type: "Juri", cql: `palavras all "${formatted}"` });
           }
       }
 
-      // Q3 - Normativa Exata (captura TODAS as ECs com matchAll — EC 41, EC 41/2003, Emenda Constitucional nº 41, etc.)
+      // Q3 - Normativa (captura TODAS as ECs com matchAll — EC 41, EC 41/2003, Emenda Constitucional nº 41, etc.)
       const ecRegex = /(?:\bec\b|emenda constitucional)\s*(?:n[.o]?\s*)?(\d+)(?:\/(\d{4}))?/gi;
       const ecMatches = Array.from(lower.matchAll(ecRegex));
       const seenEcs = new Set<string>();
@@ -202,24 +202,24 @@ export class LegalResearchService {
 
           if (!ecNumber) ecNumber = num; // primeiro EC detectado para uso no Q1
 
-          queries.push({ type: "Legis", cql: `palavras="EC ${num}"` });
-          queries.push({ type: "Juri",  cql: `palavras="EC ${num}"` });
+          queries.push({ type: "Legis", cql: `palavras all "EC ${num}"` });
+          queries.push({ type: "Juri",  cql: `palavras all "EC ${num}"` });
           if (year) {
-              queries.push({ type: "Legis", cql: `palavras="EC ${num}/${year}"` });
-              queries.push({ type: "Juri",  cql: `palavras="EC ${num}/${year}"` });
+              queries.push({ type: "Legis", cql: `palavras all "EC ${num} ${year}"` });
+              queries.push({ type: "Juri",  cql: `palavras all "EC ${num} ${year}"` });
           }
       }
 
 
-      // Q1 - Conceitual
+      // Q1 - Conceitual (keywords do brief)
       const teseKeywords = (brief.palavrasChave || []).filter(kw => lower.includes(kw.toLowerCase()));
       const selected = teseKeywords.filter(kw => !kw.toLowerCase().includes("tema") && !kw.toLowerCase().includes("re") && !kw.toLowerCase().includes("ec ")).slice(0, 2);
-      
+
       if (selected.length > 0) {
           const mainConcept = selected.join(" ");
-          queries.push({ type: "Juri", cql: `palavras="${mainConcept}"` });
+          queries.push({ type: "Juri", cql: `palavras all "${mainConcept}"` });
           if (ecNumber) {
-              queries.push({ type: "Juri", cql: `palavras="EC ${ecNumber} ${mainConcept}"` });
+              queries.push({ type: "Juri", cql: `palavras all "EC ${ecNumber} ${mainConcept}"` });
           }
       } else {
           // Fallback se não encontrar keywords prontas
@@ -228,7 +228,7 @@ export class LegalResearchService {
              .filter(w => w.length > 5 && !stopwords.includes(w));
           const fallback = Array.from(new Set(cleanWords)).slice(0, 2).join(" ");
           if (fallback) {
-              queries.push({ type: "Juri", cql: `palavras="${fallback}"` });
+              queries.push({ type: "Juri", cql: `palavras all "${fallback}"` });
           }
       }
 
@@ -251,10 +251,12 @@ export class LegalResearchService {
       const title = this.extractDc(record, "title");
       const desc = this.extractDc(record, "description");
       const urn = this.extractDc(record, "identifier");
+      const publisher = this.extractDc(record, "publisher");
       return {
         titulo: title,
         conteudo: desc || title || "Não disponível",
-        fonte: urn
+        fonte: urn,
+        publisher
       };
     });
 

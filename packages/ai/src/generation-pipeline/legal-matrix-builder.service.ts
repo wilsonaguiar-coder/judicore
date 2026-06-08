@@ -179,10 +179,10 @@ export class LegalMatrixBuilderService {
 
       // ===== JURISPRUDÊNCIA (LanceDB + LexML) =====
       let juriAproveitadosTese = 0;
-      let juriLimit = 3;
+      let juriLimit = 5;
 
       if (combinedContext.includes("tema") || combinedContext.includes("repercussão geral") || combinedContext.includes("repetitivo") || teseText.toLowerCase().includes("stf")) {
-        juriLimit = 5;
+        juriLimit = 8;
       }
 
       for (const j of researchTese.jurisprudencia) {
@@ -356,7 +356,7 @@ export class LegalMatrixBuilderService {
         fatosRelevantes: brief.fatosRelevantes,
         fundamentosLegais: refsTeseLegis,
         jurisprudenciaAplicavel: refsTeseJuri,
-        aplicacaoConcreta: `[Instrução ao Writer: Argumentar em favor desta tese usando os fatos listados. Para embasamento, cite expressamente as normas indicadas em: ${refsTeseLegis.join(", ")}. Utilize também a jurisprudência indicada em: ${refsTeseJuri.join(", ")}]`,
+        aplicacaoConcreta: `[Instrução ao Writer: Argumentar em favor desta tese usando os fatos listados.${refsTeseLegis.length > 0 ? ` Para embasamento, cite expressamente as normas indicadas em: ${refsTeseLegis.join(", ")}.` : ""}${refsTeseJuri.length > 0 ? ` Utilize também a jurisprudência indicada em: ${refsTeseJuri.join(", ")}.` : ""}]`,
         pedidoRelacionado: brief.pedidosIdentificados[i % (brief.pedidosIdentificados.length || 1)] || "Procedência do pedido",
       });
     }
