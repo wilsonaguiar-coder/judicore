@@ -27,7 +27,7 @@ async function main() {
   const qualJson = snap?.qualificationJson || {};
   const briefJson = snap?.pieceBriefJson || {};
   const researchJson = snap?.researchSummaryJson || {};
-  const matrixJson = snap?.legalMatrixJson || {};
+  const matrixJson: any = snap?.legalMatrixJson || {};
   const promptJson: any = snap?.promptSnapshotJson || {};
 
   fs.writeFileSync("qualification_extractor_output.json", JSON.stringify(qualJson, null, 2));
@@ -42,25 +42,19 @@ async function main() {
   const metadata = {
     requestId: gen.id,
     timestamp: gen.createdAt.toISOString(),
+    promptHash: promptJson.hash || "N/A",
+    commitHash: promptJson.commitHash || "N/A",
     providerPieceBrief: "Gemini 1.5 Pro",
     providerWriter: "GPT-4o",
     inputTokensGemini: gen.inputTokensGemini,
     outputTokensGemini: gen.outputTokensGemini,
     inputTokensGpt: gen.inputTokensGpt,
     outputTokensGpt: gen.outputTokensGpt,
-    commitHash: promptJson.commitHash || "N/A",
-    promptHash: promptJson.hash || "N/A"
+    processingTimeMs: gen.processingTimeMs,
   };
   fs.writeFileSync("metadata_execution.json", JSON.stringify(metadata, null, 2));
 
-  console.log("2. Informações da Execução:");
-  console.log(`* requestId: ${gen.id}`);
-  console.log(`* timestamp: ${gen.createdAt.toISOString()}`);
-  console.log(`* commitHash: ${promptJson.commitHash || "N/A (execução anterior ao v13.5.3)"}`);
-  console.log(`* promptHash: ${promptJson.hash || "N/A"}`);
-  console.log(`* provider PieceBrief: Gemini 1.5 Pro`);
-  console.log(`* provider Writer: GPT-4o`);
-
+  // ── CONSOLE REPORT ──────────────────────────────────────────
   const s1 = JSON.stringify(qualJson);
   const s2 = JSON.stringify(briefJson);
   const s3 = promptJson.systemPromptFull || promptJson.resumoInicial || "";
@@ -69,21 +63,113 @@ async function main() {
 
   const check = (str: string, term: string) => str.includes(term) ? "SIM" : "NÃO";
 
-  const name = "FRANCISCO WILSON DE BRITO AGUIAR";
-  console.log("\n4. Validar objetivamente (NOME):");
-  console.log(`[${check(s1, name) === 'SIM' ? 'x' : ' '}] qualification_extractor_output.json - ${check(s1, name)}`);
-  console.log(`[${check(s2, name) === 'SIM' ? 'x' : ' '}] piecebrief_raw.json - ${check(s2, name)}`);
-  console.log(`[${check(s3, name) === 'SIM' ? 'x' : ' '}] writer_system_prompt.txt - ${check(s3, name)}`);
-  console.log(`[${check(s4, name) === 'SIM' ? 'x' : ' '}] writer_final_payload.json - ${check(s4, name)}`);
-  console.log(`[${check(s5, name) === 'SIM' ? 'x' : ' '}] writer_response_raw.txt - ${check(s5, name)}`);
+  console.log("══════════════════════════════════════════════════════");
+  console.log("AUDITORIA ARTEFATOS");
+  console.log("══════════════════════════════════════════════════════");
+  console.log(`requestId  : ${gen.id}`);
+  console.log(`timestamp  : ${gen.createdAt.toISOString()}`);
+  console.log(`promptHash : ${promptJson.hash || "N/A"}`);
+  console.log(`commitHash : ${promptJson.commitHash || "N/A (anterior ao v13.5.3)"}`);
+  console.log(`Gemini     : ${gen.inputTokensGemini} in / ${gen.outputTokensGemini} out`);
+  console.log(`GPT        : ${gen.inputTokensGpt} in / ${gen.outputTokensGpt} out`);
+  console.log(`Tempo total: ${gen.processingTimeMs}ms`);
 
-  const cpf = "810.848.973-34";
-  console.log("\n5. Validar objetivamente (CPF):");
-  console.log(`[${check(s1, cpf) === 'SIM' ? 'x' : ' '}] qualification_extractor_output.json - ${check(s1, cpf)}`);
-  console.log(`[${check(s2, cpf) === 'SIM' ? 'x' : ' '}] piecebrief_raw.json - ${check(s2, cpf)}`);
-  console.log(`[${check(s3, cpf) === 'SIM' ? 'x' : ' '}] writer_system_prompt.txt - ${check(s3, cpf)}`);
-  console.log(`[${check(s4, cpf) === 'SIM' ? 'x' : ' '}] writer_final_payload.json - ${check(s4, cpf)}`);
-  console.log(`[${check(s5, cpf) === 'SIM' ? 'x' : ' '}] writer_response_raw.txt - ${check(s5, cpf)}`);
+  const name = "FRANCISCO WILSON DE BRITO AGUIAR";
+  const cpf  = "810.848.973-34";
+
+  console.log("\n── NOME presente nos artefatos:");
+  console.log(`[${check(s1, name) === 'SIM' ? 'x' : ' '}] qualification_extractor_output.json`);
+  console.log(`[${check(s2, name) === 'SIM' ? 'x' : ' '}] piecebrief_raw.json`);
+  console.log(`[${check(s3, name) === 'SIM' ? 'x' : ' '}] writer_system_prompt.txt`);
+  console.log(`[${check(s4, name) === 'SIM' ? 'x' : ' '}] writer_final_payload.json`);
+  console.log(`[${check(s5, name) === 'SIM' ? 'x' : ' '}] writer_response_raw.txt`);
+
+  console.log("\n── CPF presente nos artefatos:");
+  console.log(`[${check(s1, cpf) === 'SIM' ? 'x' : ' '}] qualification_extractor_output.json`);
+  console.log(`[${check(s2, cpf) === 'SIM' ? 'x' : ' '}] piecebrief_raw.json`);
+  console.log(`[${check(s3, cpf) === 'SIM' ? 'x' : ' '}] writer_system_prompt.txt`);
+  console.log(`[${check(s4, cpf) === 'SIM' ? 'x' : ' '}] writer_final_payload.json`);
+  console.log(`[${check(s5, cpf) === 'SIM' ? 'x' : ' '}] writer_response_raw.txt`);
+
+  // ── v13.6.0: MÉTRICAS DE PESQUISA ────────────────────────────
+  const obs = matrixJson?.observability || {};
+  const jurSelecionadas: any[] = matrixJson?.jurisprudenciaSelecionada || [];
+  const legisSelecionadas: any[] = matrixJson?.legislacaoSelecionada || [];
+
+  console.log("\n── v13.6.0 — Resultados da pesquisa (LegalMatrix):");
+  console.log(`Jurisprudência no pool final : ${jurSelecionadas.length}`);
+  console.log(`Legislação no pool final     : ${legisSelecionadas.length}`);
+  console.log(`LanceDB aproveitados         : ${obs?.resultadosAproveitados?.lanceDB ?? "N/A"}`);
+  console.log(`LexML aproveitados           : ${obs?.resultadosAproveitados?.lexML ?? "N/A"}`);
+  console.log(`LegisDB aproveitados         : ${obs?.resultadosAproveitados?.legisDB ?? "N/A"}`);
+
+  if (obs?.pesquisaPorTese) {
+    for (const tp of obs.pesquisaPorTese) {
+      console.log(`\n  Tese: ${String(tp.tese).slice(0, 80)}...`);
+      if (tp.queries?.lexMLQueries) {
+        for (const q of tp.queries.lexMLQueries) {
+          console.log(`    LexML [${q.returnedCount} resultados] ${q.cql}`);
+        }
+      }
+    }
+  }
+
+  // ── ARQUIVO COMBINADO DE AUDITORIA ──────────────────────────
+  const hr = "=".repeat(80);
+  const sections: string[] = [
+    `AUDITORIA ARTEFATOS — ${promptJson.hash || "N/A"}`,
+    `Execução: ${gen.id}`,
+    `Timestamp: ${gen.createdAt.toISOString()}`,
+    `CommitHash: ${promptJson.commitHash || "N/A"}`,
+    "",
+    hr,
+    "SEÇÃO 1 — METADATA",
+    hr,
+    JSON.stringify(metadata, null, 2),
+    "",
+    hr,
+    "SEÇÃO 2 — QUALIFICATION EXTRACTOR",
+    hr,
+    JSON.stringify(qualJson, null, 2),
+    "",
+    hr,
+    "SEÇÃO 3 — PIECE BRIEF (GEMINI)",
+    hr,
+    JSON.stringify(briefJson, null, 2),
+    "",
+    hr,
+    "SEÇÃO 4 — LEGAL RESEARCH SUMMARY",
+    hr,
+    JSON.stringify(researchJson, null, 2),
+    "",
+    hr,
+    "SEÇÃO 5 — LEGAL MATRIX (com observability)",
+    hr,
+    JSON.stringify(matrixJson, null, 2),
+    "",
+    hr,
+    "SEÇÃO 6 — WRITER SYSTEM PROMPT",
+    hr,
+    promptJson.systemPromptFull || promptJson.resumoInicial || "N/A",
+    "",
+    hr,
+    "SEÇÃO 7 — WRITER USER PROMPT",
+    hr,
+    promptJson.userPromptFull || "N/A",
+    "",
+    hr,
+    "SEÇÃO 8 — GPT PAYLOAD (JSON completo)",
+    hr,
+    JSON.stringify(promptJson.gptPayloadFull || {}, null, 2),
+    "",
+    hr,
+    "SEÇÃO 9 — PEÇA FINAL (WRITER OUTPUT)",
+    hr,
+    gen.generatedText || "N/A",
+  ];
+
+  fs.writeFileSync("audit_artifacts.txt", sections.join("\n"), "utf-8");
+  console.log("\n── Arquivo combinado gravado: audit_artifacts.txt");
 }
 
 main()
