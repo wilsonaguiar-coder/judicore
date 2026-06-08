@@ -37,7 +37,7 @@ export class WriterService {
 
     let messages: any[] = [
       { role: "system", content: systemPrompt },
-      { role: "user", content: "Redija a peça final completa agora. ATENÇÃO MÁXIMA: É ESTRITAMENTE PROIBIDO escrever 'vem à presença', 'vem perante', 'Diante do exposto, requer', 'Ante o exposto, requer' ou 'Termos em que, Pede deferimento'. Vá direto ao ponto, use redação institucional e direta." }
+      { role: "user", content: "Redija a peça final completa agora. Inclua TODAS as seções obrigatórias listadas na tarefa, na ordem indicada. Para petição inicial, recurso e sentença: mínimo de 2.000 palavras — desenvolva cada seção com profundidade, não escreva resumos. ATENÇÃO MÁXIMA: É ESTRITAMENTE PROIBIDO escrever 'vem à presença', 'vem perante', 'Diante do exposto, requer', 'Ante o exposto, requer', 'Termos em que', 'Pede deferimento', '[JUR-1]', '[JUR-2]' ou qualquer '[JUR-N]' literalmente. Vá direto ao ponto, redação institucional e direta." }
     ];
 
     let draft = "";
