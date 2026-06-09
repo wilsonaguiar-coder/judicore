@@ -1,6 +1,6 @@
 import { searchJurisprudencia, searchLanceDB } from "@judicore/search";
 import type { PieceBrief } from "../generation-pipeline/piece-brief.service.js";
-import { LexmlQueryExtractorService } from "./lexml-query-extractor.service.js";
+
 
 export interface RankedResult {
   titulo: string;
@@ -46,67 +46,46 @@ export class LegalResearchService {
       ? brief.tesesIdentificadas
       : [brief.estrategiaSugerida || "Tese Principal"];
 
-    // AI-powered query extraction: Gemini 2.0 Flash-Lite reads each tese
-    // and generates optimized keyword strings for LexML jurisprudência + legislação
-    const aiQuerySets = await LexmlQueryExtractorService.extractQueriesForAll(
-      tesesBase,
-      brief.tipoPeca,
-      brief.palavrasChave
-    );
+    // Usar a teseCentralBusca fornecida pelo analista (fallback para palavrasChave)
+    const searchPhrase = brief.teseCentralBusca || (brief.palavrasChave || []).join(" ");
+    const lanceDbQueryString = searchPhrase.slice(0, 100);
 
-    // LanceDB query: brief keywords as-is (semantic search benefits from full context)
-    const lanceDbQueryString = (brief.palavrasChave || []).slice(0, 8).join(" ");
+    let globalRawJuri: any[] = [];
+    let globalRawLegis: any[] = [];
+    const lexMLQueriesLogged: { keyword: string; returnedCount: number; url: string }[] = [];
+
+    // Executar buscas em paralelo para acelerar drasticamente o pipeline
+    const t0 = Date.now();
+    const lancePromise = searchLanceDB(lanceDbQueryString, ["STF", "STJ"], 10)
+      .then(results => { globalRawJuri = globalRawJuri.concat(results.map((r: any) => ({ ...r, origin: "LanceDB" }))); })
+      .catch(err => console.warn("[LegalResearchService] LanceDB fallback:", err.message));
+
+    const lexmlJuriPromise = this.fetchLexmlSearch(searchPhrase, "Juri")
+      .then(({ results, url }) => {
+        lexMLQueriesLogged.push({ keyword: searchPhrase, returnedCount: results.length, url });
+        globalRawJuri = globalRawJuri.concat(results.map(r => ({ ...r, origin: "LexML" })));
+      })
+      .catch(() => { lexMLQueriesLogged.push({ keyword: searchPhrase, returnedCount: 0, url: "Erro de Conexão" }); });
+
+    const lexmlLegisPromise = this.fetchLexmlSearch(searchPhrase, "Legis")
+      .then(({ results, url }) => {
+        lexMLQueriesLogged.push({ keyword: searchPhrase, returnedCount: results.length, url });
+        globalRawLegis = globalRawLegis.concat(results.map(r => ({ ...r, origin: "LexML" })));
+      })
+      .catch(() => { lexMLQueriesLogged.push({ keyword: searchPhrase, returnedCount: 0, url: "Erro de Conexão" }); });
+
+    await Promise.all([lancePromise, lexmlJuriPromise, lexmlLegisPromise]);
+    const totalTimeMs = Date.now() - t0;
+    timeLanceDbMs = totalTimeMs;
+    timeLexMlMs = totalTimeMs;
 
     const researchPacks: TeseResearchPack[] = [];
 
     for (let i = 0; i < tesesBase.length; i++) {
       const teseText = tesesBase[i];
-      const querySet = aiQuerySets[i] ?? { juri: [], legis: [] };
-
-      const lexMLQueriesLogged: { keyword: string; returnedCount: number; url: string }[] = [];
-      let rawJuri: any[] = [];
-      let rawLegis: any[] = [];
+      const rawJuri = [...globalRawJuri];
+      const rawLegis = [...globalRawLegis];
       const descartes: RankedResult[] = [];
-
-      // 1. LanceDB — semantic search over STF/STJ vectors
-      try {
-        const t0 = Date.now();
-        const lanceResults = await searchLanceDB(lanceDbQueryString, ["STF", "STJ"], 10);
-        timeLanceDbMs += Date.now() - t0;
-        rawJuri = rawJuri.concat(lanceResults.map((r: any) => ({ ...r, origin: "LanceDB" })));
-      } catch (err: any) {
-        console.warn("[LegalResearchService] LanceDB fallback:", err.message);
-      }
-
-      // 2. LexML — jurisprudência keyword queries (AI-generated)
-      for (const keyword of querySet.juri) {
-        let currentUrl = "";
-        try {
-          const t1 = Date.now();
-          const { results, url } = await this.fetchLexmlSearch(keyword, "Juri");
-          timeLexMlMs += Date.now() - t1;
-          currentUrl = url;
-          lexMLQueriesLogged.push({ keyword, returnedCount: results.length, url });
-          rawJuri = rawJuri.concat(results.map(r => ({ ...r, origin: "LexML" })));
-        } catch {
-          lexMLQueriesLogged.push({ keyword, returnedCount: 0, url: currentUrl || "Erro de Conexão" });
-        }
-      }
-
-      // 3. LexML — legislação keyword queries (AI-generated)
-      for (const keyword of querySet.legis) {
-        let currentUrl = "";
-        try {
-          const t1 = Date.now();
-          const { results, url } = await this.fetchLexmlSearch(keyword, "Legis");
-          timeLexMlMs += Date.now() - t1;
-          currentUrl = url;
-          lexMLQueriesLogged.push({ keyword, returnedCount: results.length, url });
-          rawLegis = rawLegis.concat(results.map(r => ({ ...r, origin: "LexML" })));
-        } catch {
-          lexMLQueriesLogged.push({ keyword, returnedCount: 0, url: currentUrl || "Erro de Conexão" });
-        }
-      }
 
       // DEDUPLICAÇÃO E RANKING — JURISPRUDÊNCIA
       const dedupMapJuri = new Map<string, any>();

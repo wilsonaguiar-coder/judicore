@@ -214,7 +214,7 @@ export class WriterService {
         outputTokens += result.outputTokens;
 
         styleValidation = StyleLinter.validateStyle(draft);
-        if (styleValidation.score === 100 || attempt === 2) break;
+        if (styleValidation.score >= 80 || attempt === 2) break;
 
         messages.push({ role: "assistant", content: draft });
         messages.push({
@@ -238,7 +238,7 @@ export class WriterService {
         outputTokens += result.outputTokens;
 
         styleValidation = StyleLinter.validateStyle(draft);
-        if (styleValidation.score === 100 || attempt === 2) break;
+        if (styleValidation.score >= 80 || attempt === 2) break;
 
         contents.push({ role: "model", parts: [{ text: draft }] });
         contents.push({

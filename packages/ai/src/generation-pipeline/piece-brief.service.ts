@@ -10,6 +10,7 @@ export interface PieceBrief {
   pontosControvertidos: string[];
   pedidosIdentificados: string[];
   tesesIdentificadas: string[];
+  teseCentralBusca: string;
   palavrasChave: string[];
   estrategiaSugerida: string;
   riscosIdentificados: string[];
@@ -34,7 +35,8 @@ DOCUMENTOS PROCESSADOS:
 ${processedText}
 
 Retorne EXCLUSIVAMENTE um JSON válido com a interface pedida. Responda em português.
-A chave "palavrasChave" deve conter termos fortes para pesquisa no STF/STJ/LexML (ex: ["dano moral atraso voo", "decadência previdenciária"]).`;
+A chave "palavrasChave" deve conter termos fortes (ex: ["dano moral", "decadência previdenciária"]).
+A chave "teseCentralBusca" deve conter uma ÚNICA FRASE simples resumindo a tese jurídica principal da peça, ideal para busca em banco de jurisprudência (ex: "nulidade de empréstimo consignado por fraude e devolução em dobro").`;
 
     const apiKey = env["GEMINI_API_KEY"];
     if (!apiKey) throw new Error("GEMINI_API_KEY ausente nas variáveis de ambiente");
@@ -47,7 +49,7 @@ A chave "palavrasChave" deve conter termos fortes para pesquisa no STF/STJ/LexML
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         systemInstruction: { 
-          parts: [{ text: "Você é um Analista Jurídico. Responda apenas com um JSON válido contendo as chaves: tipoPeca, resumoDocumentos, partesIdentificadas, cronologia, fatosRelevantes, pontosIncontroversos, pontosControvertidos, pedidosIdentificados, tesesIdentificadas, palavrasChave, estrategiaSugerida, riscosIdentificados, lacunasIdentificadas, documentosRelevantes." }] 
+          parts: [{ text: "Você é um Analista Jurídico. Responda apenas com um JSON válido contendo as chaves: tipoPeca, resumoDocumentos, partesIdentificadas, cronologia, fatosRelevantes, pontosIncontroversos, pontosControvertidos, pedidosIdentificados, tesesIdentificadas, teseCentralBusca, palavrasChave, estrategiaSugerida, riscosIdentificados, lacunasIdentificadas, documentosRelevantes." }] 
         },
         contents: [{ role: "user", parts: [{ text: prompt }] }],
         generationConfig: { temperature: 0.1, responseMimeType: "application/json" }
