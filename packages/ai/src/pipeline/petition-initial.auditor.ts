@@ -120,7 +120,7 @@ Você deve retornar EXATAMENTE e APENAS o JSON no formato abaixo:
       `---`,
       `PEÇA GERADA A SER AUDITADA:`,
       draft
-    ].join("\\n");
+    ].join("\n");
 
     const response = await client.chat.completions.create({
       model: AUDIT_MODEL,
@@ -132,15 +132,33 @@ Você deve retornar EXATAMENTE e APENAS o JSON no formato abaixo:
       ],
     });
 
-    const rawContent = response.choices[0]?.message?.content ?? "{}";
-    // Extrai o JSON mesmo que o modelo envolva em bloco markdown ```json ... ```
-    const jsonMatch = rawContent.match(/```(?:json)?\s*([\s\S]*?)```/);
-    const raw = jsonMatch ? jsonMatch[1].trim() : rawContent.trim();
+    const rawContent = response.choices[0]?.message?.content ?? "";
+    console.log(`[PetitionInitialAuditor] Raw response length: ${rawContent.length}, finishReason: ${response.choices[0]?.finish_reason}`);
+
+    // Estratégia de extração de JSON com múltiplos fallbacks
+    let raw = rawContent.trim();
+
+    // Fallback 1: Extrair de bloco markdown ```json ... ```
+    const jsonMatch = raw.match(/```(?:json)?\s*([\s\S]*?)```/);
+    if (jsonMatch) {
+      raw = jsonMatch[1].trim();
+    }
+
+    // Fallback 2: Se ainda não começa com {, encontrar o primeiro { e último }
+    if (!raw.startsWith("{")) {
+      const firstBrace = raw.indexOf("{");
+      const lastBrace = raw.lastIndexOf("}");
+      if (firstBrace !== -1 && lastBrace > firstBrace) {
+        raw = raw.substring(firstBrace, lastBrace + 1);
+      }
+    }
+
     let parsed: InitialPetitionAuditReport;
     try {
       parsed = JSON.parse(raw) as InitialPetitionAuditReport;
     } catch {
-      throw new Error(`Auditor retornou JSON inválido: ${raw.slice(0, 200)}`);
+      console.error(`[PetitionInitialAuditor] JSON parse failed. Raw (first 500 chars): ${rawContent.slice(0, 500)}`);
+      throw new Error(`Auditor retornou JSON inválido: ${rawContent.slice(0, 300)}`);
     }
 
     return {
