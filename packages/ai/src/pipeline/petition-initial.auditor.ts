@@ -124,7 +124,6 @@ Você deve retornar EXATAMENTE e APENAS o JSON no formato abaixo:
 
     const response = await client.chat.completions.create({
       model: AUDIT_MODEL,
-      max_completion_tokens: 4096,
       response_format: { type: "json_object" },
       messages: [
         { role: "system", content: systemPrompt },
