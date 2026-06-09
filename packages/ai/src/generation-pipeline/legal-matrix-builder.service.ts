@@ -2,6 +2,12 @@ import type { PieceBrief } from "./piece-brief.service.js";
 import type { LegalResearchPack } from "../legal-research/legal-research.service.js";
 import { PrismaClient } from "@judicore/db";
 
+function toArr(v: any): string[] {
+  if (Array.isArray(v)) return v.map(String);
+  if (typeof v === "string" && v.trim()) return [v];
+  return [];
+}
+
 const prisma = new PrismaClient();
 
 export interface LegalMatrixTese {
@@ -175,7 +181,7 @@ export class LegalMatrixBuilderService {
       const refsTeseLegis: string[] = [];
       const refsTeseJuri: string[] = [];
 
-      const combinedContext = (teseText + " " + brief.fatosRelevantes.join(" ") + " " + (brief.palavrasChave || []).join(" ")).toLowerCase();
+      const combinedContext = (teseText + " " + toArr(brief.fatosRelevantes).join(" ") + " " + toArr(brief.palavrasChave).join(" ")).toLowerCase();
 
       // ===== JURISPRUDÊNCIA (LanceDB + LexML) =====
       let juriAproveitadosTese = 0;
@@ -353,11 +359,11 @@ export class LegalMatrixBuilderService {
 
       teses.push({
         tese: teseText,
-        fatosRelevantes: brief.fatosRelevantes,
+        fatosRelevantes: toArr(brief.fatosRelevantes),
         fundamentosLegais: refsTeseLegis,
         jurisprudenciaAplicavel: refsTeseJuri,
         aplicacaoConcreta: `[Instrução ao Writer: Argumentar em favor desta tese usando os fatos listados.${refsTeseLegis.length > 0 ? ` Para embasamento, cite expressamente as normas indicadas em: ${refsTeseLegis.join(", ")}.` : ""}${refsTeseJuri.length > 0 ? ` Utilize também a jurisprudência indicada em: ${refsTeseJuri.join(", ")}.` : ""}]`,
-        pedidoRelacionado: brief.pedidosIdentificados[i % (brief.pedidosIdentificados.length || 1)] || "Procedência do pedido",
+        pedidoRelacionado: toArr(brief.pedidosIdentificados)[i % (toArr(brief.pedidosIdentificados).length || 1)] || "Procedência do pedido",
       });
     }
 
