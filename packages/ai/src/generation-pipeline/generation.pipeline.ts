@@ -142,7 +142,7 @@ export class GenerationPipeline {
           },
           legalMatrixJson: legalMatrix as any,
           promptSnapshotJson: {
-            hash: "v13.12.0-gpt41",
+            hash: "v13.13.0-gemini20flash",
             versao: "1.0",
             tamanho: writerRes.inputTokens,
             resumoInicial: writerRes.promptSnapshot,

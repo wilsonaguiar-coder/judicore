@@ -4,8 +4,8 @@ import { LegalMatrixBuilderService, LegalMatrix } from "./legal-matrix-builder.s
 import { buildPremiumDocumentPrompt } from "../prompts.js";
 import { StyleLinter, StyleValidationResult } from "./style-linter.js";
 
-const WRITER_PROVIDER: "openai" | "deepseek" | "gemini" = "openai";
-const WRITER_MODEL = "gpt-4.1";
+const WRITER_PROVIDER: "openai" | "deepseek" | "gemini" = "gemini";
+const WRITER_MODEL = "gemini-2.0-flash";
 
 function brazilianDate(): string {
   return new Date().toLocaleDateString("pt-BR", {
@@ -123,7 +123,7 @@ async function callGemini(
   const apiKey = process.env["GEMINI_API_KEY"];
   if (!apiKey) throw new Error("GEMINI_API_KEY não definida");
 
-  const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash:generateContent?key=${apiKey}`;
+  const url = `https://generativelanguage.googleapis.com/v1beta/models/${WRITER_MODEL}:generateContent?key=${apiKey}`;
 
   const response = await fetch(url, {
     method: "POST",
