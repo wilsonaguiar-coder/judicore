@@ -60,8 +60,8 @@ export class LegalAuditService {
       : aprovacaoGeral === "REPROVADA" ? "REPROVADA"
       : "APROVADA COM RESSALVAS";
 
-    const fortalezas = (parsed["fortalezas"] as string[] | undefined) ?? [];
-    const sugestoesReforco = (parsed["sugestoes_reforco"] as string[] | undefined) ?? [];
+    const fortalezas = (parsed["fortalezas"] as string[] | undefined) ?? (parsed["pontos_fortes"] as string[] | undefined) ?? [];
+    const sugestoesReforco = (parsed["sugestoes_reforco"] as string[] | undefined) ?? (parsed["pontos_fracos"] as string[] | undefined) ?? [];
     const riscoProcessual = (parsed["risco_processual"] as string | undefined) ?? "";
     const riscoJustificativa = (parsed["risco_justificativa"] as string | undefined) ?? "";
 
