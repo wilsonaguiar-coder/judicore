@@ -671,16 +671,20 @@ III — DISPOSITIVO
     PETICAO_INICIAL: `Redija uma PETIÇÃO INICIAL completa, densa e sofisticada, com base nos documentos fornecidos.
 Tom persuasivo e robusto, próprio das maiores bancas de advocacia.
 
-TÍTULOS OBRIGATÓRIOS — cada um destes títulos DEVE aparecer exatamente nesta grafia, como linha separada, na ordem indicada:
+ESTRUTURA OBRIGATÓRIA — siga exatamente esta ordem e numeração:
 
   ENDEREÇAMENTO (linha inicial — aplique a regra de competência das Regras Críticas acima)
   I — DA QUALIFICAÇÃO DAS PARTES
   II — DOS FATOS
   III — DO DIREITO
+  IV — DA TUTELA DE URGÊNCIA  ← omita se não houver urgência concreta nos documentos
+  V — DA GRATUIDADE DA JUSTIÇA ← omita se não houver hipossuficiência nos documentos
   VI — DOS PEDIDOS
   VII — DO VALOR DA CAUSA
+  [FECHAMENTO]
 
-Seções IV e V: incluir SOMENTE se houver base fática concreta (urgência ou hipossuficiência nos documentos).
+⚠ PROIBIDO criar qualquer seção fora desta lista — especialmente "DAS PROVAS", "DA PROVA", "DO CABIMENTO" ou "DA COMPETÊNCIA" como seções autônomas. Provas pertencem a II (fatos) ou ao rol de pedidos em VI; nunca em seção separada.
+⚠ NUMERAÇÃO: se IV e/ou V forem omitidas, VI e VII MANTÊM seus números — não renumere para IV e V.
 
 ───────────────────────────────────────────────────
 ENDEREÇAMENTO
@@ -707,18 +711,27 @@ Mínimo 3 teses. Para cada tese, siga OBRIGATORIAMENTE este formato:
    Para cada [JUR-N] favorável: norma interpretada → tese consagrada → aplicação ao caso → pedido que fundamenta.
    Sem [JUR-N] favorável: fundamente só com lei e princípios, nunca invente jurisprudência.
 
-IV — DA TUTELA DE URGÊNCIA (somente se aplicável)
+IV — DA TUTELA DE URGÊNCIA (somente se houver urgência concreta nos documentos)
 Fumus boni iuris + periculum in mora. Art. 300 do CPC/2015.
 
-V — DA GRATUIDADE DA JUSTIÇA (somente se aplicável)
+V — DA GRATUIDADE DA JUSTIÇA (somente se houver hipossuficiência nos documentos)
 Art. 98 CPC/2015 c/c art. 5º, LXXIV CF/88.
 
 VI — DOS PEDIDOS
-Formato direto e enumerado. PROIBIDO: "Diante do exposto, requer", "Ante o exposto", "Termos em que", "Pede deferimento", "Nestes termos".
-OBRIGATÓRIO: inicie com "A parte autora formula os seguintes pedidos:" e liste cada pedido numerado com seu fundamento legal.
+PROIBIDO: "Diante do exposto, requer", "Ante o exposto", "Termos em que", "Pede deferimento", "Nestes termos".
+Inicie com "A parte autora formula os seguintes pedidos:" e liste cada pedido numerado com fundamento legal.
+ORDEM DOS PEDIDOS: 1º item = a citação da parte ré; últimos itens = honorários e custas.
+Pedido de produção de provas (se necessário): inclua como penúltimo item — NUNCA como seção "DAS PROVAS".
 
 VII — DO VALOR DA CAUSA
 Calcule e justifique com base nos pedidos (art. 292 CPC/2015).
+
+[FECHAMENTO] — escreva sempre ao final, após VII:
+[Cidade/UF], [data].
+
+[Nome do Advogado]
+OAB/[UF] nº [número]
+(Use dados reais do bloco QUALIFICAÇÃO se disponíveis; caso contrário, mantenha os marcadores entre colchetes.)
 
 ATENÇÃO: produza apenas o texto final da peça. Sem notas, ressalvas ou disclaimers.`,
 
