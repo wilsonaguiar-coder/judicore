@@ -4,8 +4,8 @@ import { LegalMatrixBuilderService, LegalMatrix } from "./legal-matrix-builder.s
 import { buildPremiumDocumentPrompt } from "../prompts.js";
 import { StyleLinter, StyleValidationResult } from "./style-linter.js";
 
-const WRITER_PROVIDER: "openai" | "deepseek" | "gemini" = "gemini";
-const WRITER_MODEL = "gemini-2.5-flash";
+const WRITER_PROVIDER: "openai" | "deepseek" | "gemini" = "deepseek";
+const WRITER_MODEL = "deepseek-chat";
 
 function brazilianDate(): string {
   return new Date().toLocaleDateString("pt-BR", {
