@@ -82,12 +82,19 @@ Você deve retornar EXATAMENTE e APENAS o JSON no formato abaixo:
 }
 \`\`\`
 
-## CRITÉRIOS DE APROVAÇÃO E REPROVAÇÃO
-- **REPROVADA** SOMENTE SE: Jurisprudência inexistente como fundamento central; lei inexistente central; tese juridicamente impossível; confusão grave de regime jurídico; pedido incompatível com a causa de pedir; fato central inventado que sustenta toda a tese.
-- **REVISÃO NECESSÁRIA**: Se houver problema material grave que precisa ser consertado antes do protocolo, mas não for fatal a ponto de reprovar o rascunho por completo.
-- **APROVADA / APROVADA COM AJUSTES**: Para todo o restante. A regra de ouro é: "Dá pra protocolar com alguns ajustes de estilo/processuais? Sim."
-- O \`documentChecklist\` DEVE ter no máximo 5 itens e NUNCA pode, sozinho, reduzir o veredicto para REVISÃO NECESSÁRIA ou REPROVADA. Documentos ausentes são mera orientação.
-`;
+## CRITÉRIOS E CALIBRAGEM DE VEREDICTO E NOTA
+A sua decisão final deve seguir EXATAMENTE a seguinte escala de nota e regras:
+
+- **APROVADA (85 a 100):** Peça perfeita ou com erros de estilo irrelevantes.
+- **APROVADA COM AJUSTES (70 a 84):** Peça sólida na tese central, mas que exige correções pontuais e redacionais.
+- **REVISÃO NECESSÁRIA (50 a 69):** Reservado APENAS se a tese central estiver juridicamente mal construída, precedente central errado/mal aplicado, confusão grave de regime jurídico, fato central inventado sem estratégia de correção, ou pedidos incompatíveis com a causa de pedir.
+- **REPROVADA (0 a 49):** Reservado SOMENTE para: jurisprudência inexistente como fundamento central, lei/artigo inexistente central, tese juridicamente impossível ou fato central inventado que sustenta toda a tese e não tem conserto.
+
+**REGRA DE OURO DO SÓCIO REVISOR:**
+"Eu deixaria meu associado protocolar esta peça amanhã **APÓS** corrigir os ajustes pontuais apontados?"
+- Se SIM -> O veredicto DEVE ser **APROVADA COM AJUSTES**.
+- Se a peça merecer APROVADA COM AJUSTES devido à natureza pontual dos erros, mas você tiver calculado internamente uma nota 68, você DEVE elevar a nota para a faixa 70–74 e garantir que o veredicto seja APROVADA COM AJUSTES.
+- O \`documentChecklist\` é puramente auxiliar e NÃO PODE reduzir a nota ou rebaixar o veredicto.`;
 
     const userContent = [
       `DADOS EXTRAÍDOS (PieceBrief):`,
