@@ -37,7 +37,7 @@ export class WriterService {
 
     let messages: any[] = [
       { role: "system", content: systemPrompt },
-      { role: "user", content: "Redija a peça final completa agora. Inclua TODAS as seções obrigatórias listadas na tarefa, na ordem indicada. Para petição inicial, recurso e sentença: mínimo de 2.000 palavras — desenvolva cada seção com profundidade, não escreva resumos. ATENÇÃO MÁXIMA: É ESTRITAMENTE PROIBIDO escrever 'vem à presença', 'vem perante', 'Diante do exposto, requer', 'Ante o exposto, requer', 'Termos em que', 'Pede deferimento', '[JUR-1]', '[JUR-2]' ou qualquer '[JUR-N]' literalmente. Vá direto ao ponto, redação institucional e direta." }
+      { role: "user", content: "Redija a peça final completa agora seguindo RIGOROSAMENTE a estrutura da tarefa.\n\nPARA PETIÇÃO INICIAL — REQUISITOS INVIOLÁVEIS:\n• A seção III — DO DIREITO deve ter no mínimo 1.200 palavras. Cada ► TESE deve ter mínimo 4 parágrafos densos (§1 contexto normativo, §2 análise do dispositivo, §3 subsunção ao caso, §4 consequência jurídica). Se uma tese ficou com menos de 4 parágrafos, está incompleta.\n• Peça completa: mínimo 2.500 palavras.\n• Mínimo 4 teses com fundamentos legais distintos.\n\nPARA RECURSO E SENTENÇA: mínimo 2.000 palavras.\n\nATENÇÃO MÁXIMA: É ESTRITAMENTE PROIBIDO escrever 'vem à presença', 'vem perante', 'Diante do exposto, requer', 'Ante o exposto, requer', 'Termos em que', 'Pede deferimento', '[JUR-1]', '[JUR-2]' ou qualquer '[JUR-N]' literalmente. Redação técnica, direta e densa." }
     ];
 
     let draft = "";
@@ -51,7 +51,7 @@ export class WriterService {
         model: "gpt-4o",
         messages: messages,
         temperature: 0.2,
-        max_tokens: 4096,
+        max_tokens: 8192,
       });
 
       draft = response.choices[0]?.message.content ?? "";

@@ -699,16 +699,23 @@ II — DOS FATOS
 Narrativa cronológica, fluente e persuasiva. Mínimo 4 parágrafos. Extraia apenas fatos presentes nos documentos; use [DADO NÃO INFORMADO] para lacunas. Não adicione fatos fictícios.
 
 III — DO DIREITO
-Mínimo 3 teses. Para cada tese, siga OBRIGATORIAMENTE este formato:
+Esta é a seção mais importante da petição — deve ser longa, técnica e exaustiva. Mínimo 4 teses DISTINTAS, cada uma com artigo central diferente. PROIBIDO: repetir o mesmo artigo ou fundamento sob nomes diferentes em teses distintas.
+
+Para cada tese, siga OBRIGATORIAMENTE este formato:
 
    ► TESE [número]: [enunciado claro da proposição jurídica]
 
-   FUNDAMENTO LEGAL: artigo específico + diploma. Só cite artigo que tem certeza que existe e se aplica. Se incerto, cite o princípio sem inventar número: "princípio da boa-fé objetiva (CC/2002)".
+   FUNDAMENTO LEGAL: artigo específico + diploma (diferente do artigo central das demais teses).
+   Só cite artigo que tem certeza que existe e se aplica. Se incerto, cite o princípio sem inventar número.
 
-   ARGUMENTO: 3-4 parágrafos — conecte o artigo, os fatos e as consequências jurídicas.
+   ARGUMENTO — mínimo 4 parágrafos densos (cada parágrafo com no mínimo 4 linhas):
+   • §1 CONTEXTO NORMATIVO: o que a norma estabelece, seu histórico e por que incide neste caso.
+   • §2 ANÁLISE DO DISPOSITIVO: extensão e limites do artigo, interpretação sistemática com outros diplomas.
+   • §3 SUBSUNÇÃO: como os fatos concretos se encaixam na norma — seja específico, não genérico.
+   • §4 CONSEQUÊNCIA JURÍDICA: o que decorre juridicamente e qual pedido este argumento sustenta.
 
    JURISPRUDÊNCIA: use APENAS [JUR-N] favoráveis — omita completamente qualquer [JUR-N] desfavorável.
-   Para cada [JUR-N] favorável: norma interpretada → tese consagrada → aplicação ao caso → pedido que fundamenta.
+   Para cada [JUR-N] favorável: norma interpretada → tese consagrada pelo tribunal → 2 parágrafos aplicando ao caso concreto → pedido que fundamenta.
    Sem [JUR-N] favorável: fundamente só com lei e princípios, nunca invente jurisprudência.
 
 IV — DA TUTELA DE URGÊNCIA (somente se houver urgência concreta nos documentos)
@@ -827,9 +834,12 @@ REGRAS ABSOLUTAS — INVIOLÁVEIS
 1. JURISPRUDÊNCIA E EMENTAS: cite APENAS as decisões rotuladas [JUR-N] acima. Para cada uma: (a) cite a norma interpretada, (b) utilize a ementa fornecida para extrair a tese, (c) desenvolva o argumento, (d) conecte a um pedido. JAMAIS invente ementa, súmula, trecho de julgado ou artigo que não exista.
    ⚠ PROIBIDO ABSOLUTO: escrever "[JUR-1]", "[JUR-2]" ou qualquer "[JUR-N]" no texto final da peça — são marcadores internos de referência. No corpo da peça, cite sempre pelos dados reais: tribunal + número do processo (ex: "STF, RE 603.580/MG"). Apenas no modelo de análise interna os rótulos [JUR-N] existem.
 ${regraLeg}
-3. COMPLETUDE:
-   Desenvolva integralmente cada tese relevante até esgotar: contexto fático → fundamento normativo → jurisprudência aplicável → aplicação ao caso concreto → consequências jurídicas → pedido/conclusão.
-   Peças de mérito (Inicial, Sentença, Recurso): extensas e profundas (2.000–3.500 palavras). Despachos e Decisões simples: concisos.
+3. COMPLETUDE E EXTENSÃO MÍNIMA OBRIGATÓRIA:
+   Desenvolva integralmente cada tese até esgotar: contexto normativo → análise do dispositivo → subsunção ao caso → consequência jurídica → pedido vinculado.
+   — PETIÇÃO INICIAL: a seção III — DO DIREITO sozinha deve ter no mínimo 1.200 palavras. Cada ► TESE deve ter no mínimo 4 parágrafos com 4 linhas cada. Peça completa: mínimo 2.500 palavras.
+   — RECURSO / SENTENÇA: mínimo 2.000 palavras no total.
+   — DESPACHO / DECISÃO: concisos — não force tamanho.
+   Se uma tese ficou com menos de 4 parágrafos, ela está incompleta — reescreva antes de passar para a próxima.
 4. PERSONA E ESTILO:
    - BLACKLIST ABSOLUTA: "vem, respeitosamente", "vem perante Vossa Excelência", "data maxima venia", "nobre julgador", "Douto Juízo", "merece prosperar", "não merece prosperar", "patente que", "resta demonstrado", "resta comprovado", "conforme amplamente demonstrado".
    - "REQUERER" como clichê de abertura: PROIBIDO. Certo: "A autora requer perícia". Errado: "Diante do exposto, requer:", "Ante o exposto, requer a Vossa Excelência:".
