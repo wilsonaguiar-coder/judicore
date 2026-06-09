@@ -155,10 +155,11 @@ Você deve retornar EXATAMENTE e APENAS o JSON no formato abaixo:
 
     let parsed: InitialPetitionAuditReport;
     try {
+      if (!raw) throw new Error("Raw content is empty");
       parsed = JSON.parse(raw) as InitialPetitionAuditReport;
     } catch {
-      console.error(`[PetitionInitialAuditor] JSON parse failed. Raw (first 500 chars): ${rawContent.slice(0, 500)}`);
-      throw new Error(`Auditor retornou JSON inválido: ${rawContent.slice(0, 300)}`);
+      console.error(`[PetitionInitialAuditor] JSON parse failed. Raw: ${rawContent.slice(0, 500)}`);
+      throw new Error(`Auditor retornou JSON inválido. Finish Reason: ${response.choices?.[0]?.finish_reason}. Content length: ${rawContent.length}. Response Dump: ${JSON.stringify(response).slice(0, 300)}`);
     }
 
     return {
