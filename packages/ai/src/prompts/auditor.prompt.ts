@@ -324,13 +324,20 @@ Retorne SOMENTE o JSON, sem texto adicional.`;
 
 /**
  * Retorna as regras especiais por ramo do direito para o prompt de petição inicial.
+ * Usa regime_juridico, tipo_justica e assunto_principal (valores válidos do tipo LegalClassification).
  */
 function getRegrasEspeciaisPorRamo(classification: LegalClassification): string {
-  const tipo = classification.tipo_justica;
+  const regime = classification.regime_juridico;
   const assunto = classification.assunto_principal?.toLowerCase() ?? "";
+  const justica = classification.tipo_justica;
 
-  // RPPS / RGPS
-  if (tipo === "PREVIDENCIARIA" || assunto.includes("rpps") || assunto.includes("rgps") || assunto.includes("aposentadoria") || assunto.includes("pensão")) {
+  // RPPS / RGPS — detectado por regime previdenciário ou assunto
+  if (
+    regime === "RPPS" || regime === "RGPS"
+    || assunto.includes("rpps") || assunto.includes("rgps")
+    || assunto.includes("aposentadoria") || assunto.includes("pensão")
+    || assunto.includes("previdenciário") || assunto.includes("previdenciario")
+  ) {
     return `### RPPS / RGPS
 Não exigir prova completa da vida funcional.
 Se documentos estiverem sob guarda da Administração:
@@ -339,8 +346,36 @@ Se documentos estiverem sob guarda da Administração:
 Não reprovar a peça por ausência de ficha funcional.`;
   }
 
-  // CONSUMIDOR
-  if (tipo === "CONSUMIDOR" || assunto.includes("consumidor") || assunto.includes("cdc")) {
+  // TRABALHISTA — detectado por regime CLT, justiça do trabalho ou assunto
+  if (
+    regime === "CLT"
+    || justica === "TRABALHO"
+    || assunto.includes("trabalhista") || assunto.includes("clt")
+    || assunto.includes("reclamatória") || assunto.includes("reclamatoria")
+  ) {
+    return `### TRABALHISTA
+Considerar aptidão para a prova.
+Não exigir documentos sob guarda do empregador.`;
+  }
+
+  // TRIBUTÁRIO — detectado por regime tributário, execução fiscal ou assunto
+  if (
+    regime === "TRIBUTARIO"
+    || justica === "EXECUCAO_FISCAL"
+    || assunto.includes("tributário") || assunto.includes("tributario")
+    || assunto.includes("imposto") || assunto.includes("taxa")
+    || assunto.includes("execução fiscal") || assunto.includes("execucao fiscal")
+  ) {
+    return `### TRIBUTÁRIO
+Não exigir documentos fiscais inacessíveis ao contribuinte.
+Sugerir requisições administrativas ou judiciais.`;
+  }
+
+  // CONSUMIDOR — detectado por justiça JEC (Juizado Especial Cível) ou assunto CDC
+  if (
+    justica === "JEC"
+    || assunto.includes("consumidor") || assunto.includes("cdc")
+  ) {
     return `### CONSUMIDOR
 Não reprovar pela ausência de documentos produzidos pelo fornecedor.
 Sugerir:
@@ -349,28 +384,20 @@ Sugerir:
 * perícia.`;
   }
 
-  // FAMÍLIA
-  if (tipo === "FAMILIA" || assunto.includes("família") || assunto.includes("alimentos") || assunto.includes("divórcio") || assunto.includes("guarda") || assunto.includes("união estável")) {
+  // FAMÍLIA — detectado por assunto (normalmente na justiça estadual)
+  if (
+    assunto.includes("família") || assunto.includes("familia")
+    || assunto.includes("alimentos")
+    || assunto.includes("divórcio") || assunto.includes("divorcio")
+    || assunto.includes("guarda")
+    || assunto.includes("união estável") || assunto.includes("uniao estavel")
+  ) {
     return `### FAMÍLIA
 Reconhecer a dificuldade de prova direta.
 Valorizar:
 * indícios;
 * prova testemunhal;
 * estudos psicossociais.`;
-  }
-
-  // TRABALHISTA
-  if (tipo === "TRABALHISTA" || assunto.includes("trabalhista") || assunto.includes("clt")) {
-    return `### TRABALHISTA
-Considerar aptidão para a prova.
-Não exigir documentos sob guarda do empregador.`;
-  }
-
-  // TRIBUTÁRIO
-  if (tipo === "TRIBUTARIA" || assunto.includes("tributário") || assunto.includes("imposto") || assunto.includes("taxa")) {
-    return `### TRIBUTÁRIO
-Não exigir documentos fiscais inacessíveis ao contribuinte.
-Sugerir requisições administrativas ou judiciais.`;
   }
 
   // CÍVEL GERAL (default)
