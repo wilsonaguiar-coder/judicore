@@ -47,13 +47,16 @@ export class GenerationPipeline {
       // 2. Extração e Redução LGPD
       const extractor = new DocumentExtractor();
       const reducer = new ContextReducer();
-      let combinedText = "";
 
-      for (const file of files) {
-        const rawText = await extractor.extractText(file.buffer, file.mimeType);
-        const reducedText = reducer.process(rawText, file.category, 80000); // 80k max por arquivo
-        combinedText += `\n[Documento: ${file.category}]\n${reducedText}\n`;
-      }
+      const extractedResults = await Promise.all(
+        files.map(async (file) => {
+          const rawText = await extractor.extractText(file.buffer, file.mimeType);
+          const reducedText = reducer.process(rawText, file.category, 80000); // 80k max por arquivo
+          return `\n[Documento: ${file.category}]\n${reducedText}\n`;
+        })
+      );
+      
+      let combinedText = extractedResults.join("");
 
       if (combinedText.length > 150000) {
         combinedText = combinedText.substring(0, 150000) + "\n...[TRUNCADO PELO SISTEMA]";

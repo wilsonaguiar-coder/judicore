@@ -163,6 +163,37 @@ export interface WriterResponse {
   styleValidation?: StyleValidationResult;
 }
 
+function applyStyleAutoFix(text: string): string {
+  let fixed = text;
+  
+  // Remover saudações arcaicas iniciais
+  fixed = fixed.replace(/vem,\s*respeitosamente,?\s*/gi, "apresenta ");
+  fixed = fixed.replace(/vem\s+perante\s+vossa\s+excel[eê]ncia,?\s*/gi, "apresenta ");
+  fixed = fixed.replace(/vem\s+[aà]\s+presen[cç]a\s+de\s+vossa\s+excel[eê]ncia,?\s*/gi, "apresenta ");
+  
+  // Remover clichês de mérito
+  fixed = fixed.replace(/data\s+maxima\s+venia,?\s*/gi, "");
+  fixed = fixed.replace(/nobre\s+julgador,?\s*/gi, "juízo");
+  fixed = fixed.replace(/douto\s+ju[ií]zo,?\s*/gi, "juízo");
+  fixed = fixed.replace(/n[aã]o\s+merece\s+prosperar/gi, "deve ser rejeitado");
+  fixed = fixed.replace(/merece\s+prosperar/gi, "deve ser acolhido");
+  fixed = fixed.replace(/patente\s+que/gi, "evidente que");
+  fixed = fixed.replace(/resta\s+demonstrado/gi, "está demonstrado");
+  fixed = fixed.replace(/resta\s+comprovado/gi, "está comprovado");
+  fixed = fixed.replace(/conforme\s+amplamente\s+demonstrado/gi, "como demonstrado");
+  
+  // Remover encerramentos arcaicos
+  fixed = fixed.replace(/diante\s+do\s+exposto,?\s+requer/gi, "postula-se");
+  fixed = fixed.replace(/ante\s+o\s+exposto,?\s+requer/gi, "postula-se");
+  fixed = fixed.replace(/pelo\s+exposto,?\s+requer/gi, "postula-se");
+  fixed = fixed.replace(/requer-se/gi, "requer");
+  
+  // Excluir blocos de fechamento inúteis
+  fixed = fixed.replace(/termos\s+em\s+que,?[\s\S]*?pede\s+deferimento\.?/gi, "");
+  
+  return fixed;
+}
+
 export class WriterService {
   static async generatePiece(
     pieceType: string,
@@ -209,7 +240,7 @@ export class WriterService {
 
       for (let attempt = 1; attempt <= 2; attempt++) {
         const result = await caller(systemPrompt, messages, 32768);
-        draft = result.text;
+        draft = applyStyleAutoFix(result.text);
         inputTokens += result.inputTokens;
         outputTokens += result.outputTokens;
 
@@ -233,7 +264,7 @@ export class WriterService {
 
       for (let attempt = 1; attempt <= 2; attempt++) {
         const result = await callGemini(systemPrompt, contents, 32768);
-        draft = result.text;
+        draft = applyStyleAutoFix(result.text);
         inputTokens += result.inputTokens;
         outputTokens += result.outputTokens;
 
