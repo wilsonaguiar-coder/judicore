@@ -4,8 +4,8 @@ import { LegalMatrixBuilderService, LegalMatrix } from "./legal-matrix-builder.s
 import { buildPremiumDocumentPrompt } from "../prompts.js";
 import { StyleLinter, StyleValidationResult } from "./style-linter.js";
 
-const WRITER_PROVIDER: "deepseek" | "gemini" = "deepseek";
-const WRITER_MODEL = "deepseek-v4-pro";
+const WRITER_PROVIDER: "openai" | "deepseek" | "gemini" = "openai";
+const WRITER_MODEL = "gpt-5.5";
 
 function brazilianDate(): string {
   return new Date().toLocaleDateString("pt-BR", {
@@ -14,6 +14,51 @@ function brazilianDate(): string {
     year: "numeric",
     timeZone: "America/Fortaleza",
   });
+}
+
+// ─── OpenAI ───────────────────────────────────────────────────────────────────
+
+async function callOpenAI(
+  systemPrompt: string,
+  messages: { role: "user" | "assistant"; content: string }[],
+  maxTokens = 32768
+): Promise<{ text: string; inputTokens: number; outputTokens: number }> {
+  const apiKey = process.env["OPENAI_API_KEY"];
+  if (!apiKey) throw new Error("OPENAI_API_KEY não definida");
+
+  const response = await fetch("https://api.openai.com/v1/chat/completions", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "Authorization": `Bearer ${apiKey}`,
+    },
+    body: JSON.stringify({
+      model: WRITER_MODEL,
+      temperature: 0.2,
+      max_tokens: maxTokens,
+      messages: [
+        { role: "system", content: systemPrompt },
+        ...messages,
+      ],
+    }),
+  });
+
+  if (!response.ok) {
+    const err = await response.text();
+    throw new Error(`OpenAI Writer Error: ${response.status} — ${err}`);
+  }
+
+  const data = await response.json() as any;
+  const text: string = data.choices?.[0]?.message?.content?.trim() ?? "";
+  const inputTokens: number = data.usage?.prompt_tokens ?? 0;
+  const outputTokens: number = data.usage?.completion_tokens ?? 0;
+  const finishReason: string = data.choices?.[0]?.finish_reason ?? "UNKNOWN";
+
+  if (finishReason === "length") {
+    console.warn(`[Writer] OpenAI atingiu max_tokens (outputTokens=${outputTokens}). Peça pode estar truncada.`);
+  }
+  if (!text) throw new Error("OpenAI não retornou rascunho de peça.");
+  return { text, inputTokens, outputTokens };
 }
 
 // ─── DeepSeek (OpenAI-compatible) ────────────────────────────────────────────
@@ -153,14 +198,15 @@ export class WriterService {
     let outputTokens = 0;
     let styleValidation: StyleValidationResult | undefined;
 
-    if (WRITER_PROVIDER === "deepseek") {
-      // ── DeepSeek loop ──────────────────────────────────────────────────────
+    if (WRITER_PROVIDER === "openai" || WRITER_PROVIDER === "deepseek") {
+      // ── OpenAI / DeepSeek loop (OpenAI-compatible API) ─────────────────────
+      const caller = WRITER_PROVIDER === "openai" ? callOpenAI : callDeepSeek;
       let messages: { role: "user" | "assistant"; content: string }[] = [
         { role: "user", content: userMessage },
       ];
 
       for (let attempt = 1; attempt <= 2; attempt++) {
-        const result = await callDeepSeek(systemPrompt, messages, 32768);
+        const result = await caller(systemPrompt, messages, 32768);
         draft = result.text;
         inputTokens += result.inputTokens;
         outputTokens += result.outputTokens;
