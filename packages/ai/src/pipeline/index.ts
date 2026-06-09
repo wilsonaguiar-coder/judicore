@@ -9,6 +9,7 @@ export type {
   LegalExtraction,
   ArgumentationMatrix,
   LegalAudit,
+  InitialPetitionAuditReport,
   JurisprudenciaInput,
   ValidationResult,
   ValidationError,

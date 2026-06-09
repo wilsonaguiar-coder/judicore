@@ -4,6 +4,7 @@ import { LegalMatrixBuilderService } from "../generation-pipeline/legal-matrix-b
 import type { LegalResearchPack } from "../legal-research/legal-research.service.js";
 import * as fs from "fs";
 import * as path from "path";
+import { PetitionInitialAuditor } from "../pipeline/petition-initial.auditor.js";
 
 async function main() {
   const brief: any = {
@@ -106,8 +107,46 @@ async function main() {
       const outPath = path.join(process.cwd(), "peca_final_regression.md");
       fs.writeFileSync(outPath, finalPiece, "utf-8");
       console.log(`Peça final salva em: ${outPath}`);
+
+      console.log("\n3. Executando Auditoria Estratégica (Fase 13.6.0)...");
+      const auditor = new PetitionInitialAuditor();
+      const classification = {
+          tipo_peca: "PETICAO_INICIAL",
+          regime_juridico: "RPPS",
+          tipo_justica: "FEDERAL",
+          assunto_principal: "Pensão por Morte",
+      } as any;
+
+      const auditStart = Date.now();
+      const { audit: report } = await auditor.audit(
+          finalPiece,
+          classification,
+          matrix as any,
+          brief
+      );
+      const auditElaps = ((Date.now() - auditStart) / 1000).toFixed(1);
+
+      console.log(`Auditoria concluída em ${auditElaps}s!`);
+      console.log(`\n=== RELATÓRIO DE AUDITORIA ===`);
+      console.log(`Veredicto: ${report.verdict} (Score: ${report.score})`);
+      
+      console.log(`\nPrecisão Técnica:`);
+      report.legalCitationIssues?.forEach((i: any) => console.log(`[${i.gravidade}] ${i.tipo}: "${i.trecho}" -> ${i.sugestao}`));
+      
+      console.log(`\nCoerência de Teses:`);
+      report.thesisIssues?.forEach((i: any) => console.log(`[TESE INCORRETA] ${i.problema}`));
+
+      console.log(`\nChecklist Documental:`);
+      report.documentChecklist?.forEach((d: string) => console.log(` - ${d}`));
+
+      console.log(`==============================\n`);
+
+      const auditOutPath = path.join(process.cwd(), "auditoria_regression.json");
+      fs.writeFileSync(auditOutPath, JSON.stringify(report, null, 2), "utf-8");
+      console.log(`Relatório salvo em: ${auditOutPath}`);
+
   } catch (error) {
-      console.error("Erro na geração pelo LLM:", error);
+      console.error("Erro na execução:", error);
   }
 }
 
