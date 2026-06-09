@@ -5,7 +5,7 @@ import { buildPremiumDocumentPrompt } from "../prompts.js";
 import { StyleLinter, StyleValidationResult } from "./style-linter.js";
 
 const WRITER_PROVIDER: "openai" | "deepseek" | "gemini" = "openai";
-const WRITER_MODEL = "gpt-5.5";
+const WRITER_MODEL = "gpt-4.1";
 
 function brazilianDate(): string {
   return new Date().toLocaleDateString("pt-BR", {
@@ -34,7 +34,10 @@ async function callOpenAI(
     },
     body: JSON.stringify({
       model: WRITER_MODEL,
-      max_completion_tokens: maxTokens,
+      // gpt-5.x: max_completion_tokens sem temperature; gpt-4.x: max_tokens com temperature
+      ...(WRITER_MODEL.startsWith("gpt-5")
+        ? { max_completion_tokens: maxTokens }
+        : { max_tokens: maxTokens, temperature: 0.2 }),
       messages: [
         { role: "system", content: systemPrompt },
         ...messages,
