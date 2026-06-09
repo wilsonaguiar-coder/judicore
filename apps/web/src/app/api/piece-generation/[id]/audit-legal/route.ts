@@ -86,7 +86,7 @@ export async function POST(
       },
       body: JSON.stringify({
         model: "gpt-5.5",
-        max_completion_tokens: 4096,
+        max_completion_tokens: 16000,
         messages: [
           { role: "system", content: AUDIT_SYSTEM_PROMPT },
           { role: "user", content: userContent },
