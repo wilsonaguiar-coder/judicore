@@ -5,7 +5,9 @@ export class ThesisCoherenceValidator {
    * Constrói as regras para verificar a coerência das teses com os fatos extraídos.
    */
   static buildPromptRules(brief: PieceBrief): string {
-    const fatosPrincipais = brief.fatosRelevantes?.join("; ") ?? "Fatos não detalhados no brief.";
+    const fatos = brief.fatosRelevantes;
+    const fatosArr = Array.isArray(fatos) ? fatos : (fatos ? [String(fatos)] : []);
+    const fatosPrincipais = fatosArr.length > 0 ? fatosArr.join("; ") : "Fatos não detalhados no brief.";
 
     return `
 ### REGRAS DO THESIS COHERENCE VALIDATOR

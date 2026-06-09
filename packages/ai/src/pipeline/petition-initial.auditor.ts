@@ -8,6 +8,27 @@ import { PieceBrief } from "../generation-pipeline/piece-brief.service.js";
 
 const AUDIT_MODEL = "gpt-5.5";
 
+/** Garante que campos que devem ser arrays sejam arrays, mesmo quando vêm do banco como string. */
+function normalizeBrief(brief: any): PieceBrief {
+  const toArr = (v: any): string[] => {
+    if (Array.isArray(v)) return v;
+    if (typeof v === "string" && v.trim()) return [v];
+    return [];
+  };
+  return {
+    ...brief,
+    fatosRelevantes: toArr(brief?.fatosRelevantes),
+    palavrasChave: toArr(brief?.palavrasChave),
+    tesesIdentificadas: toArr(brief?.tesesIdentificadas),
+    pedidosIdentificados: toArr(brief?.pedidosIdentificados),
+    pontosControvertidos: toArr(brief?.pontosControvertidos),
+    pontosIncontroversos: toArr(brief?.pontosIncontroversos),
+    riscosIdentificados: toArr(brief?.riscosIdentificados),
+    lacunasIdentificadas: toArr(brief?.lacunasIdentificadas),
+    documentosRelevantes: toArr(brief?.documentosRelevantes),
+  };
+}
+
 export class PetitionInitialAuditor {
   async audit(
     draft: string,
@@ -17,10 +38,11 @@ export class PetitionInitialAuditor {
     rankingReport?: unknown
   ): Promise<{ audit: InitialPetitionAuditReport; usage: ServiceUsage }> {
     const client = getOpenAIClient();
+    const normalizedBrief = normalizeBrief(brief);
 
     // Montar as regras de validação baseadas no domínio e contexto
     const legalCitationRules = LegalCitationValidator.buildPromptRules(matrix);
-    const thesisCoherenceRules = ThesisCoherenceValidator.buildPromptRules(brief);
+    const thesisCoherenceRules = ThesisCoherenceValidator.buildPromptRules(normalizedBrief);
     const requestConsistencyRules = RequestConsistencyValidator.buildPromptRules();
     const domainMismatchRules = DomainMismatchValidator.buildPromptRules(classification);
 
