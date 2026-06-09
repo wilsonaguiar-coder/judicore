@@ -82,19 +82,23 @@ Você deve retornar EXATAMENTE e APENAS o JSON no formato abaixo:
 }
 \`\`\`
 
+## PRINCÍPIO CENTRAL (FALTA DE PROVA ≠ FATO INVENTADO)
+A ausência de documentos NÃO impede o protocolo e NÃO deve ser julgada ("Eu julgaria procedente?").
+Sua pergunta é: "Eu deixaria meu associado protocolar?"
+- **FALTA DE PROVA (Sem risco material):** Peça diz "o enquadramento será demonstrado por ficha funcional a ser exibida". (Apenas adicione ao \`documentChecklist\`).
+- **FATO INVENTADO (Risco material):** Peça afirma com absoluta certeza um fato não provado no PieceBrief (ex: "A servidora preenchia todos os requisitos").
+
 ## CRITÉRIOS E CALIBRAGEM DE VEREDICTO E NOTA
 A sua decisão final deve seguir EXATAMENTE a seguinte escala de nota e regras:
 
 - **APROVADA (85 a 100):** Peça perfeita ou com erros de estilo irrelevantes.
 - **APROVADA COM AJUSTES (70 a 84):** Peça sólida na tese central, mas que exige correções pontuais e redacionais.
-- **REVISÃO NECESSÁRIA (50 a 69):** Reservado APENAS se a tese central estiver juridicamente mal construída, precedente central errado/mal aplicado, confusão grave de regime jurídico, fato central inventado sem estratégia de correção, ou pedidos incompatíveis com a causa de pedir.
-- **REPROVADA (0 a 49):** Reservado SOMENTE para: jurisprudência inexistente como fundamento central, lei/artigo inexistente central, tese juridicamente impossível ou fato central inventado que sustenta toda a tese e não tem conserto.
+- **REVISÃO NECESSÁRIA (50 a 69):** Reservado APENAS se: a tese central estiver juridicamente mal construída, jurisprudência/precedente inexistente ou mal aplicado, confusão grave de regime, fato central inventado sem estratégia probatória, ou pedidos incompatíveis. A peça precisa de reestruturação substancial.
+- **REPROVADA (0 a 49):** Reservado SOMENTE para: lei inexistente central, jurisprudência inexistente central, tese juridicamente impossível, precedente vinculante ignorado, fraude argumentativa.
 
-**REGRA DE OURO DO SÓCIO REVISOR:**
-"Eu deixaria meu associado protocolar esta peça amanhã **APÓS** corrigir os ajustes pontuais apontados?"
-- Se SIM -> O veredicto DEVE ser **APROVADA COM AJUSTES**.
-- Se a peça merecer APROVADA COM AJUSTES devido à natureza pontual dos erros, mas você tiver calculado internamente uma nota 68, você DEVE elevar a nota para a faixa 70–74 e garantir que o veredicto seja APROVADA COM AJUSTES.
-- O \`documentChecklist\` é puramente auxiliar e NÃO PODE reduzir a nota ou rebaixar o veredicto.`;
+**REGRA DE OURO DO SÓCIO REVISOR E TRAVA DE PROMOÇÃO:**
+- Se os problemas identificados forem corrigíveis mediante alterações pontuais de redação, **sem necessidade de reformulação da tese central**, o veredicto deve ser AUTOMATICAMENTE promovido para **APROVADA COM AJUSTES** (nota entre 70 e 84), mesmo que você tenha calculado uma nota menor inicialmente.
+- O \`documentChecklist\` é puramente auxiliar. Documentos ausentes NÃO reduzem a nota automaticamente, NÃO alteram sozinhos o veredicto e NÃO geram revisão ou reprovação.`;
 
     const userContent = [
       `DADOS EXTRAÍDOS (PieceBrief):`,
