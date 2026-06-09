@@ -110,7 +110,10 @@ Você deve retornar EXATAMENTE e APENAS o JSON no formato abaixo:
       ],
     });
 
-    const raw = response.choices[0]?.message?.content ?? "{}";
+    const rawContent = response.choices[0]?.message?.content ?? "{}";
+    // Extrai o JSON mesmo que o modelo envolva em bloco markdown ```json ... ```
+    const jsonMatch = rawContent.match(/```(?:json)?\s*([\s\S]*?)```/);
+    const raw = jsonMatch ? jsonMatch[1].trim() : rawContent.trim();
     let parsed: InitialPetitionAuditReport;
     try {
       parsed = JSON.parse(raw) as InitialPetitionAuditReport;
