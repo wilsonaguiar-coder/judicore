@@ -34,7 +34,6 @@ async function callOpenAI(
     },
     body: JSON.stringify({
       model: WRITER_MODEL,
-      temperature: 0.2,
       max_completion_tokens: maxTokens,
       messages: [
         { role: "system", content: systemPrompt },
