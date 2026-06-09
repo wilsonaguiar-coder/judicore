@@ -12,11 +12,17 @@ export class LegalCitationValidator {
       : "Nenhuma norma ou jurisprudência específica foi mapeada na matriz.";
 
     return `
-### REGRAS DO LEGAL CITATION VALIDATOR
+### REGRAS DO LEGAL CITATION VALIDATOR (PRIORIDADE 1: COERÊNCIA MATERIAL - 50%)
 1. Compare todas as leis, artigos e jurisprudências citadas no texto com a LegalMatrix.
 2. ${contextStr}
-3. Se a peça citar jurisprudência, Tema, Súmula ou Dispositivo que NÃO está na matriz, você DEVE apontar no campo \`legalCitationIssues\` com a gravidade "ALERTA CRÍTICO — CITAÇÃO FORA DA MATRIZ" e sugerir a remoção ou revisão.
-4. Verifique se o precedente citado foi aplicado fora de sua ratio decidendi ou se o dispositivo legal está desatualizado (ex: regras de juros antigas).
+3. REGRAS PARA CITAÇÕES FORA DA MATRIZ:
+   - Se for legislação/jurisprudência MATERIAL fora da matriz, classifique como "CITAÇÃO EXTERNA MATERIAL". Verifique:
+     - Se NÃO EXISTE (alucinação): Registre em \`mandatoryChanges\` (ou reprove se for central).
+     - Se existe, mas é inadequada/mal aplicada: Registre em \`mandatoryChanges\`.
+     - Se existe e está correta: Não penalize, apenas valide.
+4. EXCEÇÃO DO CPC (INFRAESTRUTURA PROCESSUAL):
+   - Artigos estruturais do CPC (ex: art. 319, 321, 334, 373, 85, 98, 99, 292) NÃO precisam estar na LegalMatrix e NUNCA geram alerta de alucinação. 
+   - Se mal usados, geram apenas ajustes técnicos (\`recommendedChanges\`).
 `;
   }
 }

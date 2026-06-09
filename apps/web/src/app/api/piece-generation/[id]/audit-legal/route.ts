@@ -51,46 +51,42 @@ export async function POST(
         rankingReport
       );
 
-      // Mapeamento do JSON estruturado para Markdown rico (para não quebrar o Front-end atual)
+      // Mapeamento do JSON estruturado para Markdown rico
       const markdownParts = [];
       markdownParts.push(`## AUDITORIA ESTRATÉGICA DA PETIÇÃO INICIAL`);
       markdownParts.push(`**Veredicto Geral:** ${report.verdict} (Nota: ${report.score}/100)`);
       
       markdownParts.push(`### 1. Pontos Fortes`);
       if (report.strengths?.length > 0) {
-         markdownParts.push(report.strengths.map((s: string) => `- ${s}`).join("\n"));
+         markdownParts.push(report.strengths.map((s: string) => `- ✅ ${s}`).join("\n"));
       } else {
          markdownParts.push("Nenhum ponto forte destacado.");
       }
 
-      markdownParts.push(`### 2. Oportunidades no Texto`);
-      if (report.textIssues?.length > 0) {
-         markdownParts.push(report.textIssues.map((i: any) => `💡 **${i.tipo}** (${i.gravidade}): "${i.trecho}"\n   *Sugestão:* ${i.sugestao}`).join("\n\n"));
+      markdownParts.push(`### 2. Riscos Jurídicos Materiais`);
+      if (report.materialRisks?.length > 0) {
+         markdownParts.push(report.materialRisks.map((i: any) => `⚠️ **${i.category}** (${i.severity}): ${i.issue}\n   *Trecho:* "${i.excerpt || 'N/A'}"\n   *Sugestão:* ${i.suggestion}`).join("\n\n"));
       } else {
-         markdownParts.push("Nenhuma oportunidade de texto identificada.");
+         markdownParts.push("✅ Nenhum risco material grave identificado.");
       }
 
-      markdownParts.push(`### 3. Precisão Técnica (Leis e Jurisprudência)`);
-      if (report.legalCitationIssues?.length > 0) {
-         markdownParts.push(report.legalCitationIssues.map((i: any) => `⚠️ **${i.tipo}** (${i.gravidade}): "${i.trecho}"\n   *Correção:* ${i.sugestao}`).join("\n\n"));
+      markdownParts.push(`### 3. Ajustes Obrigatórios`);
+      if (report.mandatoryChanges?.length > 0) {
+         markdownParts.push(report.mandatoryChanges.map((i: any) => `❌ **${i.category}** (${i.severity}): ${i.issue}\n   *Trecho:* "${i.excerpt || 'N/A'}"\n   *Correção:* ${i.suggestion}`).join("\n\n"));
       } else {
-         markdownParts.push("✅ Nenhuma inadequação de lei ou jurisprudência detectada.");
+         markdownParts.push("✅ Nenhum ajuste obrigatório.");
       }
 
-      markdownParts.push(`### 4. Coerência das Teses e Pedidos`);
-      if (report.thesisIssues?.length > 0) {
-         markdownParts.push(report.thesisIssues.map((i: any) => `❌ **Tese:** ${i.tese}\n   *Problema:* ${i.problema}\n   *Correção:* ${i.correcao}`).join("\n\n"));
-      }
-      if (report.requestIssues?.length > 0) {
-         markdownParts.push(report.requestIssues.map((i: any) => `⚠️ **Pedido:** "${i.trecho}"\n   *Problema:* ${i.problema}\n   *Correção:* ${i.correcao}`).join("\n\n"));
-      }
-      if (!report.thesisIssues?.length && !report.requestIssues?.length) {
-         markdownParts.push("✅ Teses e pedidos coerentes.");
+      markdownParts.push(`### 4. Ajustes Recomendados`);
+      if (report.recommendedChanges?.length > 0) {
+         markdownParts.push(report.recommendedChanges.map((i: any) => `💡 **${i.category}** (${i.severity}): ${i.issue}\n   *Sugestão:* ${i.suggestion}`).join("\n\n"));
+      } else {
+         markdownParts.push("✅ Nenhuma recomendação secundária.");
       }
 
       markdownParts.push(`### 5. Checklist de Documentos para Protocolo`);
       if (report.documentChecklist?.length > 0) {
-         markdownParts.push(report.documentChecklist.map((d: string) => `✅ ${d}`).join("\n"));
+         markdownParts.push(report.documentChecklist.map((d: string) => `- 📎 ${d}`).join("\n"));
       } else {
          markdownParts.push("Nenhum documento específico listado.");
       }

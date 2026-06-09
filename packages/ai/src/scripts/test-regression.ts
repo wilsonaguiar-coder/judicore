@@ -130,13 +130,10 @@ async function main() {
       console.log(`\n=== RELATÓRIO DE AUDITORIA ===`);
       console.log(`Veredicto: ${report.verdict} (Score: ${report.score})`);
       
-      console.log(`\nPrecisão Técnica:`);
-      report.legalCitationIssues?.forEach((i: any) => console.log(`[${i.gravidade}] ${i.tipo}: "${i.trecho}" -> ${i.sugestao}`));
-      
-      console.log(`\nCoerência de Teses:`);
-      report.thesisIssues?.forEach((i: any) => console.log(`[TESE INCORRETA] ${i.problema}`));
-
-      console.log(`\nChecklist Documental:`);
+      console.log(`\nPontos Fortes:`, report.strengths?.length);
+      console.log(`Riscos Materiais:`, report.materialRisks?.length);
+      console.log(`Ajustes Obrigatórios:`, report.mandatoryChanges?.length);
+      console.log(`Checklist:`, report.documentChecklist?.length);
       report.documentChecklist?.forEach((d: string) => console.log(` - ${d}`));
 
       console.log(`==============================\n`);

@@ -10,13 +10,15 @@ export class ThesisCoherenceValidator {
     const fatosPrincipais = fatosArr.length > 0 ? fatosArr.join("; ") : "Fatos não detalhados no brief.";
 
     return `
-### REGRAS DO THESIS COHERENCE VALIDATOR
-1. Avalie se as teses jurídicas defendidas na peça realmente decorrem dos seguintes fatos do caso:
+### REGRAS DO THESIS COHERENCE VALIDATOR (PRIORIDADE 2: FATOS INVENTADOS - 30%)
+1. Avalie se as teses jurídicas e pedidos defendidos na peça decorrem dos seguintes fatos do caso (PieceBrief):
    - Fatos Base: ${fatosPrincipais}
-2. Verifique se há fundamentação jurídica impossível (ex: pedir benefício antes de cumprir requisito temporal evidente).
-3. Verifique se existe tese principal e subsidiária e se elas estão bem separadas ou se há contradição lógica.
-4. Identifique se algum precedente vinculante ou objeção jurídica óbvia foi ignorado pela tese construída.
-5. Registre os problemas em \`thesisIssues\`.
+2. O FOCO é detectar afirmações categóricas sem suporte no PieceBrief (Fatos Inventados). Ex: "houve indeferimento administrativo", "a aposentadoria foi concedida com integralidade", etc., se não constarem nos Fatos Base.
+3. Se detectar um fato inventado:
+   - Apenas aponte: "A peça afirma como fato consolidado informação não presente no PieceBrief: [trecho]."
+   - NÃO sugira reescrever a tese, apenas classifique o risco (ALTA ou CRÍTICA se o fato sustenta toda a tese).
+   - Registre isso em \`materialRisks\`.
+4. Avalie também se há fundamentação materialmente impossível (ex: pedir benefício antes de cumprir requisito temporal óbvio) e registre em \`mandatoryChanges\`.
 `;
   }
 }

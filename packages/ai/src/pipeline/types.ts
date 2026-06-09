@@ -133,22 +133,22 @@ export interface LegalAudit {
   ressalvas?: string[] | undefined;
 }
 
-export interface TextIssue { trecho: string; tipo: string; gravidade: string; sugestao: string; }
-export interface LegalCitationIssue { trecho: string; tipo: string; gravidade: string; sugestao: string; }
-export interface ThesisIssue { tese: string; problema: string; impacto: string; correcao: string; }
-export interface RequestIssue { trecho: string; problema: string; correcao: string; }
+export interface AuditItem {
+  category: string;
+  severity: "BAIXA" | "MÉDIA" | "ALTA" | "CRÍTICA";
+  excerpt?: string;
+  issue: string;
+  suggestion: string;
+}
 
 export interface InitialPetitionAuditReport {
   verdict: "APROVADA" | "APROVADA COM AJUSTES" | "REVISÃO NECESSÁRIA" | "REPROVADA";
   score: number;
   strengths: string[];
-  textIssues: TextIssue[];
-  legalCitationIssues: LegalCitationIssue[];
-  thesisIssues: ThesisIssue[];
-  requestIssues: RequestIssue[];
+  mandatoryChanges: AuditItem[];
+  recommendedChanges: AuditItem[];
+  materialRisks: AuditItem[];
   documentChecklist: string[];
-  mandatoryChanges: string[];
-  recommendedChanges: string[];
 }
 
 export interface ValidationError {
