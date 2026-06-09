@@ -186,7 +186,7 @@ REGRAS DE OURO:
 - Portanto, "aprovada" deve ser quase sempre true e a severidade dos alertas nunca deve ser CRITICO ou ALTO por ausência documental.
 - Use a estrutura JSON solicitada exatamente, pois o sistema depende dela para renderizar a interface.
 
-Retorne SOMENTE o JSON, sem texto adicional.\`;
+Retorne SOMENTE o JSON, sem texto adicional.`;
 }
 
 /**
