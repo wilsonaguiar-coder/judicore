@@ -5,7 +5,7 @@ import { buildPremiumDocumentPrompt } from "../prompts.js";
 import { StyleLinter, StyleValidationResult } from "./style-linter.js";
 
 const WRITER_PROVIDER: "openai" | "deepseek" | "gemini" = "gemini";
-const WRITER_MODEL = "gemini-2.0-flash";
+const WRITER_MODEL = "gemini-2.5-flash";
 
 function brazilianDate(): string {
   return new Date().toLocaleDateString("pt-BR", {
