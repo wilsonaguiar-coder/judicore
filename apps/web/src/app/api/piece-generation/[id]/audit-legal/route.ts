@@ -24,7 +24,11 @@ export async function POST(
     // Apenas petição inicial usa o novo auditor. Para as outras peças, usamos o antigo.
     let auditResult: any;
 
-    if (generation.pieceType === "PETICAO_INICIAL") {
+    const isInitialPetition = generation.pieceType === "PETICAO_INICIAL" || 
+                              generation.pieceType === "Petição Inicial" ||
+                              generation.pieceType.toLowerCase().includes("inicial");
+
+    if (isInitialPetition) {
       const auditor = new PetitionInitialAuditor();
       const brief = snap.pieceBriefJson as any;
       
