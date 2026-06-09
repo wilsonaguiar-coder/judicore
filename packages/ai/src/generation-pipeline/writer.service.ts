@@ -43,7 +43,11 @@ async function callGemini(
   const text: string = data.candidates?.[0]?.content?.parts?.[0]?.text?.trim() ?? "";
   const inputTokens: number = data.usageMetadata?.promptTokenCount ?? 0;
   const outputTokens: number = data.usageMetadata?.candidatesTokenCount ?? 0;
+  const finishReason: string = data.candidates?.[0]?.finishReason ?? "UNKNOWN";
 
+  if (finishReason === "MAX_TOKENS") {
+    console.warn(`[Writer] Gemini atingiu MAX_TOKENS (outputTokens=${outputTokens}). Peça pode estar truncada.`);
+  }
   if (!text) throw new Error("Gemini não retornou rascunho de peça.");
   return { text, inputTokens, outputTokens };
 }
@@ -97,7 +101,7 @@ export class WriterService {
 
     // Loop de auto-correção (Self-Reflection) — máximo 2 tentativas
     for (let attempt = 1; attempt <= 2; attempt++) {
-      const result = await callGemini(systemPrompt, contents, 8192);
+      const result = await callGemini(systemPrompt, contents, 32768);
       draft = result.text;
       inputTokens += result.inputTokens;
       outputTokens += result.outputTokens;
