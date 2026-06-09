@@ -142,7 +142,7 @@ export class GenerationPipeline {
           },
           legalMatrixJson: legalMatrix as any,
           promptSnapshotJson: {
-            hash: "v13.14.0-deepseek-chat",
+            hash: "v13.15.0-gemini35flash",
             versao: "1.0",
             tamanho: writerRes.inputTokens,
             resumoInicial: writerRes.promptSnapshot,

@@ -43,20 +43,35 @@ export async function POST(
 
     const snap = generation.snapshot;
 
+    // Extrai fatos-chave do brief sem enviar JSON completo (reduz tokens)
+    const brief = snap?.pieceBriefJson as any;
+    const briefResumo = brief
+      ? [
+          brief.resumoFatico ?? brief.resumo ?? "",
+          Array.isArray(brief.fatosRelevantes) ? brief.fatosRelevantes.join("; ") : "",
+          Array.isArray(brief.pedidosIdentificados) ? brief.pedidosIdentificados.join("; ") : "",
+        ].filter(Boolean).join("\n")
+      : "Não disponível";
+
+    const qual = snap?.qualificationJson as any;
+    const qualResumo = qual
+      ? Object.entries(qual)
+          .filter(([, v]: any) => v?.value)
+          .map(([k, v]: any) => `${k}: ${v.value}`)
+          .join(", ")
+      : "Não disponível";
+
     const userContent = [
       `TIPO DE PEÇA: ${generation.pieceType}`,
       `ORIENTAÇÃO DO USUÁRIO: ${generation.userOrientation ?? "Não informada"}`,
       "",
-      "--- RESUMO FÁTICO (PieceBrief) ---",
-      JSON.stringify(snap?.pieceBriefJson ?? {}, null, 2),
+      "--- DADOS DO CLIENTE EXTRAÍDOS DOS DOCUMENTOS ---",
+      qualResumo,
       "",
-      "--- DADOS EXTRAÍDOS DOS DOCUMENTOS ---",
-      JSON.stringify(snap?.qualificationJson ?? {}, null, 2),
+      "--- RESUMO FÁTICO ---",
+      briefResumo,
       "",
-      "--- MATRIZ JURÍDICA UTILIZADA ---",
-      JSON.stringify(snap?.legalMatrixJson ?? {}, null, 2),
-      "",
-      "--- PEÇA GERADA ---",
+      "--- PEÇA GERADA PELO WRITER ---",
       generation.generatedText,
     ].join("\n");
 
@@ -85,8 +100,16 @@ export async function POST(
     }
 
     const data = (await response.json()) as any;
-    const auditText: string = data.choices?.[0]?.message?.content?.trim() ?? "";
-    if (!auditText) throw new Error("GPT-5.5 não retornou relatório de auditoria.");
+    const msg = data.choices?.[0]?.message;
+    // GPT-5.5 (reasoning model) pode retornar conteúdo em reasoning_content quando content é null
+    const auditText: string =
+      msg?.content?.trim() || msg?.reasoning_content?.trim() || "";
+    const finishReason: string = data.choices?.[0]?.finish_reason ?? "UNKNOWN";
+    if (!auditText) {
+      throw new Error(
+        `GPT-5.5 não retornou relatório (finish_reason=${finishReason}, tokens=${data.usage?.completion_tokens ?? 0}).`
+      );
+    }
 
     const auditResult = {
       text: auditText,
