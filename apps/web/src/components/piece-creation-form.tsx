@@ -2,7 +2,7 @@
 
 import { useState, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { ArrowLeft, UploadCloud, X, File as FileIcon, FileText, Info, AlertCircle, Copy, Download, Check, CheckCircle2, Loader2 } from "lucide-react";
+import { ArrowLeft, UploadCloud, X, File as FileIcon, FileText, Info, AlertCircle, Copy, Download, Check, CheckCircle2, Loader2, ShieldAlert } from "lucide-react";
 import { useAuthStore } from "@/store/auth";
 import { PieceEvaluationForm } from "./piece-evaluation-form";
 
@@ -166,6 +166,27 @@ export function PieceCreationForm({ title, description, auxiliaryText }: PieceCr
   const [isGenerating, setIsGenerating] = useState(false);
   const [generatedDraft, setGeneratedDraft] = useState<string | null>(null);
   const [generationId, setGenerationId] = useState<string | null>(null);
+  const [isAuditing, setIsAuditing] = useState(false);
+  const [auditResult, setAuditResult] = useState<string | null>(null);
+  const [showAuditModal, setShowAuditModal] = useState(false);
+
+  const handleAudit = async () => {
+    if (!generationId) return;
+    setIsAuditing(true);
+    try {
+      const res = await fetch(`/api/piece-generation/${generationId}/audit-legal`, {
+        method: "POST",
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Falha na auditoria");
+      setAuditResult(data.audit?.text ?? "Sem resultado.");
+      setShowAuditModal(true);
+    } catch (err: any) {
+      alert("Erro na auditoria: " + err.message);
+    } finally {
+      setIsAuditing(false);
+    }
+  };
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files.length > 0) {
@@ -253,6 +274,48 @@ export function PieceCreationForm({ title, description, auxiliaryText }: PieceCr
   if (generatedDraft) {
     return (
       <div className="flex flex-col flex-1 h-full max-w-6xl mx-auto w-full pb-20 relative animate-in fade-in zoom-in-95 duration-300">
+
+        {/* Modal de Auditoria */}
+        {showAuditModal && auditResult && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/80 backdrop-blur-sm">
+            <div className="bg-white rounded-2xl shadow-2xl w-full max-w-3xl mx-4 flex flex-col max-h-[90vh]">
+              <div className="flex items-center justify-between px-6 py-4 border-b border-slate-200">
+                <div className="flex items-center gap-2">
+                  <ShieldAlert className="w-5 h-5 text-amber-500" />
+                  <h3 className="text-lg font-bold text-slate-800">Relatório de Auditoria Jurídica</h3>
+                  <span className="text-xs bg-slate-100 text-slate-500 px-2 py-0.5 rounded-full font-medium">GPT-5.5</span>
+                </div>
+                <button
+                  onClick={() => setShowAuditModal(false)}
+                  className="text-slate-400 hover:text-slate-700 transition-colors p-1"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+              <div className="overflow-y-auto flex-1 p-6">
+                <pre className="text-slate-700 whitespace-pre-wrap font-sans text-sm leading-relaxed">{auditResult}</pre>
+              </div>
+              <div className="px-6 py-4 border-t border-slate-100 flex justify-end gap-2">
+                <button
+                  onClick={() => {
+                    navigator.clipboard.writeText(auditResult);
+                  }}
+                  className="flex items-center px-3 py-1.5 text-sm bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg transition-colors"
+                >
+                  <Copy className="w-4 h-4 mr-1.5" />
+                  Copiar relatório
+                </button>
+                <button
+                  onClick={() => setShowAuditModal(false)}
+                  className="px-4 py-1.5 text-sm bg-slate-800 hover:bg-slate-700 text-white rounded-lg transition-colors"
+                >
+                  Fechar
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
         <div className="flex items-center mb-6 justify-between">
           <div className="flex items-center">
             <button onClick={() => setGeneratedDraft(null)} className="flex items-center text-slate-500 hover:text-slate-800 transition-colors mr-4">
@@ -262,19 +325,29 @@ export function PieceCreationForm({ title, description, auxiliaryText }: PieceCr
             <h2 className="text-2xl font-bold text-slate-800">{title} (Rascunho)</h2>
           </div>
           <div className="flex items-center gap-3">
-            <button 
+            <button
               onClick={handleCopy}
               className="flex items-center px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded-lg text-sm font-medium transition-colors"
             >
               {copied ? <Check className="w-4 h-4 mr-2 text-green-400" /> : <Copy className="w-4 h-4 mr-2" />}
               {copied ? "Copiado!" : "Copiar"}
             </button>
-            <button 
+            <button
               onClick={handleDownload}
               className="flex items-center px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg text-sm font-medium transition-colors"
             >
               <Download className="w-4 h-4 mr-2" />
               Baixar (.txt)
+            </button>
+            <button
+              onClick={handleAudit}
+              disabled={isAuditing || !generationId}
+              className="flex items-center px-4 py-2 bg-amber-500 hover:bg-amber-600 disabled:bg-amber-300 text-white rounded-lg text-sm font-medium transition-colors"
+            >
+              {isAuditing
+                ? <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                : <ShieldAlert className="w-4 h-4 mr-2" />}
+              {isAuditing ? "Auditando..." : "Auditar"}
             </button>
           </div>
         </div>
@@ -283,7 +356,7 @@ export function PieceCreationForm({ title, description, auxiliaryText }: PieceCr
           <div className="flex-1 w-full bg-white border border-slate-200 rounded-2xl p-8 overflow-y-auto max-h-[75vh] shadow-sm">
             <pre className="text-slate-800 whitespace-pre-wrap font-sans text-base leading-relaxed">{generatedDraft}</pre>
           </div>
-          
+
           <div className="w-full xl:w-[320px] shrink-0 xl:-mt-6">
             {generationId && <PieceEvaluationForm generationId={generationId} />}
           </div>

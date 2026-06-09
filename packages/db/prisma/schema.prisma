@@ -426,6 +426,7 @@ model PieceGenerationSnapshot {
   researchSummaryJson Json     @map("research_summary_json")
   legalMatrixJson     Json     @map("legal_matrix_json")
   promptSnapshotJson  Json     @map("prompt_snapshot_json")
+  legalAuditJson      Json?    @map("legal_audit_json")
   createdAt           DateTime @default(now()) @map("created_at")
 
   generation PieceGeneration @relation(fields: [generationId], references: [id], onDelete: Cascade)
