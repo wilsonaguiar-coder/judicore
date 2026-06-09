@@ -684,7 +684,10 @@ ESTRUTURA OBRIGATÓRIA — siga exatamente esta ordem e numeração:
   [FECHAMENTO]
 
 ⚠ PROIBIDO criar qualquer seção fora desta lista — especialmente "DAS PROVAS", "DA PROVA", "DO CABIMENTO" ou "DA COMPETÊNCIA" como seções autônomas. Provas pertencem a II (fatos) ou ao rol de pedidos em VI; nunca em seção separada.
+⚠ PROIBIDO renomear seções. "III — DO DIREITO" deve aparecer exatamente assim — não "III — DOS FUNDAMENTOS JURÍDICOS", "III — DAS RAZÕES JURÍDICAS", "III — DO EMBASAMENTO JURÍDICO" nem qualquer variação.
 ⚠ NUMERAÇÃO: se IV e/ou V forem omitidas, VI e VII MANTÊM seus números — não renumere para IV e V.
+⚠ PROIBIDO usar subseções numeradas (1., 2., 3.) dentro de III — DO DIREITO. Use exclusivamente o formato ► TESE [número].
+⚠ VII — DO VALOR DA CAUSA é OBRIGATÓRIA em toda petição inicial — não pode ser omitida.
 
 ───────────────────────────────────────────────────
 ENDEREÇAMENTO
@@ -846,7 +849,14 @@ ${regraLeg}
    - REDAÇÃO POSITIVA: "A prova documental evidencia que" (não "Resta cabalmente demonstrado que").
    - Petição/Recurso: Especialista Sênior — técnico, direto, parcial. Sentença/Decisão/Despacho: Magistrado — imparcial, imperativo.
 5. DADOS: JAMAIS invente nomes, CPF, datas, valores ou processos não presentes nos documentos. Use os dados reais do bloco QUALIFICAÇÃO acima.
-6. CHECKLIST: □ usei os dados reais da qualificação? □ os títulos das seções aparecem exatamente como especificado? □ todas as seções obrigatórias estão presentes? □ cada [JUR-N] usada tem tese extraída + argumento + pedido vinculado? □ eliminei toda a blacklist de estilo?
+6. CHECKLIST OBRIGATÓRIO (verifique antes de encerrar):
+   □ Usei os dados reais da qualificação (nome, CPF, endereço reais)?
+   □ Os títulos aparecem EXATAMENTE como especificado (I — DA QUALIFICAÇÃO DAS PARTES, II — DOS FATOS, III — DO DIREITO, VI — DOS PEDIDOS, VII — DO VALOR DA CAUSA)?
+   □ III — DO DIREITO tem mínimo 4 teses no formato ► TESE [número], cada uma com 4 parágrafos?
+   □ VII — DO VALOR DA CAUSA está presente? (NUNCA pode ser omitida em petição inicial)
+   □ O [FECHAMENTO] com Local/data/assinatura está presente?
+   □ Cada [JUR-N] usada tem: tese extraída + 2 parágrafos de argumento + pedido vinculado?
+   □ Eliminei toda a blacklist de estilo?
 
 TAREFA:
 ${tarefaByType[type]}`;

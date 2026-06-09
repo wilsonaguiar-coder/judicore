@@ -53,10 +53,10 @@ export class QualificationExtractor {
       cep:            notFound(),
     };
 
-    // CPF — prioridade 1: prefixo explícito "CPF:" (comum em OCR de CNH/RG)
-    // Normaliza os dígitos e reformata para XXX.XXX.XXX-XX
+    // CPF — prioridade 1: prefixo explícito "CPF" seguido de até 15 chars não-dígitos
+    // Cobre: "CPF:", "CPF nº", "CPF n.", "CPF n°", "CPF - ", "CPF no.", etc.
     const cpfPrefixado = text.match(
-      /(?:CPF|C\.P\.F\.)\s*[:\s.]{0,3}(\d{3}[.\s-]?\d{3}[.\s-]?\d{3}[.\s-]?\d{2})/i
+      /(?:CPF|C\.P\.F\.)[^0-9]{0,15}(\d{3}[.\s-]?\d{3}[.\s-]?\d{3}[.\s-]?\d{2})/i
     );
     if (cpfPrefixado) {
       const digits = cpfPrefixado[1].replace(/\D/g, "");
